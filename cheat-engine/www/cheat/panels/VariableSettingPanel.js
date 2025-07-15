@@ -213,7 +213,17 @@ export default {
                     // Get only the original names for translation
                     const originalNames = this.tableItems.map(item => item.originalName)
 
-                    // First, update all cached translations instantly
+                    // Check if using JP→KR endpoint
+                    const endPointData = TRANSLATE_SETTINGS.getEndPointData()
+                    const isJpToKr = endPointData.id === 'ezTransWeb' || endPointData.id === 'ezTransServer'
+
+                    if (isJpToKr) {
+                        console.log('Using original translation method for JP→KR endpoint')
+                        await this.translateWithOriginalMethod(originalNames)
+                        return
+                    }
+
+                    // For other endpoints, use the new cached/batch method
                     const cacheResults = this.applyCachedTranslations(originalNames)
                     const needsTranslation = cacheResults.uncachedIndices.length
 
@@ -278,6 +288,44 @@ export default {
 
                 this.isTranslating = false
                 this.translationProgress = 0
+            }
+        },
+
+        async translateWithOriginalMethod (originalNames) {
+            console.log('🔄 Using original translation method for JP→KR')
+
+            // Show progress during translation
+            this.progressInterval = setInterval(() => {
+                if (this.translationProgress < 90) {
+                    this.translationProgress = Math.min(this.translationProgress + 10, 90)
+                }
+            }, 200)
+
+            try {
+                // Use the original bulk translation method
+                const translatedNames = await TRANSLATOR.translateBulk(originalNames)
+
+                // Update display names with translated results
+                this.tableItems.forEach((item, index) => {
+                    if (translatedNames[index]) {
+                        item.displayName = translatedNames[index]
+                    }
+                })
+
+                this.translationProgress = 100
+                console.log('✅ Original method translation completed')
+
+            } finally {
+                // Clean up progress
+                if (this.progressInterval) {
+                    clearInterval(this.progressInterval)
+                    this.progressInterval = null
+                }
+
+                setTimeout(() => {
+                    this.isTranslating = false
+                    this.translationProgress = 0
+                }, 500)
             }
         },
 
