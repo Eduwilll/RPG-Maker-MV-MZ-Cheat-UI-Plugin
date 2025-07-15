@@ -152,7 +152,10 @@ export default {
         </v-switch>
         <span class="caption grey--text">
             Batch mode combines multiple texts with delimiters, dramatically reducing API calls.<br/>
-            Example: 200 variables → 4-8 API calls instead of 200 individual calls.
+            Example: 200 variables → 4-8 API calls instead of 200 individual calls.<br/>
+            <span v-if="isJpToKrEndpoint" class="orange--text font-weight-bold">
+                ⚠️ JP→KR endpoints use original method (batch mode disabled for compatibility)
+            </span>
         </span>
     </v-card-text>
 
@@ -337,6 +340,10 @@ export default {
             }
 
             return `Recommended chunk size for ${this.selectedDefaultEndPoint.name} : ${RECOMMEND_CHUNK_SIZE[this.endPointSelection]}`
+        },
+
+        isJpToKrEndpoint () {
+            return this.endPointSelection === 'ezTransWeb' || this.endPointSelection === 'ezTransServer'
         }
     },
 

@@ -166,16 +166,17 @@ export const BATCH_TRANSLATION = {
     // Maximum characters per batch request
     maxBatchLength: {
         lingva: 1500,      // Conservative for URL length
-        ezTransWeb: 5000,
-        ezTransServer: 3000
+        // Note: ezTrans services use original method, not batch
     },
 
     // Maximum items per batch
     maxBatchItems: {
         lingva: 50,        // Can fit many short variable names
-        ezTransWeb: 200,
-        ezTransServer: 100
-    }
+        // Note: ezTrans services use original method, not batch
+    },
+
+    // Services that should NOT use batch translation
+    excludeFromBatch: ['ezTransWeb', 'ezTransServer']
 }
 
 
@@ -325,8 +326,17 @@ class Translator {
 
         const epData = this.settings.getEndPointData()
         const requestedChunkSize = this.settings.getBulkTranslateChunkSize()
-        const safeChunkSize = this.getAdaptiveChunkSize(requestedChunkSize, epData.id || 'unknown')
 
+        // Check if this is a JP→KR endpoint (ezTrans services)
+        const isJpToKr = epData.id === 'ezTransWeb' || epData.id === 'ezTransServer'
+
+        if (isJpToKr) {
+            console.log(`Using original translation method for JP→KR endpoint: ${epData.id}`)
+            return await this.translateBulkOriginal(cleanedTexts)
+        }
+
+        // For other endpoints, use the new batch system
+        const safeChunkSize = this.getAdaptiveChunkSize(requestedChunkSize, epData.id || 'unknown')
         console.log(`Requested chunk size: ${requestedChunkSize}, Using safe size: ${safeChunkSize}`)
 
         // Check cache statistics
@@ -350,6 +360,26 @@ class Translator {
 
         const result = [].concat(...textsChunk)
         console.log(`Translation completed. Input: ${texts.length}, Output: ${result.length}`)
+        return result
+    }
+
+    async translateBulkOriginal (texts) {
+        console.log(`🔄 Using original translation method for ${texts.length} texts`)
+
+        // Use the original repository's bulk translation logic
+        const chunkSize = this.settings.getBulkTranslateChunkSize()
+        const textsChunk = []
+
+        for (let i = 0; i < texts.length; i += chunkSize) {
+            const chunk = texts.slice(i, Math.min(texts.length, i + chunkSize))
+            console.log(`Processing chunk ${Math.floor(i / chunkSize) + 1}: ${chunk.length} items`)
+
+            // Use the original __translateBulk method
+            textsChunk.push(await this.__translateBulk(chunk))
+        }
+
+        const result = [].concat(...textsChunk)
+        console.log(`✅ Original translation completed. Input: ${texts.length}, Output: ${result.length}`)
         return result
     }
 
