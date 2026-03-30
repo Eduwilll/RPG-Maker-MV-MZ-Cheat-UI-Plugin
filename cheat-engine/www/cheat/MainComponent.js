@@ -4,8 +4,8 @@ import { GeneralCheat } from './js/CheatHelper.js'
 import AlertSnackbar from './components/AlertSnackbar.js'
 import ConfirmDialog from './components/ConfirmDialog.js'
 import { customizeRPGMakerFunctions } from './init/customize_functions.js'
-import {Key} from './js/KeyCodes.js'
-import {Alert} from'./js/AlertHelper.js'
+import { Key } from './js/KeyCodes.js'
+import { Alert } from './js/AlertHelper.js'
 
 export default {
     name: 'MainComponent',
@@ -33,7 +33,7 @@ export default {
     }
     `,
 
-    data () {
+    data() {
         return {
             currentKey: Key.createEmpty(),
             show: false,
@@ -41,7 +41,7 @@ export default {
         }
     },
 
-    created () {
+    created() {
         const self = this
 
         customizeRPGMakerFunctions(self)
@@ -60,7 +60,7 @@ export default {
         this.checkVersion()
     },
 
-    beforeDestroy () {
+    beforeDestroy() {
         window.removeEventListener('keydown', this.onGlobalKeyDown)
         window.removeEventListener('keyup', this.onGlobalKeyUp)
     },
@@ -68,13 +68,13 @@ export default {
     watch: {
         show: {
             immediate: true,
-            handler (value) {
+            handler(value) {
             }
         }
     },
 
     methods: {
-        onGlobalKeyDown (e) {
+        onGlobalKeyDown(e) {
             if (e.repeat) {
                 GLOBAL_SHORTCUT.runKeyRepeatEvent(e, Key.fromKey(this.currentKey))
             } else {
@@ -85,13 +85,13 @@ export default {
             }
         },
 
-        onGlobalKeyUp (e) {
+        onGlobalKeyUp(e) {
             GLOBAL_SHORTCUT.runKeyLeaveEvent(e, Key.fromKey(this.currentKey))
             this.currentKey.remove(e.keyCode)
             GLOBAL_SHORTCUT.runKeyEnterEvent(e, Key.fromKey(this.currentKey))
         },
 
-        openCheatModal (componentName) {
+        openCheatModal(componentName) {
             if (componentName) {
                 this.currentComponentName = componentName
             }
@@ -99,7 +99,7 @@ export default {
             this.show = true
         },
 
-        toggleCheatModal (componentName) {
+        toggleCheatModal(componentName) {
             const prevComponentName = this.currentComponentName
 
             if (componentName) {
@@ -119,7 +119,7 @@ export default {
             this.show = true
         },
 
-        async checkVersion () {
+        async checkVersion() {
             if (!Utils.isNwjs()) {
                 return
             }
@@ -141,7 +141,7 @@ export default {
             }
         },
 
-        getCurrentCheatVersion () {
+        getCurrentCheatVersion() {
             try {
                 const targetDir = Utils.RPGMAKER_NAME === 'MV' ? 'www' : '.'
 

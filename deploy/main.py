@@ -97,7 +97,7 @@ if __name__ == '__main__':
 
     for game_type in GameTypes:
         if os.path.exists(paths.temp_root_path):
-            shutil.rmtree(paths.temp_root_path)
+            shutil.rmtree(paths.temp_root_path, ignore_errors=True)
 
         # copy js sources to temp directory
         shutil.copytree(paths.origin.root_dir, paths.temp.root_dir)
@@ -116,14 +116,16 @@ if __name__ == '__main__':
             paths.temp.get_js_source_path())
 
         # remove initialize path
-        shutil.rmtree(paths.temp.get_initialize_path())
+        if os.path.exists(paths.temp.get_initialize_path()):
+            shutil.rmtree(paths.temp.get_initialize_path(), ignore_errors=True)
 
         # compress to zip file
         idea_dir_path = os.path.join(paths.temp.root_dir, '.idea')
         if os.path.exists(idea_dir_path):
-            shutil.rmtree(idea_dir_path)
+            shutil.rmtree(idea_dir_path, ignore_errors=True)
         create_cheat_version_file(args.version, paths)
         shutil.make_archive(paths.get_output_file_path(game_type, args.version), 'gztar', paths.temp.root_dir)
 
         # remove temp directory
-        shutil.rmtree(paths.temp_root_path)
+        if os.path.exists(paths.temp_root_path):
+            shutil.rmtree(paths.temp_root_path, ignore_errors=True)

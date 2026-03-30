@@ -1,6 +1,5 @@
 import {ConfirmDialog} from '../js/DialogHelper.js'
-import {TRANSLATOR} from '../js/TranslateHelper.js'
-import {TRANSLATE_SETTINGS} from '../js/TranslateHelper.js'
+import {TRANSLATOR, TRANSLATE_SETTINGS, TRANSLATION_BANK} from '../js/TranslateHelper.js'
 
 export default {
     name: 'SwitchSettingPanel',
@@ -115,12 +114,12 @@ export default {
                 this.manualRefresh()
             }
         }
-        window.addEventListener('cheat-translate-start', this._translateListener)
+        window.addEventListener('cheat-translate-finish', this._translateListener)
     },
 
     beforeDestroy () {
         if (this._translateListener) {
-            window.removeEventListener('cheat-translate-start', this._translateListener)
+            window.removeEventListener('cheat-translate-finish', this._translateListener)
         }
     },
 
@@ -147,7 +146,7 @@ export default {
 
     methods: {
         async initializeVariables () {
-            this.switchNames = await this.getSwitchNames()
+            this.switchNames = this.getSwitchNames()
 
             this.tableItems = this.switchNames.map((switchName, idx) => {
                 return {
@@ -158,14 +157,19 @@ export default {
             })
         },
 
-        async getSwitchNames () {
+        getSwitchNames () {
             const rawSwitchNames = $dataSystem.switches.slice()
+            const translateEnabled = TRANSLATE_SETTINGS.isSwitchTranslateEnabled()
 
-            if (TRANSLATE_SETTINGS.isSwitchTranslateEnabled()) {
-                return await TRANSLATOR.translateBulk(rawSwitchNames)
-            }
-
-            return rawSwitchNames
+            return rawSwitchNames.map((name, idx) => {
+                if (translateEnabled && name && name.trim()) {
+                    const cached = TRANSLATION_BANK.get(name)
+                    if (cached) {
+                        return cached.translated
+                    }
+                }
+                return name || `Switch ${idx}`
+            })
         },
 
         async manualRefresh () {

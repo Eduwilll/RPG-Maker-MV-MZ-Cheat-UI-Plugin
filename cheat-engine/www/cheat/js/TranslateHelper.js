@@ -1,4 +1,5 @@
 import { KeyValueStorage } from './KeyValueStorage.js'
+import { Alert } from './AlertHelper.js'
 
 // Translation Bank for caching translations
 class TranslationBank {
@@ -50,7 +51,9 @@ class TranslationBank {
 
     // Create consistent cache key
     createKey(text) {
-        return text.trim().toLowerCase()
+        if (!text || typeof text !== 'string') return ''
+        // Normalize whitespace and newlines for consistent lookup
+        return text.trim().toLowerCase().replace(/\s+/g, ' ')
     }
 
     // Get cache statistics
@@ -172,6 +175,32 @@ export const DEFAULT_END_POINTS = {
             isLocal: true,
             localDomain: 'http://localhost:3000'
         }
+    },
+    lingvaLocalBalanced: {
+        id: 'lingvaLocalBalanced',
+        name: 'Local Lingva Docker (Ports 3000, 3001, 3002 Load Balanced, JA → EN)',
+        helpUrl: 'https://github.com/thedaviddelta/lingva-translate',
+        data: {
+            method: 'get',
+            urlPattern: `http://localhost:3000/api/v1/ja/en/${END_POINT_URL_PATTERN_TEXT_SYMBOL}`,
+            isLingva: true,
+            sourceLang: 'ja',
+            isLocal: true,
+            localDomain: 'http://localhost:3000,http://localhost:3001,http://localhost:3002'
+        }
+    },
+    lingvaLocalBalancedAuto: {
+        id: 'lingvaLocalBalancedAuto',
+        name: 'Local Lingva Docker (Ports 3000, 3001, 3002 Load Balanced, Auto → EN)',
+        helpUrl: 'https://github.com/thedaviddelta/lingva-translate',
+        data: {
+            method: 'get',
+            urlPattern: `http://localhost:3000/api/v1/auto/en/${END_POINT_URL_PATTERN_TEXT_SYMBOL}`,
+            isLingva: true,
+            sourceLang: 'auto',
+            isLocal: true,
+            localDomain: 'http://localhost:3000,http://localhost:3001,http://localhost:3002'
+        }
     }
 }
 
@@ -181,7 +210,9 @@ export const RECOMMEND_CHUNK_SIZE = {
     lingva: 10,
     lingvaJa: 10,
     lingvaLocal: 50,
-    lingvaLocalAuto: 50
+    lingvaLocalAuto: 50,
+    lingvaLocalBalanced: 100,
+    lingvaLocalBalancedAuto: 100
 }
 
 // Maximum safe chunk sizes for different services
@@ -191,7 +222,9 @@ export const MAX_CHUNK_SIZE = {
     lingva: 20,  // Lingva has stricter limits
     lingvaJa: 20,
     lingvaLocal: 100,
-    lingvaLocalAuto: 100
+    lingvaLocalAuto: 100,
+    lingvaLocalBalanced: 200,
+    lingvaLocalBalancedAuto: 200
 }
 
 // Optimal parallel request limits
@@ -200,8 +233,10 @@ export const MAX_PARALLEL_REQUESTS = {
     ezTransServer: 20,
     lingva: 5,   // Conservative for public API
     lingvaJa: 5,
-    lingvaLocal: 20,
-    lingvaLocalAuto: 20
+    lingvaLocal: 30,
+    lingvaLocalAuto: 30,
+    lingvaLocalBalanced: 100, // Maximized concurrency for heavy load balancing mapping
+    lingvaLocalBalancedAuto: 100
 }
 
 // Batch translation settings
@@ -277,8 +312,18 @@ class Translator {
         const epData = this.settings.getEndPointData();
         const sourceLang = epData.sourceLang || 'auto';
 
-        // Use custom URL if it's the local instance, otherwise use the public API
-        const baseDomain = epData.isLocal ? (epData.localDomain || 'http://localhost:3000') : 'https://lingva.ml';
+        // Load balancing router for local docker arrays
+        let baseDomain = 'https://lingva.ml';
+        if (epData.isLocal) {
+            const domains = (epData.localDomain || 'http://localhost:3000').split(',');
+            if (typeof this._rrIndex === 'undefined') {
+                this._rrIndex = 0;
+            }
+            baseDomain = domains[this._rrIndex % domains.length].trim();
+            console.log(`[Load Balancer] Sending bulk query chunk to: ${baseDomain}`);
+            this._rrIndex++;
+        }
+
         const primaryEndpoint = `${baseDomain}/api/v1/${sourceLang}/en/${encodeURIComponent(text)}`
 
         try {
@@ -380,7 +425,7 @@ class Translator {
         }
 
         // Clean up texts and preserve original indices
-        const cleanedTexts = texts.map(text => text ? text.replace('\n', '') : text)
+        const cleanedTexts = texts.map(text => text ? text.trim() : text)
 
         const epData = this.settings.getEndPointData()
         const requestedChunkSize = this.settings.getBulkTranslateChunkSize()
@@ -517,8 +562,14 @@ class Translator {
             // Reconstruct the original array with translations
             const results = new Array(batch.length)
             textMap.forEach(mapping => {
+                const originalStr = batch[mapping.originalIndex];
+
                 if (mapping.batchIndex >= 0 && mapping.batchIndex < translatedParts.length) {
-                    results[mapping.originalIndex] = translatedParts[mapping.batchIndex].trim()
+                    const translatedStr = translatedParts[mapping.batchIndex].trim();
+                    results[mapping.originalIndex] = translatedStr;
+
+                    // The core bugfix! We must cache the granular strings back into the bank so other tabs skip them
+                    TRANSLATION_BANK.set(originalStr, translatedStr);
                 } else {
                     results[mapping.originalIndex] = batch[mapping.originalIndex] || ''
                 }
@@ -555,22 +606,38 @@ class Translator {
         const batches = this.createBatches(chunk, endPointId)
         console.log(`📦 Created ${batches.length} batches from ${chunk.length} items`)
 
-        const allResults = []
+        const allResults = new Array(batches.length)
+        const maxParallel = MAX_PARALLEL_REQUESTS[endPointId] || 5;
+        let currentIndex = 0;
 
-        for (let i = 0; i < batches.length; i++) {
-            const batch = batches[i]
-            console.log(`🔄 Processing batch ${i + 1}/${batches.length} (${batch.length} items)`)
+        // Concurrent processing pool
+        const worker = async () => {
+            while (currentIndex < batches.length) {
+                const i = currentIndex++;
+                const batch = batches[i];
+                console.log(`🔄 Processing batch ${i + 1}/${batches.length} (${batch.length} items) on parallel thread`);
 
-            const batchResults = await this.translateBatch(batch)
-            allResults.push(...batchResults)
+                try {
+                    allResults[i] = await this.translateBatch(batch);
+                } catch (error) {
+                    console.error('Batch failed:', error);
+                    allResults[i] = batch; // fallback securely
+                }
 
-            // Delay between batches to be respectful
-            if (i < batches.length - 1) {
-                await new Promise(resolve => setTimeout(resolve, 300))
+                // Add a micro-delay inside threads for local stability
+                await new Promise(resolve => setTimeout(resolve, 50));
             }
+        };
+
+        const workers = [];
+        for (let j = 0; j < Math.min(maxParallel, batches.length); j++) {
+            workers.push(worker());
         }
 
-        return allResults
+        // Wait for all workers to complete processing batches concurrently
+        await Promise.all(workers);
+
+        return allResults.flat()
     }
 
     async translateAllGlobals() {
@@ -583,65 +650,92 @@ class Translator {
         let toTranslate = [];
 
         if (targets.variables && window.$dataSystem && window.$dataSystem.variables) {
-            toTranslate.push({ type: 'Variables', list: window.$dataSystem.variables.slice()})
+            toTranslate.push({ type: 'Variables', list: window.$dataSystem.variables.slice() })
         }
         if (targets.switches && window.$dataSystem && window.$dataSystem.switches) {
-            toTranslate.push({ type: 'Switches', list: window.$dataSystem.switches.slice()})
+            toTranslate.push({ type: 'Switches', list: window.$dataSystem.switches.slice() })
         }
         if (targets.maps && window.$dataMapInfos) {
             const rawNames = window.$dataMapInfos.map(m => m ? m.name : '')
             toTranslate.push({ type: 'Maps', list: rawNames })
         }
-        
+
+        // Comprehensive Database Extraction
+        const extractText = (arr) => arr.filter(i => i).flatMap(i => [i.name, i.description].filter(Boolean));
+
+        if (targets.items && window.$dataItems) {
+            toTranslate.push({ type: 'Items', list: extractText(window.$dataItems) })
+        }
+        if (targets.weapons && window.$dataWeapons) {
+            toTranslate.push({ type: 'Weapons', list: extractText(window.$dataWeapons) })
+        }
+        if (targets.armors && window.$dataArmors) {
+            toTranslate.push({ type: 'Armors', list: extractText(window.$dataArmors) })
+        }
+        if (targets.skills && window.$dataSkills) {
+            toTranslate.push({ type: 'Skills', list: extractText(window.$dataSkills) })
+        }
+        if (targets.states && window.$dataStates) {
+            toTranslate.push({ type: 'States', list: extractText(window.$dataStates) })
+        }
+        if (targets.classes && window.$dataClasses) {
+            toTranslate.push({ type: 'Classes', list: extractText(window.$dataClasses) })
+        }
+        if (targets.enemies && window.$dataEnemies) {
+            toTranslate.push({ type: 'Enemies', list: extractText(window.$dataEnemies) })
+        }
+
         let totalUncached = 0;
         let uncachedItemsMap = new Map();
-        
+
         toTranslate.forEach(target => {
-            const uncached = [];
+            const uncachedSet = new Set();
             target.list.forEach((item) => {
-                if (item && item.trim()) {
+                if (item && typeof item === 'string' && item.trim()) {
                     if (!TRANSLATION_BANK.get(item)) {
-                        uncached.push(item);
-                        totalUncached++;
+                        uncachedSet.add(item);
                     }
                 }
             })
-            if (uncached.length > 0) {
-                uncachedItemsMap.set(target.type, uncached);
+            if (uncachedSet.size > 0) {
+                uncachedItemsMap.set(target.type, Array.from(uncachedSet));
+                totalUncached += uncachedSet.size;
             }
         });
-        
+
         if (totalUncached === 0) {
             TRANSLATE_PROGRESS.update(false, 100, 'All Cached');
             setTimeout(() => TRANSLATE_PROGRESS.update(false, 0, ''), 2000);
             return;
         }
-        
+
         let completed = 0;
-        
+
         for (const [type, uncached] of uncachedItemsMap.entries()) {
-            TRANSLATE_PROGRESS.update(true, Math.round((completed / totalUncached) * 100), type)
+            TRANSLATE_PROGRESS.update(true, Math.round((completed / totalUncached) * 100), `${type} (${completed}/${totalUncached})`)
             try {
                 if (isJpToKr || (epData.isLingva && !useBatch)) {
                     for (let i = 0; i < uncached.length; i++) {
                         await this.translate(uncached[i]);
                         completed++;
-                        TRANSLATE_PROGRESS.update(true, Math.round((completed / totalUncached) * 100), type)
+                        TRANSLATE_PROGRESS.update(true, Math.round((completed / totalUncached) * 100), `${type} (${completed}/${totalUncached})`)
                     }
                 } else {
                     for (let i = 0; i < uncached.length; i += chunkSize) {
                         const chunk = uncached.slice(i, i + chunkSize);
                         await this.translateBulk(chunk);
                         completed += chunk.length;
-                        TRANSLATE_PROGRESS.update(true, Math.round((completed / totalUncached) * 100), type)
+                        TRANSLATE_PROGRESS.update(true, Math.round((completed / totalUncached) * 100), `${type} (${completed}/${totalUncached})`)
                     }
                 }
             } catch (err) {
                 console.warn(`Failed global translation for ${type}`, err);
             }
         }
-        
+
         TRANSLATE_PROGRESS.update(false, 100, 'Complete');
+        Alert.success('Global Translation Complete');
+        window.dispatchEvent(new CustomEvent('cheat-translate-finish'))
         setTimeout(() => TRANSLATE_PROGRESS.update(false, 0, ''), 2000);
     }
 }
@@ -669,7 +763,13 @@ class TranslateSettings {
                 },
 
                 targets: {
-                    items: false,
+                    items: true,
+                    weapons: true,
+                    armors: true,
+                    skills: true,
+                    states: true,
+                    classes: true,
+                    enemies: true,
                     variables: true,
                     switches: true,
                     maps: true,
@@ -755,6 +855,30 @@ class TranslateSettings {
         return this.isEnabled() && this.getTargets().items
     }
 
+    isWeaponTranslateEnabled() {
+        return this.isEnabled() && this.getTargets().weapons
+    }
+
+    isArmorTranslateEnabled() {
+        return this.isEnabled() && this.getTargets().armors
+    }
+
+    isSkillTranslateEnabled() {
+        return this.isEnabled() && this.getTargets().skills
+    }
+
+    isStateTranslateEnabled() {
+        return this.isEnabled() && this.getTargets().states
+    }
+
+    isClassTranslateEnabled() {
+        return this.isEnabled() && this.getTargets().classes
+    }
+
+    isEnemyTranslateEnabled() {
+        return this.isEnabled() && this.getTargets().enemies
+    }
+
     isVariableTranslateEnabled() {
         return this.isEnabled() && this.getTargets().variables
     }
@@ -773,18 +897,18 @@ export const TRANSLATE_PROGRESS = {
     progress: 0,
     text: '',
     callbacks: [],
-    
+
     update(isTranslating, progress, text) {
         this.isTranslating = isTranslating;
         this.progress = progress;
         this.text = text;
         this.callbacks.forEach(cb => cb(this));
     },
-    
+
     subscribe(cb) {
         this.callbacks.push(cb);
     },
-    
+
     unsubscribe(cb) {
         this.callbacks = this.callbacks.filter(c => c !== cb);
     }

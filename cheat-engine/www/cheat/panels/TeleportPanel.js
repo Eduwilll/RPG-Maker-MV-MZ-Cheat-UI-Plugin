@@ -1,4 +1,4 @@
-import {TRANSLATE_SETTINGS, TRANSLATOR} from '../js/TranslateHelper.js'
+import {TRANSLATE_SETTINGS, TRANSLATOR, TRANSLATION_BANK} from '../js/TranslateHelper.js'
 import {Alert} from '../js/AlertHelper.js'
 
 export default {
@@ -149,12 +149,12 @@ export default {
                 this.manualRefresh()
             }
         }
-        window.addEventListener('cheat-translate-start', this._translateListener)
+        window.addEventListener('cheat-translate-finish', this._translateListener)
     },
 
     beforeDestroy () {
         if (this._translateListener) {
-            window.removeEventListener('cheat-translate-start', this._translateListener)
+            window.removeEventListener('cheat-translate-finish', this._translateListener)
         }
     },
 
@@ -169,9 +169,9 @@ export default {
     },
 
     methods: {
-        async initializeVariables () {
+        initializeVariables () {
             const rawDataMapInfos = $dataMapInfos.filter(mapInfo => !!mapInfo)
-            const mapNames = await this.getMapNames($dataMapInfos)
+            const mapNames = this.getMapNames($dataMapInfos)
 
             this.maps = $dataMapInfos.filter(mapInfo => !!mapInfo).map(mapInfo => {
                 let fullPath = []
@@ -189,14 +189,19 @@ export default {
             })
         },
 
-        async getMapNames (dataMapInfos) {
-            const rawNames = dataMapInfos.map(m => m ? m.name : '')
-
-            if (TRANSLATE_SETTINGS.isMapTranslateEnabled()) {
-                return await TRANSLATOR.translateBulk(rawNames)
-            }
-
-            return rawNames
+        getMapNames (dataMapInfos) {
+            const translateEnabled = TRANSLATE_SETTINGS.isMapTranslateEnabled()
+            
+            return dataMapInfos.map(m => {
+                const name = m ? m.name : ''
+                if (translateEnabled && name && name.trim()) {
+                    const cached = TRANSLATION_BANK.get(name)
+                    if (cached) {
+                        return cached.translated
+                    }
+                }
+                return name
+            })
         },
 
         getMapAncestors (id, path) {

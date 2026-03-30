@@ -162,15 +162,38 @@ export default {
     
     <v-card-subtitle class="pb-0 mt-4 font-weight-bold">Targets</v-card-subtitle>
     <v-card-text class="py-0">
-<!--        <v-switch-->
-<!--            v-model="targets.items"-->
-<!--            label="Translate Items"-->
-<!--            :disabled="!enabled"-->
-<!--            dense-->
-<!--            hide-details-->
-<!--            @click.self.stop-->
-<!--            @change="onChangeTargetsValue">-->
-<!--        </v-switch>-->
+        <v-switch
+            class="mb-1 mt-4"
+            v-model="targets.items"
+            label="Translate Items"
+            :disabled="!enabled"
+            dense
+            hide-details
+            @click.self.stop
+            @change="onChangeTargetsValue">
+        </v-switch>
+        
+        <v-switch
+            class="my-1"
+            v-model="targets.weapons"
+            label="Translate Weapons"
+            :disabled="!enabled"
+            dense
+            hide-details
+            @click.self.stop
+            @change="onChangeTargetsValue">
+        </v-switch>
+        
+        <v-switch
+            class="my-1"
+            v-model="targets.armors"
+            label="Translate Armors"
+            :disabled="!enabled"
+            dense
+            hide-details
+            @click.self.stop
+            @change="onChangeTargetsValue">
+        </v-switch>
         
         <v-switch
             class="mb-1 mt-4"
@@ -198,6 +221,52 @@ export default {
             v-model="targets.maps"
             class="my-1"
             label="Translate Maps"
+            :disabled="!enabled"
+            dense
+            hide-details
+            @click.self.stop
+            @change="onChangeTargetsValue">
+        </v-switch>
+
+        <v-divider class="my-2"></v-divider>
+
+        <v-switch
+            v-model="targets.skills"
+            class="my-1"
+            label="Translate Skills"
+            :disabled="!enabled"
+            dense
+            hide-details
+            @click.self.stop
+            @change="onChangeTargetsValue">
+        </v-switch>
+
+        <v-switch
+            v-model="targets.states"
+            class="my-1"
+            label="Translate States"
+            :disabled="!enabled"
+            dense
+            hide-details
+            @click.self.stop
+            @change="onChangeTargetsValue">
+        </v-switch>
+
+        <v-switch
+            v-model="targets.classes"
+            class="my-1"
+            label="Translate Classes"
+            :disabled="!enabled"
+            dense
+            hide-details
+            @click.self.stop
+            @change="onChangeTargetsValue">
+        </v-switch>
+
+        <v-switch
+            v-model="targets.enemies"
+            class="my-1"
+            label="Translate Enemies"
             :disabled="!enabled"
             dense
             hide-details
