@@ -1,4 +1,4 @@
-import {KeyValueStorage} from './KeyValueStorage.js'
+import { KeyValueStorage } from './KeyValueStorage.js'
 
 // Translation Bank for caching translations
 class TranslationBank {
@@ -133,7 +133,44 @@ export const DEFAULT_END_POINTS = {
         data: {
             method: 'get',
             urlPattern: `https://lingva.ml/api/v1/auto/en/${END_POINT_URL_PATTERN_TEXT_SYMBOL}`,
-            isLingva: true
+            isLingva: true,
+            sourceLang: 'auto'
+        }
+    },
+    lingvaJa: {
+        id: 'lingvaJa',
+        name: 'Lingva Translate (JA → EN)',
+        helpUrl: 'https://github.com/thedaviddelta/lingva-translate',
+        data: {
+            method: 'get',
+            urlPattern: `https://lingva.ml/api/v1/ja/en/${END_POINT_URL_PATTERN_TEXT_SYMBOL}`,
+            isLingva: true,
+            sourceLang: 'ja'
+        }
+    },
+    lingvaLocal: {
+        id: 'lingvaLocal',
+        name: 'Local Lingva Docker (localhost:3000, JA → EN)',
+        helpUrl: 'https://github.com/thedaviddelta/lingva-translate',
+        data: {
+            method: 'get',
+            urlPattern: `http://localhost:3000/api/v1/ja/en/${END_POINT_URL_PATTERN_TEXT_SYMBOL}`,
+            isLingva: true,
+            sourceLang: 'ja',
+            isLocal: true
+        }
+    },
+    lingvaLocalAuto: {
+        id: 'lingvaLocalAuto',
+        name: 'Local Lingva Docker (localhost:3000, Auto-detect → EN)',
+        helpUrl: 'https://github.com/thedaviddelta/lingva-translate',
+        data: {
+            method: 'get',
+            urlPattern: `http://localhost:3000/api/v1/auto/en/${END_POINT_URL_PATTERN_TEXT_SYMBOL}`,
+            isLingva: true,
+            sourceLang: 'auto',
+            isLocal: true,
+            localDomain: 'http://localhost:3000'
         }
     }
 }
@@ -141,21 +178,30 @@ export const DEFAULT_END_POINTS = {
 export const RECOMMEND_CHUNK_SIZE = {
     ezTransWeb: 500,
     ezTransServer: 100,
-    lingva: 10
+    lingva: 10,
+    lingvaJa: 10,
+    lingvaLocal: 50,
+    lingvaLocalAuto: 50
 }
 
 // Maximum safe chunk sizes for different services
 export const MAX_CHUNK_SIZE = {
     ezTransWeb: 1000,
     ezTransServer: 500,
-    lingva: 20  // Lingva has stricter limits
+    lingva: 20,  // Lingva has stricter limits
+    lingvaJa: 20,
+    lingvaLocal: 100,
+    lingvaLocalAuto: 100
 }
 
 // Optimal parallel request limits
 export const MAX_PARALLEL_REQUESTS = {
     ezTransWeb: 50,
     ezTransServer: 20,
-    lingva: 5   // Conservative for public API
+    lingva: 5,   // Conservative for public API
+    lingvaJa: 5,
+    lingvaLocal: 20,
+    lingvaLocalAuto: 20
 }
 
 // Batch translation settings
@@ -166,12 +212,14 @@ export const BATCH_TRANSLATION = {
     // Maximum characters per batch request
     maxBatchLength: {
         lingva: 1500,      // Conservative for URL length
+        lingvaJa: 1500,
         // Note: ezTrans services use original method, not batch
     },
 
     // Maximum items per batch
     maxBatchItems: {
         lingva: 50,        // Can fit many short variable names
+        lingvaJa: 50,
         // Note: ezTrans services use original method, not batch
     },
 
@@ -181,11 +229,11 @@ export const BATCH_TRANSLATION = {
 
 
 class Translator {
-    constructor (settings) {
+    constructor(settings) {
         this.settings = settings
     }
 
-    async isAvailable () {
+    async isAvailable() {
         try {
             await this.__translate('test')
             return true
@@ -195,7 +243,7 @@ class Translator {
 
     }
 
-    async __translate (text) {
+    async __translate(text) {
         const epData = this.settings.getEndPointData()
 
         // For Lingva API, try multiple endpoints with fallbacks
@@ -225,13 +273,17 @@ class Translator {
         return response || text
     }
 
-    async __translateLingva (text) {
-        // Use only the fastest, most reliable endpoint first
-        const primaryEndpoint = `https://lingva.ml/api/v1/auto/en/${encodeURIComponent(text)}`
+    async __translateLingva(text) {
+        const epData = this.settings.getEndPointData();
+        const sourceLang = epData.sourceLang || 'auto';
+
+        // Use custom URL if it's the local instance, otherwise use the public API
+        const baseDomain = epData.isLocal ? (epData.localDomain || 'http://localhost:3000') : 'https://lingva.ml';
+        const primaryEndpoint = `${baseDomain}/api/v1/${sourceLang}/en/${encodeURIComponent(text)}`
 
         try {
             const response = await axios.get(primaryEndpoint, {
-                timeout: 3000, // Reduced timeout for speed
+                timeout: epData.isLocal ? 5000 : 15000, // Shorter timeout for local since it should be instant
                 headers: {
                     'Accept': 'application/json'
                 }
@@ -241,11 +293,16 @@ class Translator {
                 return response.data.translation
             }
         } catch (error) {
-            // Quick fallback to plausibility cloud
+            console.warn('Lingva primary API failed:', error.message);
+
+            // If local failed, drop out early (no fallback)
+            if (epData.isLocal) return text;
+
+            // Quick fallback to plausibility cloud for public endpoints
             try {
-                const fallbackEndpoint = `https://translate.plausibility.cloud/api/v1/auto/en/${encodeURIComponent(text)}`
+                const fallbackEndpoint = `https://translate.plausibility.cloud/api/v1/${sourceLang}/en/${encodeURIComponent(text)}`
                 const response = await axios.get(fallbackEndpoint, {
-                    timeout: 3000,
+                    timeout: 10000,
                     headers: { 'Accept': 'application/json' }
                 })
 
@@ -253,6 +310,7 @@ class Translator {
                     return response.data.translation
                 }
             } catch (fallbackError) {
+                console.warn('Lingva fallback API failed:', fallbackError.message);
                 // If both fail, return original quickly
             }
         }
@@ -260,11 +318,11 @@ class Translator {
         return text
     }
 
-    async __translateBulk (texts) {
+    async __translateBulk(texts) {
         return (await this.translate(texts.join('\n'))).split('\n')
     }
 
-    async translate (text) {
+    async translate(text) {
         try {
             // Check translation bank first
             const cached = TRANSLATION_BANK.get(text)
@@ -314,7 +372,7 @@ class Translator {
         return maxSafe
     }
 
-    async translateBulk (texts) {
+    async translateBulk(texts) {
         // Handle empty or invalid input
         if (!texts || !Array.isArray(texts) || texts.length === 0) {
             console.warn('translateBulk: Invalid or empty texts array')
@@ -363,7 +421,7 @@ class Translator {
         return result
     }
 
-    async translateBulkOriginal (texts) {
+    async translateBulkOriginal(texts) {
         console.log(`🔄 Using original translation method for ${texts.length} texts`)
 
         // Use the original repository's bulk translation logic
@@ -491,7 +549,7 @@ class Translator {
     }
 
     async translateLingvaChunk(chunk) {
-        const endPointId = 'lingva'
+        const endPointId = this.settings.getEndPointSelection();
 
         // Use batch translation for efficiency
         const batches = this.createBatches(chunk, endPointId)
@@ -514,16 +572,88 @@ class Translator {
 
         return allResults
     }
+
+    async translateAllGlobals() {
+        const targets = this.settings.getTargets()
+        const epData = this.settings.getEndPointData()
+        const isJpToKr = epData.id === 'ezTransWeb' || epData.id === 'ezTransServer'
+        const chunkSize = this.settings.getBulkTranslateChunkSize()
+        const useBatch = localStorage.getItem('useBatchTranslation') !== 'false'
+
+        let toTranslate = [];
+
+        if (targets.variables && window.$dataSystem && window.$dataSystem.variables) {
+            toTranslate.push({ type: 'Variables', list: window.$dataSystem.variables.slice()})
+        }
+        if (targets.switches && window.$dataSystem && window.$dataSystem.switches) {
+            toTranslate.push({ type: 'Switches', list: window.$dataSystem.switches.slice()})
+        }
+        if (targets.maps && window.$dataMapInfos) {
+            const rawNames = window.$dataMapInfos.map(m => m ? m.name : '')
+            toTranslate.push({ type: 'Maps', list: rawNames })
+        }
+        
+        let totalUncached = 0;
+        let uncachedItemsMap = new Map();
+        
+        toTranslate.forEach(target => {
+            const uncached = [];
+            target.list.forEach((item) => {
+                if (item && item.trim()) {
+                    if (!TRANSLATION_BANK.get(item)) {
+                        uncached.push(item);
+                        totalUncached++;
+                    }
+                }
+            })
+            if (uncached.length > 0) {
+                uncachedItemsMap.set(target.type, uncached);
+            }
+        });
+        
+        if (totalUncached === 0) {
+            TRANSLATE_PROGRESS.update(false, 100, 'All Cached');
+            setTimeout(() => TRANSLATE_PROGRESS.update(false, 0, ''), 2000);
+            return;
+        }
+        
+        let completed = 0;
+        
+        for (const [type, uncached] of uncachedItemsMap.entries()) {
+            TRANSLATE_PROGRESS.update(true, Math.round((completed / totalUncached) * 100), type)
+            try {
+                if (isJpToKr || (epData.isLingva && !useBatch)) {
+                    for (let i = 0; i < uncached.length; i++) {
+                        await this.translate(uncached[i]);
+                        completed++;
+                        TRANSLATE_PROGRESS.update(true, Math.round((completed / totalUncached) * 100), type)
+                    }
+                } else {
+                    for (let i = 0; i < uncached.length; i += chunkSize) {
+                        const chunk = uncached.slice(i, i + chunkSize);
+                        await this.translateBulk(chunk);
+                        completed += chunk.length;
+                        TRANSLATE_PROGRESS.update(true, Math.round((completed / totalUncached) * 100), type)
+                    }
+                }
+            } catch (err) {
+                console.warn(`Failed global translation for ${type}`, err);
+            }
+        }
+        
+        TRANSLATE_PROGRESS.update(false, 100, 'Complete');
+        setTimeout(() => TRANSLATE_PROGRESS.update(false, 0, ''), 2000);
+    }
 }
 
 
 class TranslateSettings {
-    constructor () {
+    constructor() {
         this.kvStorage = new KeyValueStorage('./www/cheat-settings/translate.json')
         this.__readSettings()
     }
 
-    __readSettings () {
+    __readSettings() {
         const json = this.kvStorage.getItem('data')
 
         if (!json) {
@@ -553,11 +683,11 @@ class TranslateSettings {
         this.data = JSON.parse(json)
     }
 
-    __writeSettings () {
+    __writeSettings() {
         this.kvStorage.setItem('data', JSON.stringify(this.data))
     }
 
-    getEndPointData () {
+    getEndPointData() {
         if (this.getEndPointSelection() === 'custom') {
             return this.getCustomEndPointData()
         }
@@ -565,40 +695,40 @@ class TranslateSettings {
         return DEFAULT_END_POINTS[this.getEndPointSelection()].data
     }
 
-    setEnabled (flag) {
+    setEnabled(flag) {
         this.data.enabled = flag
         this.__writeSettings()
     }
 
-    isEnabled () {
+    isEnabled() {
         return this.data.enabled
     }
 
 
-    getEndPointSelection () {
+    getEndPointSelection() {
         return this.data.endPointSelection
     }
 
-    setEndPointSelection (endPointId) {
+    setEndPointSelection(endPointId) {
         this.data.endPointSelection = endPointId
         this.__writeSettings()
     }
 
-    getCustomEndPointData () {
+    getCustomEndPointData() {
         return this.data.customEndPointData
     }
 
-    setCustomEndPointMethod (method) {
+    setCustomEndPointMethod(method) {
         this.data.customEndPointData.method = method
         this.__writeSettings()
     }
 
-    setCustomEndPointUrlPattern (urlPattern) {
+    setCustomEndPointUrlPattern(urlPattern) {
         this.data.customEndPointData.urlPattern = urlPattern
         this.__writeSettings()
     }
 
-    setCustomEndPointBody (body) {
+    setCustomEndPointBody(body) {
         this.data.customEndPointData.body = body
         this.__writeSettings()
     }
@@ -607,34 +737,56 @@ class TranslateSettings {
         return this.data.bulkTranslateChunkSize
     }
 
-    setBulkTranslateChunkSize (chunkSize) {
+    setBulkTranslateChunkSize(chunkSize) {
         this.data.bulkTranslateChunkSize = chunkSize
         this.__writeSettings()
     }
 
-    getTargets () {
+    getTargets() {
         return this.data.targets
     }
 
-    setTargets (targets) {
+    setTargets(targets) {
         this.data.targets = targets
         this.__writeSettings()
     }
 
-    isItemTranslateEnabled () {
+    isItemTranslateEnabled() {
         return this.isEnabled() && this.getTargets().items
     }
 
-    isVariableTranslateEnabled () {
+    isVariableTranslateEnabled() {
         return this.isEnabled() && this.getTargets().variables
     }
 
-    isSwitchTranslateEnabled () {
+    isSwitchTranslateEnabled() {
         return this.isEnabled() && this.getTargets().switches
     }
 
-    isMapTranslateEnabled () {
+    isMapTranslateEnabled() {
         return this.isEnabled() && this.getTargets().maps
+    }
+}
+
+export const TRANSLATE_PROGRESS = {
+    isTranslating: false,
+    progress: 0,
+    text: '',
+    callbacks: [],
+    
+    update(isTranslating, progress, text) {
+        this.isTranslating = isTranslating;
+        this.progress = progress;
+        this.text = text;
+        this.callbacks.forEach(cb => cb(this));
+    },
+    
+    subscribe(cb) {
+        this.callbacks.push(cb);
+    },
+    
+    unsubscribe(cb) {
+        this.callbacks = this.callbacks.filter(c => c !== cb);
     }
 }
 

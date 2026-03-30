@@ -1,4 +1,4 @@
-import {TRANSLATE_SETTINGS, TRANSLATOR, TRANSLATION_BANK} from '../js/TranslateHelper.js'
+import {TRANSLATE_SETTINGS, TRANSLATOR, TRANSLATION_BANK, TRANSLATE_PROGRESS} from '../js/TranslateHelper.js'
 
 export default {
     name: 'VariableSettingPanel',
@@ -98,8 +98,6 @@ export default {
             // Store original data separately from display data
             originalVariableNames: [],
             translatedVariableNames: [],
-            lastTranslationState: false,
-            translationCheckInterval: null,
             isTranslating: false,
             translationProgress: 0,
             progressInterval: null,
@@ -122,15 +120,18 @@ export default {
     created () {
         this.initializeVariables()
 
-        // Listen for translation setting changes
-        this.translationCheckInterval = setInterval(() => {
-            this.checkTranslationSettings()
-        }, 1000)
+        // Listen for global translation trigger
+        this._translateListener = () => {
+            if (TRANSLATE_SETTINGS.isVariableTranslateEnabled()) {
+                this.manualRefresh()
+            }
+        }
+        window.addEventListener('cheat-translate-start', this._translateListener)
     },
 
     beforeDestroy () {
-        if (this.translationCheckInterval) {
-            clearInterval(this.translationCheckInterval)
+        if (this._translateListener) {
+            window.removeEventListener('cheat-translate-start', this._translateListener)
         }
         if (this.progressInterval) {
             clearInterval(this.progressInterval)
@@ -209,6 +210,7 @@ export default {
                     console.log('Translation enabled, updating display names...')
                     this.isTranslating = true
                     this.translationProgress = 0
+                    TRANSLATE_PROGRESS.update(true, 0, 'Variables')
 
                     // Get only the original names for translation
                     const originalNames = this.tableItems.map(item => item.originalName)
@@ -233,6 +235,7 @@ export default {
                     if (needsTranslation === 0) {
                         console.log('All translations from cache - no API calls needed!')
                         this.translationProgress = 100
+                        TRANSLATE_PROGRESS.update(false, 100, 'Variables')
                         setTimeout(() => {
                             this.isTranslating = false
                             this.translationProgress = 0
@@ -244,6 +247,7 @@ export default {
                     this.progressInterval = setInterval(() => {
                         if (this.translationProgress < 90) {
                             this.translationProgress = Math.min(this.translationProgress + 10, 90)
+                            TRANSLATE_PROGRESS.update(true, this.translationProgress, 'Variables')
                         }
                     }, 200)
 
@@ -252,6 +256,7 @@ export default {
                         await this.translateNamesInstantly(originalNames)
 
                         this.translationProgress = 100
+                        TRANSLATE_PROGRESS.update(true, 100, 'Variables')
                         console.log('All display names updated (cached + new translations)')
                     } finally {
                         // Clean up progress
@@ -263,6 +268,7 @@ export default {
                         setTimeout(() => {
                             this.isTranslating = false
                             this.translationProgress = 0
+                            TRANSLATE_PROGRESS.update(false, 100, '')
                         }, 500)
                     }
                 } else {
@@ -288,6 +294,7 @@ export default {
 
                 this.isTranslating = false
                 this.translationProgress = 0
+                TRANSLATE_PROGRESS.update(false, 0, '')
             }
         },
 
@@ -313,6 +320,7 @@ export default {
                 })
 
                 this.translationProgress = 100
+                TRANSLATE_PROGRESS.update(true, 100, 'Variables')
                 console.log('✅ Original method translation completed')
 
             } finally {
@@ -379,14 +387,16 @@ export default {
 
                 completed += chunk.length
                 this.translationProgress = Math.min((completed / uncachedIndices.length) * 90, 90)
+                TRANSLATE_PROGRESS.update(true, this.translationProgress, 'Variables')
             }
         },
 
         async translateChunkInstantly (chunk, indices) {
             const epData = TRANSLATE_SETTINGS.getEndPointData()
+            const useBatch = localStorage.getItem('useBatchTranslation') !== 'false';
 
-            if (epData.isLingva) {
-                // For Lingva, translate each item individually with instant updates
+            if (epData.isLingva && !useBatch) {
+                // For Lingva without batch, translate each item individually with instant updates
                 const translationPromises = chunk.map(async (text, chunkIndex) => {
                     const globalIndex = indices[chunkIndex]
 
@@ -425,9 +435,9 @@ export default {
 
                 await Promise.all(translationPromises)
             } else {
-                // For other services, use bulk translation
+                // For other services OR Lingva with batch translation enabled, use bulk
                 try {
-                    const translatedChunk = await TRANSLATOR.__translateBulk(chunk)
+                    const translatedChunk = await TRANSLATOR.translateBulk(chunk)
 
                     // Update all items in chunk at once
                     translatedChunk.forEach((translated, chunkIndex) => {
@@ -468,18 +478,6 @@ export default {
 
             // refresh
             item.value = $gameVariables.value(item.id)
-        },
-
-        async checkTranslationSettings () {
-            const currentTranslationState = TRANSLATE_SETTINGS.isVariableTranslateEnabled()
-
-            if (currentTranslationState !== this.lastTranslationState && !this.isTranslating) {
-                console.log('Translation setting changed, updating display names...')
-                this.lastTranslationState = currentTranslationState
-
-                // Only update display names, don't reload everything
-                await this.updateDisplayNames()
-            }
         },
 
         async manualRefresh () {
