@@ -155,9 +155,11 @@ Gold: 1000
 
 ### Credits
 
+- **Original RPG Maker Cheat Plugin**: [paramonos](https://github.com/paramonos/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
+- **Translation Feature Inspiration**: [sieucapoccho3717](https://github.com/sieucapoccho3717/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
+- **Maintained & Enhanced by**: [Eduwilll](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 - **Lingva Translate**: https://github.com/thedaviddelta/lingva-translate
 - **Public Instance**: https://lingva.ml
-- **RPG Maker Cheat Plugin**: Enhanced with advanced Lingva support
 
 ### Support
 
