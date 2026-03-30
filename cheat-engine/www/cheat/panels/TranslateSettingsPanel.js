@@ -1,4 +1,4 @@
-import {TRANSLATE_SETTINGS, DEFAULT_END_POINTS, RECOMMEND_CHUNK_SIZE, MAX_CHUNK_SIZE, TRANSLATION_BANK} from '../js/TranslateHelper.js'
+import {TRANSLATE_SETTINGS, DEFAULT_END_POINTS, RECOMMEND_CHUNK_SIZE, MAX_CHUNK_SIZE, TRANSLATION_BANK, TRANSLATE_PROGRESS} from '../js/TranslateHelper.js'
 import {TRANSLATOR} from '../js/TranslateHelper.js'
 import {isInValueInRange} from '../js/GlobalShortcut.js';
 import {Alert} from '../js/AlertHelper.js'
@@ -243,6 +243,40 @@ export default {
             Translation bank stores successful translations for instant reuse.<br/>
             Cached translations load instantly without API calls.
         </span>
+
+        <v-divider class="my-4"></v-divider>
+        <div class="d-flex align-center mt-2">
+            <v-btn
+                color="green"
+                class="flex-grow-1"
+                @click="startGlobalTranslation"
+                :disabled="!enabled || isTranslatingGlobals">
+                <v-icon left>mdi-translate</v-icon>
+                Start {{ isTranslatingGlobals ? 'Translating' : 'Translation' }}
+            </v-btn>
+
+            <v-chip
+                v-if="isTranslatingGlobals"
+                small
+                color="orange"
+                text-color="white"
+                class="ml-3 px-3 py-4 font-weight-bold"
+                style="height: 36px">
+                <v-icon small left>mdi-translate</v-icon>
+                {{globalTranslationText}}... {{Math.round(globalTranslationProgress)}}%
+            </v-chip>
+        </div>
+
+        <v-btn
+            color="primary"
+            class="mt-2"
+            block
+            outlined
+            @click="testTranslationEndpoint"
+            :loading="isTestingTranslation">
+            <v-icon left>mdi-flask</v-icon>
+            Test Translation Connection
+        </v-btn>
     </v-card-text>
 </v-card>
     `,
@@ -285,12 +319,34 @@ export default {
             },
 
             // Batch translation setting
-            useBatchTranslation: true
+            useBatchTranslation: true,
+
+            // Testing state
+            isTestingTranslation: false,
+
+            // Global Translation Progress
+            isTranslatingGlobals: false,
+            globalTranslationProgress: 0,
+            globalTranslationText: ''
         }
     },
 
     created () {
         this.initializeVariables()
+        
+        // Listen to global translation progress
+        this._progressTracker = (state) => {
+            this.isTranslatingGlobals = state.isTranslating
+            this.globalTranslationProgress = state.progress
+            this.globalTranslationText = state.text
+        }
+        TRANSLATE_PROGRESS.subscribe(this._progressTracker)
+    },
+
+    beforeDestroy () {
+        if (this._progressTracker) {
+            TRANSLATE_PROGRESS.unsubscribe(this._progressTracker)
+        }
     },
 
     computed: {
@@ -498,6 +554,30 @@ export default {
                 Alert.error('Failed to export translation bank')
                 console.error('Export error:', error)
             }
+        },
+
+        async testTranslationEndpoint () {
+            this.isTestingTranslation = true;
+            try {
+                Alert.success('Testing translation... Please wait.');
+                const result = await TRANSLATOR.__translate('テスト');
+                if (result && result !== 'テスト') {
+                    Alert.success('Success! Translated "テスト" to "' + result + '"');
+                } else {
+                    Alert.error('Failed: End point returned original text or empty. Check F8 console.');
+                }
+            } catch (err) {
+                Alert.error('Connection error: ' + err.message);
+                console.error('Test Translation Error:', err);
+            } finally {
+                this.isTestingTranslation = false;
+            }
+        },
+
+        async startGlobalTranslation () {
+            if (!this.enabled) return;
+            console.log('Starting global pre-translation module');
+            await TRANSLATOR.translateAllGlobals();
         }
     }
 }

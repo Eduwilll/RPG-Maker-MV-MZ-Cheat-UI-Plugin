@@ -109,6 +109,19 @@ export default {
 
     created () {
         this.initializeVariables()
+
+        this._translateListener = () => {
+            if (TRANSLATE_SETTINGS.isSwitchTranslateEnabled()) {
+                this.manualRefresh()
+            }
+        }
+        window.addEventListener('cheat-translate-start', this._translateListener)
+    },
+
+    beforeDestroy () {
+        if (this._translateListener) {
+            window.removeEventListener('cheat-translate-start', this._translateListener)
+        }
     },
 
     computed: {
