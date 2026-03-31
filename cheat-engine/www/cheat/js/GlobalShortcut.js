@@ -56,6 +56,10 @@ const defaultShortcutSettings = {
         shortcut: 'alt w'
     },
 
+    toggleMouseTeleport: {
+        shortcut: 'alt m'
+    },
+
     enemyWound: {
         shortcut: 'alt 1'
     },
@@ -221,6 +225,14 @@ const shortcutConfig = {
         desc: '',
         enterAction (param) {
             GeneralCheat.toggleNoClip(true)
+        }
+    },
+
+    toggleMouseTeleport: {
+        name: 'Toggle mouse teleport',
+        desc: 'Teleport to mouse location on click when enabled',
+        enterAction (param) {
+            GeneralCheat.toggleMouseTeleport()
         }
     },
 

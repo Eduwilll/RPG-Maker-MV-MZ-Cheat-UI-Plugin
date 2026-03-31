@@ -4,26 +4,35 @@ export default {
     name: 'GeneralPanel',
 
     template: `
-<v-card 
-    class="ma-0 pa-0"
-    flat>
-    <v-card-subtitle class="pb-0 font-weight-bold">Edit</v-card-subtitle>
+<v-card class="ma-0 pa-0" flat>
+    <v-card-subtitle class="pb-0 font-weight-bold">
+        Edit
+    </v-card-subtitle>
     
-    <v-card-text 
-        class="py-0">
-        <v-checkbox
-            v-model="noClip"
-            label="No Clip"
-            @change="onNoClipChange">
-        </v-checkbox>
-        <v-checkbox
-            v-model="forceSave"
-            label="Force Enable Save"
-            dense
-            hide-details
-            class="pt-0"
-            @change="onForceSaveChange">
-        </v-checkbox>
+    <v-card-text class="py-0">
+        <v-row no-gutters class="d-flex justify-space-around">
+            <v-checkbox
+                v-model="noClip"
+                label="No Clip"
+                hide-details
+                dense
+                @change="onNoClipChange">
+            </v-checkbox>
+            <v-checkbox
+                v-model="forceSave"
+                label="Force Save"
+                hide-details
+                dense
+                @change="onForceSaveChange">
+            </v-checkbox>
+            <v-checkbox
+                v-model="mouseTeleport"
+                label="Mouse Tele"
+                hide-details
+                dense
+                @change="onMouseTeleportChange">
+            </v-checkbox>
+        </v-row>
     </v-card-text>
     
     <v-card-text class="py-0">
@@ -122,6 +131,13 @@ export default {
             @click="openConsole">
             Open Console
         </v-btn>
+        <v-btn
+            small
+            class="ml-1"
+            title="Open RPG Maker Debug Menu (F9)"
+            @click="openDebugMenu">
+            Debug Menu
+        </v-btn>
     </v-card-text>
     
     <v-card-text>
@@ -161,7 +177,7 @@ export default {
 </v-card>
     `,
 
-    data () {
+    data() {
         return {
             godMode: false,
             noClip: false,
@@ -180,22 +196,24 @@ export default {
             applyAllForGameSpeed: false,
             applyBattleForGameSpeed: false,
             forceSave: false,
+            mouseTeleport: false,
             canOpenConsole: typeof nw !== 'undefined' || typeof require === 'function'
         }
     },
 
-    created () {
+    created() {
         this.initializeVariables()
     },
 
     methods: {
-        initializeVariables () {
+        initializeVariables() {
             this.noClip = $gamePlayer._through
             this.speed = $gamePlayer.moveSpeed()
             this.fixSpeed = SpeedCheat.isFixed()
             this.gold = $gameParty._gold
 
             this.forceSave = GeneralCheat.isForceSaveEnabled()
+            this.mouseTeleport = GeneralCheat.isMouseTeleportEnabled()
 
             this.gameSpeed = GameSpeedCheat.getRate()
             const gameSpeedSceneOption = GameSpeedCheat.getSceneOption()
@@ -206,23 +224,23 @@ export default {
             }
         },
 
-        onNoClipChange () {
+        onNoClipChange() {
             GeneralCheat.toggleNoClip()
             this.initializeVariables()
         },
 
-        onSpeedChange () {
+        onSpeedChange() {
             SpeedCheat.setSpeed(this.speed, this.fixSpeed)
             SpeedCheat.__writeSettings(this.speed, this.fixSpeed)
             this.initializeVariables()
         },
 
-        addSpeed (amount) {
+        addSpeed(amount) {
             this.speed = Math.min(Math.max(this.speed + amount, this.minSpeed), this.maxSpeed)
             this.onSpeedChange()
         },
 
-        onGoldChange () {
+        onGoldChange() {
             if (isNaN(this.gold) || !Number.isInteger(Number(this.gold)) || this.gold < 0) {
                 return
             }
@@ -239,19 +257,19 @@ export default {
             this.initializeVariables()
         },
 
-        gotoTitle () {
+        gotoTitle() {
             SceneCheat.gotoTitle()
         },
 
-        toggleSaveScene () {
+        toggleSaveScene() {
             SceneCheat.toggleSaveScene()
         },
 
-        toggleLoadScene () {
+        toggleLoadScene() {
             SceneCheat.toggleLoadScene()
         },
 
-        onGameSpeedChange () {
+        onGameSpeedChange() {
             let sceneOption = null
             if (this.applyAllForGameSpeed) {
                 sceneOption = GameSpeedCheat.sceneOptions().all
@@ -264,17 +282,17 @@ export default {
             this.initializeVariables()
         },
 
-        addGameSpeed (amount) {
+        addGameSpeed(amount) {
             this.gameSpeed = Math.min(Math.max(this.gameSpeed + amount, this.minGameSpeed), this.maxGameSpeed)
             this.onGameSpeedChange()
         },
 
-        setGameSpeed (amount) {
+        setGameSpeed(amount) {
             this.gameSpeed = 1
             this.onGameSpeedChange()
         },
 
-        onApplyAllForGameSpeedChange () {
+        onApplyAllForGameSpeedChange() {
             if (this.applyAllForGameSpeed) {
                 this.applyBattleForGameSpeed = false
             } else {
@@ -284,7 +302,7 @@ export default {
             this.onGameSpeedChange()
         },
 
-        onApplyBattleForGameSpeedChange () {
+        onApplyBattleForGameSpeedChange() {
             if (this.applyBattleForGameSpeed) {
                 this.applyAllForGameSpeed = false
             } else {
@@ -294,13 +312,22 @@ export default {
             this.onGameSpeedChange()
         },
 
-        onForceSaveChange () {
+        onForceSaveChange() {
             GeneralCheat.forceEnableSave(this.forceSave)
             this.initializeVariables()
         },
 
-        openConsole () {
+        openConsole() {
             GeneralCheat.openConsole()
+        },
+
+        onMouseTeleportChange() {
+            GeneralCheat.toggleMouseTeleport(this.mouseTeleport)
+            this.initializeVariables()
+        },
+
+        openDebugMenu() {
+            GeneralCheat.openDebugMenu()
         }
     }
 }

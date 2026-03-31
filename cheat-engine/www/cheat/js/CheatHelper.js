@@ -234,6 +234,47 @@ export class GeneralCheat {
             Alert.error('Failed to open console. Note: This only works in NW.js (PC vers).')
         }
     }
+
+    static openDebugMenu () {
+        try {
+            if (SceneManager._scene instanceof Scene_Map) {
+                SceneManager.push(Scene_Debug)
+                Alert.success('Opening Debug Menu (F9)')
+            } else {
+                Alert.error('Open Debug Menu only works on Map screen')
+            }
+        } catch (e) {
+            console.error('Failed to open Debug Menu:', e)
+            Alert.error('Debug Menu not available in this game')
+        }
+    }
+
+    static toggleMouseTeleport (enabled) {
+        if (enabled === undefined) {
+            enabled = !this.isMouseTeleportEnabled()
+        }
+        this._mouseTeleport = enabled
+        if (enabled) {
+            if (!this._orig_onMapTouch) {
+                this._orig_onMapTouch = Scene_Map.prototype.onMapTouch
+            }
+            Scene_Map.prototype.onMapTouch = function () {
+                const x = $gameMap.canvasToMapX(TouchInput.x)
+                const y = $gameMap.canvasToMapY(TouchInput.y)
+                $gamePlayer.locate(x, y)
+            }
+            Alert.success('Mouse Teleport: Enabled')
+        } else {
+            if (this._orig_onMapTouch) {
+                Scene_Map.prototype.onMapTouch = this._orig_onMapTouch
+            }
+            Alert.info('Mouse Teleport: Disabled')
+        }
+    }
+
+    static isMouseTeleportEnabled () {
+        return !!this._mouseTeleport
+    }
 }
 
 export class GameSpeedCheat {
