@@ -9,11 +9,15 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Required to create releases
+      contents: write
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for changelog generation
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -27,23 +31,37 @@ jobs:
       - name: Build release packages
         run: python deploy/main.py --version ${{ steps.version.outputs.VERSION }}
 
-      - name: Create GitHub Release
+      - name: Create GitHub Release (Draft)
         uses: softprops/action-gh-release@v2
         with:
-          name: "Cheat UI v${{ steps.version.outputs.VERSION }}"
+          name: "v${{ steps.version.outputs.VERSION }}"
+          draft: true  # Created as draft — edit release notes before publishing
+          generate_release_notes: true  # Auto-generates changelog from commits as starting point
           body: |
-            ## RPG Maker MV/MZ Cheat UI + Translation v${{ steps.version.outputs.VERSION }}
+            ## What's New in v${{ steps.version.outputs.VERSION }}
 
-            ### 📦 Installation
-            1. Download the package for your RPG Maker version (MV or MZ)
-            2. Extract and copy `www/` contents to your game directory
+            > **Edit this section** with your features, fixes, and changes before publishing.
+
+            ### Features
+            -
+
+            ### Bug Fixes
+            -
+
+            ### Performance
+            -
+
+            ---
+
+            ### Installation
+            1. Download the package for your RPG Maker version below
+            2. Extract and copy contents to your game directory
             3. Launch game and press **Ctrl + C** for the cheat menu
 
-            ### Files
-            - `rpg-mv-cheat-*-core.tar.gz` — For RPG Maker **MV** games
-            - `rpg-mz-cheat-*-core.tar.gz` — For RPG Maker **MZ** games
+            | File | For |
+            |---|---|
+            | `rpg-mv-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz` | RPG Maker **MV** |
+            | `rpg-mz-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz` | RPG Maker **MZ** |
           files: |
             output/rpg-mv-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz
             output/rpg-mz-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz
-          draft: false
-          prerelease: false
