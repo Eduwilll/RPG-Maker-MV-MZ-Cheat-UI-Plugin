@@ -4,38 +4,52 @@ export default {
     name: 'GeneralPanel',
 
     template: `
-<v-card class="ma-0 pa-0" flat>
-    <v-card-subtitle class="pb-0 font-weight-bold">
-        Edit
-    </v-card-subtitle>
-    
-    <v-card-text class="py-0">
-        <v-row no-gutters class="d-flex justify-space-around">
-            <v-checkbox
-                v-model="noClip"
-                label="No Clip"
-                hide-details
-                dense
-                @change="onNoClipChange">
-            </v-checkbox>
-            <v-checkbox
-                v-model="forceSave"
-                label="Force Save"
-                hide-details
-                dense
-                @change="onForceSaveChange">
-            </v-checkbox>
-            <v-checkbox
-                v-model="mouseTeleport"
-                label="Mouse Tele"
-                hide-details
-                dense
-                @change="onMouseTeleportChange">
-            </v-checkbox>
+<v-card class="ma-0 pa-0" flat style="position: relative;">
+    <v-btn
+        style="top: 8px; right: 8px;"
+        color="pink"
+        dark
+        x-small
+        absolute
+        fab
+        title="Reload from game data"
+        @click="initializeVariables">
+        <v-icon small>mdi-refresh</v-icon>
+    </v-btn>
+
+    <!-- Edit Section -->
+    <v-card-subtitle class="pb-0 font-weight-bold">Edit</v-card-subtitle>
+
+    <v-card-text class="py-1">
+        <v-row no-gutters align="center" justify="start">
+            <v-col cols="auto">
+                <v-checkbox
+                    v-model="noClip"
+                    label="No Clip"
+                    hide-details
+                    dense
+                    @change="onNoClipChange" />
+            </v-col>
+            <v-col cols="auto" class="ml-3">
+                <v-checkbox
+                    v-model="forceSave"
+                    label="Force Save"
+                    hide-details
+                    dense
+                    @change="onForceSaveChange" />
+            </v-col>
+            <v-col cols="auto" class="ml-3">
+                <v-checkbox
+                    v-model="mouseTeleport"
+                    label="Mouse Tele"
+                    hide-details
+                    dense
+                    @change="onMouseTeleportChange" />
+            </v-col>
         </v-row>
     </v-card-text>
-    
-    <v-card-text class="py-0">
+
+    <v-card-text class="py-1">
         <v-text-field
             v-model="gold"
             label="Gold"
@@ -44,11 +58,11 @@ export default {
             hide-details
             @keydown.self.stop
             @change="onGoldChange"
-            @focus="$event.target.select()">
-        </v-text-field>
+            @focus="$event.target.select()" />
     </v-card-text>
-    
-    <v-card-text class="pt-4 pb-0">
+
+    <!-- Speed Section -->
+    <v-card-text class="pt-3 pb-1">
         <v-slider
             v-model="speed"
             :min="minSpeed"
@@ -59,121 +73,95 @@ export default {
             hide-details
             @change="onSpeedChange">
             <template v-slot:prepend>
-                <span class="grey--text text--lighten-1 align-self-center mr-2 body-2" style="white-space: nowrap;">Move Speed</span>
+                <span class="grey--text text--lighten-1 align-self-center mr-1 body-2" style="white-space: nowrap;">Move Speed</span>
                 <v-icon color="grey lighten-3" @click="addSpeed(-stepSpeed)">mdi-chevron-left</v-icon>
             </template>
             <template v-slot:append>
                 <v-icon color="grey lighten-3" @click="addSpeed(stepSpeed)">mdi-chevron-right</v-icon>
-                <span class="grey--text text--lighten-1 align-self-center ml-2">{{speed.toFixed(1)}}</span>
+                <span class="grey--text text--lighten-1 align-self-center ml-2">{{ speed.toFixed(1) }}</span>
             </template>
         </v-slider>
         <v-checkbox
             v-model="fixSpeed"
-            class="pt-0"
+            class="mt-1 pt-0"
             hide-details
             dense
             label="Fixed"
-            @change="onSpeedChange">
-        </v-checkbox>
-        
+            @change="onSpeedChange" />
+
         <v-slider
             v-model="gameSpeed"
             :min="minGameSpeed"
             :max="maxGameSpeed"
             :step="stepGameSpeed"
-            class="mt-3"
+            class="mt-4"
             thumb-label
             thumb-color="red"
             hide-details
             @change="onGameSpeedChange">
             <template v-slot:prepend>
-                <span class="grey--text text--lighten-1 align-self-center mr-2 d-inline-block body-2" style="white-space: nowrap;">Game Speed</span>
+                <span class="grey--text text--lighten-1 align-self-center mr-1 body-2" style="white-space: nowrap;">Game Speed</span>
                 <v-icon color="grey lighten-3" @click="addGameSpeed(-stepGameSpeed)">mdi-chevron-left</v-icon>
             </template>
             <template v-slot:append>
                 <v-icon color="grey lighten-3" @click="addGameSpeed(stepGameSpeed)">mdi-chevron-right</v-icon>
-                <span class="grey--text text--lighten-1 align-self-center ml-2 mr-2">x{{gameSpeed.toFixed(1)}}</span>
-                <v-icon size="16" color="grey lighten-3 ml-2" @click="setGameSpeed(1)">mdi-restore</v-icon>
+                <span class="grey--text text--lighten-1 align-self-center ml-2">x{{ gameSpeed.toFixed(1) }}</span>
+                <v-icon size="16" color="grey lighten-3" class="ml-2" @click="setGameSpeed(1)">mdi-restore</v-icon>
             </template>
         </v-slider>
-        
-        <v-checkbox
-            v-model="applyAllForGameSpeed"
-            class="d-inline-flex pt-0"
-            hide-details
-            dense
-            label="All"
-            @change="onApplyAllForGameSpeedChange">
-        </v-checkbox>
-        <v-checkbox
-            v-model="applyBattleForGameSpeed"
-            class="d-inline-flex ml-2 pt-0 mb-0"
-            hide-details
-            dense
-            label="Battle"
-            @change="onApplyBattleForGameSpeedChange">
-        </v-checkbox>
+
+        <v-row no-gutters align="center" class="mt-1">
+            <v-col cols="auto">
+                <v-checkbox
+                    v-model="applyAllForGameSpeed"
+                    class="pt-0"
+                    hide-details
+                    dense
+                    label="All"
+                    @change="onApplyAllForGameSpeedChange" />
+            </v-col>
+            <v-col cols="auto" class="ml-3">
+                <v-checkbox
+                    v-model="applyBattleForGameSpeed"
+                    class="pt-0"
+                    hide-details
+                    dense
+                    label="Battle"
+                    @change="onApplyBattleForGameSpeedChange" />
+            </v-col>
+        </v-row>
     </v-card-text>
-    
-    <v-card-subtitle class="mt-3 font-weight-bold">Quick Actions</v-card-subtitle>
-    
-    <v-card-text class="py-0">
-        <v-btn
-            small
-            @click="gotoTitle">
-            To Title
-        </v-btn>
-        <v-btn
-            v-if="canOpenConsole"
-            small
-            class="ml-1"
-            title="Open NW.js Developer Console"
-            @click="openConsole">
-            Open Console
-        </v-btn>
-        <v-btn
-            small
-            class="ml-1"
-            title="Open RPG Maker Debug Menu (F9)"
-            @click="openDebugMenu">
-            Debug Menu
-        </v-btn>
-    </v-card-text>
-    
-    <v-card-text>
-        <v-btn 
-            small
-            class="mr-1"
-            @click="toggleSaveScene">
-            Open Save
-        </v-btn>
-        <v-btn
-            small
-            @click="toggleLoadScene">
-            Open Load
-        </v-btn>
-    </v-card-text>
-    
-    <v-tooltip
-        bottom>
-        <span>Reload from game data</span>
-        <template v-slot:activator="{ on, attrs }">
+
+    <!-- Quick Actions Section -->
+    <v-card-subtitle class="mt-1 pb-1 font-weight-bold">Quick Actions</v-card-subtitle>
+
+    <v-card-text class="py-1">
+        <v-row no-gutters>
+            <v-btn small @click="gotoTitle">To Title</v-btn>
             <v-btn
-                style="top: 0px; right: 0px;"
-                color="pink"
-                dark
+                v-if="canOpenConsole"
                 small
-                absolute
-                top
-                right
-                fab
-                v-bind="attrs"
-                v-on="on"
-                @click="initializeVariables">
-                <v-icon>mdi-refresh</v-icon>
+                class="ml-1"
+                title="Open NW.js Developer Console"
+                @click="openConsole">
+                Open Console
             </v-btn>
-        </template>
-    </v-tooltip>
+            <v-btn
+                small
+                class="ml-1"
+                title="Open RPG Maker Debug Menu (F9)"
+                @click="openDebugMenu">
+                Debug Menu
+            </v-btn>
+        </v-row>
+    </v-card-text>
+
+    <v-card-text class="pt-1 pb-3">
+        <v-row no-gutters>
+            <v-btn small class="mr-1" @click="toggleSaveScene">Open Save</v-btn>
+            <v-btn small @click="toggleLoadScene">Open Load</v-btn>
+        </v-row>
+    </v-card-text>
 </v-card>
     `,
 
