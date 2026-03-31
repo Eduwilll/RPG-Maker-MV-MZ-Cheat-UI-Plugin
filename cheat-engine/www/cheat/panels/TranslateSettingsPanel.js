@@ -2,6 +2,7 @@ import {TRANSLATE_SETTINGS, DEFAULT_END_POINTS, RECOMMEND_CHUNK_SIZE, MAX_CHUNK_
 import {TRANSLATOR} from '../js/TranslateHelper.js'
 import {isInValueInRange} from '../js/GlobalShortcut.js';
 import {Alert} from '../js/AlertHelper.js'
+import {IN_GAME_TRANSLATOR} from '../js/InGameTranslator.js'
 
 export default {
     name: 'TranslateSettingsPanel',
@@ -273,6 +274,86 @@ export default {
             @click.self.stop
             @change="onChangeTargetsValue">
         </v-switch>
+
+        <v-divider class="my-2"></v-divider>
+        <span class="caption font-weight-bold teal--text">🌐 Full Game Translation</span>
+
+        <v-switch
+            v-model="targets.actors"
+            class="my-1"
+            label="Translate Actors (Names, Nicknames, Profiles)"
+            :disabled="!enabled"
+            dense
+            hide-details
+            @click.self.stop
+            @change="onChangeTargetsValue">
+        </v-switch>
+
+        <v-switch
+            v-model="targets.system"
+            class="my-1"
+            label="Translate System Terms (Menus, Battle Messages, Parameters)"
+            :disabled="!enabled"
+            dense
+            hide-details
+            @click.self.stop
+            @change="onChangeTargetsValue">
+        </v-switch>
+
+        <v-switch
+            v-model="targets.dialogues"
+            class="my-1"
+            label="Translate ALL Dialogues (Event Text, Choices, Common Events)"
+            :disabled="!enabled"
+            dense
+            hide-details
+            @click.self.stop
+            @change="onChangeTargetsValue">
+        </v-switch>
+        <span class="caption grey--text">
+            Scans ALL map files and extracts every dialogue, choice, scroll text,<br/>
+            battle event text, and common event text for translation.
+        </span>
+    </v-card-text>
+
+    <v-card-subtitle class="pb-0 mt-4 font-weight-bold">In-Game Translation Status</v-card-subtitle>
+    <v-card-text class="py-0">
+        <v-row class="mt-1">
+            <v-col cols="12">
+                <v-chip small :color="isDataPatched ? 'green' : 'grey'" text-color="white" class="mr-2">
+                    <v-icon small left>{{isDataPatched ? 'mdi-check-circle' : 'mdi-close-circle'}}</v-icon>
+                    Game Data: {{isDataPatched ? 'Translated' : 'Original'}}
+                </v-chip>
+                <v-chip small color="blue" text-color="white">
+                    <v-icon small left>mdi-translate</v-icon>
+                    {{inGamePatchCount}} strings patched
+                </v-chip>
+            </v-col>
+        </v-row>
+        <v-btn
+            small
+            color="teal"
+            class="mt-2"
+            @click="reapplyInGameTranslation"
+            :disabled="!enabled || bankStats.totalEntries === 0">
+            <v-icon small left>mdi-refresh</v-icon>
+            Re-apply Translation to Game Data
+        </v-btn>
+        <v-btn
+            small
+            color="orange"
+            class="mt-2 ml-2"
+            @click="revertInGameTranslation"
+            :disabled="!isDataPatched">
+            <v-icon small left>mdi-undo</v-icon>
+            Revert to Original
+        </v-btn>
+        <br/>
+        <span class="caption grey--text">
+            After running "Start Translation", the plugin automatically applies<br/>
+            translations to ALL in-game text (menus, dialogues, battles, shops).<br/>
+            Use "Re-apply" if the game reloads data. Use "Revert" to restore Japanese.
+        </span>
     </v-card-text>
 
     <v-card-subtitle class="pb-0 mt-4 font-weight-bold">Translation Bank</v-card-subtitle>
@@ -396,7 +477,11 @@ export default {
             // Global Translation Progress
             isTranslatingGlobals: false,
             globalTranslationProgress: 0,
-            globalTranslationText: ''
+            globalTranslationText: '',
+
+            // In-Game Translation Status
+            isDataPatched: false,
+            inGamePatchCount: 0
         }
     },
 
@@ -410,11 +495,21 @@ export default {
             this.globalTranslationText = state.text
         }
         TRANSLATE_PROGRESS.subscribe(this._progressTracker)
+
+        // Listen for data patching events
+        this._dataPatchListener = (e) => {
+            this.isDataPatched = IN_GAME_TRANSLATOR.isDataPatched()
+            this.inGamePatchCount = e.detail ? e.detail.patchCount : 0
+        }
+        window.addEventListener('cheat-data-patched', this._dataPatchListener)
     },
 
     beforeDestroy () {
         if (this._progressTracker) {
             TRANSLATE_PROGRESS.unsubscribe(this._progressTracker)
+        }
+        if (this._dataPatchListener) {
+            window.removeEventListener('cheat-data-patched', this._dataPatchListener)
         }
     },
 
@@ -647,6 +742,21 @@ export default {
             if (!this.enabled) return;
             console.log('Starting global pre-translation module');
             await TRANSLATOR.translateAllGlobals();
+            this.updateBankStats();
+            this.isDataPatched = IN_GAME_TRANSLATOR.isDataPatched();
+        },
+
+        reapplyInGameTranslation () {
+            IN_GAME_TRANSLATOR.applyTranslationsToGameData();
+            this.isDataPatched = IN_GAME_TRANSLATOR.isDataPatched();
+            Alert.success('In-game translation re-applied!');
+        },
+
+        revertInGameTranslation () {
+            IN_GAME_TRANSLATOR.revertGameData();
+            this.isDataPatched = false;
+            this.inGamePatchCount = 0;
+            Alert.success('Game text reverted to original!');
         }
     }
 }
