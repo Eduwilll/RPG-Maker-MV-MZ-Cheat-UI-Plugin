@@ -21,10 +21,34 @@ class TranslationBank {
     saveCache() {
         try {
             this.storage.setItem('translations', JSON.stringify(this.cache))
-            console.log(`Translation bank saved with ${Object.keys(this.cache).length} entries`)
         } catch (error) {
             console.error('Failed to save translation cache:', error)
         }
+    }
+
+    // Debounced save: batches all writes into one disk operation
+    // This prevents 13,000+ synchronous writeFileSync calls during bulk translation
+    debouncedSave() {
+        this._dirty = true
+        if (this._saveTimer) return // Already scheduled
+        this._saveTimer = setTimeout(() => {
+            this._saveTimer = null
+            if (this._dirty) {
+                this.saveCache()
+                this._dirty = false
+            }
+        }, 5000) // Save at most once every 5 seconds
+    }
+
+    // Force immediate save (call at end of bulk translation)
+    flushCache() {
+        if (this._saveTimer) {
+            clearTimeout(this._saveTimer)
+            this._saveTimer = null
+        }
+        this.saveCache()
+        this._dirty = false
+        console.log(`Translation bank saved with ${Object.keys(this.cache).length} entries`)
     }
 
     // Get cached translation
@@ -46,7 +70,7 @@ class TranslationBank {
             timestamp: Date.now(),
             source: 'lingva'
         }
-        this.saveCache()
+        this.debouncedSave()  // Batched disk write instead of per-string
     }
 
     // Create consistent cache key
@@ -105,6 +129,102 @@ class TranslationBank {
 // Global translation bank instance
 export const TRANSLATION_BANK = new TranslationBank()
 
+// ============================================================================
+// Translation Metrics — measures where time is actually spent
+// ============================================================================
+class TranslationMetrics {
+    constructor() {
+        this.reset()
+    }
+
+    reset() {
+        this.startTime = Date.now()
+        this.requestLatencies = []   // ms per HTTP request
+        this.batchSizes = []         // items per batch
+        this.batchCharLens = []      // raw chars per batch
+        this.requestsPerNode = {}    // count per domain
+        this.errors = { timeout: 0, http429: 0, http431: 0, http404: 0, http500: 0, other: 0 }
+        this.totalStrings = 0
+        this.totalBatches = 0
+        this.cacheHits = 0
+    }
+
+    recordRequest(domain, latencyMs) {
+        this.requestLatencies.push(latencyMs)
+        this.requestsPerNode[domain] = (this.requestsPerNode[domain] || 0) + 1
+    }
+
+    recordBatch(itemCount, charLen) {
+        this.batchSizes.push(itemCount)
+        this.batchCharLens.push(charLen)
+        this.totalBatches++
+    }
+
+    recordError(type) {
+        if (type === 'timeout') this.errors.timeout++
+        else if (type === '429') this.errors.http429++
+        else if (type === '431') this.errors.http431++
+        else if (type === '404') this.errors.http404++
+        else if (type === '500') this.errors.http500++
+        else this.errors.other++
+    }
+
+    percentile(arr, p) {
+        if (arr.length === 0) return 0
+        const sorted = [...arr].sort((a, b) => a - b)
+        const idx = Math.ceil(sorted.length * p / 100) - 1
+        return sorted[Math.max(0, idx)]
+    }
+
+    printReport() {
+        const elapsed = Date.now() - this.startTime
+        const elapsedStr = elapsed >= 60000
+            ? `${Math.floor(elapsed / 60000)}m ${Math.round((elapsed % 60000) / 1000)}s`
+            : `${(elapsed / 1000).toFixed(1)}s`
+
+        const avgLatency = this.requestLatencies.length > 0
+            ? Math.round(this.requestLatencies.reduce((a, b) => a + b, 0) / this.requestLatencies.length)
+            : 0
+        const p95 = this.percentile(this.requestLatencies, 95)
+        const p50 = this.percentile(this.requestLatencies, 50)
+        const minLatency = this.requestLatencies.length > 0 ? Math.min(...this.requestLatencies) : 0
+        const maxLatency = this.requestLatencies.length > 0 ? Math.max(...this.requestLatencies) : 0
+
+        const avgBatchSize = this.batchSizes.length > 0
+            ? Math.round(this.batchSizes.reduce((a, b) => a + b, 0) / this.batchSizes.length)
+            : 0
+        const avgBatchChars = this.batchCharLens.length > 0
+            ? Math.round(this.batchCharLens.reduce((a, b) => a + b, 0) / this.batchCharLens.length)
+            : 0
+
+        const throughput = elapsed > 0 ? (this.totalStrings / (elapsed / 1000)).toFixed(1) : '0'
+
+        console.log(`\n${'═'.repeat(60)}`)
+        console.log(`  TRANSLATION METRICS REPORT`)
+        console.log(`${'═'.repeat(60)}`)
+        console.log(`  Total wall-clock time:   ${elapsedStr}`)
+        console.log(`  Strings translated:      ${this.totalStrings.toLocaleString()}`)
+        console.log(`  Cache hits (skipped):    ${this.cacheHits.toLocaleString()}`)
+        console.log(`  Throughput:              ${throughput} strings/second`)
+        console.log(`  ─────────────────────────────────────────`)
+        console.log(`  HTTP Requests made:      ${this.requestLatencies.length}`)
+        console.log(`  Total batches:           ${this.totalBatches}`)
+        console.log(`  Avg batch size:          ${avgBatchSize} items, ${avgBatchChars} chars`)
+        console.log(`  ─────────────────────────────────────────`)
+        console.log(`  Latency (min/avg/p50/p95/max): ${minLatency}/${avgLatency}/${p50}/${p95}/${maxLatency} ms`)
+        console.log(`  ─────────────────────────────────────────`)
+        console.log(`  Errors:  timeout=${this.errors.timeout}  429=${this.errors.http429}  431=${this.errors.http431}  404=${this.errors.http404}  500=${this.errors.http500}  other=${this.errors.other}`)
+        console.log(`  ─────────────────────────────────────────`)
+        console.log(`  Requests per node:`)
+        for (const [domain, count] of Object.entries(this.requestsPerNode)) {
+            console.log(`    ${domain}: ${count} requests`)
+        }
+        console.log(`${'═'.repeat(60)}\n`)
+    }
+}
+
+export const TRANSLATION_METRICS = new TranslationMetrics()
+
 export const END_POINT_URL_PATTERN_TEXT_SYMBOL = '${TEXT}'
 
 export const DEFAULT_END_POINTS = {
@@ -134,6 +254,7 @@ export const DEFAULT_END_POINTS = {
         name: 'Lingva Translate (Auto-detect → EN)',
         helpUrl: 'https://github.com/thedaviddelta/lingva-translate',
         data: {
+            id: 'lingva',
             method: 'get',
             urlPattern: `https://lingva.ml/api/v1/auto/en/${END_POINT_URL_PATTERN_TEXT_SYMBOL}`,
             isLingva: true,
@@ -145,6 +266,7 @@ export const DEFAULT_END_POINTS = {
         name: 'Lingva Translate (JA → EN)',
         helpUrl: 'https://github.com/thedaviddelta/lingva-translate',
         data: {
+            id: 'lingvaJa',
             method: 'get',
             urlPattern: `https://lingva.ml/api/v1/ja/en/${END_POINT_URL_PATTERN_TEXT_SYMBOL}`,
             isLingva: true,
@@ -156,6 +278,7 @@ export const DEFAULT_END_POINTS = {
         name: 'Local Lingva Docker (localhost:3000, JA → EN)',
         helpUrl: 'https://github.com/thedaviddelta/lingva-translate',
         data: {
+            id: 'lingvaLocal',
             method: 'get',
             urlPattern: `http://localhost:3000/api/v1/ja/en/${END_POINT_URL_PATTERN_TEXT_SYMBOL}`,
             isLingva: true,
@@ -168,6 +291,7 @@ export const DEFAULT_END_POINTS = {
         name: 'Local Lingva Docker (localhost:3000, Auto-detect → EN)',
         helpUrl: 'https://github.com/thedaviddelta/lingva-translate',
         data: {
+            id: 'lingvaLocalAuto',
             method: 'get',
             urlPattern: `http://localhost:3000/api/v1/auto/en/${END_POINT_URL_PATTERN_TEXT_SYMBOL}`,
             isLingva: true,
@@ -181,6 +305,7 @@ export const DEFAULT_END_POINTS = {
         name: 'Local Lingva Docker (Ports 3000, 3001, 3002 Load Balanced, JA → EN)',
         helpUrl: 'https://github.com/thedaviddelta/lingva-translate',
         data: {
+            id: 'lingvaLocalBalanced',
             method: 'get',
             urlPattern: `http://localhost:3000/api/v1/ja/en/${END_POINT_URL_PATTERN_TEXT_SYMBOL}`,
             isLingva: true,
@@ -194,6 +319,7 @@ export const DEFAULT_END_POINTS = {
         name: 'Local Lingva Docker (Ports 3000, 3001, 3002 Load Balanced, Auto → EN)',
         helpUrl: 'https://github.com/thedaviddelta/lingva-translate',
         data: {
+            id: 'lingvaLocalBalancedAuto',
             method: 'get',
             urlPattern: `http://localhost:3000/api/v1/auto/en/${END_POINT_URL_PATTERN_TEXT_SYMBOL}`,
             isLingva: true,
@@ -231,12 +357,12 @@ export const MAX_CHUNK_SIZE = {
 export const MAX_PARALLEL_REQUESTS = {
     ezTransWeb: 50,
     ezTransServer: 20,
-    lingva: 5,   // Conservative for public API
-    lingvaJa: 5,
+    lingva: 1,   // Must be 1 for public API — Cloudflare rate limits to ~1 req/sec
+    lingvaJa: 1,
     lingvaLocal: 30,
     lingvaLocalAuto: 30,
-    lingvaLocalBalanced: 100, // Maximized concurrency for heavy load balancing mapping
-    lingvaLocalBalancedAuto: 100
+    lingvaLocalBalanced: 30, // 10 per Docker node — matches Lingva's internal Google scrape throughput
+    lingvaLocalBalancedAuto: 30
 }
 
 // Batch translation settings
@@ -246,16 +372,22 @@ export const BATCH_TRANSLATION = {
 
     // Maximum characters per batch request
     maxBatchLength: {
-        lingva: 1500,      // Conservative for URL length
-        lingvaJa: 1500,
-        // Note: ezTrans services use original method, not batch
+        lingva: 500,
+        lingvaJa: 500,
+        lingvaLocal: 800,
+        lingvaLocalAuto: 800,
+        lingvaLocalBalanced: 800,  // ~2400 chars URI-encoded — safe for Lingva's Google scraper
+        lingvaLocalBalancedAuto: 800
     },
 
     // Maximum items per batch
     maxBatchItems: {
-        lingva: 50,        // Can fit many short variable names
-        lingvaJa: 50,
-        // Note: ezTrans services use original method, not batch
+        lingva: 20,
+        lingvaJa: 20,
+        lingvaLocal: 40,
+        lingvaLocalAuto: 40,
+        lingvaLocalBalanced: 50,
+        lingvaLocalBalancedAuto: 50
     },
 
     // Services that should NOT use batch translation
@@ -311,52 +443,88 @@ class Translator {
     async __translateLingva(text) {
         const epData = this.settings.getEndPointData();
         const sourceLang = epData.sourceLang || 'auto';
+        const domains = epData.isLocal
+            ? (epData.localDomain || 'http://localhost:3000').split(',')
+            : ['https://lingva.ml'];
 
-        // Load balancing router for local docker arrays
-        let baseDomain = 'https://lingva.ml';
-        if (epData.isLocal) {
-            const domains = (epData.localDomain || 'http://localhost:3000').split(',');
-            if (typeof this._rrIndex === 'undefined') {
-                this._rrIndex = 0;
+        if (typeof this._rrIndex === 'undefined') this._rrIndex = 0;
+
+        const maxAttempts = epData.isLocal ? 2 : 4;
+
+        // Rate limiter for public endpoints (Cloudflare enforces ~1 req/sec)
+        if (!epData.isLocal) {
+            const now = Date.now()
+            const minGap = 1500 // 1.5 seconds between requests
+            if (typeof Translator._lastPublicReq === 'undefined') Translator._lastPublicReq = 0
+            const elapsed = now - Translator._lastPublicReq
+            if (elapsed < minGap) {
+                await new Promise(resolve => setTimeout(resolve, minGap - elapsed))
             }
-            baseDomain = domains[this._rrIndex % domains.length].trim();
-            console.log(`[Load Balancer] Sending bulk query chunk to: ${baseDomain}`);
-            this._rrIndex++;
+            Translator._lastPublicReq = Date.now()
         }
 
-        const primaryEndpoint = `${baseDomain}/api/v1/${sourceLang}/en/${encodeURIComponent(text)}`
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+            const baseDomain = domains[this._rrIndex % domains.length].trim();
+            this._rrIndex++;
 
-        try {
-            const response = await axios.get(primaryEndpoint, {
-                timeout: epData.isLocal ? 5000 : 15000, // Shorter timeout for local since it should be instant
-                headers: {
-                    'Accept': 'application/json'
-                }
-            })
+            const endpoint = `${baseDomain}/api/v1/${sourceLang}/en/${encodeURIComponent(text)}`
+            const reqStart = Date.now()
 
-            if (response.data && response.data.translation && response.data.translation !== text) {
-                return response.data.translation
-            }
-        } catch (error) {
-            console.warn('Lingva primary API failed:', error.message);
-
-            // If local failed, drop out early (no fallback)
-            if (epData.isLocal) return text;
-
-            // Quick fallback to plausibility cloud for public endpoints
             try {
-                const fallbackEndpoint = `https://translate.plausibility.cloud/api/v1/${sourceLang}/en/${encodeURIComponent(text)}`
-                const response = await axios.get(fallbackEndpoint, {
-                    timeout: 10000,
+                const response = await axios.get(endpoint, {
+                    timeout: 30000,
                     headers: { 'Accept': 'application/json' }
                 })
+
+                TRANSLATION_METRICS.recordRequest(baseDomain, Date.now() - reqStart)
 
                 if (response.data && response.data.translation && response.data.translation !== text) {
                     return response.data.translation
                 }
-            } catch (fallbackError) {
-                console.warn('Lingva fallback API failed:', fallbackError.message);
-                // If both fail, return original quickly
+                break
+
+            } catch (error) {
+                const latency = Date.now() - reqStart
+                TRANSLATION_METRICS.recordRequest(baseDomain, latency)
+
+                const msg = error.message || ''
+                const isTimeout = msg.includes('timeout')
+                const isRateLimit = msg.includes('429')
+
+                if (isRateLimit) TRANSLATION_METRICS.recordError('429')
+                else if (msg.includes('431') || msg.includes('414')) TRANSLATION_METRICS.recordError('431')
+                else if (msg.includes('404')) TRANSLATION_METRICS.recordError('404')
+                else if (msg.includes('500')) TRANSLATION_METRICS.recordError('500')
+                else if (isTimeout) TRANSLATION_METRICS.recordError('timeout')
+                else TRANSLATION_METRICS.recordError('other')
+
+                // 429 Rate Limited: strong exponential backoff for Cloudflare
+                if (isRateLimit && attempt < maxAttempts - 1) {
+                    const backoff = Math.min(5000 * Math.pow(2, attempt), 30000) // 5s, 10s, 20s, 30s
+                    await new Promise(resolve => setTimeout(resolve, backoff))
+                    continue
+                }
+
+                // Local timeout: retry on next node
+                if (isTimeout && epData.isLocal && attempt === 0) {
+                    continue
+                }
+
+                // Local: no external fallback
+                if (epData.isLocal) return text
+
+                // Public endpoint: try plausibility cloud fallback
+                try {
+                    const fbEndpoint = `https://translate.plausibility.cloud/api/v1/${sourceLang}/en/${encodeURIComponent(text)}`
+                    const fbResp = await axios.get(fbEndpoint, {
+                        timeout: 10000,
+                        headers: { 'Accept': 'application/json' }
+                    })
+                    if (fbResp.data && fbResp.data.translation && fbResp.data.translation !== text) {
+                        return fbResp.data.translation
+                    }
+                } catch (fbErr) { /* fallback failed too */ }
+                break
             }
         }
 
@@ -372,7 +540,6 @@ class Translator {
             // Check translation bank first
             const cached = TRANSLATION_BANK.get(text)
             if (cached) {
-                console.log(`Cache hit: "${text}" → "${cached.translated}"`)
                 return cached.translated
             }
 
@@ -382,7 +549,6 @@ class Translator {
             // Store successful translation in bank
             if (translated && translated !== text) {
                 TRANSLATION_BANK.set(text, translated)
-                console.log(`Cached: "${text}" → "${translated}"`)
             }
 
             return translated
@@ -406,6 +572,12 @@ class Translator {
     // }
 
     getAdaptiveChunkSize(requestedSize, endPointId) {
+        // Lingva endpoints handle batching internally via translateBatch
+        // We return the full length to allow the batching logic to decide the split
+        if (this.settings.getEndPointData().isLingva) {
+            return 999999
+        }
+
         const maxSafe = MAX_CHUNK_SIZE[endPointId] || 50
         const maxParallel = MAX_PARALLEL_REQUESTS[endPointId] || 10
 
@@ -440,11 +612,6 @@ class Translator {
 
         // For other endpoints, use the new batch system
         const safeChunkSize = this.getAdaptiveChunkSize(requestedChunkSize, epData.id || 'unknown')
-        console.log(`Requested chunk size: ${requestedChunkSize}, Using safe size: ${safeChunkSize}`)
-
-        // Check cache statistics
-        const cacheHits = cleanedTexts.filter(text => TRANSLATION_BANK.get(text)).length
-        console.log(`Translating ${cleanedTexts.length} texts (${cacheHits} cached, ${cleanedTexts.length - cacheHits} new)`)
 
         const textsChunk = []
 
@@ -462,7 +629,6 @@ class Translator {
         }
 
         const result = [].concat(...textsChunk)
-        console.log(`Translation completed. Input: ${texts.length}, Output: ${result.length}`)
         return result
     }
 
@@ -549,8 +715,6 @@ class Translator {
 
         // Combine texts with delimiter
         const combinedText = nonEmptyTexts.join(delimiter)
-        console.log(`🔗 Batch translation: ${nonEmptyTexts.length} items in one request`)
-        console.log(`📏 Combined length: ${combinedText.length} characters`)
 
         try {
             // Translate the combined text
@@ -575,57 +739,88 @@ class Translator {
                 }
             })
 
-            console.log(`✅ Batch translation successful: ${nonEmptyTexts.length} → ${translatedParts.length}`)
+            // Batch completed — cache individual results already done via TRANSLATION_BANK.set above
             return results
 
         } catch (error) {
-            console.warn('Batch translation failed, falling back to individual translation:', error)
+            const isTooLarge = error.message && (error.message.includes('431') || error.message.includes('414'));
+            const isServerError = error.message && error.message.includes('500');
+            const isTimeout = error.message && error.message.includes('timeout');
 
-            // Fallback: translate individually
-            const results = new Array(batch.length)
-            for (let i = 0; i < batch.length; i++) {
-                if (batch[i] && batch[i].trim()) {
-                    try {
-                        results[i] = await this.translate(batch[i])
-                        await new Promise(resolve => setTimeout(resolve, 100)) // Small delay
-                    } catch (individualError) {
-                        results[i] = batch[i] // Keep original on failure
-                    }
-                } else {
-                    results[i] = batch[i] || ''
-                }
+            if (isTooLarge) {
+                console.warn(`⚠️ Batch too large (431/414): splitting in half`);
+            } else if (isServerError) {
+                console.warn(`🔥 Server error (500): splitting in half`);
+            } else if (isTimeout) {
+                console.warn(`⏱️ Batch timeout: splitting in half`);
+            } else {
+                console.warn('Batch failed, splitting in half:', error.message);
             }
-            return results
+
+            // Smart fallback: split in half and retry recursively
+            // This is much faster than going one-by-one (O(log n) instead of O(n))
+            if (nonEmptyTexts.length <= 1) {
+                // Can't split further — return originals
+                const results = new Array(batch.length)
+                batch.forEach((t, i) => { results[i] = t || '' })
+                return results
+            }
+
+            const mid = Math.floor(nonEmptyTexts.length / 2)
+            const leftBatch = batch.slice(0, mid)
+            const rightBatch = batch.slice(mid)
+
+            const [leftResults, rightResults] = await Promise.all([
+                this.translateBatch(leftBatch),
+                this.translateBatch(rightBatch)
+            ])
+
+            return [...leftResults, ...rightResults]
         }
     }
 
     async translateLingvaChunk(chunk) {
-        const endPointId = this.settings.getEndPointSelection();
+        const epData = this.settings.getEndPointData()
+        const endPointId = epData.id || this.settings.getEndPointSelection();
 
-        // Use batch translation for efficiency
         const batches = this.createBatches(chunk, endPointId)
-        console.log(`📦 Created ${batches.length} batches from ${chunk.length} items`)
+
+        // Record batch stats for metrics
+        const delimiter = BATCH_TRANSLATION.delimiter
+        for (const b of batches) {
+            const nonEmpty = b.filter(t => t && t.trim())
+            const combinedLen = nonEmpty.join(delimiter).length
+            TRANSLATION_METRICS.recordBatch(nonEmpty.length, combinedLen)
+        }
+        TRANSLATION_METRICS.totalStrings = chunk.length
+
+        console.log(`[Translator] ${batches.length} batches × ${endPointId} — ${chunk.length} strings`)
 
         const allResults = new Array(batches.length)
         const maxParallel = MAX_PARALLEL_REQUESTS[endPointId] || 5;
         let currentIndex = 0;
+        let completedStrings = 0;
+        const totalStrings = chunk.length;
+        let lastReportedProgress = -1;
 
-        // Concurrent processing pool
         const worker = async () => {
             while (currentIndex < batches.length) {
                 const i = currentIndex++;
                 const batch = batches[i];
-                console.log(`🔄 Processing batch ${i + 1}/${batches.length} (${batch.length} items) on parallel thread`);
 
                 try {
                     allResults[i] = await this.translateBatch(batch);
-                } catch (error) {
-                    console.error('Batch failed:', error);
-                    allResults[i] = batch; // fallback securely
-                }
+                    completedStrings += batch.length;
 
-                // Add a micro-delay inside threads for local stability
-                await new Promise(resolve => setTimeout(resolve, 50));
+                    // Throttle progress: fire every 2%
+                    const progress = Math.min(Math.round((completedStrings / totalStrings) * 100), 99);
+                    if (progress >= lastReportedProgress + 2) {
+                        lastReportedProgress = progress;
+                        TRANSLATE_PROGRESS.update(true, progress, `Translating... (${completedStrings}/${totalStrings})`);
+                    }
+                } catch (error) {
+                    allResults[i] = batch;
+                }
             }
         };
 
@@ -634,9 +829,7 @@ class Translator {
             workers.push(worker());
         }
 
-        // Wait for all workers to complete processing batches concurrently
         await Promise.all(workers);
-
         return allResults.flat()
     }
 
@@ -724,8 +917,9 @@ class Translator {
             }
         }
 
-        let totalUncached = 0;
-        let uncachedItemsMap = new Map();
+        // === PHASE 2: Collect ALL uncached strings from ALL targets into one pool ===
+        let totalUncachedStrings = [];
+        let uncachedSets = new Map();
 
         toTranslate.forEach(target => {
             const uncachedSet = new Set();
@@ -737,10 +931,15 @@ class Translator {
                 }
             })
             if (uncachedSet.size > 0) {
-                uncachedItemsMap.set(target.type, Array.from(uncachedSet));
-                totalUncached += uncachedSet.size;
+                const uniqueList = Array.from(uncachedSet);
+                uncachedSets.set(target.type, uniqueList);
+                totalUncachedStrings.push(...uniqueList);
             }
         });
+
+        // Remove duplicates across categories
+        const finalPool = Array.from(new Set(totalUncachedStrings));
+        const totalUncached = finalPool.length;
 
         if (totalUncached === 0) {
             TRANSLATE_PROGRESS.update(false, 100, 'All Cached');
@@ -750,38 +949,49 @@ class Translator {
             return;
         }
 
-        console.log(`[Translator] Total strings to translate: ${totalUncached}`);
-        toTranslate.forEach(t => {
-            const uncached = uncachedItemsMap.get(t.type)
-            if (uncached) console.log(`  ${t.type}: ${uncached.length} new strings`)
+        console.log(`[Translator] Total unique strings to translate: ${totalUncached}`);
+        uncachedSets.forEach((list, type) => {
+            console.log(`  ${type}: ${list.length} strings`);
         });
 
-        let completed = 0;
+        // === PHASE 3: High-Concurrency Translation of the entire pool ===
+        TRANSLATE_PROGRESS.update(true, 0, `Translating Pool (0/${totalUncached})`);
+        TRANSLATION_METRICS.reset();
+        TRANSLATION_METRICS.totalStrings = totalUncached;
 
-        for (const [type, uncached] of uncachedItemsMap.entries()) {
-            TRANSLATE_PROGRESS.update(true, Math.round((completed / totalUncached) * 100), `${type} (${completed}/${totalUncached})`)
-            try {
-                if (isJpToKr || (epData.isLingva && !useBatch)) {
-                    for (let i = 0; i < uncached.length; i++) {
-                        await this.translate(uncached[i]);
-                        completed++;
-                        TRANSLATE_PROGRESS.update(true, Math.round((completed / totalUncached) * 100), `${type} (${completed}/${totalUncached})`)
-                    }
-                } else {
-                    for (let i = 0; i < uncached.length; i += chunkSize) {
-                        const chunk = uncached.slice(i, i + chunkSize);
-                        await this.translateBulk(chunk);
-                        completed += chunk.length;
-                        TRANSLATE_PROGRESS.update(true, Math.round((completed / totalUncached) * 100), `${type} (${completed}/${totalUncached})`)
+        try {
+            if (epData.isLingva) {
+                await this.translateBulk(finalPool);
+            } else {
+                let completed = 0;
+                for (const [type, uncached] of uncachedSets.entries()) {
+                    TRANSLATE_PROGRESS.update(true, Math.round((completed / totalUncached) * 100), `${type} (${completed}/${totalUncached})`);
+                    if (isJpToKr || (epData.isLingva && !useBatch)) {
+                        for (let i = 0; i < uncached.length; i++) {
+                            await this.translate(uncached[i]);
+                            completed++;
+                        }
+                    } else {
+                        for (let i = 0; i < uncached.length; i += chunkSize) {
+                            const chunk = uncached.slice(i, i + chunkSize);
+                            await this.translateBulk(chunk);
+                            completed += chunk.length;
+                        }
                     }
                 }
-            } catch (err) {
-                console.warn(`Failed global translation for ${type}`, err);
             }
+        } catch (err) {
+            console.error('[Translator] Global translation failed', err);
         }
 
+        // Print comprehensive metrics report
+        TRANSLATION_METRICS.printReport();
+
+        // Flush translation cache to disk (single write instead of 13,000+)
+        TRANSLATION_BANK.flushCache();
+
         TRANSLATE_PROGRESS.update(false, 100, 'Complete — Applying to game...');
-        Alert.success('Translation Complete! Applying to in-game text...');
+        Alert.success(`Translation Complete! Translated ${totalUncached} unique strings.`);
         window.dispatchEvent(new CustomEvent('cheat-translate-finish'))
         setTimeout(() => TRANSLATE_PROGRESS.update(false, 0, ''), 3000);
     }

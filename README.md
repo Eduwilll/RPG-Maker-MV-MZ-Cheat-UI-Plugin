@@ -54,6 +54,43 @@ docker-compose up -d
 
 ---
 
+## ⚡ Translation Performance Benchmarks
+
+Real benchmarks translating a full RPG Maker game **(13,338 unique strings)** — Japanese → English:
+
+| Endpoint | Time | Throughput | Batches | Avg Latency (p50) | Errors | Success Rate |
+|---|---|---|---|---|---|---|
+| **3-Node Docker Balanced** | **1m 23s** | 161 str/s | 467 | 4,055ms | 4 timeouts | 99.3% |
+| **Single Docker** | **3m 40s** | 61 str/s | 473 | 12,517ms | 11 timeouts | 99.0% |
+| **Public API (lingva.ml)** | ~60m *(estimated)* | ~4 str/s | 784 | ~3,000ms | Rate limited (429) | Varies |
+
+> **💡 Recommendation:** Use the **3-Node Docker Balanced** setup for bulk translation. It provides **17× faster** performance than the public API and avoids Cloudflare rate limiting.
+
+### Metrics Console Output
+After each translation, a detailed metrics report is printed to the developer console:
+```
+════════════════════════════════════════════════════════════
+  TRANSLATION METRICS REPORT
+════════════════════════════════════════════════════════════
+  Total wall-clock time:   1m 23s
+  Strings translated:      13,338
+  Throughput:              160.9 strings/second
+  ─────────────────────────────────────────
+  HTTP Requests made:      471
+  Total batches:           467
+  Avg batch size:          29 items, 779 chars
+  ─────────────────────────────────────────
+  Latency (min/avg/p50/p95/max): 545/4452/4055/7401/30004 ms
+  ─────────────────────────────────────────
+  Requests per node:
+    http://localhost:3000: 157 requests
+    http://localhost:3001: 157 requests
+    http://localhost:3002: 157 requests
+════════════════════════════════════════════════════════════
+```
+
+---
+
 ## 🌍 Translation Setup
 1. Open Menu (**`Ctrl + C`**) -> **Translation** Tab.
 2. Toggle **Enable** ON.
