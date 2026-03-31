@@ -125,7 +125,7 @@ export default {
             }
 
             try {
-                const releaseInfo = (await axios.get('https://api.github.com/repos/Eduwill/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases/latest')).data
+                const releaseInfo = (await axios.get('https://api.github.com/repos/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases/latest')).data
 
                 const currentCheatVersion = this.getCurrentCheatVersion()
 
