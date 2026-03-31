@@ -663,6 +663,15 @@ class Translator {
         // Comprehensive Database Extraction
         const extractText = (arr) => arr.filter(i => i).flatMap(i => [i.name, i.description].filter(Boolean));
 
+        // Extended extraction: name, description, nickname, profile, messages
+        const extractTextFull = (arr) => arr.filter(i => i).flatMap(i => {
+            const texts = [i.name, i.description, i.nickname, i.profile]
+            for (let m = 1; m <= 4; m++) {
+                if (i[`message${m}`]) texts.push(i[`message${m}`])
+            }
+            return texts.filter(Boolean)
+        });
+
         if (targets.items && window.$dataItems) {
             toTranslate.push({ type: 'Items', list: extractText(window.$dataItems) })
         }
@@ -673,16 +682,46 @@ class Translator {
             toTranslate.push({ type: 'Armors', list: extractText(window.$dataArmors) })
         }
         if (targets.skills && window.$dataSkills) {
-            toTranslate.push({ type: 'Skills', list: extractText(window.$dataSkills) })
+            toTranslate.push({ type: 'Skills', list: extractTextFull(window.$dataSkills) })
         }
         if (targets.states && window.$dataStates) {
-            toTranslate.push({ type: 'States', list: extractText(window.$dataStates) })
+            toTranslate.push({ type: 'States', list: extractTextFull(window.$dataStates) })
         }
         if (targets.classes && window.$dataClasses) {
             toTranslate.push({ type: 'Classes', list: extractText(window.$dataClasses) })
         }
         if (targets.enemies && window.$dataEnemies) {
             toTranslate.push({ type: 'Enemies', list: extractText(window.$dataEnemies) })
+        }
+
+        // === NEW: Actors (names, nicknames, profiles) ===
+        if (targets.actors && window.$dataActors) {
+            toTranslate.push({ type: 'Actors', list: extractTextFull(window.$dataActors) })
+        }
+
+        // === NEW: System Terms (menu commands, battle messages, params, etc.) ===
+        if (targets.system && window.$dataSystem) {
+            const systemTexts = this.extractSystemTerms()
+            if (systemTexts.length > 0) {
+                toTranslate.push({ type: 'System Terms', list: systemTexts })
+            }
+        }
+
+        // === NEW: Event Dialogues from ALL maps ===
+        if (targets.dialogues) {
+            TRANSLATE_PROGRESS.update(true, 0, 'Scanning map files...')
+            const dialogueTexts = await this.extractAllEventDialogues()
+            if (dialogueTexts.length > 0) {
+                toTranslate.push({ type: 'Dialogues', list: dialogueTexts })
+            }
+        }
+
+        // === NEW: Common Events ===
+        if (targets.dialogues && window.$dataCommonEvents) {
+            const commonEventTexts = this.extractCommonEventTexts()
+            if (commonEventTexts.length > 0) {
+                toTranslate.push({ type: 'Common Events', list: commonEventTexts })
+            }
         }
 
         let totalUncached = 0;
@@ -705,9 +744,17 @@ class Translator {
 
         if (totalUncached === 0) {
             TRANSLATE_PROGRESS.update(false, 100, 'All Cached');
+            Alert.success('All text already translated! Applying to game...');
+            window.dispatchEvent(new CustomEvent('cheat-translate-finish'))
             setTimeout(() => TRANSLATE_PROGRESS.update(false, 0, ''), 2000);
             return;
         }
+
+        console.log(`[Translator] Total strings to translate: ${totalUncached}`);
+        toTranslate.forEach(t => {
+            const uncached = uncachedItemsMap.get(t.type)
+            if (uncached) console.log(`  ${t.type}: ${uncached.length} new strings`)
+        });
 
         let completed = 0;
 
@@ -733,10 +780,232 @@ class Translator {
             }
         }
 
-        TRANSLATE_PROGRESS.update(false, 100, 'Complete');
-        Alert.success('Global Translation Complete');
+        TRANSLATE_PROGRESS.update(false, 100, 'Complete — Applying to game...');
+        Alert.success('Translation Complete! Applying to in-game text...');
         window.dispatchEvent(new CustomEvent('cheat-translate-finish'))
-        setTimeout(() => TRANSLATE_PROGRESS.update(false, 0, ''), 2000);
+        setTimeout(() => TRANSLATE_PROGRESS.update(false, 0, ''), 3000);
+    }
+
+    /**
+     * Extract all system terms for translation:
+     * basic terms, commands, params, messages, type names
+     */
+    extractSystemTerms() {
+        const texts = []
+        const sys = window.$dataSystem
+        if (!sys) return texts
+
+        // Basic terms (Level, HP, MP, etc.)
+        if (sys.terms && sys.terms.basic) {
+            texts.push(...sys.terms.basic.filter(t => t && typeof t === 'string' && t.trim()))
+        }
+
+        // Commands (Fight, Escape, Item, Skill, etc.)
+        if (sys.terms && sys.terms.commands) {
+            texts.push(...sys.terms.commands.filter(t => t && typeof t === 'string' && t.trim()))
+        }
+
+        // Params (Max HP, Max MP, Attack, Defense, etc.)
+        if (sys.terms && sys.terms.params) {
+            texts.push(...sys.terms.params.filter(t => t && typeof t === 'string' && t.trim()))
+        }
+
+        // Messages (battle messages like "%1 attacks!", etc.)
+        if (sys.terms && sys.terms.messages) {
+            for (const key in sys.terms.messages) {
+                const text = sys.terms.messages[key]
+                if (text && typeof text === 'string' && text.trim()) {
+                    texts.push(text)
+                }
+            }
+        }
+
+        // Type names
+        const typeArrays = ['armorTypes', 'weaponTypes', 'skillTypes', 'elements']
+        for (const arrayName of typeArrays) {
+            if (sys[arrayName]) {
+                texts.push(...sys[arrayName].filter(t => t && typeof t === 'string' && t.trim()))
+            }
+        }
+
+        // Game title
+        if (sys.gameTitle) texts.push(sys.gameTitle)
+
+        return texts
+    }
+
+    /**
+     * Extract event dialogue text from a single event's command list.
+     * RPG Maker event commands:
+     *   Code 101 = Show Text header (face, position, background)
+     *   Code 401 = Show Text content line
+     *   Code 102 = Show Choices
+     *   Code 355 = Script (first line)
+     *   Code 655 = Script (continuation)
+     *   Code 105 = Show Scrolling Text header
+     *   Code 405 = Show Scrolling Text content line
+     *   Code 320 = Change Actor Name
+     *   Code 324 = Change Actor Nickname
+     *   Code 325 = Change Profile
+     */
+    extractEventCommandTexts(commands) {
+        const texts = []
+        if (!commands || !Array.isArray(commands)) return texts
+
+        for (let i = 0; i < commands.length; i++) {
+            const cmd = commands[i]
+            if (!cmd || !cmd.parameters) continue
+
+            switch (cmd.code) {
+                case 401: // Show Text content line
+                case 405: // Show Scrolling Text content line
+                    if (cmd.parameters[0] && typeof cmd.parameters[0] === 'string' && cmd.parameters[0].trim()) {
+                        texts.push(cmd.parameters[0])
+                    }
+                    break
+
+                case 102: // Show Choices
+                    if (Array.isArray(cmd.parameters[0])) {
+                        for (const choice of cmd.parameters[0]) {
+                            if (choice && typeof choice === 'string' && choice.trim()) {
+                                texts.push(choice)
+                            }
+                        }
+                    }
+                    break
+
+                case 320: // Change Actor Name
+                case 324: // Change Actor Nickname
+                    if (cmd.parameters[1] && typeof cmd.parameters[1] === 'string' && cmd.parameters[1].trim()) {
+                        texts.push(cmd.parameters[1])
+                    }
+                    break
+
+                case 325: // Change Profile
+                    if (cmd.parameters[1] && typeof cmd.parameters[1] === 'string' && cmd.parameters[1].trim()) {
+                        texts.push(cmd.parameters[1])
+                    }
+                    break
+
+                case 356: // Plugin Command (some games store text here)
+                    // Skip — plugin-specific, too variable
+                    break
+            }
+        }
+
+        return texts
+    }
+
+    /**
+     * Extract dialogue text from Common Events.
+     */
+    extractCommonEventTexts() {
+        const texts = []
+        if (!window.$dataCommonEvents) return texts
+
+        for (const event of window.$dataCommonEvents) {
+            if (!event || !event.list) continue
+            texts.push(...this.extractEventCommandTexts(event.list))
+
+            // Also translate the common event name
+            if (event.name && typeof event.name === 'string' && event.name.trim()) {
+                texts.push(event.name)
+            }
+        }
+
+        console.log(`[Translator] Extracted ${texts.length} strings from Common Events`)
+        return texts
+    }
+
+    /**
+     * Extract dialogue text from ALL map JSON files.
+     * Reads MapXXX.json files from the game's data directory.
+     */
+    async extractAllEventDialogues() {
+        const allTexts = []
+
+        // Only works in NW.js (desktop) environment
+        if (!Utils.isNwjs()) {
+            console.warn('[Translator] Event dialogue extraction requires NW.js (desktop game)')
+            return allTexts
+        }
+
+        try {
+            const fs = require('fs')
+            const path = require('path')
+
+            // Determine the data directory
+            const isMV = Utils.RPGMAKER_NAME === 'MV'
+            const baseDir = isMV ? 'www' : '.'
+            const dataDir = path.join(baseDir, 'data')
+
+            if (!fs.existsSync(dataDir)) {
+                console.warn(`[Translator] Data directory not found: ${dataDir}`)
+                return allTexts
+            }
+
+            // Find all MapXXX.json files
+            const files = fs.readdirSync(dataDir)
+            const mapFiles = files.filter(f => /^Map\d+\.json$/i.test(f))
+
+            console.log(`[Translator] Found ${mapFiles.length} map files to scan`)
+
+            for (let fileIdx = 0; fileIdx < mapFiles.length; fileIdx++) {
+                const mapFile = mapFiles[fileIdx]
+                TRANSLATE_PROGRESS.update(true, 0, `Scanning ${mapFile} (${fileIdx + 1}/${mapFiles.length})...`)
+
+                try {
+                    const filePath = path.join(dataDir, mapFile)
+                    const mapData = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+
+                    // Map display name
+                    if (mapData.displayName && typeof mapData.displayName === 'string' && mapData.displayName.trim()) {
+                        allTexts.push(mapData.displayName)
+                    }
+
+                    // Extract from all events on this map
+                    if (mapData.events) {
+                        for (const event of mapData.events) {
+                            if (!event || !event.pages) continue
+
+                            // Event name (sometimes used for display)
+                            // if (event.name && event.name.trim()) allTexts.push(event.name)
+
+                            for (const page of event.pages) {
+                                if (!page || !page.list) continue
+                                allTexts.push(...this.extractEventCommandTexts(page.list))
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.warn(`[Translator] Failed to read ${mapFile}:`, err.message)
+                }
+            }
+
+            // Also extract from Troops (battle events)
+            try {
+                const troopsPath = path.join(dataDir, 'Troops.json')
+                if (fs.existsSync(troopsPath)) {
+                    const troopsData = JSON.parse(fs.readFileSync(troopsPath, 'utf-8'))
+                    for (const troop of troopsData) {
+                        if (!troop || !troop.pages) continue
+                        for (const page of troop.pages) {
+                            if (!page || !page.list) continue
+                            allTexts.push(...this.extractEventCommandTexts(page.list))
+                        }
+                    }
+                    console.log(`[Translator] Also scanned Troops.json for battle events`)
+                }
+            } catch (err) {
+                console.warn('[Translator] Failed to scan Troops.json:', err.message)
+            }
+
+            console.log(`[Translator] Extracted ${allTexts.length} dialogue strings from ${mapFiles.length} maps`)
+        } catch (err) {
+            console.error('[Translator] Failed to scan map files:', err)
+        }
+
+        return allTexts
     }
 }
 
@@ -773,6 +1042,9 @@ class TranslateSettings {
                     variables: true,
                     switches: true,
                     maps: true,
+                    actors: true,
+                    system: true,
+                    dialogues: true,
                 },
 
                 bulkTranslateChunkSize: 10
@@ -781,6 +1053,13 @@ class TranslateSettings {
         }
 
         this.data = JSON.parse(json)
+
+        // Backwards compatibility: add new target keys if missing from old settings
+        if (this.data.targets) {
+            if (this.data.targets.actors === undefined) this.data.targets.actors = true
+            if (this.data.targets.system === undefined) this.data.targets.system = true
+            if (this.data.targets.dialogues === undefined) this.data.targets.dialogues = true
+        }
     }
 
     __writeSettings() {
@@ -889,6 +1168,18 @@ class TranslateSettings {
 
     isMapTranslateEnabled() {
         return this.isEnabled() && this.getTargets().maps
+    }
+
+    isActorTranslateEnabled() {
+        return this.isEnabled() && this.getTargets().actors
+    }
+
+    isSystemTranslateEnabled() {
+        return this.isEnabled() && this.getTargets().system
+    }
+
+    isDialogueTranslateEnabled() {
+        return this.isEnabled() && this.getTargets().dialogues
     }
 }
 
