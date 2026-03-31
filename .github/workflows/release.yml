@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on version tags like v1.0.22
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required to create releases
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+      - name: Build release packages
+        run: python deploy/main.py --version ${{ steps.version.outputs.VERSION }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Cheat UI v${{ steps.version.outputs.VERSION }}"
+          body: |
+            ## RPG Maker MV/MZ Cheat UI + Translation v${{ steps.version.outputs.VERSION }}
+
+            ### 📦 Installation
+            1. Download the package for your RPG Maker version (MV or MZ)
+            2. Extract and copy `www/` contents to your game directory
+            3. Launch game and press **Ctrl + C** for the cheat menu
+
+            ### Files
+            - `rpg-mv-cheat-*-core.tar.gz` — For RPG Maker **MV** games
+            - `rpg-mz-cheat-*-core.tar.gz` — For RPG Maker **MZ** games
+          files: |
+            output/rpg-mv-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz
+            output/rpg-mz-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz
+          draft: false
+          prerelease: false
