@@ -327,6 +327,66 @@ export const DEFAULT_END_POINTS = {
             isLocal: true,
             localDomain: 'http://localhost:3000,http://localhost:3001,http://localhost:3002'
         }
+    },
+
+    // ─── LLM Endpoints ────────────────────────────────────────
+    ollamaLocal: {
+        id: 'ollamaLocal',
+        name: '🤖 Ollama Local LLM (localhost:11434, JA → EN)',
+        helpUrl: 'https://ollama.com',
+        data: {
+            id: 'ollamaLocal',
+            isLLM: true,
+            isLocal: true,
+            apiUrl: 'http://localhost:11434/v1/chat/completions',
+            model: 'qwen3:8b',
+            sourceLang: 'Japanese',
+            targetLang: 'English'
+        }
+    },
+    openai: {
+        id: 'openai',
+        name: '🤖 OpenAI API (GPT-4o-mini, JA → EN)',
+        helpUrl: 'https://platform.openai.com/api-keys',
+        data: {
+            id: 'openai',
+            isLLM: true,
+            isLocal: false,
+            apiUrl: 'https://api.openai.com/v1/chat/completions',
+            model: 'gpt-4o-mini',
+            sourceLang: 'Japanese',
+            targetLang: 'English',
+            requiresApiKey: true
+        }
+    },
+    googleGemini: {
+        id: 'googleGemini',
+        name: '🤖 Google Gemini API (JA → EN)',
+        helpUrl: 'https://aistudio.google.com/app/apikey',
+        data: {
+            id: 'googleGemini',
+            isLLM: true,
+            isLocal: false,
+            apiUrl: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+            model: 'gemini-2.0-flash',
+            sourceLang: 'Japanese',
+            targetLang: 'English',
+            requiresApiKey: true
+        }
+    },
+    llmCustom: {
+        id: 'llmCustom',
+        name: '🤖 Custom LLM API (OpenAI-compatible)',
+        helpUrl: 'https://ollama.com',
+        data: {
+            id: 'llmCustom',
+            isLLM: true,
+            isLocal: true,
+            apiUrl: 'http://localhost:11434/v1/chat/completions',
+            model: 'qwen3:8b',
+            sourceLang: 'Japanese',
+            targetLang: 'English'
+        }
     }
 }
 
@@ -338,31 +398,43 @@ export const RECOMMEND_CHUNK_SIZE = {
     lingvaLocal: 50,
     lingvaLocalAuto: 50,
     lingvaLocalBalanced: 100,
-    lingvaLocalBalancedAuto: 100
+    lingvaLocalBalancedAuto: 100,
+    ollamaLocal: 100,
+    openai: 100,
+    googleGemini: 100,
+    llmCustom: 100
 }
 
 // Maximum safe chunk sizes for different services
 export const MAX_CHUNK_SIZE = {
     ezTransWeb: 1000,
     ezTransServer: 500,
-    lingva: 20,  // Lingva has stricter limits
+    lingva: 20,
     lingvaJa: 20,
     lingvaLocal: 100,
     lingvaLocalAuto: 100,
     lingvaLocalBalanced: 200,
-    lingvaLocalBalancedAuto: 200
+    lingvaLocalBalancedAuto: 200,
+    ollamaLocal: 200,
+    openai: 200,
+    googleGemini: 200,
+    llmCustom: 200
 }
 
 // Optimal parallel request limits
 export const MAX_PARALLEL_REQUESTS = {
     ezTransWeb: 50,
     ezTransServer: 20,
-    lingva: 1,   // Must be 1 for public API — Cloudflare rate limits to ~1 req/sec
+    lingva: 1,
     lingvaJa: 1,
     lingvaLocal: 30,
     lingvaLocalAuto: 30,
-    lingvaLocalBalanced: 30, // 10 per Docker node — matches Lingva's internal Google scrape throughput
-    lingvaLocalBalancedAuto: 30
+    lingvaLocalBalanced: 30,
+    lingvaLocalBalancedAuto: 30,
+    ollamaLocal: 3,    // Local LLM — limited by GPU inference speed
+    openai: 10,        // Cloud API — generous rate limits
+    googleGemini: 10,
+    llmCustom: 3
 }
 
 // Batch translation settings
@@ -376,8 +448,12 @@ export const BATCH_TRANSLATION = {
         lingvaJa: 500,
         lingvaLocal: 800,
         lingvaLocalAuto: 800,
-        lingvaLocalBalanced: 800,  // ~2400 chars URI-encoded — safe for Lingva's Google scraper
-        lingvaLocalBalancedAuto: 800
+        lingvaLocalBalanced: 800,
+        lingvaLocalBalancedAuto: 800,
+        ollamaLocal: 3000,   // LLMs use POST — no URL length limit
+        openai: 4000,
+        googleGemini: 4000,
+        llmCustom: 3000
     },
 
     // Maximum items per batch
@@ -387,7 +463,11 @@ export const BATCH_TRANSLATION = {
         lingvaLocal: 40,
         lingvaLocalAuto: 40,
         lingvaLocalBalanced: 50,
-        lingvaLocalBalancedAuto: 50
+        lingvaLocalBalancedAuto: 50,
+        ollamaLocal: 50,
+        openai: 80,
+        googleGemini: 80,
+        llmCustom: 50
     },
 
     // Services that should NOT use batch translation
@@ -416,6 +496,11 @@ class Translator {
         // For Lingva API, try multiple endpoints with fallbacks
         if (epData.isLingva) {
             return await this.__translateLingva(text)
+        }
+
+        // For LLM APIs (Ollama, OpenAI, custom)
+        if (epData.isLLM) {
+            return await this.__translateLLM(text)
         }
 
         // For other APIs, use the original logic
@@ -525,6 +610,87 @@ class Translator {
                     }
                 } catch (fbErr) { /* fallback failed too */ }
                 break
+            }
+        }
+
+        return text
+    }
+
+    async __translateLLM(text) {
+        const epData = this.settings.getEndPointData()
+        const llmConfig = this.settings.getLLMConfig()
+
+        // Merge endpoint defaults with user config
+        const apiUrl = llmConfig.apiUrl || epData.apiUrl
+        const model = llmConfig.model || epData.model
+        const apiKey = llmConfig.apiKey || ''
+        const sourceLang = epData.sourceLang || 'Japanese'
+        const targetLang = epData.targetLang || 'English'
+
+        const systemPrompt = llmConfig.systemPrompt ||
+            `You are a professional RPG game translator. Translate the following ${sourceLang} game text to ${targetLang}.\n\nRules:\n- Translate ONLY the text, output NOTHING else (no explanations, no notes)\n- Preserve the delimiter ⟨SEP⟩ exactly as-is between translated segments\n- Keep game variables like \\V[123], \\N[1], %1, %2 unchanged\n- Keep newline characters (\\n) unchanged\n- Maintain the tone and personality of game dialogue\n- For RPG terms (skills, items, spells), use natural English equivalents\n- Do NOT add quotes around the translation`
+
+        const headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+        if (apiKey) {
+            headers['Authorization'] = `Bearer ${apiKey}`
+        }
+
+        const reqStart = Date.now()
+
+        try {
+            const response = await axios.post(apiUrl, {
+                model: model,
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: text }
+                ],
+                temperature: 0.3,  // Low temperature for consistent translations
+                max_tokens: Math.max(text.length * 3, 500)  // Generous token limit
+            }, {
+                timeout: 60000,  // LLMs can be slower than translation APIs
+                headers: headers
+            })
+
+            TRANSLATION_METRICS.recordRequest(apiUrl, Date.now() - reqStart)
+
+            if (response.data && response.data.choices && response.data.choices[0]) {
+                const translated = response.data.choices[0].message.content.trim()
+                if (translated && translated !== text) {
+                    return translated
+                }
+            }
+
+        } catch (error) {
+            const latency = Date.now() - reqStart
+            TRANSLATION_METRICS.recordRequest(apiUrl, latency)
+
+            const msg = error.message || ''
+            if (msg.includes('429')) TRANSLATION_METRICS.recordError('429')
+            else if (msg.includes('401') || msg.includes('403')) TRANSLATION_METRICS.recordError('other')
+            else if (msg.includes('timeout')) TRANSLATION_METRICS.recordError('timeout')
+            else TRANSLATION_METRICS.recordError('other')
+
+            // Retry once on rate limit with backoff
+            if (msg.includes('429')) {
+                await new Promise(resolve => setTimeout(resolve, 3000))
+                try {
+                    const retryResp = await axios.post(apiUrl, {
+                        model: model,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: text }
+                        ],
+                        temperature: 0.3,
+                        max_tokens: Math.max(text.length * 3, 500)
+                    }, { timeout: 60000, headers })
+
+                    if (retryResp.data?.choices?.[0]) {
+                        return retryResp.data.choices[0].message.content.trim()
+                    }
+                } catch (retryErr) { /* retry failed */ }
             }
         }
 
@@ -1257,7 +1423,14 @@ class TranslateSettings {
                     dialogues: true,
                 },
 
-                bulkTranslateChunkSize: 10
+                bulkTranslateChunkSize: 10,
+
+                llmConfig: {
+                    apiKey: '',
+                    model: '',
+                    apiUrl: '',
+                    systemPrompt: ''
+                }
             }
             return
         }
@@ -1270,6 +1443,10 @@ class TranslateSettings {
             if (this.data.targets.system === undefined) this.data.targets.system = true
             if (this.data.targets.dialogues === undefined) this.data.targets.dialogues = true
         }
+        // Backwards compatibility: add LLM config if missing
+        if (!this.data.llmConfig) {
+            this.data.llmConfig = { apiKey: '', model: '', apiUrl: '', systemPrompt: '' }
+        }
     }
 
     __writeSettings() {
@@ -1281,7 +1458,20 @@ class TranslateSettings {
             return this.getCustomEndPointData()
         }
 
-        return DEFAULT_END_POINTS[this.getEndPointSelection()].data
+        const epData = DEFAULT_END_POINTS[this.getEndPointSelection()].data
+
+        // For LLM endpoints, merge user config (model, apiUrl, apiKey)
+        if (epData.isLLM) {
+            const llm = this.getLLMConfig()
+            return {
+                ...epData,
+                model: llm.model || epData.model,
+                apiUrl: llm.apiUrl || epData.apiUrl,
+                apiKey: llm.apiKey || ''
+            }
+        }
+
+        return epData
     }
 
     setEnabled(flag) {
@@ -1319,6 +1509,15 @@ class TranslateSettings {
 
     setCustomEndPointBody(body) {
         this.data.customEndPointData.body = body
+        this.__writeSettings()
+    }
+
+    getLLMConfig() {
+        return this.data.llmConfig || { apiKey: '', model: '', apiUrl: '', systemPrompt: '' }
+    }
+
+    setLLMConfig(config) {
+        this.data.llmConfig = { ...this.data.llmConfig, ...config }
         this.__writeSettings()
     }
 
