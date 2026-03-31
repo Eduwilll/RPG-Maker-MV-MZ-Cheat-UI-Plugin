@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # ─── Lingva Translation Cluster ───────────────────────────
   lingva-1:
     image: thedaviddelta/lingva-translate:latest
     container_name: lingva-1
@@ -21,3 +22,26 @@ services:
     ports:
       - "3002:3000"
     restart: unless-stopped
+
+  # ─── Ollama LLM Server ───────────────────────────────────
+  # For GPU acceleration, install NVIDIA Container Toolkit:
+  # https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    # Uncomment below for NVIDIA GPU support:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+volumes:
+  ollama_data:

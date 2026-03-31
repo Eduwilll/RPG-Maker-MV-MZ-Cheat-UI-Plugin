@@ -195,6 +195,45 @@ export class GeneralCheat {
     static isGodMode (actor) {
         return this.getGodModeData(actor).godMode
     }
+
+    static forceEnableSave (enabled) {
+        this._forceSave = enabled
+        if (enabled) {
+            if (!this._orig_isSaveEnabled) {
+                this._orig_isSaveEnabled = Game_System.prototype.isSaveEnabled
+            }
+            Game_System.prototype.isSaveEnabled = function () {
+                return true
+            }
+            if (typeof $gameSystem !== 'undefined' && $gameSystem) {
+                $gameSystem.enableSave()
+            }
+        } else {
+            if (this._orig_isSaveEnabled) {
+                Game_System.prototype.isSaveEnabled = this._orig_isSaveEnabled
+            }
+        }
+    }
+
+    static isForceSaveEnabled () {
+        return !!this._forceSave
+    }
+
+    static openConsole () {
+        try {
+            if (typeof nw !== 'undefined' && nw.Window) {
+                nw.Window.get().showDevTools()
+            } else {
+                const gui = require('nw.gui')
+                if (gui && gui.Window) {
+                    gui.Window.get().showDevTools()
+                }
+            }
+        } catch (e) {
+            console.error('Failed to open console:', e)
+            Alert.error('Failed to open console. Note: This only works in NW.js (PC vers).')
+        }
+    }
 }
 
 export class GameSpeedCheat {

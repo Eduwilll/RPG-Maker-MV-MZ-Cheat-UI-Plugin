@@ -16,6 +16,14 @@ export default {
             label="No Clip"
             @change="onNoClipChange">
         </v-checkbox>
+        <v-checkbox
+            v-model="forceSave"
+            label="Force Enable Save"
+            dense
+            hide-details
+            class="pt-0"
+            @change="onForceSaveChange">
+        </v-checkbox>
     </v-card-text>
     
     <v-card-text class="py-0">
@@ -106,6 +114,14 @@ export default {
             @click="gotoTitle">
             To Title
         </v-btn>
+        <v-btn
+            v-if="canOpenConsole"
+            small
+            class="ml-1"
+            title="Open NW.js Developer Console"
+            @click="openConsole">
+            Open Console
+        </v-btn>
     </v-card-text>
     
     <v-card-text>
@@ -162,7 +178,9 @@ export default {
             maxGameSpeed: 10,
             stepGameSpeed: 0.1,
             applyAllForGameSpeed: false,
-            applyBattleForGameSpeed: false
+            applyBattleForGameSpeed: false,
+            forceSave: false,
+            canOpenConsole: typeof nw !== 'undefined' || typeof require === 'function'
         }
     },
 
@@ -176,6 +194,8 @@ export default {
             this.speed = $gamePlayer.moveSpeed()
             this.fixSpeed = SpeedCheat.isFixed()
             this.gold = $gameParty._gold
+
+            this.forceSave = GeneralCheat.isForceSaveEnabled()
 
             this.gameSpeed = GameSpeedCheat.getRate()
             const gameSpeedSceneOption = GameSpeedCheat.getSceneOption()
@@ -272,6 +292,15 @@ export default {
             }
 
             this.onGameSpeedChange()
+        },
+
+        onForceSaveChange () {
+            GeneralCheat.forceEnableSave(this.forceSave)
+            this.initializeVariables()
+        },
+
+        openConsole () {
+            GeneralCheat.openConsole()
         }
     }
 }

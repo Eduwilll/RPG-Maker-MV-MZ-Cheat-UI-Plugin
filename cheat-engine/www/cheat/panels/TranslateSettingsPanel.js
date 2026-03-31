@@ -122,6 +122,63 @@ export default {
         </v-textarea>
     </v-card-text>
     
+    <!-- LLM Configuration Panel -->
+    <v-card-text 
+        class="py-0 mt-4 mb-0"
+        v-if="isLLMEndPoint">
+        <v-card-subtitle class="pa-0 mb-2 font-weight-bold">🤖 LLM Configuration</v-card-subtitle>
+        
+        <v-text-field
+            class="body-2 mb-2"
+            v-model="llmConfig.model"
+            dense
+            hide-details
+            label="Model Name"
+            hint="e.g. qwen3:8b, gemma3:12b, gpt-4o-mini, gemini-2.0-flash, deepseek-chat"
+            persistent-hint
+            background-color="grey darken-3"
+            solo
+            :disabled="!enabled"
+            @keydown.self.stop
+            @change="onChangeLLMConfig">
+        </v-text-field>
+
+        <v-text-field
+            class="body-2 mb-2"
+            v-if="selectedDefaultEndPoint && selectedDefaultEndPoint.data.requiresApiKey || llmConfig.apiKey"
+            v-model="llmConfig.apiKey"
+            dense
+            hide-details
+            label="API Key"
+            type="password"
+            background-color="grey darken-3"
+            solo
+            :disabled="!enabled"
+            @keydown.self.stop
+            @change="onChangeLLMConfig">
+        </v-text-field>
+
+        <v-text-field
+            class="body-2 mb-2"
+            v-if="endPointSelection === 'llmCustom'"
+            v-model="llmConfig.apiUrl"
+            dense
+            hide-details
+            label="API URL (OpenAI-compatible endpoint)"
+            hint="e.g. http://localhost:11434/v1/chat/completions"
+            persistent-hint
+            background-color="grey darken-3"
+            solo
+            :disabled="!enabled"
+            @keydown.self.stop
+            @change="onChangeLLMConfig">
+        </v-text-field>
+
+        <v-card-text class="pa-0 mt-1 caption grey--text">
+            <strong>Recommended models:</strong> qwen3:8b, gemma3:12b (Ollama) · gpt-4o-mini (OpenAI) · gemini-2.0-flash (Google) · deepseek-chat (DeepSeek)
+        </v-card-text>
+    </v-card-text>
+    
     
     <v-card-subtitle class="pb-0 mt-4 font-weight-bold">Bulk translate</v-card-subtitle>
     <v-card-text class="py-0 mt-1">
@@ -454,6 +511,13 @@ export default {
 
             customEndPointData: {},
 
+            llmConfig: {
+                apiKey: '',
+                model: '',
+                apiUrl: '',
+                systemPrompt: ''
+            },
+
             bulkTranslateChunkSize: 500,
 
             // Translation bank stats
@@ -550,6 +614,11 @@ export default {
             return this.endPointSelection === 'custom'
         },
 
+        isLLMEndPoint () {
+            const ep = DEFAULT_END_POINTS[this.endPointSelection]
+            return ep && ep.data && ep.data.isLLM
+        },
+
         selectedDefaultEndPoint () {
             return DEFAULT_END_POINTS[this.endPointSelection]
         },
@@ -573,6 +642,7 @@ export default {
 
             this.endPointSelection = TRANSLATE_SETTINGS.getEndPointSelection()
             this.customEndPointData = TRANSLATE_SETTINGS.getCustomEndPointData()
+            this.llmConfig = TRANSLATE_SETTINGS.getLLMConfig()
 
             this.targets = TRANSLATE_SETTINGS.getTargets()
             this.bulkTranslateChunkSize = TRANSLATE_SETTINGS.getBulkTranslateChunkSize()
@@ -624,6 +694,10 @@ export default {
         onChangeCustomEndPointBody () {
             TRANSLATE_SETTINGS.setCustomEndPointBody(this.customEndPointData.body)
             this.checkTranslatorAvailable()
+        },
+
+        onChangeLLMConfig () {
+            TRANSLATE_SETTINGS.setLLMConfig(this.llmConfig)
         },
 
         checkChunkSize () {
