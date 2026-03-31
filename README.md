@@ -62,9 +62,9 @@ Real benchmarks translating a full RPG Maker game **(13,338 unique strings)** �
 |---|---|---|---|---|---|---|
 | **3-Node Docker Balanced** | **1m 23s** | 161 str/s | 467 | 4,055ms | 4 timeouts | 99.3% |
 | **Single Docker** | **3m 40s** | 61 str/s | 473 | 12,517ms | 11 timeouts | 99.0% |
-| **Public API (lingva.ml)** | ~60m *(estimated)* | ~4 str/s | 784 | ~3,000ms | Rate limited (429) | Varies |
+| **Public API (lingva.ml)** | **48m 33s** | 4.6 str/s | 784 | 3,684ms | 3 (404 fallback) | 99.9% |
 
-> **💡 Recommendation:** Use the **3-Node Docker Balanced** setup for bulk translation. It provides **17× faster** performance than the public API and avoids Cloudflare rate limiting.
+> **💡 Recommendation:** Use the **3-Node Docker Balanced** setup for bulk translation. It is **35× faster** than the public API and avoids Cloudflare rate limiting.
 
 ### Metrics Console Output
 After each translation, a detailed metrics report is printed to the developer console:
