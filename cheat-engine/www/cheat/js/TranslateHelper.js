@@ -687,7 +687,7 @@ class Translator {
                         max_tokens: Math.max(text.length * 3, 500)
                     }, { timeout: 60000, headers })
 
-                    if (retryResp.data?.choices?.[0]) {
+                    if (retryResp.data && retryResp.data.choices && retryResp.data.choices[0]) {
                         return retryResp.data.choices[0].message.content.trim()
                     }
                 } catch (retryErr) { /* retry failed */ }
