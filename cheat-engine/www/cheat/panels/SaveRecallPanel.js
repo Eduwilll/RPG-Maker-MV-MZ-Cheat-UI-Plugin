@@ -212,6 +212,8 @@ export default {
         },
 
         getMapAncestors (id, path) {
+            if (!id || !$dataMapInfos[id]) return;
+            
             path.push(id)
             if ($dataMapInfos[id].parentId === 0) {
                 path.reverse()
