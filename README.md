@@ -17,6 +17,10 @@ A powerful, GUI-based cheat tool for RPG Maker MV and MZ games, featuring **Real
 ## 🔥 Features
 - **Cheat Panel**: Gold, Stats, Speed, Items, Weapons, Armors, Skills, and more.
 - **World Hacks**: Wall-through (Noclip), God Mode, Disable Encounters.
+- **New Utilities**: 
+  - **Force Save**: Overrides game-level save restrictions.
+  - **Debug Access**: Instant access to NW.js Console and RPG Maker Debug (F9) Menu.
+  - **Mouse Teleport**: Move your player instantly with `Alt + M` (toggle) and click!
 - **Smart Translation**: Real-time translation for Variables, Switches, Maps, and Items.
   - Supports **Lingva Translate** (Free/Private Google Translate alternative).
   - **Translation Bank**: Caches results for instant loading.
@@ -51,6 +55,31 @@ We provide a `docker-compose.yml` in this repository to run a 3-instance cluster
 docker-compose up -d
 ```
 - In plugin settings, select: **"Local Lingva Docker (Ports 3000, 3001, 3002 Balanced)"**.
+
+---
+
+## 🛠️ Development & UI Preview
+
+We provide professional tools to speed up UI development and game integration.
+
+### 1. Web-UI Preview (Browser Development)
+Develop your Vue/Vuetify UI directly in your browser with near-instant updates. No game restart required!
+```powershell
+.venv\Scripts\python.exe start-preview.py
+```
+- Open `http://localhost:8080/preview/index.html` in your browser.
+- Mocked RPG Maker globals (`$gameParty`, etc.) allow the UI to function without the game engine.
+
+### 2. Dev-Sync (Auto-Injection & Symlinking)
+Link your development folder to a test game. Any saved changes in your IDE are instantly visible in the game (press `F5`).
+```powershell
+# Setup for any game
+.venv\Scripts\python.exe deploy\dev.py --game-path "C:/MyTestGame"
+
+# Quick setup for local test folders
+.venv\Scripts\python.exe deploy\dev.py --mv
+.venv\Scripts\python.exe deploy\dev.py --mz
+```
 
 ---
 
