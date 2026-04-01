@@ -1,5 +1,5 @@
-import {Alert} from './AlertHelper.js'
-import {KeyValueStorage} from './KeyValueStorage.js'
+import { Alert } from './AlertHelper.js'
+import { KeyValueStorage } from './KeyValueStorage.js'
 
 export class GeneralCheat {
     // static saveCheatSettings () {
@@ -44,15 +44,15 @@ export class GeneralCheat {
     // }
 
     // will be replaced from main component
-    static toggleCheatModal (componentName = null) {
+    static toggleCheatModal(componentName = null) {
 
     }
 
-    static openCheatModal (componentName = null) {
+    static openCheatModal(componentName = null) {
 
     }
 
-    static toggleNoClip (notify = false) {
+    static toggleNoClip(notify = false) {
         $gamePlayer._through = !$gamePlayer._through
 
         if (notify) {
@@ -60,7 +60,7 @@ export class GeneralCheat {
         }
     }
 
-    static getGodModeOnActorIds () {
+    static getGodModeOnActorIds() {
         if (!this.godModeMap) {
             return []
         }
@@ -78,7 +78,7 @@ export class GeneralCheat {
         return ret
     }
 
-    static getGodModeData (actor) {
+    static getGodModeData(actor) {
         if (!this.godModeMap) {
             this.godModeMap = new Map()
         }
@@ -104,19 +104,19 @@ export class GeneralCheat {
         return defaultData
     }
 
-    static godModeOn (actor) {
+    static godModeOn(actor) {
         if (actor instanceof Game_Actor && !this.isGodMode(actor)) {
             const godModeData = this.getGodModeData(actor)
             godModeData.godMode = true
 
             actor.gainHP_bkup = actor.gainHp
-            actor.gainHp = function(value) {
+            actor.gainHp = function (value) {
                 value = actor.mhp
                 actor.gainHP_bkup(value)
             }
 
             actor.setHp_bkup = actor.setHp
-            actor.setHp = function(hp) {
+            actor.setHp = function (hp) {
                 hp = actor.mhp
                 actor.setHp_bkup(hp)
             }
@@ -128,7 +128,7 @@ export class GeneralCheat {
             }
 
             actor.setMp_bkup = actor.setMp
-            actor.setMp = function(mp) {
+            actor.setMp = function (mp) {
                 mp = actor.mmp
                 actor.setMp_bkup(mp)
             }
@@ -140,7 +140,7 @@ export class GeneralCheat {
             }
 
             actor.setTp_bkup = actor.setTp
-            actor.setTp = function(tp) {
+            actor.setTp = function (tp) {
                 tp = actor.maxTp()
                 actor.setTp_bkup(tp)
             }
@@ -150,7 +150,7 @@ export class GeneralCheat {
                 // do nothing
             }
 
-            godModeData.godModeInterval = setInterval(function() {
+            godModeData.godModeInterval = setInterval(function () {
                 actor.gainHp(actor.mhp)
                 actor.gainMp(actor.mmp)
                 actor.gainTp(actor.maxTp())
@@ -160,7 +160,7 @@ export class GeneralCheat {
         }
     }
 
-    static godModeOff (actor) {
+    static godModeOff(actor) {
         if (actor instanceof Game_Actor && this.isGodMode(actor)) {
             const godModeData = this.getGodModeData(actor)
             godModeData.godMode = false
@@ -184,7 +184,7 @@ export class GeneralCheat {
         }
     }
 
-    static toggleGodMode (actor) {
+    static toggleGodMode(actor) {
         if (this.isGodMode(actor)) {
             this.godModeOff(actor)
         } else {
@@ -192,11 +192,11 @@ export class GeneralCheat {
         }
     }
 
-    static isGodMode (actor) {
+    static isGodMode(actor) {
         return this.getGodModeData(actor).godMode
     }
 
-    static forceEnableSave (enabled) {
+    static forceEnableSave(enabled) {
         this._forceSave = enabled
         if (enabled) {
             if (!this._orig_isSaveEnabled) {
@@ -215,11 +215,11 @@ export class GeneralCheat {
         }
     }
 
-    static isForceSaveEnabled () {
+    static isForceSaveEnabled() {
         return !!this._forceSave
     }
 
-    static openConsole () {
+    static openConsole() {
         try {
             if (typeof nw !== 'undefined' && nw.Window) {
                 nw.Window.get().showDevTools()
@@ -235,7 +235,7 @@ export class GeneralCheat {
         }
     }
 
-    static openDebugMenu () {
+    static openDebugMenu() {
         try {
             if (SceneManager._scene instanceof Scene_Map) {
                 SceneManager.push(Scene_Debug)
@@ -249,7 +249,7 @@ export class GeneralCheat {
         }
     }
 
-    static toggleMouseTeleport (enabled) {
+    static toggleMouseTeleport(enabled) {
         if (enabled === undefined) {
             enabled = !this.isMouseTeleportEnabled()
         }
@@ -272,20 +272,20 @@ export class GeneralCheat {
         }
     }
 
-    static isMouseTeleportEnabled () {
+    static isMouseTeleportEnabled() {
         return !!this._mouseTeleport
     }
 }
 
 export class GameSpeedCheat {
-    static sceneOptions () {
+    static sceneOptions() {
         if (!this._sceneOptions) {
             this._sceneOptions = {
-                all () {
+                all() {
                     return true
                 },
 
-                battle () {
+                battle() {
                     return SceneManager._scene instanceof Scene_Battle
                 }
             }
@@ -294,7 +294,7 @@ export class GameSpeedCheat {
         return this._sceneOptions
     }
 
-    static getRate () {
+    static getRate() {
         if (this.rate) {
             return this.rate
         }
@@ -302,7 +302,7 @@ export class GameSpeedCheat {
         return 1
     }
 
-    static getSceneOption () {
+    static getSceneOption() {
         if (this.sceneOption) {
             return this.sceneOption
         }
@@ -310,7 +310,7 @@ export class GameSpeedCheat {
         return this.sceneOptions().all
     }
 
-    static removeApplied () {
+    static removeApplied() {
         if (this.isApplied) {
             SceneManager.updateScene = this.origin_SceneManager_updateScene
             Scene_Map.prototype.update = this.origin_Scene_Map_update
@@ -319,7 +319,7 @@ export class GameSpeedCheat {
         }
     }
 
-    static setGameSpeed (rate, sceneOption) {
+    static setGameSpeed(rate, sceneOption) {
         // backup original functions
         if (!this.origin_SceneManager_updateScene) {
             this.origin_SceneManager_updateScene = SceneManager.updateScene
@@ -378,7 +378,7 @@ export class GameSpeedCheat {
         this.isApplied = true
     }
 
-    static __writeSettings (rate, sceneOption) {
+    static __writeSettings(rate, sceneOption) {
         const options = GameSpeedCheat.sceneOptions()
         const sceneOptionKey = Object.keys(GameSpeedCheat.sceneOptions()).find(key => options[key] === sceneOption)
 
@@ -387,7 +387,7 @@ export class GameSpeedCheat {
         storage.setItem('data', JSON.stringify({ rate: rate, sceneOption: sceneOptionKey }))
     }
 
-    static __readSettings () {
+    static __readSettings() {
         const storage = new KeyValueStorage('./www/cheat-settings/gameSpeed.json')
 
         const json = storage.getItem('data')
@@ -405,11 +405,11 @@ export class GameSpeedCheat {
 export class SpeedCheat {
     // static fixed = null // WARN: declaring static variable occurs error in nw.js (why?)
 
-    static isFixed () {
+    static isFixed() {
         return !!SpeedCheat.fixed
     }
 
-    static setFixSpeedInterval (speed) {
+    static setFixSpeedInterval(speed) {
         if (SpeedCheat.isFixed()) {
             SpeedCheat.removeFixSpeedInterval()
         }
@@ -419,7 +419,7 @@ export class SpeedCheat {
         }, 1000)
     }
 
-    static removeFixSpeedInterval () {
+    static removeFixSpeedInterval() {
         if (SpeedCheat.isFixed()) {
             clearInterval(SpeedCheat.fixed)
             SpeedCheat.fixed = undefined
@@ -430,7 +430,7 @@ export class SpeedCheat {
         $gamePlayer.setMoveSpeed(speed)
     }
 
-    static setSpeed (speed, fixed = false) {
+    static setSpeed(speed, fixed = false) {
         SpeedCheat.__setSpeed(speed)
 
         if (fixed) {
@@ -440,13 +440,13 @@ export class SpeedCheat {
         }
     }
 
-    static __writeSettings (speed, fixed) {
+    static __writeSettings(speed, fixed) {
         const storage = new KeyValueStorage('./www/cheat-settings/speed.json')
 
         storage.setItem('data', JSON.stringify({ speed: speed, fixed: fixed }))
     }
 
-    static __readSettings () {
+    static __readSettings() {
         const storage = new KeyValueStorage('./www/cheat-settings/speed.json')
 
         const json = storage.getItem('data')
@@ -464,11 +464,11 @@ export class SpeedCheat {
 }
 
 export class SceneCheat {
-    static gotoTitle () {
+    static gotoTitle() {
         SceneManager.goto(Scene_Title)
     }
 
-    static toggleSaveScene () {
+    static toggleSaveScene() {
         if (SceneManager._scene.constructor === Scene_Save) {
             SceneManager.pop()
         } else if (SceneManager._scene.constructor === Scene_Load) {
@@ -478,7 +478,7 @@ export class SceneCheat {
         }
     }
 
-    static toggleLoadScene () {
+    static toggleLoadScene() {
         if (SceneManager._scene.constructor === Scene_Load) {
             SceneManager.pop()
         } else if (SceneManager._scene.constructor === Scene_Save) {
@@ -488,14 +488,14 @@ export class SceneCheat {
         }
     }
 
-    static quickSave (slot = 1) {
+    static quickSave(slot = 1) {
         $gameSystem.onBeforeSave()
         DataManager.saveGame(slot)
 
         Alert.success(`Game saved to slot ${slot}`)
     }
 
-    static quickLoad (slot = 1) {
+    static quickLoad(slot = 1) {
         DataManager.loadGame(slot)
         SceneManager.goto(Scene_Map)
 
@@ -504,13 +504,13 @@ export class SceneCheat {
 }
 
 export class BattleCheat {
-    static recover (member) {
+    static recover(member) {
         member.setHp(member.mhp)
         member.setMp(member.mmp)
         member.setTp(member.maxTp())
     }
 
-    static recoverAllEnemy () {
+    static recoverAllEnemy() {
         for (const member of $gameTroop.members()) {
             this.recover(member)
         }
@@ -518,7 +518,7 @@ export class BattleCheat {
         Alert.success('Recovery all enemies')
     }
 
-    static recoverAllParty () {
+    static recoverAllParty() {
         for (const member of $gameParty.members()) {
             this.recover(member)
         }
@@ -526,7 +526,7 @@ export class BattleCheat {
         Alert.success('Recovery all party members')
     }
 
-    static fillTpAllEnemy () {
+    static fillTpAllEnemy() {
         for (const member of $gameTroop.members()) {
             member.setTp(member.maxTp())
         }
@@ -534,7 +534,7 @@ export class BattleCheat {
         Alert.success('Fill TP all enemies')
     }
 
-    static fillTpAllParty () {
+    static fillTpAllParty() {
         for (const member of $gameParty.members()) {
             member.setTp(member.maxTp())
         }
@@ -542,7 +542,7 @@ export class BattleCheat {
         Alert.success('Fill TP all party members')
     }
 
-    static changeAllEnemyHealth (newHp) {
+    static changeAllEnemyHealth(newHp) {
         for (const member of $gameTroop.members()) {
             member.setHp(newHp)
         }
@@ -550,7 +550,7 @@ export class BattleCheat {
         Alert.success(`HP ${newHp} for all enemies`)
     }
 
-    static changeAllPartyHealth (newHp) {
+    static changeAllPartyHealth(newHp) {
         for (const member of $gameParty.members()) {
             member.setHp(newHp)
         }
@@ -558,15 +558,15 @@ export class BattleCheat {
         Alert.success(`HP ${newHp} for all party members`)
     }
 
-    static canExecuteBattleEndProcess () {
+    static canExecuteBattleEndProcess() {
         return SceneManager._scene && SceneManager._scene.constructor === Scene_Battle && BattleManager._phase !== 'battleEnd'
     }
 
-    static encounterBattle () {
+    static encounterBattle() {
         $gamePlayer._encounterCount = 0
     }
 
-    static victory () {
+    static victory() {
         if (this.canExecuteBattleEndProcess()) {
             $gameTroop.members().forEach(enemy => {
                 enemy.addNewState(enemy.deathStateId())
@@ -578,7 +578,7 @@ export class BattleCheat {
         return false
     }
 
-    static defeat () {
+    static defeat() {
         if (this.canExecuteBattleEndProcess()) {
             $gameParty.members().forEach(actor => {
                 actor.addNewState(actor.deathStateId())
@@ -590,7 +590,7 @@ export class BattleCheat {
         return false
     }
 
-    static escape () {
+    static escape() {
         if (this.canExecuteBattleEndProcess()) {
             $gameParty.performEscape()
             SoundManager.playEscape()
@@ -602,7 +602,7 @@ export class BattleCheat {
         return false
     }
 
-    static abort () {
+    static abort() {
         if (this.canExecuteBattleEndProcess()) {
             $gameParty.performEscape()
             SoundManager.playEscape()
@@ -614,7 +614,7 @@ export class BattleCheat {
         return false
     }
 
-    static toggleDisableRandomEncounter () {
+    static toggleDisableRandomEncounter() {
         // change $gamePlayer.canEncounter function
         // if canEncounter is false, $gamePlayer.updateEncounterCount() do not decreases $gamePlayer._encounterCount
         if (this.isDisableRandomEncounter()) {
@@ -633,13 +633,13 @@ export class BattleCheat {
         this.disableRandomEncounter = !this.isDisableRandomEncounter()
     }
 
-    static isDisableRandomEncounter () {
+    static isDisableRandomEncounter() {
         return !!this.disableRandomEncounter && this.disableRandomEncounter
     }
 }
 
 export class MessageCheat {
-    static initialize () {
+    static initialize() {
         this.skip = false
 
         // Skip message display animation
@@ -660,7 +660,7 @@ export class MessageCheat {
         Window_Message.prototype.updateInput = function () {
             const ret = _Window_Message_updateInput.call(this);
 
-            if(this.pause && MessageCheat.skip){
+            if (this.pause && MessageCheat.skip) {
                 this.pause = false;
 
                 if (!this._textState) {
@@ -677,7 +677,7 @@ export class MessageCheat {
         Window_ScrollText.prototype.scrollSpeed = function () {
             let ret = Window_ScrollText_scrollSpeed.call(this);
 
-            if (MessageCheat.skip){ // 여기에서 skip 키 입력 체크
+            if (MessageCheat.skip) { // 여기에서 skip 키 입력 체크
                 ret *= 100;
             }
 
@@ -691,7 +691,7 @@ export class MessageCheat {
         Window_BattleLog.prototype.messageSpeed = function () {
             let ret = _Window_BattleLog_messageSpeed.call(this);
 
-            if (MessageCheat.skip){ // 여기에서 skip 키 입력 체크
+            if (MessageCheat.skip) { // 여기에서 skip 키 입력 체크
                 ret = 1;
             }
 
@@ -699,7 +699,7 @@ export class MessageCheat {
         };
     }
 
-    static startSkip (gameSpeed) {
+    static startSkip(gameSpeed) {
         if (gameSpeed === 1) {
             this.gameSpeedBackup = null
         } else {
@@ -714,7 +714,7 @@ export class MessageCheat {
         this.skip = true
     }
 
-    static stopSkip () {
+    static stopSkip() {
         if (this.gameSpeedBackup) {
             // restore game speed
             GameSpeedCheat.setGameSpeed(this.gameSpeedBackup.rate, this.gameSpeedBackup.sceneOption)
@@ -726,7 +726,7 @@ export class MessageCheat {
 }
 
 
-async function multiRetryAction (action, intervalTimeout, maxTryCount) {
+async function multiRetryAction(action, intervalTimeout, maxTryCount) {
     let finished = false
     let tryCount = 0
 
@@ -747,7 +747,7 @@ async function multiRetryAction (action, intervalTimeout, maxTryCount) {
     }, intervalTimeout)
 }
 
-function initialize () {
+function initialize() {
     const intervalTimeout = 500
     const maxTryCount = 100
 
