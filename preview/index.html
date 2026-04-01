@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>RPG Maker Cheat Engine - UI Preview</title>
+    
+    <!-- Vuetify and MDI Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #121212;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        #app-container {
+            border: 2px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Hide scrollbars for a cleaner "app" feel */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <v-app dark>
+            <v-main>
+                <div id="app-container" class="mx-auto" style="width: 700px;">
+                    <!-- The Cheat Modal will be rendered here -->
+                    <cheat-modal v-model="activeComponentName"></cheat-modal>
+                </div>
+                
+                <div class="mt-4 text-center grey--text text--darken-1">
+                    Current Panel: <v-chip small>{{ activeComponentName }}</v-chip>
+                </div>
+            </v-main>
+        </v-app>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    
+    <!-- 1. Load RGP Maker Mocks first so CheatHelper can find them -->
+    <script src="./rpg-mocks.js"></script>
+    
+    <!-- 2. Bootstrap the Vue app as a module -->
+    <script type="module" src="./preview.js"></script>
+</body>
+</html>
