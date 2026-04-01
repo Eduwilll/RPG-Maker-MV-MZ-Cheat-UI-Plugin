@@ -21,6 +21,7 @@ A powerful, GUI-based cheat tool for RPG Maker MV and MZ games, featuring **Real
   - **Force Save**: Overrides game-level save restrictions.
   - **Debug Access**: Instant access to NW.js Console and RPG Maker Debug (F9) Menu.
   - **Mouse Teleport**: Move your player instantly with `Alt + M` (toggle) and click!
+  - **Pop Out Window**: Launch the Cheat UI in a separate standalone window for better multitasking.
 - **Smart Translation**: Real-time translation for Variables, Switches, Maps, and Items.
   - Supports **Lingva Translate** (Free/Private Google Translate alternative).
   - **Translation Bank**: Caches results for instant loading.
@@ -68,7 +69,7 @@ Develop your Vue/Vuetify UI directly in your browser with near-instant updates. 
 .venv\Scripts\python.exe start-preview.py
 ```
 - Open `http://localhost:8080/preview/index.html` in your browser.
-- Mocked RPG Maker globals (`$gameParty`, etc.) allow the UI to function without the game engine.
+- **Improved Stability**: Now includes comprehensive RPG Maker engine mocks (`$game*`, `$data*`) and **Automatic Cache-Busting** for instant UI development.
 
 ### 2. Dev-Sync (Auto-Injection & Symlinking)
 Link your development folder to a test game. Any saved changes in your IDE are instantly visible in the game (press `F5`).
@@ -76,7 +77,7 @@ Link your development folder to a test game. Any saved changes in your IDE are i
 # Setup for any game
 .venv\Scripts\python.exe deploy\dev.py --game-path "C:/MyTestGame"
 
-# Quick setup for local test folders
+# Quick setup for local test folders (Includes Interactive Selection)
 .venv\Scripts\python.exe deploy\dev.py --mv
 .venv\Scripts\python.exe deploy\dev.py --mz
 ```
