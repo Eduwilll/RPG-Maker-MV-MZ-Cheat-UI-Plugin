@@ -9,18 +9,18 @@ export class KeyValueStorage {
 
     getItem (key) {
         if (!Utils.isNwjs()) {
-            return localStorage.getItem(key)
+            return localStorage.getItem(this.filePath + ':' + key)
         }
-
+ 
         return this.__getItemFromFile(key)
     }
-
+ 
     setItem (key, value) {
         if (!Utils.isNwjs()) {
-            localStorage.setItem(key, value)
+            localStorage.setItem(this.filePath + ':' + key, value)
             return
         }
-
+ 
         this.__setItemToFile(key, value)
     }
 

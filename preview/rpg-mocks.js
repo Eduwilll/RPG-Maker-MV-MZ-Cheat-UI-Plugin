@@ -1,5 +1,5 @@
 /**
- * RPG Maker MV/MZ Mocks for Web Preview
+ * RPG Maker MV/MZ Mocks for Web Preview (Updated)
  * This file simulates the game engine environment so the Cheat UI can run in a browser.
  */
 
@@ -8,6 +8,7 @@ window.Utils = {
     isNwjs: () => false,
     isMobileDevice: () => false,
     isAndroidChrome: () => false,
+    RPGMAKER_NAME: 'MZ', // Default to MZ for preview
 };
 
 window.Graphics = {
@@ -21,6 +22,9 @@ class MockActor {
         this._actorId = id;
         this._name = name;
         this._level = level;
+        this._exp = { 1: 0 }; // Default class exp
+        this._classId = 1;
+        this._paramPlus = new Array(8).fill(0);
         this.hp = 100;
         this.mhp = 1000;
         this.mp = 50;
@@ -30,6 +34,11 @@ class MockActor {
     name() { return this._name; }
     level() { return this._level; }
     maxTp() { return 100; }
+    param(id) { return (this._paramPlus[id] || 0) + 10; }
+    addParam(id, v) { this._paramPlus[id] = (this._paramPlus[id] || 0) + v; }
+    currentExp() { return this._exp[this._classId] || 0; }
+    changeLevel(n, show) { this._level = n; }
+    changeExp(n, show) { this._exp[this._classId] = n; }
     gainHp(v) { this.hp = Math.min(this.mhp, Math.max(0, this.hp + v)); }
     setHp(v) { this.hp = v; }
     gainMp(v) { this.mp = Math.min(this.mmp, Math.max(0, this.mp + v)); }
@@ -37,6 +46,7 @@ class MockActor {
     setTp(v) { this.tp = v; }
     deathStateId() { return 1; }
     addNewState() {}
+    isActor() { return true; }
 }
 
 window.Game_Actor = MockActor;
@@ -53,6 +63,8 @@ window.$gameParty = {
     loseGold: (v) => { window.$gameParty._gold -= v; },
     members: () => [window.$gameActors.actor(1), window.$gameActors.actor(2)],
     allMembers: () => [window.$gameActors.actor(1), window.$gameActors.actor(2)],
+    gainItem: (item, amount) => { console.log('Gained item:', item.name, amount); },
+    numItems: (item) => 5,
 };
 
 window.$gamePlayer = {
@@ -65,6 +77,8 @@ window.$gamePlayer = {
     moveSpeed: () => window.$gamePlayer._moveSpeed,
     setMoveSpeed: (v) => { window.$gamePlayer._moveSpeed = v; },
     locate: (x, y) => { window.$gamePlayer.x = x; window.$gamePlayer.y = y; },
+    isDebugThrough: () => true,
+    setTransparent: (v) => { console.log('Player transparency set to:', v); },
 };
 
 window.$gameSystem = {
@@ -92,13 +106,22 @@ window.$gameTemp = {
 };
 
 window.$gameMap = {
+    mapId: () => 1, // Fix: Game map needs mapId as a function
     canvasToMapX: (x) => Math.floor(x / 48),
     canvasToMapY: (y) => Math.floor(y / 48),
+    displayName: () => 'Mock Forest Map',
 };
 
 window.$gameTroop = {
     members: () => [new MockActor(10, 'Slime A', 1), new MockActor(11, 'Bat B', 1)],
 };
+
+window.$gameMessage = {
+    add: (text) => console.log('Game Message:', text),
+};
+
+window.$gameEnemies = [];
+window.$gameData = {};
 
 // --- Manager Mocks ---
 window.Scene_Base = class {};
@@ -124,7 +147,8 @@ window.DataManager = {
 };
 
 window.TouchInput = { x: 0, y: 0 };
-window.SoundManager = { playEscape: () => {} };
+window.SoundManager = { playEscape: () => {}, playOk: () => {} };
+window.ImageManager = { loadCharacter: () => ({ addLoadListener: (f) => f() }) };
 window.BattleManager = { 
     _phase: 'start', 
     processVictory: () => { console.log('Victory!'); },
@@ -133,10 +157,40 @@ window.BattleManager = {
     processAbort: () => { console.log('Aborted!'); },
 };
 
-// --- Cheat Settings Mocks ---
-// Mock KeyValueStorage to use localStorage instead of files
-window.mockStorage = {};
-// We will intercept the KeyValueStorage class in a real environment if needed, 
-// but for the browser we can just mock it in the helper if we can.
+// --- Spriteset Mock ---
+window.Spriteset_Base = class {
+    constructor() {}
+};
 
-console.log("RPG Maker Web Mocks Loaded!");
+// --- Database ($data*) Mocks ---
+const mockItems = new Array(10).fill(null).map((_, i) => ({ id: i, name: `Mock Item ${i}`, description: 'A test item' }));
+const mockSwitches = new Array(20).fill(null).map((_, i) => i === 0 ? null : `Switch ${i}`);
+const mockVariables = new Array(20).fill(null).map((_, i) => i === 0 ? null : `Variable ${i}`);
+
+window.$dataActors = [null, {id: 1, name: 'Hero'}, {id: 2, name: 'Sidekick'}];
+window.$dataClasses = [null, {id: 1, name: 'Warrior'}];
+window.$dataSkills = [null, {id: 1, name: 'Attack'}];
+window.$dataItems = mockItems;
+window.$dataWeapons = new Array(10).fill(null).map((_, i) => ({ id: i, name: `Weapon ${i}` }));
+window.$dataArmors = new Array(10).fill(null).map((_, i) => ({ id: i, name: `Armor ${i}` }));
+window.$dataEnemies = [null, {id: 1, name: 'Slime'}];
+window.$dataTroops = [null, {id: 1, name: '2x Slime'}];
+window.$dataStates = [null, {id: 1, name: 'Poison'}];
+window.$dataAnimations = [null, {id: 1, name: 'Fire'}];
+window.$dataTilesets = [null, {id: 1, name: 'Default'}];
+window.$dataCommonEvents = [null, {id: 1, name: 'Event 1'}];
+window.$dataSystem = {
+    variables: mockVariables,
+    switches: mockSwitches,
+    locale: 'en_US',
+    currencyUnit: 'G',
+    terms: {
+        basic: ['Level', 'Lv', 'HP', 'HP', 'MP', 'MP', 'TP', 'TP', 'EXP', 'EXP'],
+        params: ['Max HP', 'Max MP', 'Attack', 'Defense', 'M.Attack', 'M.Defense', 'Agility', 'Luck'],
+        commands: ['Fight', 'Escape', 'Attack', 'Guard', 'Item', 'Skill', 'Equip', 'Status', 'Formation', 'Options', 'Save', 'Game End'],
+    }
+};
+window.$dataMapInfos = [null, {id: 1, name: 'Mock Map', parentId: 0}];
+window.$dataMap = { width: 100, height: 100, data: [] };
+
+console.log("RPG Maker Web Mocks Expanded & Loaded!");
