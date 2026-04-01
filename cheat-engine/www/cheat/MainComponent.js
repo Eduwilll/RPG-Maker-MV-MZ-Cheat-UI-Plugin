@@ -139,18 +139,18 @@ export default {
             this.show = false
 
             const targetDir = Utils.RPGMAKER_NAME === 'MV' ? 'www/cheat/' : 'cheat/'
-            
+
             nw.Window.open(targetDir + 'window.html', {
                 title: 'RPG Maker Cheat Engine',
                 width: 700,
                 height: 800,
                 frame: true,
                 focus: true,
-                always_on_top: true
+                always_on_top: false
             }, (win) => {
                 GeneralCheat.__cheatWindow = win.window
                 win.on('closed', () => {
-                   GeneralCheat.__cheatWindow = null
+                    GeneralCheat.__cheatWindow = null
                 })
             })
         },
