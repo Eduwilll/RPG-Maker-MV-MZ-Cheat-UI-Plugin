@@ -153,6 +153,15 @@ export default {
                 @click="openDebugMenu">
                 Debug Menu
             </v-btn>
+            <v-btn
+                v-if="canOpenConsole"
+                small
+                class="ml-1"
+                color="primary"
+                title="Pop out Cheat Engine to a separate window"
+                @click="openCheatWindow">
+                Pop Out
+            </v-btn>
         </v-row>
     </v-card-text>
 
@@ -316,6 +325,10 @@ export default {
 
         openDebugMenu() {
             GeneralCheat.openDebugMenu()
+        },
+
+        openCheatWindow() {
+            GeneralCheat.openCheatWindow()
         }
     }
 }

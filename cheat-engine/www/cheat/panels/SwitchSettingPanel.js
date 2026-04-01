@@ -146,13 +146,24 @@ export default {
 
     methods: {
         async initializeVariables () {
+            if (typeof $dataSystem === 'undefined' || !$dataSystem || !$gameSwitches) {
+                console.warn('Game data not ready yet, skipping switch initialization')
+                return
+            }
+
             this.switchNames = this.getSwitchNames()
 
             this.tableItems = this.switchNames.map((switchName, idx) => {
+                let val = false
+                try {
+                    val = $gameSwitches.value(idx)
+                } catch (e) {
+                    console.warn(`Could not read switch ${idx}:`, e.message)
+                }
                 return {
                     id: idx,
                     name: switchName,
-                    value: $gameSwitches.value(idx)
+                    value: val
                 }
             })
         },

@@ -138,6 +138,11 @@ export default {
             try {
                 console.log('Initializing variables...')
 
+                if (typeof $dataSystem === 'undefined' || !$dataSystem || !$gameVariables) {
+                    console.warn('Game data not ready yet, skipping variable initialization')
+                    return
+                }
+
                 this.originalVariableNames = $dataSystem.variables.slice()
 
                 if (!this.originalVariableNames || this.originalVariableNames.length === 0) {
@@ -150,6 +155,12 @@ export default {
 
                 this.tableItems = this.originalVariableNames.map((varName, idx) => {
                     let displayName = varName || `Variable ${idx}`
+                    let val = 0
+                    try {
+                        val = $gameVariables.value(idx)
+                    } catch (e) {
+                        console.warn(`Could not read variable ${idx}:`, e.message)
+                    }
                     
                     if (translateEnabled && varName && varName.trim()) {
                         const cached = TRANSLATION_BANK.get(varName)
@@ -162,7 +173,7 @@ export default {
                         id: idx,
                         originalName: varName || `Variable ${idx}`,
                         displayName: displayName,
-                        value: $gameVariables.value(idx)
+                        value: val
                     }
                 }).filter(item => item.id > 0) // Skip index 0 which is usually null
 
