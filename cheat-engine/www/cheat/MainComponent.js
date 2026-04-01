@@ -54,6 +54,10 @@ export default {
             this.openCheatModal(componentName)
         }
 
+        GeneralCheat.openCheatWindow = (componentName = null) => {
+            this.openCheatWindow(componentName)
+        }
+
         window.addEventListener('keydown', this.onGlobalKeyDown)
         window.addEventListener('keyup', this.onGlobalKeyUp)
 
@@ -117,6 +121,38 @@ export default {
 
             // open
             this.show = true
+        },
+
+        openCheatWindow(componentName = null) {
+            if (!Utils.isNwjs()) {
+                Alert.error("Separate window mode only works in NW.js (PC version).")
+                this.openCheatModal(componentName)
+                return
+            }
+
+            if (GeneralCheat.__cheatWindow && !GeneralCheat.__cheatWindow.closed) {
+                GeneralCheat.__cheatWindow.focus()
+                return
+            }
+
+            // Hide the overlay if it was open
+            this.show = false
+
+            const targetDir = Utils.RPGMAKER_NAME === 'MV' ? 'www/cheat/' : 'cheat/'
+            
+            nw.Window.open(targetDir + 'window.html', {
+                title: 'RPG Maker Cheat Engine',
+                width: 700,
+                height: 800,
+                frame: true,
+                focus: true,
+                always_on_top: true
+            }, (win) => {
+                GeneralCheat.__cheatWindow = win.window
+                win.on('closed', () => {
+                   GeneralCheat.__cheatWindow = null
+                })
+            })
         },
 
         async checkVersion() {
