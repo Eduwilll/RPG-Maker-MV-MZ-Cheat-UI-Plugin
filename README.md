@@ -4,6 +4,13 @@ A powerful, GUI-based cheat tool for RPG Maker MV and MZ games, featuring **Real
 
 ---
 
+### 📖 [Full Documentation Site](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/)
+Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/) for detailed guides on:
+- **[Installation Guide](/guide/getting-started)**
+- **[Translation & AI Setup](/guide/translation-usage)**
+- **[Full Engine Reference](/guide/features)**
+- **[Keyboard Shortcuts](/guide/shortcuts)**
+
 ## 📸 UI Samples
 <p float="left">
   <img src="https://user-images.githubusercontent.com/99193603/153754676-cee2b96e-c03a-491f-b71c-3c57d6dcc474.JPG" width="24%"/>
@@ -30,14 +37,24 @@ A powerful, GUI-based cheat tool for RPG Maker MV and MZ games, featuring **Real
 
 ---
 
-## 🛠️ Quick Installation (MV/MZ)
+## 🛠️ Installation
 
-1. **Download**: Get the latest zip from [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases).
-2. **Copy Files**: Extract and copy `js` and `cheat` folders:
-   - **MV**: Copy to `{game_dir}/www/`
-   - **MZ**: Copy to `{game_dir}/`
-   > ⚠️ **Backup**: Replace `main.js`. Backup your original first!
-3. **Run**: Launch game. Press **`Ctrl + C`** for the menu.
+### Step 1: Download
+Get the latest `-core.tar.gz` package for your engine from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page.
+
+### Step 2: Copy Files
+Extract the archive and copy the `js/` and `cheat/` folders into your game directory:
+
+| Engine | Copy To | File to Backup/Replace |
+|--------|---------|-------------------------|
+| **RPG Maker MV** | `{game_folder}/www/` | `www/js/main.js` |
+| **RPG Maker MZ** | `{game_folder}/` | `js/main.js` |
+
+> [!CAUTION]
+> **Backup your original `main.js` first!** This plugin must replace the game's entry point to inject the cheat UI.
+
+### Step 3: Run
+Launch the game and press **`Ctrl + C`** to toggle the menu. It starts semi-transparent in the top-right corner.
 
 ---
 
