@@ -2,54 +2,10 @@ import { Alert } from './AlertHelper.js'
 import { KeyValueStorage } from './KeyValueStorage.js'
 
 export class GeneralCheat {
-    // static saveCheatSettings () {
-    //     const saveData = {
-    //         godMode: {
-    //             actorIds: this.getGodModeOnActorIds()
-    //         },
-    //     }
-    //
-    //     localStorage.setItem('cheat.settings.general', JSON.stringify(saveData))
-    // }
-    //
-    // static initializeCheatSettings () {
-    //     if (this.initialized) {
-    //         return
-    //     }
-    //
-    //     // load save data from localStorage
-    //     let saveData = localStorage.getItem('cheat.settings.general')
-    //
-    //     if (!saveData) {
-    //         this.initialized = true
-    //         return
-    //     }
-    //
-    //     saveData = JSON.parse(saveData)
-    //     console.log(saveData)
-    //
-    //     // godMode
-    //     if (saveData.godMode) {
-    //         const godModeData = saveData.godMode
-    //         // actors
-    //         if (godModeData.actorIds) {
-    //             for (const actorId of godModeData.actorIds) {
-    //                 console.log('god mode on', actorId, $gameActors.actor(actorId))
-    //                 this.godModeOn($gameActors.actor(actorId))
-    //             }
-    //         }
-    //     }
-    //
-    //     this.initialized = true
-    // }
-
-    // will be replaced from main component
     static toggleCheatModal(componentName = null) {
-
     }
 
     static openCheatModal(componentName = null) {
-
     }
 
     static toggleNoClip(notify = false) {
@@ -156,7 +112,7 @@ export class GeneralCheat {
                 actor.gainTp(actor.maxTp())
             }, 1000)
 
-            this.saveCheatSettings()
+            // this.saveCheatSettings()
         }
     }
 
@@ -168,8 +124,6 @@ export class GeneralCheat {
             clearInterval(godModeData.godModeInterval)
             godModeData.godModeInterval = null
 
-            // actor.godMode field remains in save file, but backup methods aren't
-            //
             if (actor.gainHP_bkup) {
                 actor.gainHp = actor.gainHP_bkup
                 actor.setHp = actor.setHp_bkup
@@ -180,7 +134,7 @@ export class GeneralCheat {
                 actor.paySkillCost = actor.paySkillCost_bkup
             }
 
-            this.saveCheatSettings()
+            // this.saveCheatSettings()
         }
     }
 
@@ -348,8 +302,6 @@ export class GameSpeedCheat {
             return
         }
 
-        // updateScene triggers event such as key inpuy, mouse input ...
-        // It occurs double click.
         const SceneManager_updateScene = this.origin_SceneManager_updateScene
         let currentUpdateSceneRate = 0
         SceneManager.updateScene = function () {
@@ -363,10 +315,8 @@ export class GameSpeedCheat {
             currentUpdateSceneRate -= currStep
 
             if (currStep > 0) {
-                // update original frame
                 SceneManager_updateScene.call(this)
 
-                // update duplicated frames
                 for (let i = 0; i < currStep - 1; ++i) {
                     SceneManager.updateInputData()
                     SceneManager.changeScene()
@@ -403,8 +353,6 @@ export class GameSpeedCheat {
 }
 
 export class SpeedCheat {
-    // static fixed = null // WARN: declaring static variable occurs error in nw.js (why?)
-
     static isFixed() {
         return !!SpeedCheat.fixed
     }
@@ -542,6 +490,26 @@ export class BattleCheat {
         Alert.success('Fill TP all party members')
     }
 
+    static clearStates(member) {
+        member.clearStates()
+    }
+
+    static clearStatesAllEnemy() {
+        for (const member of $gameTroop.members()) {
+            this.clearStates(member)
+        }
+
+        Alert.success('Clear states all enemies')
+    }
+
+    static clearStatesAllParty() {
+        for (const member of $gameParty.members()) {
+            this.clearStates(member)
+        }
+
+        Alert.success('Clear states all party members')
+    }
+
     static changeAllEnemyHealth(newHp) {
         for (const member of $gameTroop.members()) {
             member.setHp(newHp)
@@ -615,8 +583,6 @@ export class BattleCheat {
     }
 
     static toggleDisableRandomEncounter() {
-        // change $gamePlayer.canEncounter function
-        // if canEncounter is false, $gamePlayer.updateEncounterCount() do not decreases $gamePlayer._encounterCount
         if (this.isDisableRandomEncounter()) {
             if (this.canEncounter_bkup) {
                 $gamePlayer.canEncounter = this.canEncounter_bkup
@@ -642,20 +608,15 @@ export class MessageCheat {
     static initialize() {
         this.skip = false
 
-        // Skip message display animation
-        // It seems to be executed whenever each character is output in the message window
         const _Window_Message_updateShowFast = Window_Message.prototype.updateShowFast;
         Window_Message.prototype.updateShowFast = function () {
             _Window_Message_updateShowFast.call(this);
-            // 여기에 skip 키 입력 체크
             if (MessageCheat.skip) {
                 this._showFast = true;
                 this._pauseSkip = true;
             }
         };
 
-        // Skip waiting for input after displaying text
-        // It seems to always run every few ms
         const _Window_Message_updateInput = Window_Message.prototype.updateInput;
         Window_Message.prototype.updateInput = function () {
             const ret = _Window_Message_updateInput.call(this);
@@ -672,12 +633,11 @@ export class MessageCheat {
             return ret;
         };
 
-        // Accelerates the scrolling message speed
         const Window_ScrollText_scrollSpeed = Window_ScrollText.prototype.scrollSpeed;
         Window_ScrollText.prototype.scrollSpeed = function () {
             let ret = Window_ScrollText_scrollSpeed.call(this);
 
-            if (MessageCheat.skip) { // 여기에서 skip 키 입력 체크
+            if (MessageCheat.skip) {
                 ret *= 100;
             }
 
@@ -685,13 +645,11 @@ export class MessageCheat {
         };
 
 
-        // --------------------------- 배틀 로그 관련
-        // Accelerates the battle log output speed
         const _Window_BattleLog_messageSpeed = Window_BattleLog.prototype.messageSpeed;
         Window_BattleLog.prototype.messageSpeed = function () {
             let ret = _Window_BattleLog_messageSpeed.call(this);
 
-            if (MessageCheat.skip) { // 여기에서 skip 키 입력 체크
+            if (MessageCheat.skip) {
                 ret = 1;
             }
 
@@ -716,7 +674,6 @@ export class MessageCheat {
 
     static stopSkip() {
         if (this.gameSpeedBackup) {
-            // restore game speed
             GameSpeedCheat.setGameSpeed(this.gameSpeedBackup.rate, this.gameSpeedBackup.sceneOption)
             this.gameSpeedBackup = null
         }
@@ -738,7 +695,6 @@ async function multiRetryAction(action, intervalTimeout, maxTryCount) {
         } catch (e) {
             console.log(e)
             if (tryCount < maxTryCount) {
-                // try again
                 return
             }
         }

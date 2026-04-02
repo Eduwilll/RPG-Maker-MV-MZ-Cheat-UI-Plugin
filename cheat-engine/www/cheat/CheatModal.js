@@ -127,11 +127,6 @@ export default {
                   ]
               },
               {
-                  name: 'Clear States',
-                  icon: 'mdi-water-off',
-                  component: ''
-              },
-              {
                   name: 'Variables',
                   icon: 'mdi-variable',
                   component: 'variable-setting-panel'
