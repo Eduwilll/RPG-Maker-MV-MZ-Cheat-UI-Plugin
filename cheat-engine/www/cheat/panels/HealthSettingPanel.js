@@ -38,6 +38,7 @@ export default {
         <v-btn small @click.prevent="changeAllEnemyHealth(1)">Set 1</v-btn>
         <v-btn small @click.prevent="recoverAllEnemy">Recovery</v-btn>
         <v-btn small @click.prevent="fillTpAllEnemy">Fill TP</v-btn>
+        <v-btn small @click.prevent="clearStatesAllEnemy">Clear States</v-btn>
     </v-card-text>
     
     <v-card-subtitle class="caption pb-1">Party</v-card-subtitle>
@@ -46,6 +47,7 @@ export default {
         <v-btn small @click.prevent="changeAllPartyHealth(1)">Set 1</v-btn>
         <v-btn small @click.prevent="recoverAllParty">Recovery</v-btn>
         <v-btn small @click.prevent="fillTpAllParty">Fill TP</v-btn>
+        <v-btn small @click.prevent="clearStatesAllParty">Clear States</v-btn>
     </v-card-text>
     
     <template v-if="enemy && enemy.length > 0">
@@ -127,6 +129,16 @@ export default {
 
         fillTpAllParty () {
             BattleCheat.fillTpAllParty()
+            this.initializeVariables()
+        },
+
+        clearStatesAllEnemy () {
+            BattleCheat.clearStatesAllEnemy()
+            this.initializeVariables()
+        },
+
+        clearStatesAllParty () {
+            BattleCheat.clearStatesAllParty()
             this.initializeVariables()
         },
 
