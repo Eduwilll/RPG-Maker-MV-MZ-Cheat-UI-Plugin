@@ -128,7 +128,7 @@ Bind any of the following actions to a custom key combo:
 - Edit party HP
 - Edit enemy HP
 
-See the [Shortcuts page](/guide/shortcuts) for detailed instructions.
+See the [Shortcuts page](/guide/features/shortcuts) for detailed instructions.
 
 ---
 
@@ -146,7 +146,7 @@ Opens the Chromium DevTools panel (F12-style) inside the game window. Useful for
 
 Translate variable names, switch names, map names, and item names in real-time.
 
-For detailed instructions and engine setup, see the **[Full Translation Guide](/guide/translation-usage)**.
+For detailed instructions and engine setup, see the **[Full Translation Guide](/guide/translation/translation-usage)**.
 
 ### LLM & AI Engine
 The plugin features a high-performance translation engine that supports:

@@ -8,7 +8,7 @@
             "name": "Launch Edge",
             "request": "launch",
             "type": "msedge",
-            "url": "http://localhost:8080/preview/index.html",
+            "url": "http://localhost:5173/RPG-Maker-MV-MZ-Cheat-UI-Plugin/",
             "webRoot": "${workspaceFolder}"
         },
         {

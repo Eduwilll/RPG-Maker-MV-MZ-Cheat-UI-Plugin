@@ -11,6 +11,10 @@ This guide walks you through installing the plugin and opening the cheat window 
 The plugin overwrites `www/js/main.js` (MV) or `js/main.js` (MZ). Always keep a backup of that file before installing.
 :::
 
+::: tip 🛠️ For Developers
+If you are planning to modify the plugin UI or contribute to the project, see our **[Development & Test Guide](/guide/introduction/development)** for better tools.
+:::
+
 ## Pick your installation path
 
 Choose the guide that matches your game's engine:
@@ -53,6 +57,6 @@ From there, explore the tabs:
 
 ## Next steps
 
-- [Full feature reference →](/guide/features)
-- [Customizing shortcuts →](/guide/shortcuts)
-- [Troubleshooting →](/guide/troubleshooting)
+- [Full feature reference →](/guide/features/features)
+- [Customizing shortcuts →](/guide/features/shortcuts)
+- [Troubleshooting →](/guide/troubleshooting/troubleshooting)

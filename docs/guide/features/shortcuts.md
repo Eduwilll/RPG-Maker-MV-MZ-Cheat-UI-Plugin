@@ -40,4 +40,4 @@ You can change any of these bindings or add new ones in the **Shortcuts** tab:
 
 ## Sharing Shortcuts Across Games
 
-Shortcut bindings are stored in `www/cheat-settings/` (MV) or `cheat-settings/` (MZ) inside the game folder. To reuse your shortcuts in another game, simply copy this folder. See [Sharing Settings](/guide/sharing-settings) for more details.
+Shortcut bindings are stored in `www/cheat-settings/` (MV) or `cheat-settings/` (MZ) inside the game folder. To reuse your shortcuts in another game, simply copy this folder. See [Sharing Settings](/guide/features/sharing-settings) for more details.
