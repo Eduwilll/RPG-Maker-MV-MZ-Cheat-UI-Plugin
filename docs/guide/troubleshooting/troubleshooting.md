@@ -4,7 +4,7 @@
 
 **Most likely cause:** The game's bundled NW.js is older than v0.26.4, which doesn't support the ES6 syntax used by this plugin.
 
-**Fix:** Update NW.js manually. See the [Updating NW.js](/guide/update-nwjs) guide.
+**Fix:** Update NW.js manually. See the [Updating NW.js](/guide/installation/update-nwjs) guide.
 
 If updating NW.js doesn't help, the game may be fundamentally incompatible. Try the [alternative plugin](https://github.com/emerladCoder/RPG-Maker-MV-Cheat-Menu-Plugin) instead.
 

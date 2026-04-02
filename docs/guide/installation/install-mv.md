@@ -52,4 +52,4 @@ It starts semi-transparent. Hover your mouse over the upper-right corner of the 
 
 ## Troubleshooting
 
-If the game crashes or the cheat doesn't load, see the [Troubleshooting guide](/guide/troubleshooting). The most common cause is an outdated NW.js version bundled with the game — see [Updating nwjs](/guide/update-nwjs).
+If the game crashes or the cheat doesn't load, see the [Troubleshooting guide](/guide/troubleshooting/troubleshooting). The most common cause is an outdated NW.js version bundled with the game — see [Updating nwjs](/guide/installation/update-nwjs).

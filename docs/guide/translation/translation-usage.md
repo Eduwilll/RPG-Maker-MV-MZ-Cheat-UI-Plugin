@@ -6,7 +6,7 @@ The Cheat UI can translate game data (Items, Variables, Switches, Maps) in real-
 
 ## Before you begin
 
-1.  Pick an engine in the **Settings** or **Translate** tab (see the [Engines Guide](/guide/translation-engines) for more details).
+1.  Pick an engine in the **Settings** or **Translate** tab (see the [Engines Guide](/guide/translation/translation-engines) for more details).
 2.  If using a local engine (Lingva Docker, Ollama, ezTrans), ensure the background server is running.
 3.  Check your target language (Target default is **English**).
 

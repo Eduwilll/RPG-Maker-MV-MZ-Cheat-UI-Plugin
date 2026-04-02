@@ -1,15 +1,45 @@
 # RPG Maker MV/MZ Cheat UI + Translation
 
+<p align="left">
+  <a href="https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases">
+    <img src="https://img.shields.io/github/v/release/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin" alt="GitHub Release" />
+  </a>
+  <a href="https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin" alt="License" />
+  </a>
+  <a href="https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/stargazers">
+    <img src="https://img.shields.io/github/stars/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin?style=social" alt="GitHub Stars" />
+  </a>
+  <a href="https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/network/members">
+    <img src="https://img.shields.io/github/forks/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin" alt="GitHub Forks" />
+  </a>
+  <a href="https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/issues">
+    <img src="https://img.shields.io/github/issues/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin" alt="GitHub Issues" />
+  </a>
+  <a href="https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/commits/main">
+    <img src="https://img.shields.io/github/last-commit/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin" alt="GitHub Last Commit" />
+  </a>
+  <a href="https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/pulls">
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome" />
+  </a>
+  <br/>
+  <a href="https://deepwiki.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin">
+    <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" />
+  </a>
+</p>
+
 A powerful, GUI-based cheat tool for RPG Maker MV and MZ games, featuring **Real-time Machine Translation** support.
 
 ---
 
 ### 📖 [Full Documentation Site](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/)
 Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/) for detailed guides on:
-- **[Installation Guide](/guide/getting-started)**
-- **[Translation & AI Setup](/guide/translation-usage)**
-- **[Full Engine Reference](/guide/features)**
-- **[Keyboard Shortcuts](/guide/shortcuts)**
+- **[Installation Guide](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/introduction/getting-started)**
+- **[Translation & AI Setup](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/translation/translation-usage)**
+- **[Full Engine Reference](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/features)**
+- **[Keyboard Shortcuts](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/shortcuts)**
+
+---
 
 ## 📸 UI Samples
 <p float="left">

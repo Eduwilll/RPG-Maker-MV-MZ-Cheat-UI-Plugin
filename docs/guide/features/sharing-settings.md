@@ -25,4 +25,4 @@ This is useful when you install the plugin into multiple games and don't want to
 
 If you run into errors after updating the plugin, deleting the `cheat-settings` folder fixes most of them. The folder will be recreated with defaults on next launch.
 
-See [Troubleshooting](/guide/troubleshooting) for more detail.
+See [Troubleshooting](/guide/troubleshooting/troubleshooting) for more detail.

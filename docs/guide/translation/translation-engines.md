@@ -2,7 +2,7 @@
 
 The Cheat UI supports multiple translation engines ranging from free public APIs to high-performance local clusters and legacy Korean translators.
 
-For instructions on how to actually start these servers, see the **[Server Setup (Run) Guide](/guide/translation-setup)**.
+For instructions on how to actually start these servers, see the **[Server Setup (Run) Guide](/guide/translation/translation-setup)**.
 
 ## Comparison of Engines
 

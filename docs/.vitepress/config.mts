@@ -25,15 +25,15 @@ export default defineConfig({
 
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Guide', link: '/guide/getting-started' },
-      { text: 'Translation', link: '/guide/translation-usage' },
-      { text: 'Features', link: '/guide/features' },
-      { text: 'Changelog', link: '/guide/changelog' },
+      { text: 'Guide', link: '/guide/introduction/getting-started' },
+      { text: 'Translation', link: '/guide/translation/translation-usage' },
+      { text: 'Features', link: '/guide/features/features' },
+      { text: 'Changelog', link: '/guide/meta/changelog' },
       {
         text: 'v1.1.2',
         items: [
           { text: 'Releases', link: 'https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases' },
-          { text: 'Changelog', link: '/guide/changelog' },
+          { text: 'Changelog', link: '/guide/meta/changelog' },
         ]
       }
     ],
@@ -42,46 +42,47 @@ export default defineConfig({
       {
         text: 'Introduction',
         items: [
-          { text: 'What is this?', link: '/guide/what-is-this' },
-          { text: 'Getting Started', link: '/guide/getting-started' },
+          { text: 'What is this?', link: '/guide/introduction/what-is-this' },
+          { text: 'Getting Started', link: '/guide/introduction/getting-started' },
+          { text: 'Development & Test', link: '/guide/introduction/development' },
         ]
       },
       {
         text: 'Installation',
         items: [
-          { text: 'RPG Maker MV', link: '/guide/install-mv' },
-          { text: 'RPG Maker MZ', link: '/guide/install-mz' },
-          { text: 'Updating nwjs', link: '/guide/update-nwjs' },
+          { text: 'RPG Maker MV', link: '/guide/installation/install-mv' },
+          { text: 'RPG Maker MZ', link: '/guide/installation/install-mz' },
+          { text: 'Updating nwjs', link: '/guide/installation/update-nwjs' },
         ]
       },
       {
         text: 'Translation',
         items: [
-          { text: 'Translation Guide', link: '/guide/translation-usage' },
-          { text: 'Translation Engines', link: '/guide/translation-engines' },
-          { text: 'Server Setup Guide', link: '/guide/translation-setup' },
+          { text: 'Translation Guide', link: '/guide/translation/translation-usage' },
+          { text: 'Translation Engines', link: '/guide/translation/translation-engines' },
+          { text: 'Server Setup Guide', link: '/guide/translation/translation-setup' },
         ]
       },
       {
         text: 'Usage',
         items: [
-          { text: 'Features', link: '/guide/features' },
-          { text: 'Shortcuts', link: '/guide/shortcuts' },
-          { text: 'Sharing Settings', link: '/guide/sharing-settings' },
+          { text: 'Features', link: '/guide/features/features' },
+          { text: 'Shortcuts', link: '/guide/features/shortcuts' },
+          { text: 'Sharing Settings', link: '/guide/features/sharing-settings' },
         ]
       },
       {
         text: 'Troubleshooting',
         items: [
-          { text: 'Common Issues', link: '/guide/troubleshooting' },
+          { text: 'Common Issues', link: '/guide/troubleshooting/troubleshooting' },
         ]
       },
       {
         text: 'Meta',
         items: [
-          { text: 'Changelog', link: '/guide/changelog' },
-          { text: 'Contributing', link: '/guide/contributing' },
-          { text: 'License', link: '/guide/license' },
+          { text: 'Changelog', link: '/guide/meta/changelog' },
+          { text: 'Contributing', link: '/guide/meta/contributing' },
+          { text: 'License', link: '/guide/meta/license' },
         ]
       }
     ],

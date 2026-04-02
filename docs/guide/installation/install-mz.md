@@ -50,4 +50,4 @@ Run the game executable. Press <kbd>Ctrl</kbd> + <kbd>C</kbd> to open the cheat 
 
 ## Troubleshooting
 
-See the [Troubleshooting guide](/guide/troubleshooting) if the game crashes or nothing happens. Check the [Updating nwjs](/guide/update-nwjs) page if you get a JavaScript error about unsupported syntax.
+See the [Troubleshooting guide](/guide/troubleshooting/troubleshooting) if the game crashes or nothing happens. Check the [Updating nwjs](/guide/installation/update-nwjs) page if you get a JavaScript error about unsupported syntax.

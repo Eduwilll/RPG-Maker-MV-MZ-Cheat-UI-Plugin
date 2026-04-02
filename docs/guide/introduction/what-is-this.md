@@ -26,4 +26,4 @@ The game must be the PC (NW.js) version. Browser or mobile builds of RPG Maker g
 
 ## License
 
-Released under the [MIT License](/guide/license). Originally created by [paramonos](https://github.com/paramonos). This fork is maintained by [Eduwilll](https://github.com/Eduwilll).
+Released under the [MIT License](/guide/meta/license). Originally created by [paramonos](https://github.com/paramonos). This fork is maintained by [Eduwilll](https://github.com/Eduwilll).
