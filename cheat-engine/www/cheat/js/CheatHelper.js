@@ -160,6 +160,51 @@ export class GeneralCheat {
             Game_System.prototype.isSaveEnabled = function () {
                 return true
             }
+
+            // --- Menu Visibility Fixes ---
+            if (typeof Window_MenuCommand !== 'undefined') {
+                // 1. Force 'needsCommand' (Overriding Database System toggle)
+                if (!this._orig_needsCommand) {
+                    this._orig_needsCommand = Window_MenuCommand.prototype.needsCommand
+                }
+                Window_MenuCommand.prototype.needsCommand = function (name) {
+                    if (name === 'save') return true
+                    return GeneralCheat._orig_needsCommand.call(this, name)
+                }
+
+                // 2. Inject command if still missing (Brute-force)
+                if (!this._menuCommandPatched) {
+                    this._menuCommandPatched = true
+                    const _makeCommandList = Window_MenuCommand.prototype.makeCommandList
+                    Window_MenuCommand.prototype.makeCommandList = function () {
+                        _makeCommandList.call(this)
+                        if (GeneralCheat.isForceSaveEnabled() && !this.findSymbol('save')) {
+                            const index = this._list.findIndex(cmd => cmd.symbol === 'gameEnd')
+                            const saveCmd = { name: TextManager.save, symbol: 'save', enabled: true, ext: null }
+                            if (index >= 0) {
+                                this._list.splice(index, 0, saveCmd)
+                            } else {
+                                this._list.push(saveCmd)
+                            }
+                        }
+                    }
+                }
+            }
+
+            // --- Scene Guard Fix ---
+            if (typeof Scene_Menu !== 'undefined') {
+                if (!this._orig_commandSave) {
+                    this._orig_commandSave = Scene_Menu.prototype.commandSave
+                }
+                Scene_Menu.prototype.commandSave = function () {
+                    if (GeneralCheat.isForceSaveEnabled()) {
+                        SceneManager.push(Scene_Save)
+                        return
+                    }
+                    GeneralCheat._orig_commandSave.call(this)
+                }
+            }
+
             if (typeof $gameSystem !== 'undefined' && $gameSystem) {
                 $gameSystem.enableSave()
             }
