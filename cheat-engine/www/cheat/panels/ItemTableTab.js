@@ -10,7 +10,7 @@ export default {
         :items="filteredTableItems"
         :search="search"
         :custom-filter="tableItemFilter"
-        :items-per-page="5">
+        :items-per-page="10">
         <template v-slot:top>
             <v-text-field
                 label="Search..."
@@ -92,7 +92,7 @@ export default {
 </v-card>
     `,
 
-    data () {
+    data() {
         return {
             search: '',
             excludeNameless: false,
@@ -116,20 +116,20 @@ export default {
         }
     },
 
-    created () {
+    created() {
     },
 
     watch: {
         items: {
             immediate: true,
-            handler () {
+            handler() {
                 this.initializeVariables()
             }
         }
     },
 
     computed: {
-        filteredTableItems () {
+        filteredTableItems() {
             return this.tableItems.filter(item => {
                 if (this.excludeNameless && !item.name) {
                     return false
@@ -145,7 +145,7 @@ export default {
     },
 
     methods: {
-        initializeVariables () {
+        initializeVariables() {
             this.tableHeaders = this.headers.slice(0)
             this.tableHeaders.push({
                 text: 'Amount',
@@ -161,7 +161,7 @@ export default {
             })
         },
 
-        onItemChange (item) {
+        onItemChange(item) {
             // modify amount
             const diff = item.amount - $gameParty.numItems(item._item)
             $gameParty.gainItem(item._item, diff)
@@ -170,10 +170,10 @@ export default {
             item.amount = $gameParty.numItems(item._item)
         },
 
-        onTableFilterChange () {
+        onTableFilterChange() {
         },
 
-        tableItemFilter (value, search, item) {
+        tableItemFilter(value, search, item) {
             if (search === null || search.trim() === '') {
                 return true
             }

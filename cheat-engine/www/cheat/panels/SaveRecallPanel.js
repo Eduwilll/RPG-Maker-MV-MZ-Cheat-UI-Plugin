@@ -1,5 +1,5 @@
-import {KEY_VALUE_STORAGE} from '../js/KeyValueStorage.js'
-import {TRANSLATE_SETTINGS, TRANSLATOR} from '../js/TranslateHelper.js'
+import { KEY_VALUE_STORAGE } from '../js/KeyValueStorage.js'
+import { TRANSLATE_SETTINGS, TRANSLATOR } from '../js/TranslateHelper.js'
 
 export default {
     name: 'SaveRecallPanel',
@@ -47,7 +47,7 @@ export default {
         :items="tableItems"
         :search="search"
         :custom-filter="tableItemFilter"
-        :items-per-page="5">
+        :items-per-page="10">
         <template v-slot:top>
             <v-text-field
                 label="Search..."
@@ -126,7 +126,7 @@ export default {
 </v-card>
     `,
 
-    data () {
+    data() {
         return {
             locationAliasInput: '',
 
@@ -157,13 +157,12 @@ export default {
         }
     },
 
-    mounted () {
+    mounted() {
         this.initializeVariables()
-        this.$refs.locationAliasField.focus()
     },
 
     computed: {
-        tableItems () {
+        tableItems() {
             return this.locations.map((location, idx) => {
                 return {
                     name: location.name,
@@ -177,7 +176,7 @@ export default {
             })
         },
 
-        filteredTableItems () {
+        filteredTableItems() {
             return this.tableItems.filter(item => {
                 if (this.excludeNameless && !item.name) {
                     return false
@@ -189,12 +188,12 @@ export default {
     },
 
     methods: {
-        async initializeVariables () {
+        async initializeVariables() {
             this.loadLocations()
             this.currentMapName = await this.getMapFullPath($gameMap.mapId())
         },
 
-        async getMapFullPath (id) {
+        async getMapFullPath(id) {
             if (!id || !$dataMapInfos[id]) {
                 return 'NULL'
             }
@@ -211,9 +210,9 @@ export default {
             return fullPath
         },
 
-        getMapAncestors (id, path) {
+        getMapAncestors(id, path) {
             if (!id || !$dataMapInfos[id]) return;
-            
+
             path.push(id)
             if ($dataMapInfos[id].parentId === 0) {
                 path.reverse()
@@ -223,11 +222,11 @@ export default {
             this.getMapAncestors($dataMapInfos[id].parentId, path)
         },
 
-        saveLocations () {
+        saveLocations() {
             KEY_VALUE_STORAGE.setItem('cheat.locations', JSON.stringify(this.locations))
         },
 
-        loadLocations () {
+        loadLocations() {
             const data = KEY_VALUE_STORAGE.getItem('cheat.locations')
 
             if (!data) {
@@ -238,19 +237,19 @@ export default {
             this.locations = JSON.parse(data)
         },
 
-        onLocationAliasKeyDown (e) {
+        onLocationAliasKeyDown(e) {
             if (e.code === 'Enter') {
                 this.onAddLocation()
             }
         },
 
-        onAddLocation () {
+        onAddLocation() {
             this.addLocation(this.locationAliasInput)
             this.locationAliasInput = ''
             this.$refs.locationAliasField.blur()
         },
 
-        addLocation (locationAlias) {
+        addLocation(locationAlias) {
             this.locations.push({
                 name: locationAlias,
                 mapId: $gameMap.mapId(),
@@ -260,17 +259,17 @@ export default {
             this.saveLocations()
         },
 
-        removeLocation (index) {
+        removeLocation(index) {
             this.locations.splice(index, 1)
             this.saveLocations()
         },
 
-        teleportLocation (mapId, x, y) {
+        teleportLocation(mapId, x, y) {
             $gamePlayer.reserveTransfer(mapId, x, y, $gamePlayer.direction(), 0);
             $gamePlayer.setPosition(x, y);
         },
 
-        tableItemFilter (value, search, item) {
+        tableItemFilter(value, search, item) {
             if (search === null || search.trim() === '') {
                 return true
             }
