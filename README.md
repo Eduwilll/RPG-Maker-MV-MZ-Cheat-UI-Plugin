@@ -57,7 +57,8 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 - **New Utilities**: 
   - **Force Save**: Overrides game-level save restrictions.
   - **Debug Access**: Instant access to NW.js Console and RPG Maker Debug (F9) Menu.
-  - **Mouse Teleport**: Move your player instantly with `Alt + M` (toggle) and click!
+  - **Map Events Panel**: Interactive map overlay with real-time tracking of player, events, enemies, and treasures.
+  - **Mouse Teleport**: Move your player instantly with `Alt + M` (toggle) or via **Click to Teleport** on the Map Panel!
   - **Pop Out Window**: Launch the Cheat UI in a separate standalone window for better multitasking.
 - **Smart Translation**: Real-time translation for Variables, Switches, Maps, and Items.
   - Supports **Lingva Translate** (Free/Private Google Translate alternative).

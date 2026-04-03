@@ -1,6 +1,29 @@
 # Changelog
 
-## v1.1.2 — Latest
+## v1.2.0 — Latest
+
+### What's New in v1.2.0
+**Features**
+- [Feat] **Map Events Panel**: New interactive map overlay showing player, events, enemies, and treasures.
+- [Feat] **Click to Teleport**: Instant movement by clicking any walkable tile on the map overlay.
+- [Feat] **Map Intel**: Real-time hover details for coordinates, passability, and event identity.
+- [Feat] **Dynamic Zoom**: Toggle between 25x25 local view and full map view with adjustable zoom slider.
+
+**Bug Fixes**
+- [Fix] **TP Recovery**: Disabled automatic TP recovery in battle to prevent conflicts with custom TP-based mechanics.
+- [Fix] **UI Alignment**: Standardized all panel components with `dense` styling for pixel-perfect vertical alignment.
+- [Fix] **Focus Stability**: Improved amount input focus and reactive sorting behavior in item tables.
+- [Fix] **Canvas Scaling**: Fixed coordinate mapping for clicks and hovers across different window sizes.
+
+**Internationalization**
+- [I18n] Completed 100% English translation of all UI strings, including the new Map Panel.
+
+**Credits**
+- Special thanks to @Justype for the Map Events feature and TP fix contribution.
+
+---
+
+## v1.1.2
 
 ### What's New in v1.1.2
 **Features**

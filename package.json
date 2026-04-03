@@ -1,6 +1,6 @@
 {
   "name": "rpg-cheat-ui-plugin-docs",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Documentation for RPG Maker MV/MZ Cheat UI Plugin",
   "scripts": {
     "docs:dev": "vitepress dev docs",
