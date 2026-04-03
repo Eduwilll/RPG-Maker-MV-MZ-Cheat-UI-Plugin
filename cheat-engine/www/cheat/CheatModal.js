@@ -33,8 +33,8 @@ export default {
 <v-card 
     dark
     class="z-index-cheat-0"
-    width="700" 
-    height="400">
+    :width="isWindow ? '100vw' : '700'" 
+    :height="isWindow ? '100vh' : '400'">
     <v-row 
         class="fill-height ma-0 pa-0">
         <div
@@ -75,94 +75,98 @@ export default {
     props: {
         currentComponentName: {
             type: String
+        },
+        isWindow: {
+            type: Boolean,
+            default: false
         }
     },
 
-    data () {
-      return {
-          navWidth: 200,
+    data() {
+        return {
+            navWidth: 200,
 
-          navTreeModel: undefined,
+            navTreeModel: undefined,
 
-          navTreeItems: [
-              {
-                  name: 'General',
-                  icon: 'mdi-hammer-screwdriver',
-                  component: 'general-panel'
-              },
-              {
-                  name: 'Shortcuts',
-                  icon: 'mdi-keyboard-outline',
-                  component: 'shortcut-panel'
-              },
-              {
-                  name: 'HP/MP/Battle',
-                  icon: 'mdi-battery-70',
-                  component: 'health-setting-panel'
-              },
-              {
-                  name: 'Stats/Level',
-                  icon: 'mdi-sword-cross',
-                  component: 'stats-setting-panel'
-              },
-              {
-                  name: 'Items',
-                  icon: 'mdi-bag-personal-outline',
-                  children: [
-                      {
-                          name: 'Item',
-                          icon: 'mdi-flask-empty-plus',
-                          component: 'item-setting-panel'
-                      },
-                      {
-                          name: 'Weapon',
-                          icon: 'mdi-sword',
-                          component: 'weapon-setting-panel'
-                      },
-                      {
-                          name: 'Armor',
-                          icon: 'mdi-shield-plus',
-                          component: 'armor-setting-panel'
-                      }
-                  ]
-              },
-              {
-                  name: 'Variables',
-                  icon: 'mdi-variable',
-                  component: 'variable-setting-panel'
-              },
-              {
-                  name: 'Switches',
-                  icon: 'mdi-toggle-switch',
-                  component: 'switch-setting-panel'
-              },
-              {
-                  name: 'Save Locations',
-                  icon: 'mdi-map-marker-plus',
-                  component: 'save-recall-panel'
-              },
-              {
-                  name: 'Teleport',
-                  icon: 'mdi-run-fast',
-                  component: 'teleport-panel'
-              },
-              {
-                  name: 'Settings',
-                  icon: 'mdi-cog',
-                  children: [
-                      {
-                          name: 'Translate',
-                          icon: 'mdi-google-translate',
-                          component: 'translate-settings-panel'
-                      }
-                  ]
-              }
-          ]
-      }
+            navTreeItems: [
+                {
+                    name: 'General',
+                    icon: 'mdi-hammer-screwdriver',
+                    component: 'general-panel'
+                },
+                {
+                    name: 'Shortcuts',
+                    icon: 'mdi-keyboard-outline',
+                    component: 'shortcut-panel'
+                },
+                {
+                    name: 'HP/MP/Battle',
+                    icon: 'mdi-battery-70',
+                    component: 'health-setting-panel'
+                },
+                {
+                    name: 'Stats/Level',
+                    icon: 'mdi-sword-cross',
+                    component: 'stats-setting-panel'
+                },
+                {
+                    name: 'Items',
+                    icon: 'mdi-bag-personal-outline',
+                    children: [
+                        {
+                            name: 'Item',
+                            icon: 'mdi-flask-empty-plus',
+                            component: 'item-setting-panel'
+                        },
+                        {
+                            name: 'Weapon',
+                            icon: 'mdi-sword',
+                            component: 'weapon-setting-panel'
+                        },
+                        {
+                            name: 'Armor',
+                            icon: 'mdi-shield-plus',
+                            component: 'armor-setting-panel'
+                        }
+                    ]
+                },
+                {
+                    name: 'Variables',
+                    icon: 'mdi-variable',
+                    component: 'variable-setting-panel'
+                },
+                {
+                    name: 'Switches',
+                    icon: 'mdi-toggle-switch',
+                    component: 'switch-setting-panel'
+                },
+                {
+                    name: 'Save Locations',
+                    icon: 'mdi-map-marker-plus',
+                    component: 'save-recall-panel'
+                },
+                {
+                    name: 'Teleport',
+                    icon: 'mdi-run-fast',
+                    component: 'teleport-panel'
+                },
+                {
+                    name: 'Settings',
+                    icon: 'mdi-cog',
+                    children: [
+                        {
+                            name: 'Translate',
+                            icon: 'mdi-google-translate',
+                            component: 'translate-settings-panel'
+                        }
+                    ]
+                }
+            ]
+        }
     },
 
     computed: {
-        componentNameToNavItem () {
+        componentNameToNavItem() {
             const ret = {}
             this.iterateLeaf(this.navTreeItems, item => {
                 ret[item.component] = item
@@ -171,7 +175,7 @@ export default {
         }
     },
 
-    mounted () {
+    mounted() {
         let navItem = this.componentNameToNavItem[this.currentComponentName]
 
         if (!navItem) {
@@ -182,13 +186,13 @@ export default {
     },
 
     methods: {
-        onNavTreeUpdate (data) {
+        onNavTreeUpdate(data) {
             if (data && data.length === 1) {
                 this.$emit('change', data[0].component)
             }
         },
 
-        iterateLeaf (node, leafFunc) {
+        iterateLeaf(node, leafFunc) {
             if (Array.isArray(node)) {
                 for (const item of node) {
                     this.iterateLeaf(item, leafFunc)
