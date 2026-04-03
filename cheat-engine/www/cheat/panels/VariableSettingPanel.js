@@ -7,7 +7,7 @@ export default {
 <v-card flat class="ma-0 pa-0">
     <v-data-table
         v-if="tableHeaders"
-        denses
+        dense
         :headers="tableHeaders"
         :items="filteredTableItems"
         :search="search"

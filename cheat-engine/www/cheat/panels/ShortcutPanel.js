@@ -68,7 +68,7 @@ export default {
     </v-card-text>
     <v-data-table
         class="mt-2"
-        denses
+        dense
         single-expand
         :headers="filteredHeaders"
         :expanded.sync="tableExpanded"

@@ -40,7 +40,7 @@ export default {
     <v-data-table
         v-if="tableHeaders"
         class="mt-2"
-        denses
+        dense
         :headers="filteredTableHeaders"
         :items="maps"
         :search="search"
