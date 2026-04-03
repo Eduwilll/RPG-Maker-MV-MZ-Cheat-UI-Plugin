@@ -10,9 +10,10 @@ export class GeneralCheat {
 
     static toggleNoClip(notify = false) {
         $gamePlayer._through = !$gamePlayer._through
-
-        if (notify) {
+        if ($gamePlayer._through) {
             Alert.success(`No clip toggled: ${$gamePlayer._through}`)
+        } else {
+            Alert.info(`No clip toggled: ${$gamePlayer._through}`)
         }
     }
 
@@ -162,10 +163,12 @@ export class GeneralCheat {
             if (typeof $gameSystem !== 'undefined' && $gameSystem) {
                 $gameSystem.enableSave()
             }
+            Alert.success('Force Save: Enabled')
         } else {
             if (this._orig_isSaveEnabled) {
                 Game_System.prototype.isSaveEnabled = this._orig_isSaveEnabled
             }
+            Alert.info('Force Save: Disabled')
         }
     }
 
@@ -587,13 +590,14 @@ export class BattleCheat {
             if (this.canEncounter_bkup) {
                 $gamePlayer.canEncounter = this.canEncounter_bkup
             }
-
+            Alert.info('Disable Random Encounter: Disabled')
         } else {
             this.canEncounter_bkup = $gamePlayer.canEncounter
 
             $gamePlayer.canEncounter = function () {
                 return false
             }
+            Alert.success('Disable Random Encounter: Enabled')
         }
 
         this.disableRandomEncounter = !this.isDisableRandomEncounter()
