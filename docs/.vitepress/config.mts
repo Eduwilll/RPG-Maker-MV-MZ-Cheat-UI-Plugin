@@ -31,7 +31,7 @@ export default defineConfig({
       { text: 'Features', link: '/guide/features/features' },
       { text: 'Changelog', link: '/guide/meta/changelog' },
       {
-        text: 'v1.1.2',
+        text: 'v1.2.0',
         items: [
           { text: 'Releases', link: 'https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases' },
           { text: 'Changelog', link: '/guide/meta/changelog' },
