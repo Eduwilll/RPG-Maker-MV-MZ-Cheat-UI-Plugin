@@ -7,46 +7,80 @@ export default {
     name: 'MapEventPanel',
 
     template: `
-<v-card flat class="ma-0 pa-0">
-    <v-row class="mb-0 pa-0">
-        <v-col cols="12">
-            <canvas
-                ref="mapCanvas"
-                :width="canvasWidth"
-                :height="canvasHeight"
-                :style="canvasStyle"
-                @click="onCanvasClick">
-            </canvas>
+<v-card flat class="ma-0 pa-0" color="transparent">
+    <v-row class="ma-0 pa-0" justify="center">
+        <v-col cols="12" class="pa-0">
+            <div class="d-flex justify-center grey darken-4" style="min-height: 200px; width: 100%;">
+                <canvas
+                    ref="mapCanvas"
+                    :width="canvasWidth"
+                    :height="canvasHeight"
+                    :style="canvasStyle"
+                    @click="onCanvasClick"
+                    @mousemove="onCanvasMouseMove"
+                    @mouseleave="onCanvasMouseLeave">
+                </canvas>
+            </div>
         </v-col>
     </v-row>
     
-    <v-row class="mb-0 pa-0">
+    <v-row class="ma-0 pa-1">
         <v-col cols="12">
-            <div class="text-caption">
-                <v-chip x-small color="grey">Grey: Walkable</v-chip>
-                <v-chip x-small color="grey darken-3" class="ml-2">Dark Grey: Non-walkable</v-chip>
-                <v-chip x-small color="red" class="ml-2">Red Dot: Player</v-chip>
-                <v-chip x-small color="yellow" text-color="black" class="ml-2">EV: Event</v-chip>
-                <v-chip x-small color="white" text-color="black" class="ml-2">White Line: Border</v-chip>
-                <v-chip x-small color="orange" class="ml-2">Orange Dot: Enemy/NPC</v-chip>
-                <v-chip x-small color="blue" class="ml-2">Blue Dot: Treasure/Item</v-chip>
+            <div class="d-flex flex-wrap">
+                <v-chip x-small color="grey" class="ma-1">Grey: Walkable</v-chip>
+                <v-chip x-small color="grey darken-3" class="ma-1">Dark: Blocked</v-chip>
+                <v-chip x-small color="red" class="ma-1">Red: Player</v-chip>
+                <v-chip x-small color="yellow" text-color="black" class="ma-1">EV: Event</v-chip>
+                <v-chip x-small color="white" text-color="black" class="ma-1">White: Border</v-chip>
+                <v-chip x-small color="orange" class="ma-1">Orange: Enemy</v-chip>
+                <v-chip x-small color="blue" class="ma-1">Blue: Treasure</v-chip>
+            </div>
+            <div v-if="hoverInfo" class="text-caption mt-0 mb-1 blue--text font-weight-bold ml-1">
+                {{ hoverInfo }}
             </div>
         </v-col>
     </v-row>
 
-    <v-row class="mb-0 pa-0">
-        <v-col cols="12" md="4">
+    <v-divider></v-divider>
+
+    <v-row class="ma-0 pa-2" align="center">
+        <v-col cols="12" sm="6" class="py-1">
             <v-switch
                 v-model="limitedView"
-                label="25x25 view"
+                label="25x25 View"
                 color="primary"
+                dense
                 hide-details>
             </v-switch>
         </v-col>
-        <v-col cols="12" md="4">
+        <v-col cols="12" sm="6" class="py-1">
+            <v-switch
+                v-model="clickToTeleportEnabled"
+                label="Click to Teleport"
+                color="success"
+                dense
+                hide-details>
+            </v-switch>
+        </v-col>
+    </v-row>
+
+    <v-row class="ma-0 pa-2" align="center">
+        <v-col cols="12" sm="4" class="py-1">
+            <v-slider
+                v-if="limitedView"
+                v-model="baseCellSize"
+                label="Zoom"
+                min="8"
+                max="48"
+                dense
+                hide-details
+                @input="onZoomChange">
+            </v-slider>
+        </v-col>
+        <v-col cols="6" sm="4" class="py-1">
             <v-text-field
                 v-model="currentMapId"
-                label="Current Map ID"
+                label="Map ID"
                 dense
                 readonly
                 background-color="grey darken-3"
@@ -54,10 +88,10 @@ export default {
                 outlined>
             </v-text-field>
         </v-col>
-        <v-col cols="12" md="4">
+        <v-col cols="6" sm="4" class="py-1">
             <v-text-field
                 v-model="readInterval"
-                label="Read Interval (100-1000ms)"
+                label="Interval (ms)"
                 dense
                 type="number"
                 background-color="grey darken-3"
@@ -77,7 +111,7 @@ export default {
             canvasWidth: 550,
             canvasHeight: 550,
             cellSize: 14, // Size of each grid cell in pixels (dynamic for full view)
-            baseCellSize: 14, // Original cellSize for limited view mode
+            baseCellSize: this.loadSetting('mapEventPanel_baseCellSize', 14), // Original cellSize for limited view mode
 
             mapData: null,
             mapEvents: [],
@@ -94,12 +128,9 @@ export default {
             // Track last known map ID to detect map changes
             lastKnownMapId: 0,
 
-            // Pre-compiled regex patterns for better performance
-            treasureNamePattern: /treasure|chest|box|gold|coin|money|gem|jewel|diamond|ruby|emerald|loot|reward|prize|vault|safe|宝箱|宝物|金币|金钱|珠宝|财宝|奖励|宝石|钻石|红宝石|绿宝石|たからばこ|たからもの|きんか|きんせん|ほうせき|しゅほう|おうごん|ゴールド|コイン|マネー|ジェム|ジュエル|ダイヤモンド|ルビー|エメラルド|トレジャー|チェスト|ボックス|リワード|プライズ/i,
-            treasureImageNamePattern: /chest|box|treasure|gold|coin|gem|jewel|crystal|orb|artifact|vault|safe|money|diamond|ruby|emerald|宝箱|宝物|金币|金钱|珠宝|财宝|钻石|红宝石|绿宝石|宝石|たからばこ|たからもの|きんか|きんせん|ほうせき|ダイヤモンド|ルビー|エメラルド|ゴールド|コイン|ジェム|ジュエル|クリスタル|トレジャー|チェスト|ボックス/i,
-            treasureTextPattern: /found|obtained|received|gained|treasure|gold|coin|item|reward|loot|prize|discovered|acquired|collected|发现|获得|得到|找到|宝物|金币|收集|获取|奖励|战利品|發見|入手|取得|みつけた|てにいれた|えた|かくとく|ほうしゅう|あいてむ|たからもの|きんか|ゴールド|アイテム|リワード|トレジャー|コイン|しゅうしゅう|はっけん/i,
-            enemyCommentPattern: /enemy|敌人|monster|hostile|boss|guard|soldier|bandit|thief|assassin|villain|criminal|mercenary|outlaw|warrior|knight|敵|モンスター|敵対|ボス|ガード|兵士|盗賊|暗殺者|悪|魔物|魔獣|デーモン|鬼|妖怪|悪役|犯罪者|傭兵|戦士|騎士|アウトロー/i,
-            enemyImageNamePattern: /enemy|monster|evil|demon|beast|soldier|guard|bandit|thief|assassin|mercenary|outlaw|criminal|villain|boss|captain|samurai|ninja|ronin|hunter|archer|swordsman|mage|wizard|witch|sorcerer|priest|cleric|warrior|knight|man|woman|person|human|people|npc|char|character|sprite|敌人|敵|怪物|魔物|士兵|守卫|强盗|小偷|刺客|雇佣兵|罪犯|恶棍|老板|队长|武士|忍者|猎人|弓箭手|剑士|法师|巫师|祭司|战士|骑士|人|角色|モンスター|悪|デーモン|魔獣|兵士|ガード|盗賊|暗殺者|傭兵|犯罪者|悪役|ボス|キャプテン|サムライ|ニンジャ|浪人|ハンター|アーチャー|ソードマン|メイジ|ウィザード|魔女|ソーサラー|プリースト|クレリック|戦士|騎士|人間|キャラクター|スプライト/i,
+            // Hover info
+            hoverInfo: '',
+            lastRenderState: '',
 
             // Visibility and runtime control
             isCanvasVisible: false, // whether the canvas is currently visible in viewport
@@ -110,6 +141,13 @@ export default {
     },
 
     created() {
+        // Pre-compiled regex patterns for better performance (non-reactive)
+        this.treasureNamePattern = /treasure|chest|box|gold|coin|money|gem|jewel|diamond|ruby|emerald|loot|reward|prize|vault|safe|宝箱|宝物|金币|金钱|珠宝|财宝|奖励|宝石|钻石|红宝石|绿宝石|たからばこ|たからもの|きんか|きんせん|ほうせき|しゅほう|おうごん|ゴールド|コイン|マネー|ジェム|ジュエル|ダイヤモンド|ルビー|エメラルド|トレジャー|チェスト|ボックス|リワード|プライズ/i
+        this.treasureImageNamePattern = /chest|box|treasure|gold|coin|gem|jewel|crystal|orb|artifact|vault|safe|money|diamond|ruby|emerald|宝箱|宝物|金币|金钱|珠宝|财宝|钻石|红宝石|绿宝石|宝石|たからばこ|たからもの|きんか|きんせん|ほうせき|ダイヤモンド|ルビー|エメラルド|ゴールド|コイン|ジェム|ジュエル|クリスタル|トレジャー|チェスト|ボックス/i
+        this.treasureTextPattern = /found|obtained|received|gained|treasure|gold|coin|item|reward|loot|prize|discovered|acquired|collected|发现|获得|得到|找到|宝物|金币|收集|获取|奖励|战利品|發見|入手|取得|みつけた|てにいれた|えた|かくとく|ほうしゅう|あいてむ|たからもの|きんか|ゴールド|アイテム|リワード|トレジャー|コイン|しゅうしゅう|はっけん/i
+        this.enemyCommentPattern = /enemy|敌人|monster|hostile|boss|guard|soldier|bandit|thief|assassin|villain|criminal|mercenary|outlaw|warrior|knight|敵|モンスター|敵対|ボス|ガード|兵士|盗賊|暗殺者|悪|魔物|魔獣|デーモン|鬼|妖怪|悪役|犯罪者|傭兵|戦士|騎士|アウトロー/i
+        this.enemyImageNamePattern = /enemy|monster|evil|demon|beast|soldier|guard|bandit|thief|assassin|mercenary|outlaw|criminal|villain|boss|captain|samurai|ninja|ronin|hunter|archer|swordsman|mage|wizard|witch|sorcerer|priest|cleric|warrior|knight|man|woman|person|human|people|npc|char|character|sprite|敌人|敵|怪物|魔物|士兵|守卫|强盗|小偷|刺客|雇佣兵|罪犯|恶棍|老板|队长|武士|忍者|猎人|弓箭手|剑士|法师|巫师|祭司|战士|骑士|人|角色|モンスター|悪|デーモン|魔獣|兵士|ガード|盗賊|暗殺者|傭兵|犯罪者|悪役|ボス|キャプテン|サムライ|ニンジャ|浪人|ハンター|アーチャー|ソードマン|メイジ|ウィザード|魔女|ソーサラー|プリースト|クレリック|戦士|騎士|人間|キャラクター|スプライト/i
+
         this.initializeMapDisplay()
     },
 
@@ -117,8 +155,18 @@ export default {
         this.$nextTick(() => {
             // Start observing canvas visibility and do an initial render only if visible
             this.setupCanvasVisibilityObserver()
+            this.updateCanvasSize()
             if (this.isCanvasVisible) this.renderMap()
+            
+            // Add global resize listener to handle dynamic panel resizing
+            window.addEventListener('resize', this.onWindowResize)
         })
+    },
+
+    activated() {
+        // Redraw when the tab/panel becomes active (if using keep-alive)
+        this.updateCanvasSize()
+        if (this.isCanvasVisible) this.renderMap()
     },
 
     watch: {
@@ -167,6 +215,9 @@ export default {
     },
 
     beforeDestroy() {
+        // Clean up resize listener
+        window.removeEventListener('resize', this.onWindowResize)
+
         // Clean up observer and interval when component is destroyed
         try {
             if (this.visibilityObserver && typeof this.visibilityObserver.disconnect === 'function') {
@@ -199,9 +250,15 @@ export default {
 
         canvasStyle() {
             return {
-                border: '1px solid #ccc',
+                border: '1px solid #555',
                 backgroundColor: '#000',
-                cursor: this.clickToTeleportEnabled ? 'pointer' : 'default'
+                cursor: this.clickToTeleportEnabled ? 'crosshair' : 'default',
+                width: '100%',
+                maxWidth: '600px',
+                height: 'auto',
+                display: 'block',
+                imageRendering: 'pixelated', // Keep it sharp
+                boxShadow: '0 0 10px rgba(0,0,0,0.5)'
             }
         }
     },
@@ -261,6 +318,9 @@ export default {
 
         updateCanvasSize() {
             if (!this.mapData) return
+            
+            // Force re-render on next renderMap call (canvas is cleared when resized)
+            this.lastRenderState = ''
 
             if (this.limitedView) {
                 // For limited view, use base cellSize and calculate canvas size
@@ -284,6 +344,87 @@ export default {
                 this.canvasWidth = this.mapData.width * this.cellSize
                 this.canvasHeight = this.mapData.height * this.cellSize
             }
+        },
+
+        onZoomChange() {
+            this.saveSetting('mapEventPanel_baseCellSize', this.baseCellSize)
+            this.updateCanvasSize()
+            if (this.isCanvasVisible) this.renderMap()
+        },
+
+        onWindowResize() {
+            // Re-calculate layout when window/panel is resized
+            this.updateCanvasSize()
+            if (this.isCanvasVisible) this.renderMap()
+        },
+
+        onCanvasMouseMove(event) {
+            if (!this.mapData || !this.$refs.mapCanvas) return
+
+            const canvas = this.$refs.mapCanvas
+            const rect = canvas.getBoundingClientRect()
+            const x = (event.clientX - rect.left) * (canvas.width / rect.width)
+            const y = (event.clientY - rect.top) * (canvas.height / rect.height)
+
+            const cellX = Math.floor(x / this.cellSize)
+            const cellY = Math.floor(y / this.cellSize)
+
+            let mapX, mapY
+            if (this.limitedView) {
+                const startX = Math.max(0, this.playerPosition.x - Math.floor(this.maxViewSize / 2))
+                const startY = Math.max(0, this.playerPosition.y - Math.floor(this.maxViewSize / 2))
+                const endX = Math.min(this.mapData.width, startX + this.maxViewSize)
+                const endY = Math.min(this.mapData.height, startY + this.maxViewSize)
+                const realStartX = (endX - startX < this.maxViewSize) ? Math.max(0, endX - this.maxViewSize) : startX
+                const realStartY = (endY - startY < this.maxViewSize) ? Math.max(0, endY - this.maxViewSize) : startY
+                mapX = realStartX + cellX
+                mapY = realStartY + cellY
+            } else {
+                mapX = cellX
+                mapY = cellY
+            }
+
+            if (mapX < 0 || mapX >= this.mapData.width || mapY < 0 || mapY >= this.mapData.height) {
+                this.hoverInfo = ''
+                return
+            }
+
+            // Check for events at this position
+            let info = `Pos: (${mapX}, ${mapY})`
+            
+            // Passability info
+            const isWalkable = this.isTilePassable(mapX, mapY)
+            info += isWalkable ? ' | Walkable' : ' | Blocked'
+
+            // Check player
+            if (mapX === this.playerPosition.x && mapY === this.playerPosition.y) {
+                info += ` | Player`
+            }
+
+            // Check enemies
+            const enemy = this.enemies.find(e => e.x === mapX && e.y === mapY)
+            if (enemy) {
+                info += ` | Enemy: ${enemy.characterName || 'Unknown'} (ID: ${enemy.id})`
+            }
+
+            // Check treasures
+            const treasure = this.treasureBoxes.find(t => t.x === mapX && t.y === mapY)
+            if (treasure) {
+                info += ` | Treasure: ${treasure.name || 'Unknown'} (ID: ${treasure.id})`
+            }
+
+            // Check regular events
+            const regEvent = this.regularEvents.find(e => e.x === mapX && e.y === mapY)
+            if (regEvent) {
+                const name = regEvent.name || 'Event'
+                info += ` | ${name} (ID: ${regEvent.id})`
+            }
+
+            this.hoverInfo = info
+        },
+
+        onCanvasMouseLeave() {
+            this.hoverInfo = ''
         },
 
         // Visibility observer setup: use IntersectionObserver when available,
@@ -566,6 +707,11 @@ export default {
 
         renderMap() {
             if (!this.mapData || !this.$refs.mapCanvas) return
+
+            // Performance optimization: check if state has changed since last render
+            const currentState = `${this.currentMapId}-${this.playerPosition.x}-${this.playerPosition.y}-${this.cellSize}-${this.limitedView}-${this.enemies.length}-${this.treasureBoxes.length}`
+            if (this.lastRenderState === currentState) return
+            this.lastRenderState = currentState
 
             const canvas = this.$refs.mapCanvas
             const ctx = canvas.getContext('2d')
@@ -899,11 +1045,11 @@ export default {
         onCanvasClick(event) {
             if (!this.clickToTeleportEnabled || !this.mapData || !this.$refs.mapCanvas) return
 
-            // Get canvas bounds and click position
+            // Get canvas bounds and click position with scaling accounts
             const canvas = this.$refs.mapCanvas
             const rect = canvas.getBoundingClientRect()
-            const clickX = event.clientX - rect.left
-            const clickY = event.clientY - rect.top
+            const clickX = (event.clientX - rect.left) * (canvas.width / rect.width)
+            const clickY = (event.clientY - rect.top) * (canvas.height / rect.height)
 
             // Calculate which grid cell was clicked
             const cellX = Math.floor(clickX / this.cellSize)
