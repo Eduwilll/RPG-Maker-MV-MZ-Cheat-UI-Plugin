@@ -5,7 +5,7 @@ export default {
 <v-card flat class="ma-0 pa-0">
  <v-data-table
         v-if="tableHeaders"
-        denses
+        dense
         :headers="tableHeaders"
         :items="filteredTableItems"
         :search="search"
@@ -59,11 +59,12 @@ export default {
                 style="width: 60px;"
                 hide-details
                 solo
-                v-model="item.amount"
+                :value="item.amount"
                 label="Amount"
                 dense
                 @keydown.self.stop
-                @change="onItemChange(item)"
+                @click.native.stop
+                @change="onItemChange(item, $event)"
                 @focus="$event.target.select()">
             </v-text-field>
         </template>
@@ -161,8 +162,12 @@ export default {
             })
         },
 
-        onItemChange(item) {
+        onItemChange(item, newValue) {
             // modify amount
+            if (newValue !== undefined) {
+                item.amount = Number(newValue) || 0
+            }
+
             const diff = item.amount - $gameParty.numItems(item._item)
             $gameParty.gainItem(item._item, diff)
 
