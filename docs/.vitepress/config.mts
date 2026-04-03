@@ -8,6 +8,7 @@ import {
 export default defineConfig({
   title: 'RPG Cheat UI Plugin',
   description: 'GUI-based cheat overlay for RPG Maker MV and MZ games',
+  ignoreDeadLinks: [/^https?:\/\/localhost/],
 
   // Change this to /RPG-Maker-MV-MZ-Cheat-UI-Plugin/ to match your repo name
   base: '/RPG-Maker-MV-MZ-Cheat-UI-Plugin/',
