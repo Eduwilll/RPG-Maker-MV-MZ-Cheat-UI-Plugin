@@ -20,7 +20,7 @@ The **Web-UI Preview** allows you to develop the cheat interface directly in you
    ```bash [.py]
    .venv\Scripts\python.exe start-preview.py
    ```
-3. Open the provided URL in your browser: [http://localhost:8080/preview/index.html](http://localhost:8080/preview/index.html)
+3. Open the provided URL in your browser: `http://localhost:8080/preview/index.html`
 
 ---
 
