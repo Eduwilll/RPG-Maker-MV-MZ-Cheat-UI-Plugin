@@ -14,6 +14,10 @@ const defaultShortcutSettings = {
         shortcut: 'ctrl m'
     },
 
+    toggleCheatModalToMapEventComponent: {
+        shortcut: 'ctrl e'
+    },
+
     quickSave: {
         shortcut: 'ctrl s',
         param: {
@@ -130,6 +134,14 @@ const shortcutConfig = {
         desc: '',
         enterAction(param) {
             GeneralCheat.toggleCheatModal('save-recall-panel')
+        }
+    },
+
+    toggleCheatModalToMapEventComponent: {
+        name: 'Toggle "Map Events" tab',
+        desc: '',
+        enterAction(param) {
+            GeneralCheat.toggleCheatModal('map-event-panel')
         }
     },
 
@@ -315,6 +327,7 @@ const shortcutConfig = {
             }
         }
     }
+
 }
 
 class ShortcutConfig {

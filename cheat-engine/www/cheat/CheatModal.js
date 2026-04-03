@@ -8,6 +8,7 @@ import VariableSettingPanel from './panels/VariableSettingPanel.js'
 import SwitchSettingPanel from './panels/SwitchSettingPanel.js'
 import SaveRecallPanel from './panels/SaveRecallPanel.js'
 import TeleportPanel from './panels/TeleportPanel.js'
+import MapEventPanel from './panels/MapEventPanel.js'
 import ShortcutPanel from './panels/ShortcutPanel.js'
 import TranslateSettingsPanel from './panels/TranslateSettingsPanel.js'
 
@@ -24,6 +25,7 @@ export default {
         VariableSettingPanel,
         SwitchSettingPanel,
         SaveRecallPanel,
+        MapEventPanel,
         TeleportPanel,
         ShortcutPanel,
         TranslateSettingsPanel
@@ -144,6 +146,11 @@ export default {
                     name: 'Save Locations',
                     icon: 'mdi-map-marker-plus',
                     component: 'save-recall-panel'
+                },
+                {
+                    name: 'Map Events',
+                    icon: 'mdi-map-marker-plus',
+                    component: 'map-event-panel'
                 },
                 {
                     name: 'Teleport',
