@@ -1,5 +1,5 @@
-import {ConfirmDialog} from '../js/DialogHelper.js'
-import {TRANSLATOR, TRANSLATE_SETTINGS, TRANSLATION_BANK} from '../js/TranslateHelper.js'
+import { ConfirmDialog } from '../js/DialogHelper.js'
+import { TRANSLATOR, TRANSLATE_SETTINGS, TRANSLATION_BANK } from '../js/TranslateHelper.js'
 
 export default {
     name: 'SwitchSettingPanel',
@@ -13,7 +13,7 @@ export default {
         :items="filteredTableItems"
         :search="search"
         :custom-filter="tableItemFilter"
-        :items-per-page="5">
+        :items-per-page="10">
         <template v-slot:top>
             <v-text-field
                 label="Search..."
@@ -85,7 +85,7 @@ export default {
 </v-card>
     `,
 
-    data () {
+    data() {
         return {
             search: '',
             excludeNameless: false,
@@ -106,7 +106,7 @@ export default {
         }
     },
 
-    created () {
+    created() {
         this.initializeVariables()
 
         this._translateListener = () => {
@@ -117,14 +117,14 @@ export default {
         window.addEventListener('cheat-translate-finish', this._translateListener)
     },
 
-    beforeDestroy () {
+    beforeDestroy() {
         if (this._translateListener) {
             window.removeEventListener('cheat-translate-finish', this._translateListener)
         }
     },
 
     computed: {
-        filteredTableItems () {
+        filteredTableItems() {
             return this.tableItems.filter(item => {
                 if (item.id === 0 || (this.excludeNameless && !item.name) || (!this.tableItemFilter(item.name, this.search, item))) {
                     return false
@@ -134,18 +134,18 @@ export default {
             })
         },
 
-        allSwitchOn () {
+        allSwitchOn() {
             const hasTurnOff = this.filteredTableItems.find((item) => item.value === false)
             return !!!hasTurnOff
         },
 
-        allSwitchIcon () {
+        allSwitchIcon() {
             return this.allSwitchOn ? 'mdi-toggle-switch-off' : 'mdi-toggle-switch'
         }
     },
 
     methods: {
-        async initializeVariables () {
+        async initializeVariables() {
             if (typeof $dataSystem === 'undefined' || !$dataSystem || !$gameSwitches) {
                 console.warn('Game data not ready yet, skipping switch initialization')
                 return
@@ -168,7 +168,7 @@ export default {
             })
         },
 
-        getSwitchNames () {
+        getSwitchNames() {
             const rawSwitchNames = $dataSystem.switches.slice()
             const translateEnabled = TRANSLATE_SETTINGS.isSwitchTranslateEnabled()
 
@@ -183,7 +183,7 @@ export default {
             })
         },
 
-        async manualRefresh () {
+        async manualRefresh() {
             console.log('🔄 Manual refresh triggered - reloading switches and translations')
             this.switchNames = []
             this.tableItems = []
@@ -191,7 +191,7 @@ export default {
             console.log('✅ Switch refresh completed')
         },
 
-        onItemChange (item) {
+        onItemChange(item) {
             // modify value
             $gameSwitches.setValue(item.id, item.value)
 
@@ -199,7 +199,7 @@ export default {
             item.value = $gameSwitches.value(item.id)
         },
 
-        tableItemFilter (value, search, item) {
+        tableItemFilter(value, search, item) {
             if (search === null || search.trim() === '') {
                 return true
             }
@@ -207,7 +207,7 @@ export default {
             return item.name.toLowerCase().contains(search.toLowerCase())
         },
 
-        toggleAllSwitches () {
+        toggleAllSwitches() {
             const self = this
             ConfirmDialog.show({
                 width: 450,
@@ -221,7 +221,7 @@ export default {
                     icon: this.allSwitchIcon,
                     color: 'green',
                     label: this.allSwitchOn ? 'Turn Off' : 'Turn On',
-                    async action () {
+                    async action() {
                         const value = !self.allSwitchOn
                         self.filteredTableItems.forEach(item => {
                             $gameSwitches.setValue(item.id, value)

@@ -1,5 +1,5 @@
-import {TRANSLATE_SETTINGS, TRANSLATOR, TRANSLATION_BANK} from '../js/TranslateHelper.js'
-import {Alert} from '../js/AlertHelper.js'
+import { TRANSLATE_SETTINGS, TRANSLATOR, TRANSLATION_BANK } from '../js/TranslateHelper.js'
+import { Alert } from '../js/AlertHelper.js'
 
 export default {
     name: 'TeleportPanel',
@@ -45,7 +45,7 @@ export default {
         :items="maps"
         :search="search"
         :custom-filter="tableItemFilter"
-        :items-per-page="5">
+        :items-per-page="10">
         <template v-slot:top>
             <v-text-field
                 label="Search..."
@@ -110,7 +110,7 @@ export default {
 </v-card>
     `,
 
-    data () {
+    data() {
         return {
             inputX: '0',
             inputY: '0',
@@ -141,7 +141,7 @@ export default {
         }
     },
 
-    created () {
+    created() {
         this.initializeVariables()
 
         this._translateListener = () => {
@@ -152,14 +152,14 @@ export default {
         window.addEventListener('cheat-translate-finish', this._translateListener)
     },
 
-    beforeDestroy () {
+    beforeDestroy() {
         if (this._translateListener) {
             window.removeEventListener('cheat-translate-finish', this._translateListener)
         }
     },
 
     computed: {
-        filteredTableHeaders () {
+        filteredTableHeaders() {
             if (this.excludeFullPath) {
                 return this.tableHeaders.filter(header => header.value !== 'fullPath')
             }
@@ -169,7 +169,7 @@ export default {
     },
 
     methods: {
-        initializeVariables () {
+        initializeVariables() {
             const rawDataMapInfos = $dataMapInfos.filter(mapInfo => !!mapInfo)
             const mapNames = this.getMapNames($dataMapInfos)
 
@@ -189,9 +189,9 @@ export default {
             })
         },
 
-        getMapNames (dataMapInfos) {
+        getMapNames(dataMapInfos) {
             const translateEnabled = TRANSLATE_SETTINGS.isMapTranslateEnabled()
-            
+
             return dataMapInfos.map(m => {
                 const name = m ? m.name : ''
                 if (translateEnabled && name && name.trim()) {
@@ -204,7 +204,7 @@ export default {
             })
         },
 
-        getMapAncestors (id, path) {
+        getMapAncestors(id, path) {
             path.push(id)
             if ($dataMapInfos[id].parentId === 0) {
                 path.reverse()
@@ -214,19 +214,19 @@ export default {
             this.getMapAncestors($dataMapInfos[id].parentId, path)
         },
 
-        async manualRefresh () {
+        async manualRefresh() {
             console.log('🔄 Manual refresh triggered - reloading maps and translations')
             this.maps = []
             await this.initializeVariables()
             console.log('✅ Map refresh completed')
         },
 
-        teleportLocation (mapId, x, y) {
+        teleportLocation(mapId, x, y) {
             $gamePlayer.reserveTransfer(mapId, x, y, $gamePlayer.direction(), 0);
             $gamePlayer.setPosition(x, y);
         },
 
-        tableItemFilter (value, search, item) {
+        tableItemFilter(value, search, item) {
             if (search === null || search.trim() === '') {
                 return true
             }

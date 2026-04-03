@@ -1,4 +1,4 @@
-import {TRANSLATE_SETTINGS, TRANSLATOR, TRANSLATION_BANK, TRANSLATE_PROGRESS} from '../js/TranslateHelper.js'
+import { TRANSLATE_SETTINGS, TRANSLATOR, TRANSLATION_BANK, TRANSLATE_PROGRESS } from '../js/TranslateHelper.js'
 
 export default {
     name: 'VariableSettingPanel',
@@ -12,7 +12,7 @@ export default {
         :items="filteredTableItems"
         :search="search"
         :custom-filter="tableItemFilter"
-        :items-per-page="5">
+        :items-per-page="10">
         <template v-slot:top>
             <v-text-field
                 label="Search..."
@@ -80,7 +80,7 @@ export default {
 </v-card>
     `,
 
-    data () {
+    data() {
         return {
             search: '',
             excludeNameless: false,
@@ -103,7 +103,7 @@ export default {
         }
     },
 
-    created () {
+    created() {
         this.initializeVariables()
 
         // Listen for global translation trigger
@@ -115,14 +115,14 @@ export default {
         window.addEventListener('cheat-translate-finish', this._translateListener)
     },
 
-    beforeDestroy () {
+    beforeDestroy() {
         if (this._translateListener) {
             window.removeEventListener('cheat-translate-finish', this._translateListener)
         }
     },
 
     computed: {
-        filteredTableItems () {
+        filteredTableItems() {
             return this.tableItems.filter(item => {
                 if (this.excludeNameless && !item.name) {
                     return false
@@ -134,7 +134,7 @@ export default {
     },
 
     methods: {
-        async initializeVariables () {
+        async initializeVariables() {
             try {
                 console.log('Initializing variables...')
 
@@ -150,7 +150,7 @@ export default {
                     this.tableItems = []
                     return
                 }
-                
+
                 const translateEnabled = TRANSLATE_SETTINGS.isVariableTranslateEnabled()
 
                 this.tableItems = this.originalVariableNames.map((varName, idx) => {
@@ -161,7 +161,7 @@ export default {
                     } catch (e) {
                         console.warn(`Could not read variable ${idx}:`, e.message)
                     }
-                    
+
                     if (translateEnabled && varName && varName.trim()) {
                         const cached = TRANSLATION_BANK.get(varName)
                         if (cached) {
@@ -185,7 +185,7 @@ export default {
             }
         },
 
-        onItemChange (item) {
+        onItemChange(item) {
             // modify value
             $gameVariables.setValue(item.id, item.value)
 
@@ -193,7 +193,7 @@ export default {
             item.value = $gameVariables.value(item.id)
         },
 
-        async manualRefresh () {
+        async manualRefresh() {
             console.log('🔄 Manual refresh triggered - reloading variables and translations')
             this.isInitialized = false
             this.tableItems = []
@@ -201,7 +201,7 @@ export default {
             console.log('✅ Manual refresh completed')
         },
 
-        tableItemFilter (value, search, item) {
+        tableItemFilter(value, search, item) {
             if (search === null || search.trim() === '') {
                 return true
             }

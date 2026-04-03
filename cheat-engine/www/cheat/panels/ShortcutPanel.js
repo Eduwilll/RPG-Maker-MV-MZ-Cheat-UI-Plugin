@@ -1,7 +1,7 @@
 import KeyInputField from '../components/KeyInputField.js'
 import { GLOBAL_SHORTCUT } from '../js/GlobalShortcut.js'
-import {Key} from '../js/KeyCodes.js'
-import {Alert} from '../js/AlertHelper.js'
+import { Key } from '../js/KeyCodes.js'
+import { Alert } from '../js/AlertHelper.js'
 
 export default {
     name: 'ShortcutPanel',
@@ -75,7 +75,7 @@ export default {
         :items="filteredShortcuts"
         :search="search"
         :custom-filter="tableItemFilter"
-        :items-per-page="5">
+        :items-per-page="10">
         <template
             v-slot:item.shortcut="{ item }">
             <key-input-field
@@ -149,7 +149,7 @@ export default {
 </v-card>
     `,
 
-    data () {
+    data() {
         return {
             shortcuts: [],
 
@@ -180,16 +180,16 @@ export default {
         }
     },
 
-    created () {
+    created() {
         this.initializeVariables()
     },
 
     computed: {
-        filteredHeaders () {
+        filteredHeaders() {
             return this.tableHeaders.filter(header => !this.hideDesc || header.value !== 'desc')
         },
 
-        filteredShortcuts () {
+        filteredShortcuts() {
             return this.shortcuts.filter(item => {
                 return this.shortcutSearch.isEmpty() || item.shortcut.contains(this.shortcutSearch)
             })
@@ -197,20 +197,20 @@ export default {
     },
 
     methods: {
-        restoreToDefault () {
+        restoreToDefault() {
             GLOBAL_SHORTCUT.restoreDefaultSettings()
             this.initializeVariables()
         },
 
-        onSearchChange (search) {
-          this.shortcutSearch = Key.createEmpty()
+        onSearchChange(search) {
+            this.shortcutSearch = Key.createEmpty()
         },
 
-        onShortcutSearchChange (key) {
+        onShortcutSearchChange(key) {
             this.search = ''
         },
 
-        changeExpanded (item) {
+        changeExpanded(item) {
             if (this.tableExpanded.length === 1 && this.tableExpanded[0] === item) {
                 this.tableExpanded = []
             } else {
@@ -218,7 +218,7 @@ export default {
             }
         },
 
-        onShortcutChange (key, item) {
+        onShortcutChange(key, item) {
             try {
                 GLOBAL_SHORTCUT.setShortcut(item.id, key)
             } catch (err) {
@@ -238,7 +238,7 @@ export default {
             item.param[paramId].value = GLOBAL_SHORTCUT.getParam(item.id, paramId)
         },
 
-        convertToInternalData (settings, config) {
+        convertToInternalData(settings, config) {
             const param = {}
 
             if (settings.param) {
@@ -265,13 +265,13 @@ export default {
             }
         },
 
-        initializeVariables () {
+        initializeVariables() {
             this.shortcuts = Object.keys(GLOBAL_SHORTCUT.shortcutConfig).map(key => {
                 return this.convertToInternalData(GLOBAL_SHORTCUT.shortcutSettings[key], GLOBAL_SHORTCUT.shortcutConfig[key])
             })
         },
 
-        tableItemFilter (value, search, item) {
+        tableItemFilter(value, search, item) {
             if (search === null || search.trim() === '') {
                 return true
             }
