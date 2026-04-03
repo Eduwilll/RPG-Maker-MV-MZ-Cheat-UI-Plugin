@@ -1,6 +1,33 @@
 # Changelog
 
-## v1.1.2 — Latest
+## v1.2.0 — Latest
+
+### What's New in v1.2.0
+**Features**
+- [Feat] **Map Events Panel**: Full visual map overlay showing player, events, enemies, and treasures.  (Credits: @Justype)
+- [Feat] **Click to Teleport**: Instant movement by clicking any walkable tile on the map overlay.
+- [Feat] **Map Intel**: Real-time hover details for coordinates, passability, and event identity.
+- [Feat] **Toast Notifications**: Added interactive feedback/toasts for No Clip, Force Save, and Encounter toggles.
+- [Feat] **Fullscreen Window mode**: Added `isWindow` prop to `CheatModal` for better fullscreen pop-out support.
+- [Feat] **Dynamic View & Zoom**: Toggle between 25x25 local tracking and full map view with adjustable zoom slider.
+
+**Bug Fixes**
+- [Fix] **Ultimate Force Save**: Enhanced save scene guard and visibility for bypassing restricted game saves.
+- [Fix] **TP Recovery**: Disabled automatic TP recovery in battle to prevent conflicts with custom TP-based mechanics. (Credits: @Justype)
+- [Fix] **UI Alignment**: Standardized all panel components with `dense` styling for pixel-perfect vertical alignment.
+- [Fix] **Table Stability**: Fixed re-sorting and focus issues, and updated all item tables with **Pagination** support.
+- [Fix] **CI/CD**: Migrated GitHub Actions to use `pnpm` for faster, more reliable builds.
+
+**Modern Documentation**
+- [Docs] **VitePress Overhaul**: Complete documentation restructure with setup guides, visuals, and development workflows.
+- [Docs] **Dev-Sync 2.0**: Improved scanning for local test games and interactive selection in `dev.py`.
+
+**Internationalization**
+- [I18n] Completed 100% English translation of all remaining UI strings, including the new Map Panel.
+
+---
+
+## v1.1.2
 
 ### What's New in v1.1.2
 **Features**
