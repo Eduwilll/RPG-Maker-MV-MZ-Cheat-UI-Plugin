@@ -1,9 +1,5 @@
 export class ConfirmDialog {
-    static show (option) {
+  static show(option) {}
 
-    }
-
-    static close () {
-
-    }
+  static close() {}
 }

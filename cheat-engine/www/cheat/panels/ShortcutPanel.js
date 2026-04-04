@@ -1,16 +1,16 @@
-import KeyInputField from '../components/KeyInputField.js'
-import { GLOBAL_SHORTCUT } from '../js/GlobalShortcut.js'
-import { Key } from '../js/KeyCodes.js'
-import { Alert } from '../js/AlertHelper.js'
+import KeyInputField from "../components/KeyInputField.js";
+import { GLOBAL_SHORTCUT } from "../js/GlobalShortcut.js";
+import { Key } from "../js/KeyCodes.js";
+import { Alert } from "../js/AlertHelper.js";
 
 export default {
-    name: 'ShortcutPanel',
+  name: "ShortcutPanel",
 
-    components: {
-        KeyInputField
-    },
+  components: {
+    KeyInputField,
+  },
 
-    template: `
+  template: `
 <v-card flat class="ma-0 pa-0">
     <v-row>
         <v-col
@@ -149,135 +149,148 @@ export default {
 </v-card>
     `,
 
-    data() {
-        return {
-            shortcuts: [],
+  data() {
+    return {
+      shortcuts: [],
 
-            tableExpanded: [],
+      tableExpanded: [],
 
-            hideDesc: true,
-            search: '',
-            shortcutSearch: Key.createEmpty(),
+      hideDesc: true,
+      search: "",
+      shortcutSearch: Key.createEmpty(),
 
-            tableHeaders: [
-                {
-                    text: 'Name',
-                    value: 'name'
-                },
-                {
-                    text: 'Desc',
-                    value: 'desc',
-                },
-                {
-                    text: 'Shortcut',
-                    value: 'shortcut'
-                },
-                {
-                    text: 'Param',
-                    value: 'param'
-                }
-            ]
-        }
+      tableHeaders: [
+        {
+          text: "Name",
+          value: "name",
+        },
+        {
+          text: "Desc",
+          value: "desc",
+        },
+        {
+          text: "Shortcut",
+          value: "shortcut",
+        },
+        {
+          text: "Param",
+          value: "param",
+        },
+      ],
+    };
+  },
+
+  created() {
+    this.initializeVariables();
+  },
+
+  computed: {
+    filteredHeaders() {
+      return this.tableHeaders.filter(
+        (header) => !this.hideDesc || header.value !== "desc",
+      );
     },
 
-    created() {
-        this.initializeVariables()
+    filteredShortcuts() {
+      return this.shortcuts.filter((item) => {
+        return (
+          this.shortcutSearch.isEmpty() ||
+          item.shortcut.contains(this.shortcutSearch)
+        );
+      });
+    },
+  },
+
+  methods: {
+    restoreToDefault() {
+      GLOBAL_SHORTCUT.restoreDefaultSettings();
+      this.initializeVariables();
     },
 
-    computed: {
-        filteredHeaders() {
-            return this.tableHeaders.filter(header => !this.hideDesc || header.value !== 'desc')
-        },
-
-        filteredShortcuts() {
-            return this.shortcuts.filter(item => {
-                return this.shortcutSearch.isEmpty() || item.shortcut.contains(this.shortcutSearch)
-            })
-        }
+    onSearchChange(search) {
+      this.shortcutSearch = Key.createEmpty();
     },
 
-    methods: {
-        restoreToDefault() {
-            GLOBAL_SHORTCUT.restoreDefaultSettings()
-            this.initializeVariables()
-        },
+    onShortcutSearchChange(key) {
+      this.search = "";
+    },
 
-        onSearchChange(search) {
-            this.shortcutSearch = Key.createEmpty()
-        },
+    changeExpanded(item) {
+      if (this.tableExpanded.length === 1 && this.tableExpanded[0] === item) {
+        this.tableExpanded = [];
+      } else {
+        this.tableExpanded = [item];
+      }
+    },
 
-        onShortcutSearchChange(key) {
-            this.search = ''
-        },
+    onShortcutChange(key, item) {
+      try {
+        GLOBAL_SHORTCUT.setShortcut(item.id, key);
+      } catch (err) {
+        Alert.error(err.message);
+      }
 
-        changeExpanded(item) {
-            if (this.tableExpanded.length === 1 && this.tableExpanded[0] === item) {
-                this.tableExpanded = []
-            } else {
-                this.tableExpanded = [item]
-            }
-        },
+      item.shortcut = GLOBAL_SHORTCUT.getShortcut(item.id);
+    },
 
-        onShortcutChange(key, item) {
-            try {
-                GLOBAL_SHORTCUT.setShortcut(item.id, key)
-            } catch (err) {
-                Alert.error(err.message)
-            }
+    onParameterChange(value, item, paramId) {
+      try {
+        GLOBAL_SHORTCUT.setParam(item.id, paramId, value);
+      } catch (err) {
+        Alert.error(err.message);
+      }
 
-            item.shortcut = GLOBAL_SHORTCUT.getShortcut(item.id)
-        },
+      item.param[paramId].value = GLOBAL_SHORTCUT.getParam(item.id, paramId);
+    },
 
-        onParameterChange(value, item, paramId) {
-            try {
-                GLOBAL_SHORTCUT.setParam(item.id, paramId, value)
-            } catch (err) {
-                Alert.error(err.message)
-            }
+    convertToInternalData(settings, config) {
+      const param = {};
 
-            item.param[paramId].value = GLOBAL_SHORTCUT.getParam(item.id, paramId)
-        },
-
-        convertToInternalData(settings, config) {
-            const param = {}
-
-            if (settings.param) {
-                for (const paramName of Object.keys(settings.param)) {
-                    param[paramName] = {
-                        id: paramName,
-                        value: settings.param[paramName]
-                    }
-                }
-
-            }
-
-            return {
-                id: config.id,
-                name: config.name,
-                desc: config.desc,
-                necessary: config.necessary,
-                combiningKeyAlone: config.combiningKeyAlone,
-                paramDesc: config.param,
-
-                // use deep copy of settings
-                shortcut: Key.fromKey(settings.shortcut),
-                param: param
-            }
-        },
-
-        initializeVariables() {
-            this.shortcuts = Object.keys(GLOBAL_SHORTCUT.shortcutConfig).map(key => {
-                return this.convertToInternalData(GLOBAL_SHORTCUT.shortcutSettings[key], GLOBAL_SHORTCUT.shortcutConfig[key])
-            })
-        },
-
-        tableItemFilter(value, search, item) {
-            if (search === null || search.trim() === '') {
-                return true
-            }
-
-            search = search.toLowerCase()
-            return item.name.toLowerCase().contains(search) || item.desc.toLowerCase().contains(search) || item.shortcut.asDisplayString().toLowerCase().contains(search)
+      if (settings.param) {
+        for (const paramName of Object.keys(settings.param)) {
+          param[paramName] = {
+            id: paramName,
+            value: settings.param[paramName],
+          };
         }
-    }
-}
+      }
+
+      return {
+        id: config.id,
+        name: config.name,
+        desc: config.desc,
+        necessary: config.necessary,
+        combiningKeyAlone: config.combiningKeyAlone,
+        paramDesc: config.param,
+
+        // use deep copy of settings
+        shortcut: Key.fromKey(settings.shortcut),
+        param: param,
+      };
+    },
+
+    initializeVariables() {
+      this.shortcuts = Object.keys(GLOBAL_SHORTCUT.shortcutConfig).map(
+        (key) => {
+          return this.convertToInternalData(
+            GLOBAL_SHORTCUT.shortcutSettings[key],
+            GLOBAL_SHORTCUT.shortcutConfig[key],
+          );
+        },
+      );
+    },
+
+    tableItemFilter(value, search, item) {
+      if (search === null || search.trim() === "") {
+        return true;
+      }
+
+      search = search.toLowerCase();
+      return (
+        item.name.toLowerCase().contains(search) ||
+        item.desc.toLowerCase().contains(search) ||
+        item.shortcut.asDisplayString().toLowerCase().contains(search)
+      );
+    },
+  },
+};

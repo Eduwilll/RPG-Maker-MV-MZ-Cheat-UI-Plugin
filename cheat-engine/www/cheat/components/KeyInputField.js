@@ -1,9 +1,9 @@
-import {Key} from '../js/KeyCodes.js'
+import { Key } from "../js/KeyCodes.js";
 
 export default {
-    name: 'ShortcutPanel',
+  name: "ShortcutPanel",
 
-    template: `
+  template: `
 <v-text-field
     v-model="showingText"
     :label="label"
@@ -28,82 +28,81 @@ export default {
 </v-text-field>
     `,
 
-    data () {
-        return {
-        }
+  data() {
+    return {};
+  },
+
+  model: {
+    prop: "shortcut",
+    event: "change",
+  },
+
+  props: {
+    shortcut: {
+      type: Key,
+      default: () => Key.createEmpty(),
     },
 
-    model: {
-        prop: 'shortcut',
-        event: 'change'
+    deletable: {
+      type: Boolean,
+      default: true,
     },
 
-    props: {
-        shortcut: {
-            type: Key,
-            default: () => Key.createEmpty()
-        },
-
-        deletable: {
-            type: Boolean,
-            default: true
-        },
-
-        label: {
-            type: String,
-            default: ''
-        },
-
-        solo: {
-            type: Boolean,
-            default: false
-        },
-
-        outlined: {
-            type: Boolean,
-            default: false
-        },
-
-        backgroundColor: {
-            type: String,
-            default: undefined
-        },
-
-        combiningKeyAlone: {
-            type: Boolean,
-            default: false
-        }
+    label: {
+      type: String,
+      default: "",
     },
 
-    computed: {
-        deleteBtnStyle () {
-            return `opacity: ${this.shortcut.isEmpty() ? 0 : 0.7}`
-        },
-
-        showingText () {
-            return this.shortcut.asDisplayString()
-        }
+    solo: {
+      type: Boolean,
+      default: false,
     },
 
-    methods : {
-        onDeleteClick () {
-            const eventKey = Key.createEmpty()
-            this.$emit('change', eventKey)
-            this.$emit('input', eventKey)
-        },
+    outlined: {
+      type: Boolean,
+      default: false,
+    },
 
-        onShortcutInput (e) {
-            const eventKey = Key.fromEvent(e)
+    backgroundColor: {
+      type: String,
+      default: undefined,
+    },
 
-            if (eventKey.isCombiningKey() && !this.combiningKeyAlone) {
-                return
-            }
+    combiningKeyAlone: {
+      type: Boolean,
+      default: false,
+    },
+  },
 
-            if (!eventKey.equals(this.shortcut)) {
-                this.$emit('change', eventKey)
-            }
+  computed: {
+    deleteBtnStyle() {
+      return `opacity: ${this.shortcut.isEmpty() ? 0 : 0.7}`;
+    },
 
-            this.$emit('input', eventKey)
-        }
-    }
-}
+    showingText() {
+      return this.shortcut.asDisplayString();
+    },
+  },
+
+  methods: {
+    onDeleteClick() {
+      const eventKey = Key.createEmpty();
+      this.$emit("change", eventKey);
+      this.$emit("input", eventKey);
+    },
+
+    onShortcutInput(e) {
+      const eventKey = Key.fromEvent(e);
+
+      if (eventKey.isCombiningKey() && !this.combiningKeyAlone) {
+        return;
+      }
+
+      if (!eventKey.equals(this.shortcut)) {
+        this.$emit("change", eventKey);
+      }
+
+      this.$emit("input", eventKey);
+    },
+  },
+};
