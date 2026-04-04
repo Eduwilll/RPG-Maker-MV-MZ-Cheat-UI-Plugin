@@ -3,6 +3,13 @@ body::-webkit-scrollbar {
   display: none;
 }
 
+html,
+body {
+  overflow: hidden !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+
 .hide-scrollbar::-webkit-scrollbar {
   width: 0 !important;
   height: 0 !important;
