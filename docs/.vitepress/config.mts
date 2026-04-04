@@ -73,6 +73,12 @@ export default defineConfig({
         ]
       },
       {
+        text: 'Technical',
+        items: [
+          { text: 'Core Architecture', link: '/guide/technical/architecture' },
+        ]
+      },
+      {
         text: 'Troubleshooting',
         items: [
           { text: 'Common Issues', link: '/guide/troubleshooting/troubleshooting' },

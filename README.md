@@ -114,11 +114,16 @@ We provide professional tools to speed up UI development and game integration.
 
 ### 1. Web-UI Preview (Browser Development)
 Develop your Vue/Vuetify UI directly in your browser with near-instant updates. No game restart required!
+- **Note**: No Node dependencies are required for the previewer (it uses local libraries in `cheat/libs/`).
+
 ```powershell
+# Run the previewer from the Python virtual environment
 .venv\Scripts\python.exe start-preview.py
 ```
 - Open `http://localhost:8080/preview/index.html` in your browser.
-- **Improved Stability**: Now includes comprehensive RPG Maker engine mocks (`$game*`, `$data*`) and **Automatic Cache-Busting** for instant UI development.
+- **Improved Stability**: The `start-preview.py` script includes comprehensive RPG Maker engine mocks and **Automatic Cache-Busting** for instant UI development.
+
+
 
 ### 2. Dev-Sync (Auto-Injection & Symlinking)
 Link your development folder to a test game. Any saved changes in your IDE are instantly visible in the game (press `F5`).
@@ -130,6 +135,9 @@ Link your development folder to a test game. Any saved changes in your IDE are i
 .venv\Scripts\python.exe deploy\dev.py --mv
 .venv\Scripts\python.exe deploy\dev.py --mz
 ```
+
+### 3. Technical Architecture
+For developers and contributors, please refer to our **[Architecture Overview](docs/guide/technical/architecture.md)** for details on the core engine, UI hooking, and data management best practices.
 
 ---
 

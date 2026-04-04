@@ -1,12 +1,34 @@
-# Development & UI Testing
+---
 
-This guide explains how to develop and test the Cheat UI using our professional developer tools.
+## 🏗️ Getting Started
+
+Before contributing to the UI or Documentation, ensure you have the necessary environments ready:
+
+### 1. Node & Documentation
+This project uses **pnpm** for managing the VitePress documentation site.
+```powershell
+# Only required if you want to build/preview the documentation site
+pnpm install
+```
+
+### 2. Python & Scripts
+Automation, build scripts, and the **Web-UI Previewer** require a Python **virtual environment** (`venv`). No Node dependencies are needed for basic UI development.
+```powershell
+# Standard execution pattern
+.venv\Scripts\python.exe [SCRIPT_NAME].py
+```
 
 ---
 
 ## 1. Web-UI Preview (Rapid Prototyping)
 
-The **Web-UI Preview** allows you to develop the cheat interface directly in your web browser. This is the fastest way to tweak layouts, colors, and components without launching an actual game.
+The **Web-UI Preview** (powered by `start-preview.py`) allows you to develop the cheat interface directly in your web browser. 
+
+### Why it's fast:
+- **Zero dependencies**: It uses the libraries already included in `cheat/libs/` (Vue, Vuetify, Axios).
+- **Instant Updates**: Changes to your `.js` or `.css` files are reflected immediately (with a browser refresh).
+
+
 
 ### Features
 - **Instant Updates**: Changes to your `.js` or `.css` files are reflected immediately (with a browser refresh).
