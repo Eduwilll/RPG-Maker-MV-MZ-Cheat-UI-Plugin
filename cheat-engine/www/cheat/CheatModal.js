@@ -35,6 +35,7 @@ export default {
 <v-card 
     dark
     class="z-index-cheat-0"
+    style="position: fixed; top: 0; left: 0;"
     :width="isWindow ? '100vw' : '700'" 
     :height="isWindow ? '100vh' : '400'">
     <v-row 
