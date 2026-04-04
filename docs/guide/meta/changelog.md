@@ -1,6 +1,13 @@
 # Changelog
 
-## v1.2.0 — Latest
+## v1.2.1 — Latest
+
+### Bug Fixes
+- [Fix] **Quick Save/JsonEx Crash**: Resolved a critical crash (`TypeError: Cannot read properties of undefined (reading 'name')`) that occurred during saving when Vue reactivity watchers were accidentally injected into RPG Maker's `Game_Actor` or `Game_Enemy` instances.
+
+---
+
+## v1.2.0
 
 ### What's New in v1.2.0
 **Features**

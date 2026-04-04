@@ -55,7 +55,7 @@ export default {
         <v-card-text class="pt-0 pb-0">
             <health-setting-tab
                 :items="enemy"
-                @change="onDetailChange">
+                @change="onDetailChange($event, 'enemy')">
             </health-setting-tab>
         </v-card-text>
     </template>
@@ -65,7 +65,7 @@ export default {
         <v-card-text class="pt-0 pb-0">
             <health-setting-tab
                 :items="party"
-                @change="onDetailChange">
+                @change="onDetailChange($event, 'party')">
             </health-setting-tab>
         </v-card-text>
     </template>
@@ -107,8 +107,18 @@ export default {
 
     methods: {
         initializeVariables () {
-            this.enemy = $gameTroop.members().map(member => member)
-            this.party = $gameParty.members().map(member => member)
+            this.enemy = $gameTroop.members().map((member, index) => ({
+                id: index,
+                name: member.name(),
+                hp: { hp: member.hp, mhp: member.mhp },
+                mp: { mp: member.mp, mmp: member.mmp }
+            }))
+            this.party = $gameParty.members().map(member => ({
+                id: member.actorId(),
+                name: member.name(),
+                hp: { hp: member.hp, mhp: member.mhp },
+                mp: { mp: member.mp, mmp: member.mmp }
+            }))
             this.disableRandomEncounter = BattleCheat.isDisableRandomEncounter()
         },
 
@@ -177,11 +187,18 @@ export default {
             this.initializeVariables()
         },
 
-        onDetailChange (items) {
+        onDetailChange (items, type) {
             for (const item of items) {
-                const member = item._member
-                member.setHp(Number(item.hp.hp))
-                member.setMp(Number(item.mp.mp))
+                let member = null;
+                if (type === 'party') {
+                    member = $gameParty.members().find(a => a.actorId() === item.id)
+                } else if (type === 'enemy') {
+                    member = $gameTroop.members()[item.id]
+                }
+                if (member) {
+                    member.setHp(Number(item.hp.hp))
+                    member.setMp(Number(item.mp.mp))
+                }
             }
             this.initializeVariables()
         }

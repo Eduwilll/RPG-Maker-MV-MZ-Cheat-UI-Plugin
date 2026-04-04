@@ -83,20 +83,8 @@ export default {
         items: {
             immediate: true,
             handler () {
-                this.editingItems = this.items.map((member) => {
-                    return {
-                        _member: member,
-                        name: member.name(),
-                        hp: {
-                            hp: member.hp,
-                            mhp: member.mhp,
-                        },
-                        mp: {
-                            mp: member.mp,
-                            mmp: member.mmp
-                        }
-                    }
-                })
+                // Dereference objects to prevent Vue from deeply injecting __ob__ into RPG Maker database/game objects.
+                this.editingItems = JSON.parse(JSON.stringify(this.items))
             }
         }
     },

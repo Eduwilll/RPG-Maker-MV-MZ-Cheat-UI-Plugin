@@ -123,7 +123,6 @@ export default {
             }
 
             return {
-                _actor: actor,
                 id: actor._actorId,
                 name: actor._name,
                 godMode: GeneralCheat.isGodMode(actor),
@@ -139,23 +138,29 @@ export default {
         },
 
         onLevelChange (item) {
-            item._actor.changeLevel(Number(item.level), false)
+            const actor = $gameParty.members().find(a => a._actorId === item.id)
+            if (actor) actor.changeLevel(Number(item.level), false)
             this.initializeVariables()
         },
 
         onExpChange (item) {
-            item._actor.changeExp(Number(item.exp), false)
+            const actor = $gameParty.members().find(a => a._actorId === item.id)
+            if (actor) actor.changeExp(Number(item.exp), false)
             this.initializeVariables()
         },
 
         onParamChange (item, paramIndex) {
-            const diff = item.param[paramIndex] - item._actor.param(paramIndex)
-            item._actor.addParam(paramIndex, diff)
+            const actor = $gameParty.members().find(a => a._actorId === item.id)
+            if (actor) {
+                const diff = item.param[paramIndex] - actor.param(paramIndex)
+                actor.addParam(paramIndex, diff)
+            }
             this.initializeVariables()
         },
 
         onGodModeChange (item) {
-            GeneralCheat.toggleGodMode(item._actor)
+            const actor = $gameParty.members().find(a => a._actorId === item.id)
+            if (actor) GeneralCheat.toggleGodMode(actor)
             this.initializeVariables()
         }
     }
