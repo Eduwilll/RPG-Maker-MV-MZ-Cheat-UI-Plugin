@@ -40,7 +40,7 @@ export default defineConfig({
       { text: "Features", link: "/guide/features/features" },
       { text: "Changelog", link: "/guide/meta/changelog" },
       {
-        text: "v1.2.0",
+        text: "v1.2.1",
         items: [
           {
             text: "Releases",

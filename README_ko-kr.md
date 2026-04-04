@@ -15,8 +15,13 @@ RPG Maker MV/MZ 게임을 위한 강력한 GUI 기반 치트 툴이며, **실시
 ---
 
 ## 🔥 주요 기능
-- **치트 패널**: 골드, 스탯, 스피드, 아이템, 무기, 방어구, 스킬 등 편집 기능.
-- **맵 치트**: 벽뚫기(Noclip), 캐릭터 무적(God Mode), 인카운트 비활성화.
+- **새로운 유틸리티**: 
+  - **Force Save**: 게임 내 저장 제한을 무시하고 강제로 저장 기능을 활성화합니다.
+  - **디버그 메뉴**: NW.js 콘솔 및 RPG Maker 디버그(F9) 메뉴에 즉시 접근 가능.
+  - **전술 맵 패널**: 플레이어, 이벤트, 적군, 보물 상자를 실시간으로 추적하는 인터랙티브 맵 오버레이.
+  - **마우스 텔레포트**: 맵 클릭 또는 `Alt + M` 키로 즉시 이동할 수 있는 기능.
+  - **토스트 알림**: 노클립, 강제 저장, 인카운트 상태 변경 시 화면 레이어 알림.
+  - **팝업 윈도우**: 치트 UI를 별도의 독립된 창에서 실행하여 멀티태스킹 최적화.
 - **스마트 번역**: 실시간으로 변수, 스위치, 맵 이름, 아이템 설명 번역.
   - **Lingva Translate** 지원 (개인 정보 보호 및 무료 구글 번역 대안).
   - **Translation Bank**: 번역된 내용을 캐시하여 다음 로드 시 즉시 반영.
@@ -59,6 +64,44 @@ docker-compose up -d
 2. **Enable** 스위치를 ON으로 설정.
 3. **End Point** 선택 (예: **Lingva JA → EN**).
 4. **Targets** 에서 번역할 항목(Variables, Items 등)을 체크하고 **"Start Translation"**을 누릅니다.
+
+---
+
+## 🛠️ 개발 및 UI 미리보기 (Development)
+
+우리는 UI 개발 및 게임 통합 속도를 높이기 위한 전문적인 도구를 제공합니다.
+
+### 1. Web-UI 미리보기 (브라우저 개발)
+게임 재시작 없이 브라우저에서 직접 Vue/Vuetify UI를 실시간으로 개발할 수 있습니다.
+- **참고**: 미리보기용 종속성 설치가 필요하지 않습니다 (`cheat/libs/`의 로컬 라이브러리 사용).
+
+```powershell
+# Python 가상 환경에서 미리보기 실행
+.venv\Scripts\python.exe start-preview.py
+```
+- 브라우저에서 `http://localhost:8080/preview/index.html`을 엽니다.
+
+### 2. Dev-Sync (자동 주입 및 심볼릭 링크)
+개발 폴더를 테스트 게임에 연결합니다. IDE에서 저장한 변경 사항은 게임에서 즉시 확인 가능합니다 (`F5` 키).
+```powershell
+# 임의의 게임에 설정
+.venv\Scripts\python.exe deploy\dev.py --game-path "C:/MyTestGame"
+
+# 로컬 테스트 폴더 빠른 설정 (인터랙티브 선택 포함)
+.venv\Scripts\python.exe deploy\dev.py --mv
+.venv\Scripts\python.exe deploy\dev.py --mz
+
+# 선택 사항: cheat-version-description.json 에 커스텀 버전 명시
+.venv\Scripts\python.exe deploy\dev.py --mz --version v1.2.3-alpha
+```
+
+### 3. 자동 포맷팅 (Prettier & Husky)
+일관된 코드 스타일 유지를 위해 **Prettier**를 사용하며, **Husky**를 통해 모든 커밋 전에 자동으로 포맷이 적용됩니다.
+- **수동 포맷**: `pnpm run format`
+- **Pre-commit Hook**: `git commit` 시 `lint-staged`가 자동으로 변경 사항을 정리합니다.
+
+### 4. 기술 아키텍처
+개발자 및 기여자는 핵심 엔진, UI 후킹 및 데이터 관리 기초에 대한 자세한 내용을 **[Architecture Overview](docs/guide/technical/architecture.md)**에서 확인하세요.
 
 ---
 

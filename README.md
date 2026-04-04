@@ -134,9 +134,17 @@ Link your development folder to a test game. Any saved changes in your IDE are i
 # Quick setup for local test folders (Includes Interactive Selection)
 .venv\Scripts\python.exe deploy\dev.py --mv
 .venv\Scripts\python.exe deploy\dev.py --mz
+
+# Optional: Specify a custom version in cheat-version-description.json
+.venv\Scripts\python.exe deploy\dev.py --mz --version v1.2.3-alpha
 ```
 
-### 3. Technical Architecture
+### 3. Automated Formatting (Prettier & Husky)
+We use **Prettier** for consistent code styling and **Husky** to ensure all commits are formatted automatically.
+- **Manual Format**: `pnpm run format`
+- **Pre-commit Hook**: Any `git commit` will automatically trigger `lint-staged` to format your changes.
+
+### 4. Technical Architecture
 For developers and contributors, please refer to our **[Architecture Overview](docs/guide/technical/architecture.md)** for details on the core engine, UI hooking, and data management best practices.
 
 ---
