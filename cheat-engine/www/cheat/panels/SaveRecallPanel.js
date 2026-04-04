@@ -1,10 +1,10 @@
-import { KEY_VALUE_STORAGE } from '../js/KeyValueStorage.js'
-import { TRANSLATE_SETTINGS, TRANSLATOR } from '../js/TranslateHelper.js'
+import { KEY_VALUE_STORAGE } from "../js/KeyValueStorage.js";
+import { TRANSLATE_SETTINGS, TRANSLATOR } from "../js/TranslateHelper.js";
 
 export default {
-    name: 'SaveRecallPanel',
+  name: "SaveRecallPanel",
 
-    template: `
+  template: `
 <v-card flat class="ma-0 pa-0">
     <v-card-subtitle class="ma-0 pa-0">Save Location</v-card-subtitle>
     <span class="body-2 green--text text--darken-1">Map : {{currentMapName}}</span>
@@ -126,157 +126,166 @@ export default {
 </v-card>
     `,
 
-    data() {
+  data() {
+    return {
+      locationAliasInput: "",
+
+      search: "",
+
+      locations: [],
+
+      currentMapName: "",
+
+      tableHeaders: [
+        {
+          text: "Name",
+          value: "name",
+        },
+        {
+          text: "Map",
+          value: "mapName",
+        },
+        {
+          text: "Coord",
+          value: "coord",
+        },
+        {
+          text: "Actions",
+          value: "actions",
+        },
+      ],
+    };
+  },
+
+  mounted() {
+    this.initializeVariables();
+  },
+
+  computed: {
+    tableItems() {
+      return this.locations.map((location, idx) => {
         return {
-            locationAliasInput: '',
-
-            search: '',
-
-            locations: [],
-
-            currentMapName: '',
-
-            tableHeaders: [
-                {
-                    text: 'Name',
-                    value: 'name'
-                },
-                {
-                    text: 'Map',
-                    value: 'mapName'
-                },
-                {
-                    text: 'Coord',
-                    value: 'coord'
-                },
-                {
-                    text: 'Actions',
-                    value: 'actions'
-                }
-            ]
-        }
+          name: location.name,
+          mapName: $dataMapInfos[location.mapId]
+            ? $dataMapInfos[location.mapId].name
+            : "NULL",
+          mapId: location.mapId,
+          coord: {
+            x: location.x,
+            y: location.y,
+          },
+        };
+      });
     },
 
-    mounted() {
-        this.initializeVariables()
+    filteredTableItems() {
+      return this.tableItems.filter((item) => {
+        if (this.excludeNameless && !item.name) {
+          return false;
+        }
+
+        return true;
+      });
+    },
+  },
+
+  methods: {
+    async initializeVariables() {
+      this.loadLocations();
+      this.currentMapName = await this.getMapFullPath($gameMap.mapId());
     },
 
-    computed: {
-        tableItems() {
-            return this.locations.map((location, idx) => {
-                return {
-                    name: location.name,
-                    mapName: ($dataMapInfos[location.mapId] ? $dataMapInfos[location.mapId].name : 'NULL'),
-                    mapId: location.mapId,
-                    coord: {
-                        x: location.x,
-                        y: location.y
-                    }
-                }
-            })
-        },
+    async getMapFullPath(id) {
+      if (!id || !$dataMapInfos[id]) {
+        return "NULL";
+      }
 
-        filteredTableItems() {
-            return this.tableItems.filter(item => {
-                if (this.excludeNameless && !item.name) {
-                    return false
-                }
+      let fullPath = [];
+      this.getMapAncestors(id, fullPath);
 
-                return true
-            })
-        }
+      fullPath = fullPath.map((id) => $dataMapInfos[id].name).join(" / ");
+
+      if (TRANSLATE_SETTINGS.isMapTranslateEnabled()) {
+        return await TRANSLATOR.translate(fullPath);
+      }
+
+      return fullPath;
     },
 
-    methods: {
-        async initializeVariables() {
-            this.loadLocations()
-            this.currentMapName = await this.getMapFullPath($gameMap.mapId())
-        },
+    getMapAncestors(id, path) {
+      if (!id || !$dataMapInfos[id]) return;
 
-        async getMapFullPath(id) {
-            if (!id || !$dataMapInfos[id]) {
-                return 'NULL'
-            }
+      path.push(id);
+      if ($dataMapInfos[id].parentId === 0) {
+        path.reverse();
+        return;
+      }
 
-            let fullPath = []
-            this.getMapAncestors(id, fullPath)
+      this.getMapAncestors($dataMapInfos[id].parentId, path);
+    },
 
-            fullPath = fullPath.map(id => $dataMapInfos[id].name).join(' / ')
+    saveLocations() {
+      KEY_VALUE_STORAGE.setItem(
+        "cheat.locations",
+        JSON.stringify(this.locations),
+      );
+    },
 
-            if (TRANSLATE_SETTINGS.isMapTranslateEnabled()) {
-                return await TRANSLATOR.translate(fullPath)
-            }
+    loadLocations() {
+      const data = KEY_VALUE_STORAGE.getItem("cheat.locations");
 
-            return fullPath
-        },
+      if (!data) {
+        this.locations = [];
+        return;
+      }
 
-        getMapAncestors(id, path) {
-            if (!id || !$dataMapInfos[id]) return;
+      this.locations = JSON.parse(data);
+    },
 
-            path.push(id)
-            if ($dataMapInfos[id].parentId === 0) {
-                path.reverse()
-                return
-            }
+    onLocationAliasKeyDown(e) {
+      if (e.code === "Enter") {
+        this.onAddLocation();
+      }
+    },
 
-            this.getMapAncestors($dataMapInfos[id].parentId, path)
-        },
+    onAddLocation() {
+      this.addLocation(this.locationAliasInput);
+      this.locationAliasInput = "";
+      this.$refs.locationAliasField.blur();
+    },
 
-        saveLocations() {
-            KEY_VALUE_STORAGE.setItem('cheat.locations', JSON.stringify(this.locations))
-        },
+    addLocation(locationAlias) {
+      this.locations.push({
+        name: locationAlias,
+        mapId: $gameMap.mapId(),
+        x: $gamePlayer.x,
+        y: $gamePlayer.y,
+      });
+      this.saveLocations();
+    },
 
-        loadLocations() {
-            const data = KEY_VALUE_STORAGE.getItem('cheat.locations')
+    removeLocation(index) {
+      this.locations.splice(index, 1);
+      this.saveLocations();
+    },
 
-            if (!data) {
-                this.locations = []
-                return
-            }
+    teleportLocation(mapId, x, y) {
+      $gamePlayer.reserveTransfer(mapId, x, y, $gamePlayer.direction(), 0);
+      $gamePlayer.setPosition(x, y);
+    },
 
-            this.locations = JSON.parse(data)
-        },
+    tableItemFilter(value, search, item) {
+      if (search === null || search.trim() === "") {
+        return true;
+      }
 
-        onLocationAliasKeyDown(e) {
-            if (e.code === 'Enter') {
-                this.onAddLocation()
-            }
-        },
+      search = search.toLowerCase();
 
-        onAddLocation() {
-            this.addLocation(this.locationAliasInput)
-            this.locationAliasInput = ''
-            this.$refs.locationAliasField.blur()
-        },
-
-        addLocation(locationAlias) {
-            this.locations.push({
-                name: locationAlias,
-                mapId: $gameMap.mapId(),
-                x: $gamePlayer.x,
-                y: $gamePlayer.y
-            })
-            this.saveLocations()
-        },
-
-        removeLocation(index) {
-            this.locations.splice(index, 1)
-            this.saveLocations()
-        },
-
-        teleportLocation(mapId, x, y) {
-            $gamePlayer.reserveTransfer(mapId, x, y, $gamePlayer.direction(), 0);
-            $gamePlayer.setPosition(x, y);
-        },
-
-        tableItemFilter(value, search, item) {
-            if (search === null || search.trim() === '') {
-                return true
-            }
-
-            search = search.toLowerCase()
-
-            return item.name.toLowerCase().contains(search) || item.mapName.toLowerCase().contains(search) || String(item.value).toLowerCase().contains(search)
-        }
-    }
-}
+      return (
+        item.name.toLowerCase().contains(search) ||
+        item.mapName.toLowerCase().contains(search) ||
+        String(item.value).toLowerCase().contains(search)
+      );
+    },
+  },
+};

@@ -1,0 +1,37 @@
+# Excluded file types
+**/*.md
+**/*.yml
+**/*.yaml
+**/*.txt
+
+# Dependency directories
+node_modules
+.venv
+venv
+env
+
+# Build outputs
+dist
+docs/.vitepress/dist
+build
+out
+
+# Cache and temporary folders
+.pnpm-store
+.vitepress/cache
+.pytest_cache
+__pycache__
+tmp
+
+# Test artifacts
+coverage
+
+# RPG Maker games in tests (do not format original engine files)
+tests/MV
+tests/MZ
+
+# Minified files and external libs
+cheat-engine/www/cheat/libs/*.min.js
+cheat-engine/www/cheat/libs/vue.js
+cheat-engine/www/cheat/libs/vuetify.js
+

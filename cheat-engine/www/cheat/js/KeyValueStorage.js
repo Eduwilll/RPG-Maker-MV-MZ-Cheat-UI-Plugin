@@ -1,48 +1,52 @@
 export class KeyValueStorage {
-    constructor (filePath) {
-        if (Utils.isNwjs()) {
-            this.filePath = filePath
-            this.fileEncoding = 'utf-8'
-            this.fileSystem = require('fs')
-        }
+  constructor(filePath) {
+    if (Utils.isNwjs()) {
+      this.filePath = filePath;
+      this.fileEncoding = "utf-8";
+      this.fileSystem = require("fs");
+    }
+  }
+
+  getItem(key) {
+    if (!Utils.isNwjs()) {
+      return localStorage.getItem(this.filePath + ":" + key);
     }
 
-    getItem (key) {
-        if (!Utils.isNwjs()) {
-            return localStorage.getItem(this.filePath + ':' + key)
-        }
- 
-        return this.__getItemFromFile(key)
-    }
- 
-    setItem (key, value) {
-        if (!Utils.isNwjs()) {
-            localStorage.setItem(this.filePath + ':' + key, value)
-            return
-        }
- 
-        this.__setItemToFile(key, value)
+    return this.__getItemFromFile(key);
+  }
+
+  setItem(key, value) {
+    if (!Utils.isNwjs()) {
+      localStorage.setItem(this.filePath + ":" + key, value);
+      return;
     }
 
-    __readFile () {
-        if (!this.fileSystem.existsSync(this.filePath)) {
-            return {}
-        }
+    this.__setItemToFile(key, value);
+  }
 
-        return JSON.parse(this.fileSystem.readFileSync(this.filePath, this.fileEncoding))
+  __readFile() {
+    if (!this.fileSystem.existsSync(this.filePath)) {
+      return {};
     }
 
-    __getItemFromFile (key) {
-        return this.__readFile()[key]
-    }
+    return JSON.parse(
+      this.fileSystem.readFileSync(this.filePath, this.fileEncoding),
+    );
+  }
 
-    __setItemToFile (key, value) {
-        const data = this.__readFile()
+  __getItemFromFile(key) {
+    return this.__readFile()[key];
+  }
 
-        data[key] = value
+  __setItemToFile(key, value) {
+    const data = this.__readFile();
 
-        this.fileSystem.writeFileSync(this.filePath, JSON.stringify(data))
-    }
+    data[key] = value;
+
+    this.fileSystem.writeFileSync(this.filePath, JSON.stringify(data));
+  }
 }
 
-export const KEY_VALUE_STORAGE = new KeyValueStorage('./www/cheat-settings/kv-storage.json')
+export const KEY_VALUE_STORAGE = new KeyValueStorage(
+  "./www/cheat-settings/kv-storage.json",
+);

@@ -1,9 +1,9 @@
-import {Alert} from'../js/AlertHelper.js'
+import { Alert } from "../js/AlertHelper.js";
 
 export default {
-    name: 'ShortcutPanel',
+  name: "ShortcutPanel",
 
-    template: `
+  template: `
 <v-snackbar
     app
     top
@@ -32,58 +32,56 @@ export default {
 </v-snackbar>
     `,
 
-    data () {
-        return {
-            showSnackbar: false,
-            text: '',
-            timeout: 1000,
-            color: 'black'
-        }
+  data() {
+    return {
+      showSnackbar: false,
+      text: "",
+      timeout: 1000,
+      color: "black",
+    };
+  },
+
+  mounted() {
+    Alert.alertInternal = (level, msg, err = null, timeout = 1500) => {
+      let color = null;
+      switch (level) {
+        case "success":
+          color = "green";
+          break;
+        case "info":
+          color = "blue";
+          break;
+        case "warn":
+          color = "orange";
+          break;
+        case "error":
+          color = "red";
+          break;
+        default:
+          color = "blue-grey";
+      }
+
+      this.show({
+        text: msg,
+        color: color,
+        timeout: timeout,
+      });
+    };
+  },
+
+  created() {},
+
+  methods: {
+    show(options) {
+      this.showSnackbar = false;
+
+      this.text = options.text.split("\n");
+      this.timeout = options.timeout;
+      if (options.color) {
+        this.color = options.color;
+      }
+
+      this.showSnackbar = true;
     },
-
-    mounted () {
-        Alert.alertInternal = (level, msg, err = null, timeout = 1500) => {
-            let color = null
-            switch (level) {
-                case 'success':
-                    color = 'green'
-                    break
-                case 'info':
-                    color = 'blue'
-                    break
-                case 'warn':
-                    color = 'orange'
-                    break
-                case 'error':
-                    color = 'red'
-                    break
-                default:
-                    color = 'blue-grey'
-            }
-
-            this.show({
-                text: msg,
-                color: color,
-                timeout: timeout,
-            })
-        }
-    },
-
-    created () {
-
-    },
-
-    methods : {
-        show (options) {
-            this.showSnackbar = false
-
-            this.text = options.text.split('\n')
-            this.timeout = options.timeout
-            if (options.color) {
-                this.color = options.color
-            }
-
-            this.showSnackbar = true
-        }
-    }
-}
+  },
+};

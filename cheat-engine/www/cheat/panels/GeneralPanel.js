@@ -1,9 +1,14 @@
-import { GeneralCheat, GameSpeedCheat, SpeedCheat, SceneCheat } from '../js/CheatHelper.js'
+import {
+  GeneralCheat,
+  GameSpeedCheat,
+  SpeedCheat,
+  SceneCheat,
+} from "../js/CheatHelper.js";
 
 export default {
-    name: 'GeneralPanel',
+  name: "GeneralPanel",
 
-    template: `
+  template: `
 <v-card class="ma-0 pa-0" flat style="position: relative;">
     <v-btn
         style="top: 8px; right: 8px;"
@@ -174,161 +179,174 @@ export default {
 </v-card>
     `,
 
-    data() {
-        return {
-            godMode: false,
-            noClip: false,
-            gold: 0,
-            speed: 0,
-            fixSpeed: false,
+  data() {
+    return {
+      godMode: false,
+      noClip: false,
+      gold: 0,
+      speed: 0,
+      fixSpeed: false,
 
-            minSpeed: 1,
-            maxSpeed: 10,
-            stepSpeed: 0.5,
+      minSpeed: 1,
+      maxSpeed: 10,
+      stepSpeed: 0.5,
 
-            gameSpeed: 1,
-            minGameSpeed: 0.1,
-            maxGameSpeed: 10,
-            stepGameSpeed: 0.1,
-            applyAllForGameSpeed: false,
-            applyBattleForGameSpeed: false,
-            forceSave: false,
-            mouseTeleport: false,
-            canOpenConsole: typeof nw !== 'undefined' || typeof require === 'function'
-        }
+      gameSpeed: 1,
+      minGameSpeed: 0.1,
+      maxGameSpeed: 10,
+      stepGameSpeed: 0.1,
+      applyAllForGameSpeed: false,
+      applyBattleForGameSpeed: false,
+      forceSave: false,
+      mouseTeleport: false,
+      canOpenConsole:
+        typeof nw !== "undefined" || typeof require === "function",
+    };
+  },
+
+  created() {
+    this.initializeVariables();
+  },
+
+  methods: {
+    initializeVariables() {
+      this.noClip = $gamePlayer._through;
+      this.speed = $gamePlayer.moveSpeed();
+      this.fixSpeed = SpeedCheat.isFixed();
+      this.gold = $gameParty._gold;
+
+      this.forceSave = GeneralCheat.isForceSaveEnabled();
+      this.mouseTeleport = GeneralCheat.isMouseTeleportEnabled();
+
+      this.gameSpeed = GameSpeedCheat.getRate();
+      const gameSpeedSceneOption = GameSpeedCheat.getSceneOption();
+      if (gameSpeedSceneOption === GameSpeedCheat.sceneOptions().all) {
+        this.applyAllForGameSpeed = true;
+      } else if (
+        gameSpeedSceneOption === GameSpeedCheat.sceneOptions().battle
+      ) {
+        this.applyBattleForGameSpeed = true;
+      }
     },
 
-    created() {
-        this.initializeVariables()
+    onNoClipChange() {
+      GeneralCheat.toggleNoClip();
+      this.initializeVariables();
     },
 
-    methods: {
-        initializeVariables() {
-            this.noClip = $gamePlayer._through
-            this.speed = $gamePlayer.moveSpeed()
-            this.fixSpeed = SpeedCheat.isFixed()
-            this.gold = $gameParty._gold
+    onSpeedChange() {
+      SpeedCheat.setSpeed(this.speed, this.fixSpeed);
+      SpeedCheat.__writeSettings(this.speed, this.fixSpeed);
+      this.initializeVariables();
+    },
 
-            this.forceSave = GeneralCheat.isForceSaveEnabled()
-            this.mouseTeleport = GeneralCheat.isMouseTeleportEnabled()
+    addSpeed(amount) {
+      this.speed = Math.min(
+        Math.max(this.speed + amount, this.minSpeed),
+        this.maxSpeed,
+      );
+      this.onSpeedChange();
+    },
 
-            this.gameSpeed = GameSpeedCheat.getRate()
-            const gameSpeedSceneOption = GameSpeedCheat.getSceneOption()
-            if (gameSpeedSceneOption === GameSpeedCheat.sceneOptions().all) {
-                this.applyAllForGameSpeed = true
-            } else if (gameSpeedSceneOption === GameSpeedCheat.sceneOptions().battle) {
-                this.applyBattleForGameSpeed = true
-            }
-        },
+    onGoldChange() {
+      if (
+        isNaN(this.gold) ||
+        !Number.isInteger(Number(this.gold)) ||
+        this.gold < 0
+      ) {
+        return;
+      }
 
-        onNoClipChange() {
-            GeneralCheat.toggleNoClip()
-            this.initializeVariables()
-        },
+      const diff = this.gold - $gameParty._gold;
 
-        onSpeedChange() {
-            SpeedCheat.setSpeed(this.speed, this.fixSpeed)
-            SpeedCheat.__writeSettings(this.speed, this.fixSpeed)
-            this.initializeVariables()
-        },
+      if (diff < 0) {
+        $gameParty.loseGold(-diff);
+      } else if (diff > 0) {
+        $gameParty.gainGold(diff);
+      }
 
-        addSpeed(amount) {
-            this.speed = Math.min(Math.max(this.speed + amount, this.minSpeed), this.maxSpeed)
-            this.onSpeedChange()
-        },
+      this.gold = $gameParty._gold;
+      this.initializeVariables();
+    },
 
-        onGoldChange() {
-            if (isNaN(this.gold) || !Number.isInteger(Number(this.gold)) || this.gold < 0) {
-                return
-            }
+    gotoTitle() {
+      SceneCheat.gotoTitle();
+    },
 
-            const diff = this.gold - $gameParty._gold
+    toggleSaveScene() {
+      SceneCheat.toggleSaveScene();
+    },
 
-            if (diff < 0) {
-                $gameParty.loseGold(-diff)
-            } else if (diff > 0) {
-                $gameParty.gainGold(diff)
-            }
+    toggleLoadScene() {
+      SceneCheat.toggleLoadScene();
+    },
 
-            this.gold = $gameParty._gold
-            this.initializeVariables()
-        },
+    onGameSpeedChange() {
+      let sceneOption = null;
+      if (this.applyAllForGameSpeed) {
+        sceneOption = GameSpeedCheat.sceneOptions().all;
+      } else if (this.applyBattleForGameSpeed) {
+        sceneOption = GameSpeedCheat.sceneOptions().battle;
+      }
 
-        gotoTitle() {
-            SceneCheat.gotoTitle()
-        },
+      GameSpeedCheat.setGameSpeed(this.gameSpeed, sceneOption);
+      GameSpeedCheat.__writeSettings(this.gameSpeed, sceneOption);
+      this.initializeVariables();
+    },
 
-        toggleSaveScene() {
-            SceneCheat.toggleSaveScene()
-        },
+    addGameSpeed(amount) {
+      this.gameSpeed = Math.min(
+        Math.max(this.gameSpeed + amount, this.minGameSpeed),
+        this.maxGameSpeed,
+      );
+      this.onGameSpeedChange();
+    },
 
-        toggleLoadScene() {
-            SceneCheat.toggleLoadScene()
-        },
+    setGameSpeed(amount) {
+      this.gameSpeed = 1;
+      this.onGameSpeedChange();
+    },
 
-        onGameSpeedChange() {
-            let sceneOption = null
-            if (this.applyAllForGameSpeed) {
-                sceneOption = GameSpeedCheat.sceneOptions().all
-            } else if (this.applyBattleForGameSpeed) {
-                sceneOption = GameSpeedCheat.sceneOptions().battle
-            }
+    onApplyAllForGameSpeedChange() {
+      if (this.applyAllForGameSpeed) {
+        this.applyBattleForGameSpeed = false;
+      } else {
+        this.applyBattleForGameSpeed = true;
+      }
 
-            GameSpeedCheat.setGameSpeed(this.gameSpeed, sceneOption)
-            GameSpeedCheat.__writeSettings(this.gameSpeed, sceneOption)
-            this.initializeVariables()
-        },
+      this.onGameSpeedChange();
+    },
 
-        addGameSpeed(amount) {
-            this.gameSpeed = Math.min(Math.max(this.gameSpeed + amount, this.minGameSpeed), this.maxGameSpeed)
-            this.onGameSpeedChange()
-        },
+    onApplyBattleForGameSpeedChange() {
+      if (this.applyBattleForGameSpeed) {
+        this.applyAllForGameSpeed = false;
+      } else {
+        this.applyAllForGameSpeed = true;
+      }
 
-        setGameSpeed(amount) {
-            this.gameSpeed = 1
-            this.onGameSpeedChange()
-        },
+      this.onGameSpeedChange();
+    },
 
-        onApplyAllForGameSpeedChange() {
-            if (this.applyAllForGameSpeed) {
-                this.applyBattleForGameSpeed = false
-            } else {
-                this.applyBattleForGameSpeed = true
-            }
+    onForceSaveChange() {
+      GeneralCheat.forceEnableSave(this.forceSave);
+      this.initializeVariables();
+    },
 
-            this.onGameSpeedChange()
-        },
+    openConsole() {
+      GeneralCheat.openConsole();
+    },
 
-        onApplyBattleForGameSpeedChange() {
-            if (this.applyBattleForGameSpeed) {
-                this.applyAllForGameSpeed = false
-            } else {
-                this.applyAllForGameSpeed = true
-            }
+    onMouseTeleportChange() {
+      GeneralCheat.toggleMouseTeleport(this.mouseTeleport);
+      this.initializeVariables();
+    },
 
-            this.onGameSpeedChange()
-        },
+    openDebugMenu() {
+      GeneralCheat.openDebugMenu();
+    },
 
-        onForceSaveChange() {
-            GeneralCheat.forceEnableSave(this.forceSave)
-            this.initializeVariables()
-        },
-
-        openConsole() {
-            GeneralCheat.openConsole()
-        },
-
-        onMouseTeleportChange() {
-            GeneralCheat.toggleMouseTeleport(this.mouseTeleport)
-            this.initializeVariables()
-        },
-
-        openDebugMenu() {
-            GeneralCheat.openDebugMenu()
-        },
-
-        openCheatWindow() {
-            GeneralCheat.openCheatWindow()
-        }
-    }
-}
+    openCheatWindow() {
+      GeneralCheat.openCheatWindow();
+    },
+  },
+};

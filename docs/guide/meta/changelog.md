@@ -2,6 +2,10 @@
 
 ## v1.2.1 — Latest
 
+### dev-sync & maintenance
+- [Fix] **Prettier Configuration**: Formalized project-wide formatting (2-space, semi, double quote) with `.prettierrc` and a simplified `pnpm run format` command.
+- [Feat] **dev.py versioning**: Added `--version` flag to `dev.py` to allow custom strings in `cheat-version-description.json`.
+
 ### Bug Fixes
 - [Fix] **Quick Save/JsonEx Crash**: Resolved a critical crash (`TypeError: Cannot read properties of undefined (reading 'name')`) that occurred during saving when Vue reactivity watchers were accidentally injected into RPG Maker's `Game_Actor` or `Game_Enemy` instances.
 

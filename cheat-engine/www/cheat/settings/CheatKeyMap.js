@@ -1,3 +1,3 @@
 export default {
-    toggleCheatModal: 'ctrl c'
-}
+  toggleCheatModal: "ctrl c",
+};

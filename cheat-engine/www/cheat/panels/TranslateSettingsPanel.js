@@ -1,13 +1,20 @@
-import {TRANSLATE_SETTINGS, DEFAULT_END_POINTS, RECOMMEND_CHUNK_SIZE, MAX_CHUNK_SIZE, TRANSLATION_BANK, TRANSLATE_PROGRESS} from '../js/TranslateHelper.js'
-import {TRANSLATOR} from '../js/TranslateHelper.js'
-import {isInValueInRange} from '../js/GlobalShortcut.js';
-import {Alert} from '../js/AlertHelper.js'
-import {IN_GAME_TRANSLATOR} from '../js/InGameTranslator.js'
+import {
+  TRANSLATE_SETTINGS,
+  DEFAULT_END_POINTS,
+  RECOMMEND_CHUNK_SIZE,
+  MAX_CHUNK_SIZE,
+  TRANSLATION_BANK,
+  TRANSLATE_PROGRESS,
+} from "../js/TranslateHelper.js";
+import { TRANSLATOR } from "../js/TranslateHelper.js";
+import { isInValueInRange } from "../js/GlobalShortcut.js";
+import { Alert } from "../js/AlertHelper.js";
+import { IN_GAME_TRANSLATOR } from "../js/InGameTranslator.js";
 
 export default {
-    name: 'TranslateSettingsPanel',
+  name: "TranslateSettingsPanel",
 
-    template: `
+  template: `
 <v-card flat class="ma-0 pa-0">
     <v-card-subtitle class="pb-0 font-weight-bold">Usage</v-card-subtitle>
     <v-card-text class="pb-0">
@@ -488,349 +495,379 @@ export default {
 </v-card>
     `,
 
-    data () {
-        return {
-            translatorStatusChangedTime: 0,
-            translatorChecking: false,
-            translatorRunning: false,
-            enabled: false,
-            targets: {},
+  data() {
+    return {
+      translatorStatusChangedTime: 0,
+      translatorChecking: false,
+      translatorRunning: false,
+      enabled: false,
+      targets: {},
 
-            endPointSelection: '',
+      endPointSelection: "",
 
-            restApiMethods: [
-                {
-                    name: 'GET',
-                    value: 'get'
-                },
-                {
-                    name: 'POST',
-                    value: 'post'
-                }
-            ],
-
-            customEndPointData: {},
-
-            llmConfig: {
-                apiKey: '',
-                model: '',
-                apiUrl: '',
-                systemPrompt: ''
-            },
-
-            bulkTranslateChunkSize: 500,
-
-            // Translation bank stats
-            bankStats: {
-                totalEntries: 0,
-                ageText: 'No data'
-            },
-
-            // Chunk size warning
-            chunkSizeWarning: {
-                message: '',
-                class: ''
-            },
-
-            // Batch translation setting
-            useBatchTranslation: true,
-
-            // Testing state
-            isTestingTranslation: false,
-
-            // Global Translation Progress
-            isTranslatingGlobals: false,
-            globalTranslationProgress: 0,
-            globalTranslationText: '',
-
-            // In-Game Translation Status
-            isDataPatched: false,
-            inGamePatchCount: 0
-        }
-    },
-
-    created () {
-        this.initializeVariables()
-        
-        // Listen to global translation progress
-        this._progressTracker = (state) => {
-            this.isTranslatingGlobals = state.isTranslating
-            this.globalTranslationProgress = state.progress
-            this.globalTranslationText = state.text
-        }
-        TRANSLATE_PROGRESS.subscribe(this._progressTracker)
-
-        // Listen for data patching events
-        this._dataPatchListener = (e) => {
-            this.isDataPatched = IN_GAME_TRANSLATOR.isDataPatched()
-            this.inGamePatchCount = e.detail ? e.detail.patchCount : 0
-        }
-        window.addEventListener('cheat-data-patched', this._dataPatchListener)
-    },
-
-    beforeDestroy () {
-        if (this._progressTracker) {
-            TRANSLATE_PROGRESS.unsubscribe(this._progressTracker)
-        }
-        if (this._dataPatchListener) {
-            window.removeEventListener('cheat-data-patched', this._dataPatchListener)
-        }
-    },
-
-    computed: {
-        translatorStatusMessage () {
-            if (this.translatorChecking) {
-                return 'Checking translation server...'
-            }
-
-            if (this.translatorRunning) {
-                const serverName = this.selectedDefaultEndPoint ? this.selectedDefaultEndPoint.name : 'Custom'
-                return `Translation server(${serverName}) is now running`
-            }
-
-            return 'WARN: Translator server is not running'
+      restApiMethods: [
+        {
+          name: "GET",
+          value: "get",
         },
-
-        translatorStatusColor () {
-            if (this.translatorChecking) {
-                return 'orange'
-            }
-
-            if (this.translatorRunning) {
-                return 'green'
-            }
-
-            return 'red'
+        {
+          name: "POST",
+          value: "post",
         },
+      ],
 
-        endPointList () {
-            const ret = Object.values(DEFAULT_END_POINTS).map(ep => ({ id: ep.id, name: ep.name }))
-            ret.push({ id: 'custom', name: 'Custom' })
+      customEndPointData: {},
 
-            return ret
-        },
+      llmConfig: {
+        apiKey: "",
+        model: "",
+        apiUrl: "",
+        systemPrompt: "",
+      },
 
-        isCustomEndPoint () {
-            return this.endPointSelection === 'custom'
-        },
+      bulkTranslateChunkSize: 500,
 
-        isLLMEndPoint () {
-            const ep = DEFAULT_END_POINTS[this.endPointSelection]
-            return ep && ep.data && ep.data.isLLM
-        },
+      // Translation bank stats
+      bankStats: {
+        totalEntries: 0,
+        ageText: "No data",
+      },
 
-        selectedDefaultEndPoint () {
-            return DEFAULT_END_POINTS[this.endPointSelection]
-        },
+      // Chunk size warning
+      chunkSizeWarning: {
+        message: "",
+        class: "",
+      },
 
-        recommendChunkSizeDesc () {
-            if (this.isCustomEndPoint || !RECOMMEND_CHUNK_SIZE[this.endPointSelection]) {
-                return null
-            }
+      // Batch translation setting
+      useBatchTranslation: true,
 
-            return `Recommended chunk size for ${this.selectedDefaultEndPoint.name} : ${RECOMMEND_CHUNK_SIZE[this.endPointSelection]}`
-        },
+      // Testing state
+      isTestingTranslation: false,
 
-        isJpToKrEndpoint () {
-            return this.endPointSelection === 'ezTransWeb' || this.endPointSelection === 'ezTransServer'
-        }
-    },
+      // Global Translation Progress
+      isTranslatingGlobals: false,
+      globalTranslationProgress: 0,
+      globalTranslationText: "",
 
-    methods: {
-        async initializeVariables () {
-            this.enabled = TRANSLATE_SETTINGS.isEnabled()
+      // In-Game Translation Status
+      isDataPatched: false,
+      inGamePatchCount: 0,
+    };
+  },
 
-            this.endPointSelection = TRANSLATE_SETTINGS.getEndPointSelection()
-            this.customEndPointData = TRANSLATE_SETTINGS.getCustomEndPointData()
-            this.llmConfig = TRANSLATE_SETTINGS.getLLMConfig()
+  created() {
+    this.initializeVariables();
 
-            this.targets = TRANSLATE_SETTINGS.getTargets()
-            this.bulkTranslateChunkSize = TRANSLATE_SETTINGS.getBulkTranslateChunkSize()
+    // Listen to global translation progress
+    this._progressTracker = (state) => {
+      this.isTranslatingGlobals = state.isTranslating;
+      this.globalTranslationProgress = state.progress;
+      this.globalTranslationText = state.text;
+    };
+    TRANSLATE_PROGRESS.subscribe(this._progressTracker);
 
-            // Load batch translation preference
-            this.useBatchTranslation = localStorage.getItem('useBatchTranslation') !== 'false'
+    // Listen for data patching events
+    this._dataPatchListener = (e) => {
+      this.isDataPatched = IN_GAME_TRANSLATOR.isDataPatched();
+      this.inGamePatchCount = e.detail ? e.detail.patchCount : 0;
+    };
+    window.addEventListener("cheat-data-patched", this._dataPatchListener);
+  },
 
-            this.updateBankStats()
-            this.checkChunkSize()
-            this.checkTranslatorAvailable()
-        },
-
-        onChangeEnabled () {
-            TRANSLATE_SETTINGS.setEnabled(this.enabled)
-        },
-
-        onChangeTargetsValue () {
-            TRANSLATE_SETTINGS.setTargets(this.targets)
-        },
-
-        async checkTranslatorAvailable () {
-            const time = Date.now()
-
-            this.translatorChecking = true
-            const currentRunningState = await TRANSLATOR.isAvailable()
-
-            if (this.translatorStatusChangedTime < time) {
-                this.translatorStatusChangedTime = time
-                this.translatorChecking = false
-                this.translatorRunning = currentRunningState
-            }
-        },
-
-        onChangeEndPoint () {
-            TRANSLATE_SETTINGS.setEndPointSelection(this.endPointSelection)
-            this.checkTranslatorAvailable()
-        },
-
-        onChangeCustomEndPointMethod () {
-            TRANSLATE_SETTINGS.setCustomEndPointMethod(this.customEndPointData.method)
-            this.checkTranslatorAvailable()
-        },
-
-        onChangeCustomEndPointUrlPattern () {
-            TRANSLATE_SETTINGS.setCustomEndPointUrlPattern(this.customEndPointData.urlPattern)
-            this.checkTranslatorAvailable()
-        },
-
-        onChangeCustomEndPointBody () {
-            TRANSLATE_SETTINGS.setCustomEndPointBody(this.customEndPointData.body)
-            this.checkTranslatorAvailable()
-        },
-
-        onChangeLLMConfig () {
-            TRANSLATE_SETTINGS.setLLMConfig(this.llmConfig)
-        },
-
-        checkChunkSize () {
-            const chunkSize = Number(this.bulkTranslateChunkSize)
-            const endPointId = this.endPointSelection
-            const maxSafe = MAX_CHUNK_SIZE[endPointId] || 50
-
-            if (chunkSize <= 0) {
-                this.chunkSizeWarning = {
-                    message: 'Chunk size must be greater than 0',
-                    class: 'caption font-weight-bold red--text'
-                }
-            } else if (chunkSize > maxSafe) {
-                this.chunkSizeWarning = {
-                    message: `⚠️ Large chunk size (${chunkSize}) may cause issues with ${endPointId}. Recommended max: ${maxSafe}`,
-                    class: 'caption font-weight-bold orange--text'
-                }
-            } else if (chunkSize > 100) {
-                this.chunkSizeWarning = {
-                    message: `⚠️ Large chunk size may be slower due to rate limiting`,
-                    class: 'caption font-weight-bold amber--text'
-                }
-            } else {
-                this.chunkSizeWarning = {
-                    message: '✅ Good chunk size for reliable translation',
-                    class: 'caption font-weight-bold green--text'
-                }
-            }
-        },
-
-        onChnageBulkTranslateChunkSize () {
-            const validateMsg = isInValueInRange(this.bulkTranslateChunkSize, 1, 2000)
-
-            if (validateMsg) {
-                Alert.error(validateMsg)
-                this.bulkTranslateChunkSize = 500
-                return
-            }
-
-            this.checkChunkSize()
-            TRANSLATE_SETTINGS.setBulkTranslateChunkSize(Number(this.bulkTranslateChunkSize))
-        },
-
-        onChangeBatchTranslation () {
-            // Store batch translation preference
-            localStorage.setItem('useBatchTranslation', this.useBatchTranslation.toString())
-            console.log(`Batch translation ${this.useBatchTranslation ? 'enabled' : 'disabled'}`)
-        },
-
-        updateBankStats () {
-            const stats = TRANSLATION_BANK.getStats()
-            this.bankStats.totalEntries = stats.totalEntries
-
-            if (stats.newestEntry) {
-                const age = Date.now() - stats.newestEntry
-                const days = Math.floor(age / (24 * 60 * 60 * 1000))
-                if (days > 0) {
-                    this.bankStats.ageText = `${days} days old`
-                } else {
-                    this.bankStats.ageText = 'Recent'
-                }
-            } else {
-                this.bankStats.ageText = 'No data'
-            }
-        },
-
-        clearTranslationBank () {
-            if (confirm('Clear all cached translations? This cannot be undone.')) {
-                TRANSLATION_BANK.cache = {}
-                TRANSLATION_BANK.saveCache()
-                this.updateBankStats()
-                Alert.success('Translation bank cleared')
-            }
-        },
-
-        exportTranslationBank () {
-            try {
-                const data = TRANSLATION_BANK.export()
-                const blob = new Blob([data], { type: 'application/json' })
-                const url = URL.createObjectURL(blob)
-
-                const a = document.createElement('a')
-                a.href = url
-                a.download = `translation-bank-${new Date().toISOString().split('T')[0]}.json`
-                document.body.appendChild(a)
-                a.click()
-                document.body.removeChild(a)
-                URL.revokeObjectURL(url)
-
-                Alert.success('Translation bank exported')
-            } catch (error) {
-                Alert.error('Failed to export translation bank')
-                console.error('Export error:', error)
-            }
-        },
-
-        async testTranslationEndpoint () {
-            this.isTestingTranslation = true;
-            try {
-                Alert.success('Testing translation... Please wait.');
-                const result = await TRANSLATOR.__translate('テスト');
-                if (result && result !== 'テスト') {
-                    Alert.success('Success! Translated "テスト" to "' + result + '"');
-                } else {
-                    Alert.error('Failed: End point returned original text or empty. Check F8 console.');
-                }
-            } catch (err) {
-                Alert.error('Connection error: ' + err.message);
-                console.error('Test Translation Error:', err);
-            } finally {
-                this.isTestingTranslation = false;
-            }
-        },
-
-        async startGlobalTranslation () {
-            if (!this.enabled) return;
-            console.log('Starting global pre-translation module');
-            await TRANSLATOR.translateAllGlobals();
-            this.updateBankStats();
-            this.isDataPatched = IN_GAME_TRANSLATOR.isDataPatched();
-        },
-
-        reapplyInGameTranslation () {
-            IN_GAME_TRANSLATOR.applyTranslationsToGameData();
-            this.isDataPatched = IN_GAME_TRANSLATOR.isDataPatched();
-            Alert.success('In-game translation re-applied!');
-        },
-
-        revertInGameTranslation () {
-            IN_GAME_TRANSLATOR.revertGameData();
-            this.isDataPatched = false;
-            this.inGamePatchCount = 0;
-            Alert.success('Game text reverted to original!');
-        }
+  beforeDestroy() {
+    if (this._progressTracker) {
+      TRANSLATE_PROGRESS.unsubscribe(this._progressTracker);
     }
-}
+    if (this._dataPatchListener) {
+      window.removeEventListener("cheat-data-patched", this._dataPatchListener);
+    }
+  },
+
+  computed: {
+    translatorStatusMessage() {
+      if (this.translatorChecking) {
+        return "Checking translation server...";
+      }
+
+      if (this.translatorRunning) {
+        const serverName = this.selectedDefaultEndPoint
+          ? this.selectedDefaultEndPoint.name
+          : "Custom";
+        return `Translation server(${serverName}) is now running`;
+      }
+
+      return "WARN: Translator server is not running";
+    },
+
+    translatorStatusColor() {
+      if (this.translatorChecking) {
+        return "orange";
+      }
+
+      if (this.translatorRunning) {
+        return "green";
+      }
+
+      return "red";
+    },
+
+    endPointList() {
+      const ret = Object.values(DEFAULT_END_POINTS).map((ep) => ({
+        id: ep.id,
+        name: ep.name,
+      }));
+      ret.push({ id: "custom", name: "Custom" });
+
+      return ret;
+    },
+
+    isCustomEndPoint() {
+      return this.endPointSelection === "custom";
+    },
+
+    isLLMEndPoint() {
+      const ep = DEFAULT_END_POINTS[this.endPointSelection];
+      return ep && ep.data && ep.data.isLLM;
+    },
+
+    selectedDefaultEndPoint() {
+      return DEFAULT_END_POINTS[this.endPointSelection];
+    },
+
+    recommendChunkSizeDesc() {
+      if (
+        this.isCustomEndPoint ||
+        !RECOMMEND_CHUNK_SIZE[this.endPointSelection]
+      ) {
+        return null;
+      }
+
+      return `Recommended chunk size for ${this.selectedDefaultEndPoint.name} : ${RECOMMEND_CHUNK_SIZE[this.endPointSelection]}`;
+    },
+
+    isJpToKrEndpoint() {
+      return (
+        this.endPointSelection === "ezTransWeb" ||
+        this.endPointSelection === "ezTransServer"
+      );
+    },
+  },
+
+  methods: {
+    async initializeVariables() {
+      this.enabled = TRANSLATE_SETTINGS.isEnabled();
+
+      this.endPointSelection = TRANSLATE_SETTINGS.getEndPointSelection();
+      this.customEndPointData = TRANSLATE_SETTINGS.getCustomEndPointData();
+      this.llmConfig = TRANSLATE_SETTINGS.getLLMConfig();
+
+      this.targets = TRANSLATE_SETTINGS.getTargets();
+      this.bulkTranslateChunkSize =
+        TRANSLATE_SETTINGS.getBulkTranslateChunkSize();
+
+      // Load batch translation preference
+      this.useBatchTranslation =
+        localStorage.getItem("useBatchTranslation") !== "false";
+
+      this.updateBankStats();
+      this.checkChunkSize();
+      this.checkTranslatorAvailable();
+    },
+
+    onChangeEnabled() {
+      TRANSLATE_SETTINGS.setEnabled(this.enabled);
+    },
+
+    onChangeTargetsValue() {
+      TRANSLATE_SETTINGS.setTargets(this.targets);
+    },
+
+    async checkTranslatorAvailable() {
+      const time = Date.now();
+
+      this.translatorChecking = true;
+      const currentRunningState = await TRANSLATOR.isAvailable();
+
+      if (this.translatorStatusChangedTime < time) {
+        this.translatorStatusChangedTime = time;
+        this.translatorChecking = false;
+        this.translatorRunning = currentRunningState;
+      }
+    },
+
+    onChangeEndPoint() {
+      TRANSLATE_SETTINGS.setEndPointSelection(this.endPointSelection);
+      this.checkTranslatorAvailable();
+    },
+
+    onChangeCustomEndPointMethod() {
+      TRANSLATE_SETTINGS.setCustomEndPointMethod(
+        this.customEndPointData.method,
+      );
+      this.checkTranslatorAvailable();
+    },
+
+    onChangeCustomEndPointUrlPattern() {
+      TRANSLATE_SETTINGS.setCustomEndPointUrlPattern(
+        this.customEndPointData.urlPattern,
+      );
+      this.checkTranslatorAvailable();
+    },
+
+    onChangeCustomEndPointBody() {
+      TRANSLATE_SETTINGS.setCustomEndPointBody(this.customEndPointData.body);
+      this.checkTranslatorAvailable();
+    },
+
+    onChangeLLMConfig() {
+      TRANSLATE_SETTINGS.setLLMConfig(this.llmConfig);
+    },
+
+    checkChunkSize() {
+      const chunkSize = Number(this.bulkTranslateChunkSize);
+      const endPointId = this.endPointSelection;
+      const maxSafe = MAX_CHUNK_SIZE[endPointId] || 50;
+
+      if (chunkSize <= 0) {
+        this.chunkSizeWarning = {
+          message: "Chunk size must be greater than 0",
+          class: "caption font-weight-bold red--text",
+        };
+      } else if (chunkSize > maxSafe) {
+        this.chunkSizeWarning = {
+          message: `⚠️ Large chunk size (${chunkSize}) may cause issues with ${endPointId}. Recommended max: ${maxSafe}`,
+          class: "caption font-weight-bold orange--text",
+        };
+      } else if (chunkSize > 100) {
+        this.chunkSizeWarning = {
+          message: `⚠️ Large chunk size may be slower due to rate limiting`,
+          class: "caption font-weight-bold amber--text",
+        };
+      } else {
+        this.chunkSizeWarning = {
+          message: "✅ Good chunk size for reliable translation",
+          class: "caption font-weight-bold green--text",
+        };
+      }
+    },
+
+    onChnageBulkTranslateChunkSize() {
+      const validateMsg = isInValueInRange(
+        this.bulkTranslateChunkSize,
+        1,
+        2000,
+      );
+
+      if (validateMsg) {
+        Alert.error(validateMsg);
+        this.bulkTranslateChunkSize = 500;
+        return;
+      }
+
+      this.checkChunkSize();
+      TRANSLATE_SETTINGS.setBulkTranslateChunkSize(
+        Number(this.bulkTranslateChunkSize),
+      );
+    },
+
+    onChangeBatchTranslation() {
+      // Store batch translation preference
+      localStorage.setItem(
+        "useBatchTranslation",
+        this.useBatchTranslation.toString(),
+      );
+      console.log(
+        `Batch translation ${this.useBatchTranslation ? "enabled" : "disabled"}`,
+      );
+    },
+
+    updateBankStats() {
+      const stats = TRANSLATION_BANK.getStats();
+      this.bankStats.totalEntries = stats.totalEntries;
+
+      if (stats.newestEntry) {
+        const age = Date.now() - stats.newestEntry;
+        const days = Math.floor(age / (24 * 60 * 60 * 1000));
+        if (days > 0) {
+          this.bankStats.ageText = `${days} days old`;
+        } else {
+          this.bankStats.ageText = "Recent";
+        }
+      } else {
+        this.bankStats.ageText = "No data";
+      }
+    },
+
+    clearTranslationBank() {
+      if (confirm("Clear all cached translations? This cannot be undone.")) {
+        TRANSLATION_BANK.cache = {};
+        TRANSLATION_BANK.saveCache();
+        this.updateBankStats();
+        Alert.success("Translation bank cleared");
+      }
+    },
+
+    exportTranslationBank() {
+      try {
+        const data = TRANSLATION_BANK.export();
+        const blob = new Blob([data], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `translation-bank-${new Date().toISOString().split("T")[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        Alert.success("Translation bank exported");
+      } catch (error) {
+        Alert.error("Failed to export translation bank");
+        console.error("Export error:", error);
+      }
+    },
+
+    async testTranslationEndpoint() {
+      this.isTestingTranslation = true;
+      try {
+        Alert.success("Testing translation... Please wait.");
+        const result = await TRANSLATOR.__translate("テスト");
+        if (result && result !== "テスト") {
+          Alert.success('Success! Translated "テスト" to "' + result + '"');
+        } else {
+          Alert.error(
+            "Failed: End point returned original text or empty. Check F8 console.",
+          );
+        }
+      } catch (err) {
+        Alert.error("Connection error: " + err.message);
+        console.error("Test Translation Error:", err);
+      } finally {
+        this.isTestingTranslation = false;
+      }
+    },
+
+    async startGlobalTranslation() {
+      if (!this.enabled) return;
+      console.log("Starting global pre-translation module");
+      await TRANSLATOR.translateAllGlobals();
+      this.updateBankStats();
+      this.isDataPatched = IN_GAME_TRANSLATOR.isDataPatched();
+    },
+
+    reapplyInGameTranslation() {
+      IN_GAME_TRANSLATOR.applyTranslationsToGameData();
+      this.isDataPatched = IN_GAME_TRANSLATOR.isDataPatched();
+      Alert.success("In-game translation re-applied!");
+    },
+
+    revertInGameTranslation() {
+      IN_GAME_TRANSLATOR.revertGameData();
+      this.isDataPatched = false;
+      this.inGamePatchCount = 0;
+      Alert.success("Game text reverted to original!");
+    },
+  },
+};

@@ -1,7 +1,7 @@
 export default {
-    name: 'ItemTableTab',
+  name: "ItemTableTab",
 
-    template: `
+  template: `
 <v-card flat class="ma-0 pa-0">
  <v-data-table
         v-if="tableHeaders"
@@ -93,104 +93,104 @@ export default {
 </v-card>
     `,
 
-    data() {
-        return {
-            search: '',
-            excludeNameless: false,
-            onlyOwnedItems: false,
-            tableHeaders: [],
-            tableItems: []
+  data() {
+    return {
+      search: "",
+      excludeNameless: false,
+      onlyOwnedItems: false,
+      tableHeaders: [],
+      tableItems: [],
+    };
+  },
+
+  props: {
+    items: [],
+    headers: {
+      type: Array,
+    },
+    asTableData: {
+      type: Function,
+    },
+    searchableAttrs: {
+      type: Array,
+      default: [],
+    },
+  },
+
+  created() {},
+
+  watch: {
+    items: {
+      immediate: true,
+      handler() {
+        this.initializeVariables();
+      },
+    },
+  },
+
+  computed: {
+    filteredTableItems() {
+      return this.tableItems.filter((item) => {
+        if (this.excludeNameless && !item.name) {
+          return false;
         }
+
+        if (this.onlyOwnedItems && item.amount === 0) {
+          return false;
+        }
+
+        return true;
+      });
+    },
+  },
+
+  methods: {
+    initializeVariables() {
+      this.tableHeaders = this.headers.slice(0);
+      this.tableHeaders.push({
+        text: "Amount",
+        value: "amount",
+      });
+
+      this.tableItems = this.items
+        .filter((item) => !!item)
+        .map((item) => {
+          const tableItem = this.asTableData(item);
+          tableItem._item = item;
+          tableItem.amount = $gameParty.numItems(item);
+
+          return tableItem;
+        });
     },
 
-    props: {
-        items: [],
-        headers: {
-            type: Array
-        },
-        asTableData: {
-            type: Function
-        },
-        searchableAttrs: {
-            type: Array,
-            default: []
-        }
+    onItemChange(item, newValue) {
+      // modify amount
+      if (newValue !== undefined) {
+        item.amount = Number(newValue) || 0;
+      }
+
+      const diff = item.amount - $gameParty.numItems(item._item);
+      $gameParty.gainItem(item._item, diff);
+
+      // refresh
+      item.amount = $gameParty.numItems(item._item);
     },
 
-    created() {
-    },
+    onTableFilterChange() {},
 
-    watch: {
-        items: {
-            immediate: true,
-            handler() {
-                this.initializeVariables()
-            }
+    tableItemFilter(value, search, item) {
+      if (search === null || search.trim() === "") {
+        return true;
+      }
+
+      search = search.toLowerCase();
+      for (const attr of this.searchableAttrs) {
+        if (item[attr] && item[attr].toLowerCase().includes(search)) {
+          return true;
         }
+      }
+
+      return false;
     },
-
-    computed: {
-        filteredTableItems() {
-            return this.tableItems.filter(item => {
-                if (this.excludeNameless && !item.name) {
-                    return false
-                }
-
-                if (this.onlyOwnedItems && item.amount === 0) {
-                    return false
-                }
-
-                return true
-            })
-        }
-    },
-
-    methods: {
-        initializeVariables() {
-            this.tableHeaders = this.headers.slice(0)
-            this.tableHeaders.push({
-                text: 'Amount',
-                value: 'amount'
-            })
-
-            this.tableItems = this.items.filter(item => !!item).map(item => {
-                const tableItem = this.asTableData(item)
-                tableItem._item = item
-                tableItem.amount = $gameParty.numItems(item)
-
-                return tableItem
-            })
-        },
-
-        onItemChange(item, newValue) {
-            // modify amount
-            if (newValue !== undefined) {
-                item.amount = Number(newValue) || 0
-            }
-
-            const diff = item.amount - $gameParty.numItems(item._item)
-            $gameParty.gainItem(item._item, diff)
-
-            // refresh
-            item.amount = $gameParty.numItems(item._item)
-        },
-
-        onTableFilterChange() {
-        },
-
-        tableItemFilter(value, search, item) {
-            if (search === null || search.trim() === '') {
-                return true
-            }
-
-            search = search.toLowerCase()
-            for (const attr of this.searchableAttrs) {
-                if (item[attr] && item[attr].toLowerCase().includes(search)) {
-                    return true
-                }
-            }
-
-            return false
-        }
-    }
-}
+  },
+};

@@ -1,9 +1,14 @@
-import { TRANSLATE_SETTINGS, TRANSLATOR, TRANSLATION_BANK, TRANSLATE_PROGRESS } from '../js/TranslateHelper.js'
+import {
+  TRANSLATE_SETTINGS,
+  TRANSLATOR,
+  TRANSLATION_BANK,
+  TRANSLATE_PROGRESS,
+} from "../js/TranslateHelper.js";
 
 export default {
-    name: 'VariableSettingPanel',
+  name: "VariableSettingPanel",
 
-    template: `
+  template: `
 <v-card flat class="ma-0 pa-0">
     <v-data-table
         v-if="tableHeaders"
@@ -80,135 +85,155 @@ export default {
 </v-card>
     `,
 
-    data() {
-        return {
-            search: '',
-            excludeNameless: false,
+  data() {
+    return {
+      search: "",
+      excludeNameless: false,
 
-            // Store original data separately from display data
-            originalVariableNames: [],
-            isInitialized: false,
+      // Store original data separately from display data
+      originalVariableNames: [],
+      isInitialized: false,
 
-            tableHeaders: [
-                {
-                    text: 'Name',
-                    value: 'displayName'
-                },
-                {
-                    text: 'Value',
-                    value: 'value'
-                }
-            ],
-            tableItems: []
-        }
-    },
-
-    created() {
-        this.initializeVariables()
-
-        // Listen for global translation trigger
-        this._translateListener = () => {
-            if (TRANSLATE_SETTINGS.isVariableTranslateEnabled()) {
-                this.manualRefresh()
-            }
-        }
-        window.addEventListener('cheat-translate-finish', this._translateListener)
-    },
-
-    beforeDestroy() {
-        if (this._translateListener) {
-            window.removeEventListener('cheat-translate-finish', this._translateListener)
-        }
-    },
-
-    computed: {
-        filteredTableItems() {
-            return this.tableItems.filter(item => {
-                if (this.excludeNameless && !item.name) {
-                    return false
-                }
-
-                return true
-            })
-        }
-    },
-
-    methods: {
-        async initializeVariables() {
-            try {
-                console.log('Initializing variables...')
-
-                if (typeof $dataSystem === 'undefined' || !$dataSystem || !$gameVariables) {
-                    console.warn('Game data not ready yet, skipping variable initialization')
-                    return
-                }
-
-                this.originalVariableNames = $dataSystem.variables.slice()
-
-                if (!this.originalVariableNames || this.originalVariableNames.length === 0) {
-                    console.warn('No variables found in game data')
-                    this.tableItems = []
-                    return
-                }
-
-                const translateEnabled = TRANSLATE_SETTINGS.isVariableTranslateEnabled()
-
-                this.tableItems = this.originalVariableNames.map((varName, idx) => {
-                    let displayName = varName || `Variable ${idx}`
-                    let val = 0
-                    try {
-                        val = $gameVariables.value(idx)
-                    } catch (e) {
-                        console.warn(`Could not read variable ${idx}:`, e.message)
-                    }
-
-                    if (translateEnabled && varName && varName.trim()) {
-                        const cached = TRANSLATION_BANK.get(varName)
-                        if (cached) {
-                            displayName = cached.translated
-                        }
-                    }
-
-                    return {
-                        id: idx,
-                        originalName: varName || `Variable ${idx}`,
-                        displayName: displayName,
-                        value: val
-                    }
-                }).filter(item => item.id > 0) // Skip index 0 which is usually null
-
-                console.log(`Loaded ${this.tableItems.length} variables.`)
-                this.isInitialized = true
-            } catch (error) {
-                console.error('Error initializing variables:', error)
-                this.tableItems = []
-            }
+      tableHeaders: [
+        {
+          text: "Name",
+          value: "displayName",
         },
-
-        onItemChange(item) {
-            // modify value
-            $gameVariables.setValue(item.id, item.value)
-
-            // refresh
-            item.value = $gameVariables.value(item.id)
+        {
+          text: "Value",
+          value: "value",
         },
+      ],
+      tableItems: [],
+    };
+  },
 
-        async manualRefresh() {
-            console.log('🔄 Manual refresh triggered - reloading variables and translations')
-            this.isInitialized = false
-            this.tableItems = []
-            await this.initializeVariables()
-            console.log('✅ Manual refresh completed')
-        },
+  created() {
+    this.initializeVariables();
 
-        tableItemFilter(value, search, item) {
-            if (search === null || search.trim() === '') {
-                return true
-            }
+    // Listen for global translation trigger
+    this._translateListener = () => {
+      if (TRANSLATE_SETTINGS.isVariableTranslateEnabled()) {
+        this.manualRefresh();
+      }
+    };
+    window.addEventListener("cheat-translate-finish", this._translateListener);
+  },
 
-            search = search.toLowerCase()
-
-            return item.name.toLowerCase().contains(search) || String(item.value).toLowerCase().contains(search)
-        }
+  beforeDestroy() {
+    if (this._translateListener) {
+      window.removeEventListener(
+        "cheat-translate-finish",
+        this._translateListener,
+      );
     }
-}
+  },
+
+  computed: {
+    filteredTableItems() {
+      return this.tableItems.filter((item) => {
+        if (this.excludeNameless && !item.name) {
+          return false;
+        }
+
+        return true;
+      });
+    },
+  },
+
+  methods: {
+    async initializeVariables() {
+      try {
+        console.log("Initializing variables...");
+
+        if (
+          typeof $dataSystem === "undefined" ||
+          !$dataSystem ||
+          !$gameVariables
+        ) {
+          console.warn(
+            "Game data not ready yet, skipping variable initialization",
+          );
+          return;
+        }
+
+        this.originalVariableNames = $dataSystem.variables.slice();
+
+        if (
+          !this.originalVariableNames ||
+          this.originalVariableNames.length === 0
+        ) {
+          console.warn("No variables found in game data");
+          this.tableItems = [];
+          return;
+        }
+
+        const translateEnabled =
+          TRANSLATE_SETTINGS.isVariableTranslateEnabled();
+
+        this.tableItems = this.originalVariableNames
+          .map((varName, idx) => {
+            let displayName = varName || `Variable ${idx}`;
+            let val = 0;
+            try {
+              val = $gameVariables.value(idx);
+            } catch (e) {
+              console.warn(`Could not read variable ${idx}:`, e.message);
+            }
+
+            if (translateEnabled && varName && varName.trim()) {
+              const cached = TRANSLATION_BANK.get(varName);
+              if (cached) {
+                displayName = cached.translated;
+              }
+            }
+
+            return {
+              id: idx,
+              originalName: varName || `Variable ${idx}`,
+              displayName: displayName,
+              value: val,
+            };
+          })
+          .filter((item) => item.id > 0); // Skip index 0 which is usually null
+
+        console.log(`Loaded ${this.tableItems.length} variables.`);
+        this.isInitialized = true;
+      } catch (error) {
+        console.error("Error initializing variables:", error);
+        this.tableItems = [];
+      }
+    },
+
+    onItemChange(item) {
+      // modify value
+      $gameVariables.setValue(item.id, item.value);
+
+      // refresh
+      item.value = $gameVariables.value(item.id);
+    },
+
+    async manualRefresh() {
+      console.log(
+        "🔄 Manual refresh triggered - reloading variables and translations",
+      );
+      this.isInitialized = false;
+      this.tableItems = [];
+      await this.initializeVariables();
+      console.log("✅ Manual refresh completed");
+    },
+
+    tableItemFilter(value, search, item) {
+      if (search === null || search.trim() === "") {
+        return true;
+      }
+
+      search = search.toLowerCase();
+
+      return (
+        item.name.toLowerCase().contains(search) ||
+        String(item.value).toLowerCase().contains(search)
+      );
+    },
+  },
+};

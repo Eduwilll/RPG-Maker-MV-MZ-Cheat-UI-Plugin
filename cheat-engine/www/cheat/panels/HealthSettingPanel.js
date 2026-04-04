@@ -1,14 +1,14 @@
-import HealthSettingTab from './HealthSettingTab.js'
-import {BattleCheat} from '../js/CheatHelper.js'
+import HealthSettingTab from "./HealthSettingTab.js";
+import { BattleCheat } from "../js/CheatHelper.js";
 
 export default {
-    name: 'HealthSettingPanel',
+  name: "HealthSettingPanel",
 
-    components: {
-        HealthSettingTab
-    },
+  components: {
+    HealthSettingTab,
+  },
 
-    template: `
+  template: `
 <v-card 
     class="ma-0 pa-0"
     flat>
@@ -93,114 +93,114 @@ export default {
 </v-card>
     `,
 
-    data () {
-        return {
-            disableRandomEncounter: false,
-            enemy: [],
-            party: []
-        }
+  data() {
+    return {
+      disableRandomEncounter: false,
+      enemy: [],
+      party: [],
+    };
+  },
+
+  created() {
+    this.initializeVariables();
+  },
+
+  methods: {
+    initializeVariables() {
+      this.enemy = $gameTroop.members().map((member, index) => ({
+        id: index,
+        name: member.name(),
+        hp: { hp: member.hp, mhp: member.mhp },
+        mp: { mp: member.mp, mmp: member.mmp },
+      }));
+      this.party = $gameParty.members().map((member) => ({
+        id: member.actorId(),
+        name: member.name(),
+        hp: { hp: member.hp, mhp: member.mhp },
+        mp: { mp: member.mp, mmp: member.mmp },
+      }));
+      this.disableRandomEncounter = BattleCheat.isDisableRandomEncounter();
     },
 
-    created () {
-        this.initializeVariables()
+    recoverAllEnemy() {
+      BattleCheat.recoverAllEnemy();
+      this.initializeVariables();
     },
 
-    methods: {
-        initializeVariables () {
-            this.enemy = $gameTroop.members().map((member, index) => ({
-                id: index,
-                name: member.name(),
-                hp: { hp: member.hp, mhp: member.mhp },
-                mp: { mp: member.mp, mmp: member.mmp }
-            }))
-            this.party = $gameParty.members().map(member => ({
-                id: member.actorId(),
-                name: member.name(),
-                hp: { hp: member.hp, mhp: member.mhp },
-                mp: { mp: member.mp, mmp: member.mmp }
-            }))
-            this.disableRandomEncounter = BattleCheat.isDisableRandomEncounter()
-        },
+    recoverAllParty() {
+      BattleCheat.recoverAllParty();
+      this.initializeVariables();
+    },
 
-        recoverAllEnemy () {
-            BattleCheat.recoverAllEnemy()
-            this.initializeVariables()
-        },
+    fillTpAllEnemy() {
+      BattleCheat.fillTpAllEnemy();
+      this.initializeVariables();
+    },
 
-        recoverAllParty () {
-            BattleCheat.recoverAllParty()
-            this.initializeVariables()
-        },
+    fillTpAllParty() {
+      BattleCheat.fillTpAllParty();
+      this.initializeVariables();
+    },
 
-        fillTpAllEnemy () {
-            BattleCheat.fillTpAllEnemy()
-            this.initializeVariables()
-        },
+    clearStatesAllEnemy() {
+      BattleCheat.clearStatesAllEnemy();
+      this.initializeVariables();
+    },
 
-        fillTpAllParty () {
-            BattleCheat.fillTpAllParty()
-            this.initializeVariables()
-        },
+    clearStatesAllParty() {
+      BattleCheat.clearStatesAllParty();
+      this.initializeVariables();
+    },
 
-        clearStatesAllEnemy () {
-            BattleCheat.clearStatesAllEnemy()
-            this.initializeVariables()
-        },
+    changeAllEnemyHealth(newHp) {
+      BattleCheat.changeAllEnemyHealth(newHp);
+      this.initializeVariables();
+    },
 
-        clearStatesAllParty () {
-            BattleCheat.clearStatesAllParty()
-            this.initializeVariables()
-        },
+    changeAllPartyHealth(newHp) {
+      BattleCheat.changeAllPartyHealth(newHp);
+      this.initializeVariables();
+    },
 
-        changeAllEnemyHealth (newHp) {
-            BattleCheat.changeAllEnemyHealth(newHp)
-            this.initializeVariables()
-        },
+    encounterBattle() {
+      BattleCheat.encounterBattle();
+    },
 
-        changeAllPartyHealth (newHp) {
-            BattleCheat.changeAllPartyHealth(newHp)
-            this.initializeVariables()
-        },
+    victory() {
+      BattleCheat.victory();
+    },
 
-        encounterBattle () {
-            BattleCheat.encounterBattle()
-        },
+    defeat() {
+      BattleCheat.defeat();
+    },
 
-        victory () {
-            BattleCheat.victory()
-        },
+    escape() {
+      BattleCheat.escape();
+    },
 
-        defeat () {
-            BattleCheat.defeat()
-        },
+    abort() {
+      BattleCheat.abort();
+    },
 
-        escape () {
-            BattleCheat.escape()
-        },
+    onDisableRandomEncounterChange() {
+      BattleCheat.toggleDisableRandomEncounter();
+      this.initializeVariables();
+    },
 
-        abort () {
-            BattleCheat.abort()
-        },
-
-        onDisableRandomEncounterChange () {
-            BattleCheat.toggleDisableRandomEncounter()
-            this.initializeVariables()
-        },
-
-        onDetailChange (items, type) {
-            for (const item of items) {
-                let member = null;
-                if (type === 'party') {
-                    member = $gameParty.members().find(a => a.actorId() === item.id)
-                } else if (type === 'enemy') {
-                    member = $gameTroop.members()[item.id]
-                }
-                if (member) {
-                    member.setHp(Number(item.hp.hp))
-                    member.setMp(Number(item.mp.mp))
-                }
-            }
-            this.initializeVariables()
+    onDetailChange(items, type) {
+      for (const item of items) {
+        let member = null;
+        if (type === "party") {
+          member = $gameParty.members().find((a) => a.actorId() === item.id);
+        } else if (type === "enemy") {
+          member = $gameTroop.members()[item.id];
         }
-    }
-}
+        if (member) {
+          member.setHp(Number(item.hp.hp));
+          member.setMp(Number(item.mp.mp));
+        }
+      }
+      this.initializeVariables();
+    },
+  },
+};
