@@ -117,7 +117,7 @@ def select_game_interactively(game_paths, type_name):
             print("\nSync cancelled.")
             return None
 
-def setup_dev_sync(game_path):
+def setup_dev_sync(game_path, version='vDEV-SYNC'):
     try:
         paths = DevPaths(game_path)
     except Exception as e:
@@ -186,7 +186,7 @@ def setup_dev_sync(game_path):
 
     # 5. Version file
     with open(os.path.join(paths.root, 'cheat-version-description.json'), 'w') as wf:
-        json.dump({'version': 'vDEV-SYNC'}, wf, indent=2)
+        json.dump({'version': version}, wf, indent=2)
         
     print("\n" + "="*40)
     print("🚀 [SUCCESS] Dev-Sync setup complete!")
@@ -201,6 +201,7 @@ if __name__ == '__main__':
     parser.add_argument('--game-path', type=str, help='Path to game root folder')
     parser.add_argument('--mv', action='store_true', help='Target local MV test game')
     parser.add_argument('--mz', action='store_true', help='Target local MZ test game')
+    parser.add_argument('--version', type=str, default='vDEV-SYNC', help='Version string to write to cheat-version-description.json')
     args = parser.parse_args()
     
     # Auto-target common test paths if flags provided
@@ -219,4 +220,5 @@ if __name__ == '__main__':
         if not args.game_path:
             print("Error: Could not determine game target. Please provide --game-path or ensure test games are in the 'tests' folder.")
     else:
-        setup_dev_sync(target)
+        setup_dev_sync(target, args.version)
+
