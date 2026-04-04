@@ -30,7 +30,7 @@ Many actions come pre-bound to convenient shortcuts. You can use these immediate
 
 You can change any of these bindings or add new ones in the **Shortcuts** tab:
 
-![Shortcut Panel](/images/shortcut-panel.png)
+![Shortcut Panel](../../public/images/shortcut-panel.png)
 
 1. Open the cheat window (<kbd>Ctrl</kbd> + <kbd>C</kbd>).
 2. Go to the **Shortcuts** tab.

@@ -6,10 +6,10 @@ RPG Maker MV/MZ 게임을 위한 강력한 GUI 기반 치트 툴이며, **실시
 
 ## 📸 UI 샘플
 <p float="left">
-  <img src="https://user-images.githubusercontent.com/99193603/153754676-cee2b96e-c03a-491f-b71c-3c57d6dcc474.JPG" width="24%"/>
-  <img src="https://user-images.githubusercontent.com/99193603/153754683-4e7a09a5-2d31-436d-8546-7a5d658eb282.JPG" width="24%"/>
-  <img src="https://user-images.githubusercontent.com/99193603/153754687-732648c8-3483-42bb-9634-dd22d674dfed.JPG" width="24%"/>
-  <img src="https://user-images.githubusercontent.com/99193603/153754696-0cbc76f9-99fa-47a7-a0d0-6510a2f76e01.JPG" width="24%"/>
+  <img src="https://raw.githubusercontent.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/main/docs/public/images/cheatModal-open-focused.png" width="24%"/>
+  <img src="https://raw.githubusercontent.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/main/docs/public/images/general-panel.png" width="24%"/>
+  <img src="https://raw.githubusercontent.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/main/docs/public/images/stats-setting-panel.png" width="24%"/>
+  <img src="https://raw.githubusercontent.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/main/docs/public/images/translate-settings-panel.png" width="24%"/>
 </p>
 
 ---

@@ -1,6 +1,4 @@
----
-
-## 🏗️ Getting Started
+# 🏗️ Development Guide
 
 Before contributing to the UI or Documentation, ensure you have the necessary environments ready:
 

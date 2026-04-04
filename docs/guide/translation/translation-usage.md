@@ -2,7 +2,7 @@
 
 The Cheat UI can translate game data (Items, Variables, Switches, Maps) in real-time. This guide explains how to use these features properly.
 
-![Translate Panel](/images/translate-settings-panel.png)
+![Translate Panel](../../public/images/translate-settings-panel.png)
 
 ## Before you begin
 

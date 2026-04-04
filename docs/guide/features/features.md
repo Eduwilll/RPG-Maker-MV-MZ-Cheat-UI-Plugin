@@ -12,7 +12,7 @@ You can rebind this shortcut in the **Shortcuts** tab.
 
 ## Stats tab
 
-![Stats Panel](/images/stats-setting-panel.png)
+![Stats Panel](../../public/images/stats-setting-panel.png)
 
 Edit live party stats without opening the save menu.
 
@@ -28,7 +28,7 @@ Edit live party stats without opening the save menu.
 
 ## Utilities (General Tab)
 
-![General Panel](/images/general-panel.png)
+![General Panel](../../public/images/general-panel.png)
 
 Special helpers to bypass game restrictions.
 
@@ -43,7 +43,7 @@ Special helpers to bypass game restrictions.
 
 ## Items tab
 
-![Items Panel](/images/item-setting-panel.png)
+![Items Panel](../../public/images/item-setting-panel.png)
 
 - Search items by name to find them instantly
 - Add any item, weapon, or armor to the inventory
@@ -53,7 +53,7 @@ Special helpers to bypass game restrictions.
 
 ## Variables tab
 
-![Variables Panel](/images/variable-setting-panel.png)
+![Variables Panel](../../public/images/variable-setting-panel.png)
 
 Displays all game variables with their current values. Click any variable to edit it in-place. Use the search bar to filter by variable name or ID.
 
@@ -61,7 +61,7 @@ Displays all game variables with their current values. Click any variable to edi
 
 ## Switches tab
 
-![Switches Panel](/images/switch-setting-panel.png)
+![Switches Panel](../../public/images/switch-setting-panel.png)
 
 Lists all game switches (boolean on/off flags). Toggle any switch with a single click. Searchable by name or ID.
 
@@ -69,7 +69,7 @@ Lists all game switches (boolean on/off flags). Toggle any switch with a single 
 
 ## Map / Teleport tab
 
-![Teleport Panel](/images/teleport-panel.png)
+![Teleport Panel](../../public/images/teleport-panel.png)
 
 | Feature | Description |
 |---------|-------------|
@@ -82,7 +82,7 @@ Lists all game switches (boolean on/off flags). Toggle any switch with a single 
 
 ## Battle tab
 
-![Battle Panel](/images/health-setting-panel.png)
+![Battle Panel](../../public/images/health-setting-panel.png)
 
 | Feature | Description |
 |---------|-------------|
@@ -142,7 +142,7 @@ Opens the Chromium DevTools panel (F12-style) inside the game window. Useful for
 
 ## Translate tab
 
-![Translate Panel](/images/translate-settings-panel.png)
+![Translate Panel](../../public/images/translate-settings-panel.png)
 
 Translate variable names, switch names, map names, and item names in real-time.
 

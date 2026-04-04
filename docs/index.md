@@ -6,7 +6,7 @@ hero:
   text: "Plugin for RPG Maker MV/MZ"
   tagline: A clean, GUI-based cheat overlay. Toggle it in-game and edit anything — stats, items, variables, speed, and more.
   image:
-    src: /images/general-panel.png
+    src: ./public/images/general-panel.png
     alt: Cheat UI Screenshot
   actions:
     - theme: brand
