@@ -1,62 +1,66 @@
 # Getting Started
 
-This guide walks you through installing the plugin and opening the cheat window for the first time.
+This guide helps you install the plugin, launch your game, and confirm that the cheat UI is working.
 
-## Prerequisites
+## Before you install
 
-- A PC copy of an RPG Maker MV or MZ game (NW.js version)
-- Basic ability to copy files in Windows Explorer or your file manager
+- Use a desktop RPG Maker MV or MZ game that runs through NW.js.
+- Make sure you can copy files into the game folder.
+- Back up the original `main.js` before replacing anything.
 
 ::: warning Back up your game first
-The plugin overwrites `www/js/main.js` (MV) or `js/main.js` (MZ). Always keep a backup of that file before installing.
+The plugin replaces `www/js/main.js` on MV and `js/main.js` on MZ. Keep a clean backup so you can revert quickly if needed.
 :::
 
-::: tip 🛠️ For Developers
-If you are planning to modify the plugin UI or contribute to the project, see our **[Development & Test Guide](/guide/introduction/development)** for better tools.
+::: tip For contributors
+If you want to modify the UI or work on the project itself, start with [Development & Test](/guide/introduction/development) after installation.
 :::
 
-## Pick your installation path
+## Choose your engine
 
-Choose the guide that matches your game's engine:
+Use the installation guide that matches the game you want to patch:
 
-<div style="display: flex; gap: 1rem; margin: 1.5rem 0; flex-wrap: wrap;">
-
-<a href="/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/install-mv" style="flex: 1; min-width: 200px; display: block; padding: 1.25rem 1.5rem; border: 1px solid var(--vp-c-brand-1); border-radius: 8px; text-decoration: none; color: inherit;">
-  <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🗂️</div>
-  <div style="font-weight: 600; color: var(--vp-c-brand-1); margin-bottom: 0.25rem;">RPG Maker MV →</div>
-  <div style="font-size: 0.875rem; color: var(--vp-c-text-2);">Files go into <code>www/</code> inside the game folder.</div>
-</a>
-
-<a href="/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/install-mz" style="flex: 1; min-width: 200px; display: block; padding: 1.25rem 1.5rem; border: 1px solid var(--vp-c-brand-1); border-radius: 8px; text-decoration: none; color: inherit;">
-  <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📁</div>
-  <div style="font-weight: 600; color: var(--vp-c-brand-1); margin-bottom: 0.25rem;">RPG Maker MZ →</div>
-  <div style="font-size: 0.875rem; color: var(--vp-c-text-2);">Files go directly into the game root folder.</div>
-</a>
-
+<div class="doc-card-grid">
+  <a class="doc-card" href="/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/installation/install-mv">
+    <strong>🗂️ RPG Maker MV</strong>
+    <span>Copy the packaged files into the game's `www/` folder and replace `www/js/main.js`.</span>
+  </a>
+  <a class="doc-card" href="/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/installation/install-mz">
+    <strong>🗂️ RPG Maker MZ</strong>
+    <span>Copy the packaged files into the game root and replace `js/main.js`.</span>
+  </a>
 </div>
 
-## After installing
+## First launch checklist
 
-Once the files are in place, launch the game normally and press <kbd>`Ctrl`</kbd> + <kbd>`C`</kbd> to open the cheat window.
+After copying the plugin files into the correct location:
 
-The window appears semi-transparent in the **upper-right corner** of the game window. Hover your mouse over it to make it fully visible.
+1. Start the game normally.
+2. Press <kbd>Ctrl</kbd> + <kbd>C</kbd>.
+3. Look in the upper-right corner for the cheat overlay.
+4. Hover over the panel if it looks semi-transparent.
 
-From there, explore the tabs:
+If the UI does not appear, continue to [Troubleshooting](/guide/troubleshooting/troubleshooting).
 
-| Tab | What you can do |
-|-----|----------------|
-| **Stats** | Edit HP, MP, gold, movement speed |
-| **Items** | Add or remove items by name |
-| **Variables** | Read/write game variables |
-| **Switches** | Toggle any game switch |
-| **Map** | Teleport, save/recall location, no-clip |
-| **Battle** | Force outcomes, fill TP |
-| **Translation** | Translate game text in real-time with AI |
-| **Shortcuts** | Bind actions to key combos |
-| **Settings** | Speed, encounter toggle, Pop-out, dev tools |
+## What opens first
 
-## Next steps
+Once the overlay is visible, you can move through the main panels right away:
 
-- [Full feature reference →](/guide/features/features)
-- [Customizing shortcuts →](/guide/features/shortcuts)
-- [Troubleshooting →](/guide/troubleshooting/troubleshooting)
+| Area | Use it for |
+| --- | --- |
+| General | Utility toggles, debug access, save helpers, and pop-out window mode |
+| Stats | Party HP, MP, gold, speed, and related core values |
+| Items | Items, weapons, and armors |
+| Variables / Switches | Editing game logic values in real time |
+| Map / Teleport | Position tools, no-clip, saved locations, and fast movement |
+| Battle | Battle outcome controls and health or TP shortcuts |
+| Translation | Endpoint setup, targets, and batch translation |
+| Shortcuts | Rebinding actions to custom key combinations |
+
+## Recommended next pages
+
+- [Install on RPG Maker MV](/guide/installation/install-mv)
+- [Install on RPG Maker MZ](/guide/installation/install-mz)
+- [Feature Reference](/guide/features/features)
+- [Shortcuts](/guide/features/shortcuts)
+- [Translation Usage](/guide/translation/translation-usage)

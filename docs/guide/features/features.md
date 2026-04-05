@@ -1,164 +1,116 @@
 # Features
 
-Full reference of everything the cheat UI can do.
+This page is the quick reference for the main panels and tools exposed by the cheat UI.
 
-## Opening the cheat window
+## Open the cheat UI
 
-Press <kbd>`Ctrl`</kbd> + <kbd>`C`</kbd> (default) to toggle the cheat panel. The window appears in the **upper-right corner** of the game. It is semi-transparent until you hover over it — that's intentional, so it doesn't block gameplay.
+Press <kbd>Ctrl</kbd> + <kbd>C</kbd> to toggle the main overlay. By default it appears in the upper-right corner of the game window and stays semi-transparent until you hover over it.
 
-You can rebind this shortcut in the **Shortcuts** tab.
+You can rebind that shortcut from the [Shortcuts](/guide/features/shortcuts) page.
 
----
+## General tab
+
+![General Panel](../../public/images/general-panel.png)
+
+Utility controls that affect the running game immediately.
+
+| Feature | What it does |
+| --- | --- |
+| Force Save | Bypasses game-level save restrictions so you can save where the game normally blocks it |
+| Mouse Teleport | Lets you jump by clicking the map when the toggle is enabled |
+| Debug Console | Opens NW.js developer tools for inspection and debugging |
+| Debug Menu | Opens the built-in RPG Maker debug menu |
+| Pop Out Window | Moves the cheat UI into a separate standalone window in NW.js |
 
 ## Stats tab
 
 ![Stats Panel](../../public/images/stats-setting-panel.png)
 
-Edit live party stats without opening the save menu.
+Change live party values without opening built-in game menus.
 
-| Field | Description |
-|-------|-------------|
-| HP / MP | Set current or max HP/MP for any party member |
-| Gold | Set gold to any value |
-| Movement speed | Change walk/run speed multiplier |
-| Level | Directly set a character's level |
-| **Pop Out Window** | Click the button in the General panel to launch the Cheat UI in a separate standalone window. |
-
----
-
-## Utilities (General Tab)
-
-![General Panel](../../public/images/general-panel.png)
-
-Special helpers to bypass game restrictions.
-
-| Feature | Description |
-|---------|-------------|
-| **Force Save** | Overrides game-level save restrictions, allowing you to save even in forbidden areas. |
-| **Mouse Teleport** | When enabled (**Alt + M**), click anywhere on the map to instantly teleport the player. |
-| **Debug Console** | Open the NW.js developer tools to inspect game scripts or variables. |
-| **Debug Menu (F9)** | Instant access to the built-in RPG Maker debug menu. |
-
----
+| Field | What it affects |
+| --- | --- |
+| HP / MP | Current and max values for party members |
+| Gold | Party gold amount |
+| Movement speed | Walk and run speed behavior |
+| Level | Actor level adjustments |
 
 ## Items tab
 
 ![Items Panel](../../public/images/item-setting-panel.png)
 
-- Search items by name to find them instantly
-- Add any item, weapon, or armor to the inventory
-- Set quantity to any value
-
----
+- Search for items by name.
+- Add or remove items, weapons, and armors.
+- Set quantities directly instead of editing through event commands.
 
 ## Variables tab
 
 ![Variables Panel](../../public/images/variable-setting-panel.png)
 
-Displays all game variables with their current values. Click any variable to edit it in-place. Use the search bar to filter by variable name or ID.
-
----
+Read and update game variables by name or ID. This is useful for event flags, progression values, and debugging route-specific behavior.
 
 ## Switches tab
 
 ![Switches Panel](../../public/images/switch-setting-panel.png)
 
-Lists all game switches (boolean on/off flags). Toggle any switch with a single click. Searchable by name or ID.
+Toggle boolean game switches in real time. Search helps when games have hundreds of named switches.
 
----
-
-## Map / Teleport tab
+## Map and teleport tools
 
 ![Teleport Panel](../../public/images/teleport-panel.png)
 
-| Feature | Description |
-|---------|-------------|
-| Save location | Saves current map ID + X/Y coordinates |
-| Recall location | Teleports back to the saved position |
-| Teleport | Go to any map ID + X/Y you enter manually |
-| No Clip | Walk through walls and impassable terrain |
+| Feature | What it does |
+| --- | --- |
+| Save location | Stores current map ID and coordinates |
+| Recall location | Returns you to a saved point |
+| Manual teleport | Moves you to entered map and coordinate values |
+| No Clip | Lets the player move through blocked terrain |
 
----
-
-## Battle tab
+## Battle tools
 
 ![Battle Panel](../../public/images/health-setting-panel.png)
 
-| Feature | Description |
-|---------|-------------|
-| Force victory | Immediately end battle as a win |
-| Force defeat | Immediately trigger game-over |
-| Force escape | Exit battle as if escaped |
-| Force abort | End battle without any result |
-| Fill party TP | Set all party members' TP to max |
-| Fill enemy TP | Set all enemies' TP to max |
-| Set party HP | Set all members to 1 HP or full HP |
-| Set enemy HP | Set all enemies to 1 HP or full HP |
+| Feature | What it does |
+| --- | --- |
+| Force victory | Ends the battle as a win |
+| Force defeat | Triggers defeat immediately |
+| Force escape | Leaves the battle as an escape |
+| Force abort | Ends the battle without normal completion flow |
+| Fill party TP | Sets party TP to max |
+| Fill enemy TP | Sets enemy TP to max |
+| Set party HP | Pushes party HP to low or full values |
+| Set enemy HP | Pushes enemy HP to low or full values |
 
----
+## Speed and encounter controls
 
-## Speed tab
-
-Control how fast the game runs.
-
-- **Speed multiplier**: ×0.1 (slow-mo) to ×10 (fast-forward)
-- **Apply in**: all scenes, or battles only
-
----
-
-## Encounter tab
-
-| Toggle | Description |
-|--------|-------------|
-| Disable encounters | Random encounters stop occurring |
-| Force encounter | Trigger a random encounter immediately |
-
----
+- Speed multiplier ranges from `x0.1` to `x10`.
+- Speed changes can apply globally or only in battle, depending on the selected setting.
+- Encounter controls let you disable random encounters or force one immediately.
 
 ## Shortcuts tab
 
-Bind any of the following actions to a custom key combo:
+Bind custom key combinations for common actions such as:
 
-- Toggle save window
-- Toggle load window
-- Quick save
-- Quick load
-- Go to title screen
+- Quick save and quick load
+- Save and load windows
 - Toggle no-clip
 - Edit party HP
 - Edit enemy HP
+- Return to title
 
-See the [Shortcuts page](/guide/features/shortcuts) for detailed instructions.
-
----
-
-## Developer Tools
-
-Opens the Chromium DevTools panel (F12-style) inside the game window. Useful for inspecting game internals, reading the console, or debugging scripts.
-
----
-
----
+See [Shortcuts](/guide/features/shortcuts) for the full shortcut workflow.
 
 ## Translate tab
 
 ![Translate Panel](../../public/images/translate-settings-panel.png)
 
-Translate variable names, switch names, map names, and item names in real-time.
+The translation system can batch-translate and cache multiple categories of game text.
 
-For detailed instructions and engine setup, see the **[Full Translation Guide](/guide/translation/translation-usage)**.
+| Capability | Details |
+| --- | --- |
+| Supported targets | Items, weapons, armors, actors, maps, system terms, variables, switches, and dialogue-related text |
+| Backends | Lingva, local Lingva nodes, Ollama, OpenAI-compatible APIs, and Gemini-style endpoints |
+| Cache behavior | Translations are stored locally so repeated strings do not need to be fetched again |
+| Runtime application | Cached results are applied to game data and text rendering hooks during gameplay |
 
-### LLM & AI Engine
-The plugin features a high-performance translation engine that supports:
-- **Lingva Translate**: A private, free alternative to Google Translate. Support for JA → EN and more.
-- **Local AI (Ollama)**: Connect to a locally running Ollama instance for private, unlimited translations.
-- **Cloud AI (OpenAI / Gemini)**: Use state-of-the-art models like GPT-4o or Gemini 2.0 for the highest quality dialogue translation.
-
-### Performance Features
-- **Translation Bank**: Results are cached locally so you never pay (or wait) for the same string twice.
-- **Batch Processing**: Translates up to 80 strings per request, allowing full game translation in minutes.
-- **Load Balancing**: Support for multi-node Lingva clusters for extreme throughput.
-
-::: tip Local Setup
-For the best experience, we recommend running a local **Lingva Docker Cluster** for instant, free, and private translations.
-:::
+For setup instructions, continue to [Translation Usage](/guide/translation/translation-usage).

@@ -1,84 +1,134 @@
-# 🏗️ Development Guide
+# Development and Test
 
-Before contributing to the UI or Documentation, ensure you have the necessary environments ready:
+This fork includes its own contributor tooling because testing inside RPG Maker alone is slow. Use this page as the practical starting point for local development.
 
-### 1. Node & Documentation
-This project uses **pnpm** for managing the VitePress documentation site.
-```powershell
-# Only required if you want to build/preview the documentation site
+## Tooling overview
+
+There are two main workflows:
+
+- Browser preview for fast UI iteration.
+- Dev-sync into a real MV or MZ game for runtime validation.
+
+You will usually use both.
+
+## Prerequisites
+
+### Node and pnpm
+
+Needed for the documentation site and repo formatting tasks.
+
+::: code-group
+```sh [pnpm]
 pnpm install
 ```
+:::
 
-### 2. Python & Scripts
-Automation, build scripts, and the **Web-UI Previewer** require a Python **virtual environment** (`venv`). No Node dependencies are needed for basic UI development.
-```powershell
-# Standard execution pattern
-.venv\Scripts\python.exe [SCRIPT_NAME].py
+### Python virtual environment
+
+Used for preview, packaging, and dev-sync scripts.
+
+::: code-group
+```sh [.py]
+.venv\Scripts\python.exe --version
+```
+:::
+
+## Workflow 1: browser preview
+
+Use this when you are changing layout, panel interactions, or other UI behavior that does not require the full game engine.
+
+### Start the preview server
+
+::: code-group
+```sh [.py]
+.venv\Scripts\python.exe start-preview.py
+```
+:::
+
+Then open:
+
+```text
+http://localhost:8080/preview/index.html
 ```
 
----
+### What preview mode gives you
 
-## 1. Web-UI Preview (Rapid Prototyping)
+- Fast reloads with cache disabled
+- A browser-based rendering surface for the cheat UI
+- Mocked RPG Maker objects and helper services
+- No need to relaunch a full game for every CSS or panel tweak
 
-The **Web-UI Preview** (powered by `start-preview.py`) allows you to develop the cheat interface directly in your web browser. 
+### Limitations of preview mode
 
-### Why it's fast:
-- **Zero dependencies**: It uses the libraries already included in `cheat/libs/` (Vue, Vuetify, Axios).
-- **Instant Updates**: Changes to your `.js` or `.css` files are reflected immediately (with a browser refresh).
+Preview mode is not a replacement for in-game testing.
 
+Use a real game when your change affects:
 
+- engine patches
+- keyboard handling in NW.js
+- translation hooks
+- file-system-backed persistence
+- boot or packaging behavior
 
-### Features
-- **Instant Updates**: Changes to your `.js` or `.css` files are reflected immediately (with a browser refresh).
-- **Engine Mocks**: The previewer automatically injects mock versions of `$gameParty`, `$dataItems`, and other RPG Maker objects so the UI doesn't crash outside of a game.
-- **Cache-Busting**: The built-in server automatically prevents the browser from caching old UI files.
+## Workflow 2: dev-sync into a real game
 
-### How to use
-1. Open your terminal in the project root.
-2. Run the preview script using your virtual environment:
+Use this when you need to validate behavior inside an actual RPG Maker MV or MZ runtime.
 
-   ```bash [.py]
-   .venv\Scripts\python.exe start-preview.py
-   ```
-3. Open the provided URL in your browser: `http://localhost:8080/preview/index.html`
+### Sync with a known game path
 
----
-
-## 2. Dev-Sync (Live In-Game Testing)
-
-Once your UI looks good in the browser, you'll want to test it inside a real RPG Maker game. Instead of manually copying files every time, use the **Dev-Sync** tool.
-
-### Features
-- **Junction/Symlinking**: It creates a "Magic Link" between your development folder and the game's `cheat/` folder.
-- **Entry Point Injection**: Automatically replaces the game's `main.js` with our bootstrap launcher.
-- **Interactive Selection**: Automatically scans your `tests/` folder for games to link.
-
-### How to use
-Run the development sync tool from the root:
-
-#### Sync with a specific game path:
-```bash [.py]
-.venv\Scripts\python.exe deploy/dev.py --game-path "C:/Games/MyTestGame"
+::: code-group
+```sh [.py]
+.venv\Scripts\python.exe deploy\dev.py --game-path "C:/Games/MyTestGame"
 ```
+:::
 
-#### Sync with local test games (Interactive):
-If you have games inside a `tests/MV` or `tests/MZ` folder, you can use these shortcuts:
-```bash [.py]
-.venv\Scripts\python.exe deploy/dev.py --mv    # Scan for MV games
-.venv\Scripts\python.exe deploy/dev.py --mz    # Scan for MZ games
+### Sync with test games in the repo
+
+::: code-group
+```sh [.py]
+.venv\Scripts\python.exe deploy\dev.py --mv
+.venv\Scripts\python.exe deploy\dev.py --mz
 ```
+:::
 
-### The Development Cycle
-1. **Link once**: Run `dev.py` once per game project.
-2. **Edit code**: Change any file in `cheat-engine/www/cheat/`.
-3. **Save**: Your changes are instantly visible in the game's folder (via the symlink).
-4. **Refresh**: Press <kbd>F5</kbd> inside the game to see the updates!
+### What dev-sync does
 
----
+- Detects whether the target is MV or MZ
+- Copies the correct injected `main.js`
+- Merges support files into the target game
+- Links the source `cheat/` folder into the game
+- Writes a development version descriptor
 
-## 🛠️ Internal Structure
+### Typical edit loop
 
-- **`cheat-engine/www/cheat/js/`**: Core logic (Translation, Storage, Helper).
-- **`cheat-engine/www/cheat/panels/`**: The actual UI tabs (Stats, Items, etc.).
-- **`preview/`**: The mock environment for browser development.
-- **`deploy/`**: Scripts for packaging and syncing.
+1. Run `deploy/dev.py` once for the target game.
+2. Edit files under `cheat-engine/www/cheat/`.
+3. Save changes.
+4. Press <kbd>F5</kbd> inside the game to reload.
+
+## Where to make changes
+
+| Area | Path |
+| --- | --- |
+| Main overlay lifecycle | `cheat-engine/www/cheat/MainComponent.js` |
+| Navigation and panel mounting | `cheat-engine/www/cheat/CheatModal.js` |
+| Feature panels | `cheat-engine/www/cheat/panels/` |
+| Shared helpers and storage | `cheat-engine/www/cheat/js/` |
+| Bootstrapping and engine patches | `cheat-engine/www/cheat/init/` |
+| Browser preview bridge | `preview/` |
+| Packaging scripts | `deploy/` |
+
+## Contributor habits that help
+
+- Test UI changes in preview mode first.
+- Test engine or translation changes in a real game before merging.
+- Keep MV and MZ compatibility in mind when touching bootstrap or path logic.
+- Avoid introducing state patterns that store live RPG Maker objects inside Vue reactivity.
+- Update docs when behavior or workflow changes.
+
+## Related technical references
+
+- [Architecture](/guide/technical/architecture)
+- [Repository Structure](/guide/technical/repository-structure)
+- [Runtime and Data Flow](/guide/technical/runtime-and-data-flow)
+- [Build and Release](/guide/technical/build-and-release)

@@ -1,56 +1,102 @@
 # Contributing
 
-Contributions are welcome! Here's how to get involved.
+This repository is a maintained fork of an older project. A lot of the contribution work here is not just adding features, but also making the behavior understandable and safer to maintain. Documentation improvements are first-class contributions.
+
+## Good first contribution areas
+
+- Clarify installation and troubleshooting steps
+- Improve panel UX or layout polish
+- Fix MV or MZ compatibility issues
+- Improve translation target extraction or endpoint handling
+- Expand contributor documentation
+- Add safer tests or validation steps around packaging and release workflows
+
+## Before you open a pull request
+
+Read these pages first:
+
+- [Development and Test](/guide/introduction/development)
+- [Architecture](/guide/technical/architecture)
+- [Repository Structure](/guide/technical/repository-structure)
+- [Runtime and Data Flow](/guide/technical/runtime-and-data-flow)
 
 ## Reporting bugs
 
-Open an issue on [GitHub](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/issues). Please include:
+Open an issue on [GitHub](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/issues) and include:
 
-- Game name and engine version (MV or MZ)
-- Plugin version
-- Steps to reproduce
-- What you expected vs what happened
-- Error messages from the developer console (if any)
+- game name
+- engine version: MV or MZ
+- plugin version
+- expected behavior
+- actual behavior
+- reproduction steps
+- screenshots if helpful
+- console output from NW.js developer tools if available
 
-## Contributing to the docs
+## Development setup
 
-The docs live in the `docs/` folder of the repository. Each page is a plain Markdown file.
+### Docs
 
-To run the docs locally:
-
-
-```bash
-# Clone the repo
-git clone https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin.git
-cd RPG-Maker-MV-MZ-Cheat-UI-Plugin
-```
 ::: code-group
-
-```sh [npm]
-# Install dependencies
-npm install
-
-# Start the local dev server
-npm run docs:dev
-```
-
 ```sh [pnpm]
-# Install dependencies
 pnpm install
-
-# Start the local dev server
 pnpm run docs:dev
 ```
 :::
-Then open `http://localhost:5173` in your browser. Changes to `.md` files hot-reload instantly.
 
-## Contributing code
+### Python tools
 
-1. Fork the repository
-2. Create a branch: `git checkout -b feature/your-feature`
-3. Make your changes
-4. Open a pull request with a clear description
+::: code-group
+```sh [.py]
+.venv\Scripts\python.exe start-preview.py
+.venv\Scripts\python.exe deploy\dev.py --mz
+```
+:::
 
-## Code style
+## Code contribution flow
 
-The plugin is written in plain JavaScript (ES6+). Follow the existing code style — no build step, no bundler, keep it simple.
+1. Fork the repository.
+2. Create a focused branch.
+3. Make the smallest change that solves the problem cleanly.
+4. Validate in preview mode, in a real game, or both, depending on the layer touched.
+5. Update the docs if behavior, installation, or contributor workflow changed.
+6. Open a pull request with clear context.
+
+## What maintainers need in a pull request
+
+- A short explanation of the problem
+- A summary of the fix
+- Notes about MV, MZ, or both
+- How you validated the change
+- Any known limitations or follow-up work
+
+## Code style expectations
+
+This repo intentionally stays close to its runtime constraints:
+
+- plain JavaScript modules
+- Vue 2 and Vuetify 2 without a bundler for the game runtime
+- minimal complexity in boot and packaging code
+
+Follow existing patterns unless there is a strong reason to refactor. When you do refactor, document the reasoning.
+
+## Contributor safety rules
+
+- Be careful when patching RPG Maker engine methods.
+- Do not store live RPG Maker objects directly in Vue reactive state when they may be serialized by saves.
+- Test MV and MZ assumptions when touching paths or bootstrap files.
+- Treat translation as a cache-first system, not a draw-time network system.
+- Keep installation docs aligned with the actual release archive layout.
+
+## Documentation contributions
+
+If you are unsure where to start, improving docs is always useful. This fork benefits a lot from:
+
+- clearer mental models
+- examples of safe modification patterns
+- troubleshooting notes rooted in real repo behavior
+- diagrams and repo maps for new contributors
+
+## Maintainer note
+
+Because this is a fork of an older project, contributor-facing clarity matters almost as much as feature work. If you find hidden behavior while debugging, document it before you forget it.
