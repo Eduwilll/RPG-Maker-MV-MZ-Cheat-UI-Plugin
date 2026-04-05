@@ -1,6 +1,14 @@
 # Changelog
 
-## v1.2.1 — Latest
+## v1.2.2 — Latest
+
+### Metadata & Maintenance
+- [Tweak] **Project Keywords**: Added `"translation-tool"` and `"cheat-engine-program"` for better discoverability.
+- [Misc] **Version Bump**: Bumped version to `1.2.2`.
+
+---
+
+## v1.2.1
 
 ### dev-sync & maintenance
 - [Fix] **Prettier Configuration**: Formalized project-wide formatting (2-space, semi, double quote) with `.prettierrc` and a simplified `pnpm run format` command.

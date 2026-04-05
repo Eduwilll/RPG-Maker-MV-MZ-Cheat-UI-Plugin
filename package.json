@@ -1,6 +1,6 @@
 {
   "name": "rpg-cheat-ui-plugin-docs",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Documentation for RPG Maker MV/MZ Cheat UI Plugin",
   "scripts": {
     "docs:dev": "vitepress dev docs",
@@ -9,9 +9,15 @@
     "format": "prettier . --write",
     "prepare": "husky install"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "rpg-maker",
+    "mz",
+    "mv",
+    "translation-tool",
+    "cheat-engine-program"
+  ],
+  "author": "Eduwilll",
+  "license": "MIT",
   "devDependencies": {
     "husky": "^8.0.0",
     "lint-staged": "^16.4.0",
