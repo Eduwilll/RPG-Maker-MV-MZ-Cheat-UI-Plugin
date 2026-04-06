@@ -40,6 +40,12 @@ Phase 1 uses a lightweight TypeScript configuration for JavaScript projects:
 - `tsconfig.json` provides editor and `checkJs` groundwork without changing runtime packaging.
 - `types/` contains local declarations for RPG Maker globals, cheat-specific globals, and environment assumptions.
 - `@ts-check` is enabled file-by-file so we can improve safety incrementally instead of flooding the repo with errors all at once.
+- `pnpm run typecheck` is the main verification step for this foundation.
+
+The translation subsystem was also split into smaller contributor-focused modules during this phase:
+
+- `TranslateHelper.js` now acts as the coordinator instead of owning every translation responsibility directly.
+- `TranslationConfig.js`, `TranslationBank.js`, `TranslateSettings.js`, and `TranslateProgress.js` hold the reusable translation state and config pieces.
 
 ## Workflow 1: browser preview
 

@@ -94,7 +94,11 @@ The translation system has two separate responsibilities:
 
 Main modules:
 
-- `TranslateHelper.js`: endpoint definitions, bulk translation logic, translation bank, metrics, target extraction, and settings.
+- `TranslateHelper.js`: translator orchestration, batching flow, and extraction entry points.
+- `TranslationConfig.js`: endpoint definitions and chunking limits.
+- `TranslationBank.js`: cached translation storage and translation metrics.
+- `TranslateSettings.js`: persisted translation settings and endpoint selection state.
+- `TranslateProgress.js`: shared progress state used by the translation UI.
 - `InGameTranslator.js`: runtime hooks that patch cached text into the game UI and data.
 - `KeyValueStorage.js`: persistence for translation settings and the translation bank.
 
