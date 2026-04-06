@@ -1,6 +1,7 @@
 declare type EngineName = "MV" | "MZ" | string;
 
 declare interface NwWindowApi {
+  get(): { showDevTools(): void };
   open(
     url: string,
     options: Record<string, any>,

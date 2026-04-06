@@ -1,5 +1,5 @@
 import HealthSettingTab from "./HealthSettingTab.js";
-import { BattleCheat } from "../js/CheatHelper.js";
+import { BattleCheat } from "../js/CheatBattle.js";
 
 export default {
   name: "HealthSettingPanel",

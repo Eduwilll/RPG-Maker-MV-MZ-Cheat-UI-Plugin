@@ -1,4 +1,4 @@
-import { GeneralCheat } from "../js/CheatHelper.js";
+import { GeneralCheat } from "../js/CheatGeneral.js";
 
 export default {
   name: "StatsSettingPanel",

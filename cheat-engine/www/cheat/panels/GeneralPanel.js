@@ -1,9 +1,6 @@
-import {
-  GeneralCheat,
-  GameSpeedCheat,
-  SpeedCheat,
-  SceneCheat,
-} from "../js/CheatHelper.js";
+import { GameSpeedCheat, SpeedCheat } from "../js/CheatSpeed.js";
+import { GeneralCheat } from "../js/CheatGeneral.js";
+import { SceneCheat } from "../js/CheatBattle.js";
 
 export default {
   name: "GeneralPanel",

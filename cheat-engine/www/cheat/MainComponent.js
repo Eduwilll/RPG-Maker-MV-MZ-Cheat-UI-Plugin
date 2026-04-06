@@ -2,7 +2,7 @@
 
 import CheatModal from "./CheatModal.js";
 import { GLOBAL_SHORTCUT } from "./js/GlobalShortcut.js";
-import { GeneralCheat } from "./js/CheatHelper.js";
+import { GeneralCheat } from "./js/CheatGeneral.js";
 import AlertSnackbar from "./components/AlertSnackbar.js";
 import ConfirmDialog from "./components/ConfirmDialog.js";
 import { customizeRPGMakerFunctions } from "./init/customize_functions.js";

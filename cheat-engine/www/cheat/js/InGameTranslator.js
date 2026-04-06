@@ -12,6 +12,12 @@
  */
 
 import { TRANSLATION_BANK, TRANSLATE_SETTINGS } from "./TranslateHelper.js";
+import {
+  applyTranslationsToGameData,
+  revertGameData,
+} from "./InGameTranslationData.js";
+import { translateCommandListNames } from "./InGameTranslationLists.js";
+import { findCachedTranslatedText } from "./InGameTranslationText.js";
 
 class InGameTranslator {
   constructor() {
@@ -66,302 +72,9 @@ class InGameTranslator {
    */
   applyTranslationsToGameData() {
     if (!TRANSLATE_SETTINGS.isEnabled()) return;
-
-    const targets = TRANSLATE_SETTINGS.getTargets();
-    let patchCount = 0;
-
-    // Helper to patch name + description on data arrays
-    /**
-     * @param {Array<CheatDataEntry | null> | undefined} dataArray
-     * @param {string} targetKey
-     * @returns {number}
-     */
-    const patchDataArray = (dataArray, targetKey) => {
-      if (!targets[targetKey] || !dataArray) return 0;
-      let count = 0;
-      for (const item of dataArray) {
-        if (!item) continue;
-
-        // Patch name
-        if (item.name && typeof item.name === "string" && item.name.trim()) {
-          const cached = TRANSLATION_BANK.get(item.name);
-          if (cached) {
-            // Store original for undo
-            if (!item._originalName) {
-              item._originalName = item.name;
-            }
-            item.name = cached.translated;
-            count++;
-          }
-        }
-
-        // Patch description
-        if (
-          item.description &&
-          typeof item.description === "string" &&
-          item.description.trim()
-        ) {
-          const cached = TRANSLATION_BANK.get(item.description);
-          if (cached) {
-            if (!item._originalDescription) {
-              item._originalDescription = item.description;
-            }
-            item.description = cached.translated;
-            count++;
-          }
-        }
-
-        // Patch nickname (for actors)
-        if (
-          item.nickname &&
-          typeof item.nickname === "string" &&
-          item.nickname.trim()
-        ) {
-          const cached = TRANSLATION_BANK.get(item.nickname);
-          if (cached) {
-            if (!item._originalNickname) {
-              item._originalNickname = item.nickname;
-            }
-            item.nickname = cached.translated;
-            count++;
-          }
-        }
-
-        // Patch profile (for actors)
-        if (
-          item.profile &&
-          typeof item.profile === "string" &&
-          item.profile.trim()
-        ) {
-          const cached = TRANSLATION_BANK.get(item.profile);
-          if (cached) {
-            if (!item._originalProfile) {
-              item._originalProfile = item.profile;
-            }
-            item.profile = cached.translated;
-            count++;
-          }
-        }
-
-        // Patch message1-4 (for skills - usage messages)
-        for (let m = 1; m <= 4; m++) {
-          const msgKey = `message${m}`;
-          if (
-            item[msgKey] &&
-            typeof item[msgKey] === "string" &&
-            item[msgKey].trim()
-          ) {
-            const cached = TRANSLATION_BANK.get(item[msgKey]);
-            if (cached) {
-              if (!item[`_original_${msgKey}`]) {
-                item[`_original_${msgKey}`] = item[msgKey];
-              }
-              item[msgKey] = cached.translated;
-              count++;
-            }
-          }
-        }
-      }
-      return count;
-    };
-
-    // Patch all data arrays
-    if (window.$dataItems)
-      patchCount += patchDataArray(window.$dataItems, "items");
-    if (window.$dataWeapons)
-      patchCount += patchDataArray(window.$dataWeapons, "weapons");
-    if (window.$dataArmors)
-      patchCount += patchDataArray(window.$dataArmors, "armors");
-    if (window.$dataSkills)
-      patchCount += patchDataArray(window.$dataSkills, "skills");
-    if (window.$dataStates)
-      patchCount += patchDataArray(window.$dataStates, "states");
-    if (window.$dataClasses)
-      patchCount += patchDataArray(window.$dataClasses, "classes");
-    if (window.$dataEnemies)
-      patchCount += patchDataArray(window.$dataEnemies, "enemies");
-
-    // Patch actors
-    if (window.$dataActors && targets.actors) {
-      patchCount += patchDataArray(window.$dataActors, "actors");
-    }
-
-    // Patch map display names
-    if (window.$dataMapInfos && targets.maps) {
-      for (const mapInfo of window.$dataMapInfos) {
-        if (!mapInfo || !mapInfo.name) continue;
-        const cached = TRANSLATION_BANK.get(mapInfo.name);
-        if (cached) {
-          if (!mapInfo._originalName) {
-            mapInfo._originalName = mapInfo.name;
-          }
-          mapInfo.name = cached.translated;
-          patchCount++;
-        }
-      }
-    }
-
-    // Patch system terms (basic game vocabulary)
-    if (window.$dataSystem && targets.system) {
-      patchCount += this._patchSystemTerms();
-    }
-
-    // Patch variable/switch names (used only in debug/cheat display)
-    if (window.$dataSystem) {
-      if (targets.variables && window.$dataSystem.variables) {
-        for (let i = 0; i < window.$dataSystem.variables.length; i++) {
-          const name = window.$dataSystem.variables[i];
-          if (name && typeof name === "string" && name.trim()) {
-            const cached = TRANSLATION_BANK.get(name);
-            if (cached) {
-              if (!window.$dataSystem._originalVariables) {
-                window.$dataSystem._originalVariables =
-                  window.$dataSystem.variables.slice();
-              }
-              window.$dataSystem.variables[i] = cached.translated;
-              patchCount++;
-            }
-          }
-        }
-      }
-
-      if (targets.switches && window.$dataSystem.switches) {
-        for (let i = 0; i < window.$dataSystem.switches.length; i++) {
-          const name = window.$dataSystem.switches[i];
-          if (name && typeof name === "string" && name.trim()) {
-            const cached = TRANSLATION_BANK.get(name);
-            if (cached) {
-              if (!window.$dataSystem._originalSwitches) {
-                window.$dataSystem._originalSwitches =
-                  window.$dataSystem.switches.slice();
-              }
-              window.$dataSystem.switches[i] = cached.translated;
-              patchCount++;
-            }
-          }
-        }
-      }
-    }
-
+    const patchCount = applyTranslationsToGameData();
     this._dataPatched = true;
     console.log(`[InGameTranslator] Patched ${patchCount} game data strings`);
-
-    // Dispatch event so UI panels refresh
-    window.dispatchEvent(
-      new CustomEvent("cheat-data-patched", { detail: { patchCount } }),
-    );
-  }
-
-  /**
-   * Patch system terms (menu commands, battle messages, etc.)
-   */
-  _patchSystemTerms() {
-    let count = 0;
-    const sys = window.$dataSystem;
-    if (!sys) {
-      return count;
-    }
-
-    // System terms - basic vocabulary
-    if (sys.terms && sys.terms.basic) {
-      if (!sys._originalTermsBasic) {
-        sys._originalTermsBasic = sys.terms.basic.slice();
-      }
-      for (let i = 0; i < sys.terms.basic.length; i++) {
-        const text = sys.terms.basic[i];
-        if (text && typeof text === "string" && text.trim()) {
-          const cached = TRANSLATION_BANK.get(text);
-          if (cached) {
-            sys.terms.basic[i] = cached.translated;
-            count++;
-          }
-        }
-      }
-    }
-
-    // System terms - commands (Fight, Escape, etc.)
-    if (sys.terms && sys.terms.commands) {
-      if (!sys._originalTermsCommands) {
-        sys._originalTermsCommands = sys.terms.commands.slice();
-      }
-      for (let i = 0; i < sys.terms.commands.length; i++) {
-        const text = sys.terms.commands[i];
-        if (text && typeof text === "string" && text.trim()) {
-          const cached = TRANSLATION_BANK.get(text);
-          if (cached) {
-            sys.terms.commands[i] = cached.translated;
-            count++;
-          }
-        }
-      }
-    }
-
-    // System terms - params (Max HP, Attack, etc.)
-    if (sys.terms && sys.terms.params) {
-      if (!sys._originalTermsParams) {
-        sys._originalTermsParams = sys.terms.params.slice();
-      }
-      for (let i = 0; i < sys.terms.params.length; i++) {
-        const text = sys.terms.params[i];
-        if (text && typeof text === "string" && text.trim()) {
-          const cached = TRANSLATION_BANK.get(text);
-          if (cached) {
-            sys.terms.params[i] = cached.translated;
-            count++;
-          }
-        }
-      }
-    }
-
-    // System terms - messages (battle messages like "%1 attacks!", "A critical hit!", etc.)
-    if (sys.terms && sys.terms.messages) {
-      if (!sys._originalTermsMessages) {
-        sys._originalTermsMessages = Object.assign({}, sys.terms.messages);
-      }
-      for (const key in sys.terms.messages) {
-        const text = sys.terms.messages[key];
-        if (text && typeof text === "string" && text.trim()) {
-          const cached = TRANSLATION_BANK.get(text);
-          if (cached) {
-            sys.terms.messages[key] = cached.translated;
-            count++;
-          }
-        }
-      }
-    }
-
-    // MZ uses different structure: sys.uiArea, etc.
-    // Also handle gameTitle
-    if (sys.gameTitle) {
-      const cached = TRANSLATION_BANK.get(sys.gameTitle);
-      if (cached) {
-        if (!sys._originalGameTitle) sys._originalGameTitle = sys.gameTitle;
-        sys.gameTitle = cached.translated;
-        count++;
-      }
-    }
-
-    // Armor/weapon/skill types
-    const typeArrays = ["armorTypes", "weaponTypes", "skillTypes", "elements"];
-    for (const arrayName of typeArrays) {
-      if (sys[arrayName]) {
-        if (!sys[`_original_${arrayName}`]) {
-          sys[`_original_${arrayName}`] = sys[arrayName].slice();
-        }
-        for (let i = 0; i < sys[arrayName].length; i++) {
-          const text = sys[arrayName][i];
-          if (text && typeof text === "string" && text.trim()) {
-            const cached = TRANSLATION_BANK.get(text);
-            if (cached) {
-              sys[arrayName][i] = cached.translated;
-              count++;
-            }
-          }
-        }
-      }
-    }
-
-    return count;
   }
 
   /**
@@ -369,101 +82,7 @@ class InGameTranslator {
    * Called when translation is disabled.
    */
   revertGameData() {
-    const revertDataArray = (dataArray) => {
-      if (!dataArray) return;
-      for (const item of dataArray) {
-        if (!item) continue;
-        if (item._originalName) {
-          item.name = item._originalName;
-          delete item._originalName;
-        }
-        if (item._originalDescription) {
-          item.description = item._originalDescription;
-          delete item._originalDescription;
-        }
-        if (item._originalNickname) {
-          item.nickname = item._originalNickname;
-          delete item._originalNickname;
-        }
-        if (item._originalProfile) {
-          item.profile = item._originalProfile;
-          delete item._originalProfile;
-        }
-        for (let m = 1; m <= 4; m++) {
-          const key = `_original_message${m}`;
-          if (item[key]) {
-            item[`message${m}`] = item[key];
-            delete item[key];
-          }
-        }
-      }
-    };
-
-    revertDataArray(window.$dataItems);
-    revertDataArray(window.$dataWeapons);
-    revertDataArray(window.$dataArmors);
-    revertDataArray(window.$dataSkills);
-    revertDataArray(window.$dataStates);
-    revertDataArray(window.$dataClasses);
-    revertDataArray(window.$dataEnemies);
-    revertDataArray(window.$dataActors);
-
-    // Revert map names
-    if (window.$dataMapInfos) {
-      for (const mapInfo of window.$dataMapInfos) {
-        if (mapInfo && mapInfo._originalName) {
-          mapInfo.name = mapInfo._originalName;
-          delete mapInfo._originalName;
-        }
-      }
-    }
-
-    // Revert system terms
-    if (window.$dataSystem) {
-      const sys = window.$dataSystem;
-      if (sys._originalTermsBasic) {
-        sys.terms.basic = sys._originalTermsBasic;
-        delete sys._originalTermsBasic;
-      }
-      if (sys._originalTermsCommands) {
-        sys.terms.commands = sys._originalTermsCommands;
-        delete sys._originalTermsCommands;
-      }
-      if (sys._originalTermsParams) {
-        sys.terms.params = sys._originalTermsParams;
-        delete sys._originalTermsParams;
-      }
-      if (sys._originalTermsMessages) {
-        sys.terms.messages = sys._originalTermsMessages;
-        delete sys._originalTermsMessages;
-      }
-      if (sys._originalGameTitle) {
-        sys.gameTitle = sys._originalGameTitle;
-        delete sys._originalGameTitle;
-      }
-      if (sys._originalVariables) {
-        sys.variables = sys._originalVariables;
-        delete sys._originalVariables;
-      }
-      if (sys._originalSwitches) {
-        sys.switches = sys._originalSwitches;
-        delete sys._originalSwitches;
-      }
-
-      const typeArrays = [
-        "armorTypes",
-        "weaponTypes",
-        "skillTypes",
-        "elements",
-      ];
-      for (const arrayName of typeArrays) {
-        if (sys[`_original_${arrayName}`]) {
-          sys[arrayName] = sys[`_original_${arrayName}`];
-          delete sys[`_original_${arrayName}`];
-        }
-      }
-    }
-
+    revertGameData();
     this._dataPatched = false;
     console.log("[InGameTranslator] Game data reverted to original text");
   }
@@ -478,7 +97,6 @@ class InGameTranslator {
    * This handles all "Show Text" event commands.
    */
   _hookWindowMessage() {
-    const self = this;
     const _Window_Message_startMessage = Window_Message.prototype.startMessage;
 
     Window_Message.prototype.startMessage = function () {
@@ -489,18 +107,7 @@ class InGameTranslator {
         const texts = gameMessage._texts;
         for (let i = 0; i < texts.length; i++) {
           if (texts[i] && typeof texts[i] === "string" && texts[i].trim()) {
-            // Strip escape codes for lookup, but preserve them for display
-            const plainText = self._stripEscapeCodes(texts[i]);
-            const cached = TRANSLATION_BANK.get(plainText);
-            if (cached) {
-              texts[i] = cached.translated;
-            } else {
-              // Try full text with escape codes
-              const cachedFull = TRANSLATION_BANK.get(texts[i]);
-              if (cachedFull) {
-                texts[i] = cachedFull.translated;
-              }
-            }
+            texts[i] = findCachedTranslatedText(texts[i], TRANSLATION_BANK);
           }
         }
 
@@ -544,7 +151,6 @@ class InGameTranslator {
    * Hook Window_Base.drawTextEx to translate rich text (with escape codes).
    */
   _hookDrawTextEx() {
-    const self = this;
     const _Window_Base_drawTextEx = Window_Base.prototype.drawTextEx;
 
     Window_Base.prototype.drawTextEx = function (text, x, y, width) {
@@ -553,17 +159,7 @@ class InGameTranslator {
         typeof text === "string" &&
         text.trim()
       ) {
-        const plainText = self._stripEscapeCodes(text);
-        const cached = TRANSLATION_BANK.get(plainText);
-        if (cached) {
-          text = cached.translated;
-        } else {
-          // Try full text with escape codes
-          const cachedFull = TRANSLATION_BANK.get(text);
-          if (cachedFull) {
-            text = cachedFull.translated;
-          }
-        }
+        text = findCachedTranslatedText(text, TRANSLATION_BANK);
       }
       return _Window_Base_drawTextEx.call(this, text, x, y, width);
     };
@@ -604,18 +200,7 @@ class InGameTranslator {
       _Window_ChoiceList_makeCommandList.call(this);
 
       if (TRANSLATE_SETTINGS.isEnabled() && this._list) {
-        for (const command of this._list) {
-          if (
-            command.name &&
-            typeof command.name === "string" &&
-            command.name.trim()
-          ) {
-            const cached = TRANSLATION_BANK.get(command.name);
-            if (cached) {
-              command.name = cached.translated;
-            }
-          }
-        }
+        translateCommandListNames(this._list, TRANSLATION_BANK);
       }
     };
   }
@@ -788,18 +373,7 @@ class InGameTranslator {
         _makeCommandList.call(this);
 
         if (TRANSLATE_SETTINGS.isEnabled() && this._list) {
-          for (const command of this._list) {
-            if (
-              command.name &&
-              typeof command.name === "string" &&
-              command.name.trim()
-            ) {
-              const cached = TRANSLATION_BANK.get(command.name);
-              if (cached) {
-                command.name = cached.translated;
-              }
-            }
-          }
+          translateCommandListNames(this._list, TRANSLATION_BANK);
         }
       };
     };
@@ -840,32 +414,6 @@ class InGameTranslator {
   // ========================================================================
   // UTILITIES
   // ========================================================================
-
-  /**
-   * Strip RPG Maker escape codes from text for translation bank lookup.
-   * Escape codes: \C[n], \I[n], \V[n], \N[n], \G, \{, \}, etc.
-   */
-  _stripEscapeCodes(text) {
-    if (!text || typeof text !== "string") return text;
-    return text
-      .replace(/\\C\[\d+\]/gi, "")
-      .replace(/\\I\[\d+\]/gi, "")
-      .replace(/\\V\[\d+\]/gi, "")
-      .replace(/\\N\[\d+\]/gi, "")
-      .replace(/\\P\[\d+\]/gi, "")
-      .replace(/\\G/gi, "")
-      .replace(/\\{/g, "")
-      .replace(/\\}/g, "")
-      .replace(/\\!/g, "")
-      .replace(/\\\./g, "")
-      .replace(/\\\|/g, "")
-      .replace(/\\>/g, "")
-      .replace(/\\</g, "")
-      .replace(/\\\^/g, "")
-      .replace(/\x1b[A-Za-z]\[\d+\]/g, "")
-      .replace(/\x1b[A-Za-z]/g, "")
-      .trim();
-  }
 
   /**
    * Check if data has been patched with translations

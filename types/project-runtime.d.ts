@@ -91,3 +91,8 @@ interface Window {
   $dataMapInfos?: Array<CheatMapInfoEntry | null>;
   $dataSystem?: CheatSystemData;
 }
+
+declare module "nw.gui" {
+  const gui: any;
+  export = gui;
+}
