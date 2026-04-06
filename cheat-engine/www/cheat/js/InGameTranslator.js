@@ -1,3 +1,5 @@
+// @ts-check
+
 /**
  * InGameTranslator.js
  *
@@ -13,8 +15,11 @@ import { TRANSLATION_BANK, TRANSLATE_SETTINGS } from "./TranslateHelper.js";
 
 class InGameTranslator {
   constructor() {
+    /** @type {boolean} */
     this._initialized = false;
+    /** @type {boolean} */
     this._dataPatched = false;
+    /** @type {Map<string, string>} */
     this._originalData = new Map(); // Backup original strings for undo
   }
 
@@ -66,6 +71,11 @@ class InGameTranslator {
     let patchCount = 0;
 
     // Helper to patch name + description on data arrays
+    /**
+     * @param {Array<CheatDataEntry | null> | undefined} dataArray
+     * @param {string} targetKey
+     * @returns {number}
+     */
     const patchDataArray = (dataArray, targetKey) => {
       if (!targets[targetKey] || !dataArray) return 0;
       let count = 0;
@@ -248,6 +258,9 @@ class InGameTranslator {
   _patchSystemTerms() {
     let count = 0;
     const sys = window.$dataSystem;
+    if (!sys) {
+      return count;
+    }
 
     // System terms - basic vocabulary
     if (sys.terms && sys.terms.basic) {
@@ -469,9 +482,11 @@ class InGameTranslator {
     const _Window_Message_startMessage = Window_Message.prototype.startMessage;
 
     Window_Message.prototype.startMessage = function () {
+      const gameMessage = /** @type {any} */ ($gameMessage);
+
       if (TRANSLATE_SETTINGS.isEnabled()) {
         // Translate each line of the dialogue
-        const texts = $gameMessage._texts;
+        const texts = gameMessage._texts;
         for (let i = 0; i < texts.length; i++) {
           if (texts[i] && typeof texts[i] === "string" && texts[i].trim()) {
             // Strip escape codes for lookup, but preserve them for display
@@ -490,10 +505,10 @@ class InGameTranslator {
         }
 
         // Also translate the speaker name (face name display / name window)
-        if ($gameMessage._speakerName) {
-          const cached = TRANSLATION_BANK.get($gameMessage._speakerName);
+        if (gameMessage._speakerName) {
+          const cached = TRANSLATION_BANK.get(gameMessage._speakerName);
           if (cached) {
-            $gameMessage._speakerName = cached.translated;
+            gameMessage._speakerName = cached.translated;
           }
         }
         // MZ has _speakerName, MV may use name window plugins differently
@@ -691,8 +706,10 @@ class InGameTranslator {
 
     if (_Window_ScrollText_startMessage) {
       Window_ScrollText.prototype.startMessage = function () {
+        const gameMessage = /** @type {any} */ ($gameMessage);
+
         if (TRANSLATE_SETTINGS.isEnabled()) {
-          const texts = $gameMessage._texts;
+          const texts = gameMessage._texts;
           for (let i = 0; i < texts.length; i++) {
             if (texts[i] && typeof texts[i] === "string" && texts[i].trim()) {
               const cached = TRANSLATION_BANK.get(texts[i]);

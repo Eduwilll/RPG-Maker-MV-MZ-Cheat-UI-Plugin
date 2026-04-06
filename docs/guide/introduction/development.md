@@ -33,6 +33,14 @@ Used for preview, packaging, and dev-sync scripts.
 ```
 :::
 
+### Static-checking foundation
+
+Phase 1 uses a lightweight TypeScript configuration for JavaScript projects:
+
+- `tsconfig.json` provides editor and `checkJs` groundwork without changing runtime packaging.
+- `types/` contains local declarations for RPG Maker globals, cheat-specific globals, and environment assumptions.
+- `@ts-check` is enabled file-by-file so we can improve safety incrementally instead of flooding the repo with errors all at once.
+
 ## Workflow 1: browser preview
 
 Use this when you are changing layout, panel interactions, or other UI behavior that does not require the full game engine.

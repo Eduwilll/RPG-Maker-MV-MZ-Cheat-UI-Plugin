@@ -1,3 +1,5 @@
+// @ts-check
+
 import CheatModal from "./CheatModal.js";
 import { GLOBAL_SHORTCUT } from "./js/GlobalShortcut.js";
 import { GeneralCheat } from "./js/CheatHelper.js";
@@ -42,19 +44,23 @@ export default {
   },
 
   created() {
-    const self = this;
+    customizeRPGMakerFunctions(
+      /** @type {{ show: boolean }} */ (/** @type {unknown} */ (this)),
+    );
 
-    customizeRPGMakerFunctions(self);
+    const cheatApi = /** @type {GeneralCheatLike} */ (
+      /** @type {unknown} */ (GeneralCheat)
+    );
 
-    GeneralCheat.toggleCheatModal = (componentName = null) => {
+    cheatApi.toggleCheatModal = (componentName = null) => {
       this.toggleCheatModal(componentName);
     };
 
-    GeneralCheat.openCheatModal = (componentName = null) => {
+    cheatApi.openCheatModal = (componentName = null) => {
       this.openCheatModal(componentName);
     };
 
-    GeneralCheat.openCheatWindow = (componentName = null) => {
+    cheatApi.openCheatWindow = (componentName = null) => {
       this.openCheatWindow(componentName);
     };
 
@@ -77,6 +83,10 @@ export default {
   },
 
   methods: {
+    /**
+     * @param {KeyboardEvent} e
+     * @returns {void}
+     */
     onGlobalKeyDown(e) {
       if (e.repeat) {
         GLOBAL_SHORTCUT.runKeyRepeatEvent(e, Key.fromKey(this.currentKey));
@@ -88,12 +98,20 @@ export default {
       }
     },
 
+    /**
+     * @param {KeyboardEvent} e
+     * @returns {void}
+     */
     onGlobalKeyUp(e) {
       GLOBAL_SHORTCUT.runKeyLeaveEvent(e, Key.fromKey(this.currentKey));
       this.currentKey.remove(e.keyCode);
       GLOBAL_SHORTCUT.runKeyEnterEvent(e, Key.fromKey(this.currentKey));
     },
 
+    /**
+     * @param {string | null} [componentName]
+     * @returns {void}
+     */
     openCheatModal(componentName) {
       if (componentName) {
         this.currentComponentName = componentName;
@@ -102,6 +120,10 @@ export default {
       this.show = true;
     },
 
+    /**
+     * @param {string | null} [componentName]
+     * @returns {void}
+     */
     toggleCheatModal(componentName) {
       const prevComponentName = this.currentComponentName;
 
@@ -122,15 +144,23 @@ export default {
       this.show = true;
     },
 
+    /**
+     * @param {string | null} [componentName]
+     * @returns {void}
+     */
     openCheatWindow(componentName = null) {
+      const cheatApi = /** @type {GeneralCheatLike} */ (
+        /** @type {unknown} */ (GeneralCheat)
+      );
+
       if (!Utils.isNwjs()) {
         Alert.error("Separate window mode only works in NW.js (PC version).");
         this.openCheatModal(componentName);
         return;
       }
 
-      if (GeneralCheat.__cheatWindow && !GeneralCheat.__cheatWindow.closed) {
-        GeneralCheat.__cheatWindow.focus();
+      if (cheatApi.__cheatWindow && !cheatApi.__cheatWindow.closed) {
+        cheatApi.__cheatWindow.focus();
         return;
       }
 
@@ -150,9 +180,9 @@ export default {
           always_on_top: false,
         },
         (win) => {
-          GeneralCheat.__cheatWindow = win.window;
+          cheatApi.__cheatWindow = win.window;
           win.on("closed", () => {
-            GeneralCheat.__cheatWindow = null;
+            cheatApi.__cheatWindow = null;
           });
         },
       );
