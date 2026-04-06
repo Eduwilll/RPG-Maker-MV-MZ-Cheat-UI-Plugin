@@ -8,6 +8,11 @@ import ConfirmDialog from "./components/ConfirmDialog.js";
 import { customizeRPGMakerFunctions } from "./init/customize_functions.js";
 import { Key } from "./js/KeyCodes.js";
 import { Alert } from "./js/AlertHelper.js";
+import {
+  getCheatRootDir,
+  getCheatVersionFilePath,
+  isDesktopRuntime,
+} from "./js/RuntimeEnv.js";
 
 export default {
   name: "MainComponent",
@@ -153,7 +158,7 @@ export default {
         /** @type {unknown} */ (GeneralCheat)
       );
 
-      if (!Utils.isNwjs()) {
+      if (!isDesktopRuntime()) {
         Alert.error("Separate window mode only works in NW.js (PC version).");
         this.openCheatModal(componentName);
         return;
@@ -167,10 +172,8 @@ export default {
       // Hide the overlay if it was open
       this.show = false;
 
-      const targetDir = Utils.RPGMAKER_NAME === "MV" ? "www/cheat/" : "cheat/";
-
       nw.Window.open(
-        targetDir + "window.html",
+        getCheatRootDir() + "window.html",
         {
           title: "RPG Maker Cheat Engine",
           width: 700,
@@ -189,7 +192,7 @@ export default {
     },
 
     async checkVersion() {
-      if (!Utils.isNwjs()) {
+      if (!isDesktopRuntime()) {
         return;
       }
 
@@ -218,13 +221,8 @@ export default {
 
     getCurrentCheatVersion() {
       try {
-        const targetDir = Utils.RPGMAKER_NAME === "MV" ? "www" : ".";
-
         const description = JSON.parse(
-          require("fs").readFileSync(
-            targetDir + "/cheat-version-description.json",
-            "utf-8",
-          ),
+          require("fs").readFileSync(getCheatVersionFilePath(), "utf-8"),
         );
 
         return description.version;

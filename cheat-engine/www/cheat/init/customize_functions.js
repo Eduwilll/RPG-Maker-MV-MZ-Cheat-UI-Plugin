@@ -3,6 +3,7 @@
 // customize mv functions
 import { MessageCheat } from "../js/CheatHelper.js";
 import { IN_GAME_TRANSLATOR } from "../js/InGameTranslator.js";
+import { isMvProject } from "../js/RuntimeEnv.js";
 
 /**
  * Apply runtime patches needed for the overlay to coexist with RPG Maker.
@@ -15,7 +16,7 @@ export function customizeRPGMakerFunctions(mainComponent) {
     /** @type {any} */ (TouchInput)
   );
 
-  if (Utils.RPGMAKER_NAME === "MV") {
+  if (isMvProject()) {
     // WARN: directly changing engine code can be dangerous
     // remove preventDefault
     touchInput._onWheel = function () {

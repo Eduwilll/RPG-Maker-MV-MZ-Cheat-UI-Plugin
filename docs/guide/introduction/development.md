@@ -45,7 +45,8 @@ Phase 1 uses a lightweight TypeScript configuration for JavaScript projects:
 The translation subsystem was also split into smaller contributor-focused modules during this phase:
 
 - `TranslateHelper.js` now acts as the coordinator instead of owning every translation responsibility directly.
-- `TranslationConfig.js`, `TranslationBank.js`, `TranslateSettings.js`, and `TranslateProgress.js` hold the reusable translation state and config pieces.
+- `TranslationConfig.js`, `TranslationBank.js`, `TranslateSettings.js`, `TranslateProgress.js`, and `TranslationExtractors.js` hold the reusable translation state and config pieces.
+- `RuntimeEnv.js` is the new home for small shared MV/MZ and NW.js environment helpers.
 
 ## Workflow 1: browser preview
 

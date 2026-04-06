@@ -97,8 +97,11 @@ Main modules:
 - `TranslateHelper.js`: translator orchestration, batching flow, and extraction entry points.
 - `TranslationConfig.js`: endpoint definitions and chunking limits.
 - `TranslationBank.js`: cached translation storage and translation metrics.
+- `TranslationExtractors.js`: game-data and event-text extraction helpers.
 - `TranslateSettings.js`: persisted translation settings and endpoint selection state.
 - `TranslateProgress.js`: shared progress state used by the translation UI.
+- `RuntimeEnv.js`: small MV/MZ and NW.js environment helpers used by runtime modules.
+- `CheatSpeed.js`: game-speed and message-skip helpers split out of the older shared cheat helper file.
 - `InGameTranslator.js`: runtime hooks that patch cached text into the game UI and data.
 - `KeyValueStorage.js`: persistence for translation settings and the translation bank.
 
@@ -118,7 +121,7 @@ The repo supports both engines, but the differences are mostly handled near the 
 - MV commonly uses `www/` as the effective root inside the game folder.
 - MZ commonly uses the project root directly.
 - Boot scripts differ between engines, so there are separate initialization templates.
-- Some engine internals and global object behavior vary, which is why patches often branch on `Utils.RPGMAKER_NAME`.
+- Some engine internals and global object behavior vary. Newer code is starting to centralize those checks through `RuntimeEnv.js` instead of branching inline everywhere.
 
 ## Developer tooling
 

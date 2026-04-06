@@ -1,5 +1,7 @@
 // @ts-check
 
+import { isDesktopRuntime } from "./RuntimeEnv.js";
+
 /**
  * Small persistence wrapper that writes to JSON in NW.js and
  * falls back to browser localStorage in preview mode.
@@ -16,7 +18,7 @@ export class KeyValueStorage {
     /** @type {typeof import("fs") | null} */
     this.fileSystem = null;
 
-    if (Utils.isNwjs()) {
+    if (isDesktopRuntime()) {
       // Loaded lazily so preview mode can run without Node's fs.
       this.fileSystem = require("fs");
     }
@@ -27,7 +29,7 @@ export class KeyValueStorage {
    * @returns {any}
    */
   getItem(key) {
-    if (!Utils.isNwjs()) {
+    if (!isDesktopRuntime()) {
       return localStorage.getItem(this.filePath + ":" + key);
     }
 
@@ -40,7 +42,7 @@ export class KeyValueStorage {
    * @returns {void}
    */
   setItem(key, value) {
-    if (!Utils.isNwjs()) {
+    if (!isDesktopRuntime()) {
       localStorage.setItem(this.filePath + ":" + key, value);
       return;
     }

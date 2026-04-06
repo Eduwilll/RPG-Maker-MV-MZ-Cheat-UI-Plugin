@@ -38,7 +38,10 @@ Most contributor work happens under `cheat-engine/www/`.
 | `cheat-engine/www/cheat/js/TranslateHelper.js` | Change translation orchestration, extraction flow, or batch execution |
 | `cheat-engine/www/cheat/js/TranslationConfig.js` | Change built-in endpoints and chunking defaults |
 | `cheat-engine/www/cheat/js/TranslationBank.js` | Change cached translation storage or metrics collection |
+| `cheat-engine/www/cheat/js/TranslationExtractors.js` | Change database, common-event, and map-dialogue extraction rules |
 | `cheat-engine/www/cheat/js/TranslateSettings.js` | Change persisted translation settings and target selection |
+| `cheat-engine/www/cheat/js/RuntimeEnv.js` | Change shared MV/MZ path and environment helpers |
+| `cheat-engine/www/cheat/js/CheatSpeed.js` | Change game-speed tuning and message-skip behavior |
 | `cheat-engine/www/cheat/js/InGameTranslator.js` | Change how cached translations are applied at runtime |
 | `cheat-engine/www/cheat/init/customize_functions.js` | Patch RPG Maker behavior or initialize runtime hooks |
 | `cheat-engine/www/cheat/css/main.css` | Style the in-game overlay |

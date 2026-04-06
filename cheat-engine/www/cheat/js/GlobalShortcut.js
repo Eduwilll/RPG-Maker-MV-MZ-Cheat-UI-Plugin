@@ -8,6 +8,7 @@ import {
   BattleCheat,
   MessageCheat,
 } from "./CheatHelper.js";
+import { isDesktopRuntime } from "./RuntimeEnv.js";
 import { ShortcutMap } from "./ShortcutHelper.js";
 
 // default shortcut settings
@@ -327,7 +328,7 @@ const shortcutConfig = {
     name: "Open dev tool",
     desc: "Open Chromium dev tool",
     enterAction(param) {
-      if (Utils.isNwjs()) {
+      if (isDesktopRuntime()) {
         require("nw.gui").Window.get().showDevTools();
       }
     },
@@ -527,7 +528,7 @@ class GlobalShortcut {
    */
   readRawShortcutSettings() {
     // if nwjs environment, read shortcut settings from file
-    if (Utils.isNwjs()) {
+    if (isDesktopRuntime()) {
       const fs = require("fs");
       const path = require("path");
 
@@ -585,7 +586,7 @@ class GlobalShortcut {
   }
 
   writeRawShortcutSettings(shortcutSettings) {
-    if (Utils.isNwjs()) {
+    if (isDesktopRuntime()) {
       const fs = require("fs");
       const path = require("path");
 
@@ -616,7 +617,7 @@ class GlobalShortcut {
   }
 
   restoreDefaultSettings() {
-    if (Utils.isNwjs()) {
+    if (isDesktopRuntime()) {
       // remove settings file
       try {
         require("fs").unlinkSync(this.shortcutSettingsFile);
