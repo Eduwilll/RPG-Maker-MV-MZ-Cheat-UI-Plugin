@@ -179,10 +179,10 @@ export default {
 
   methods: {
     initializeVariables() {
-      const rawDataMapInfos = $dataMapInfos.filter((mapInfo) => !!mapInfo);
-      const mapNames = this.getMapNames($dataMapInfos);
+      const dataMapInfos = Array.isArray($dataMapInfos) ? $dataMapInfos : [];
+      const mapNames = this.getMapNames(dataMapInfos);
 
-      this.maps = $dataMapInfos
+      this.maps = dataMapInfos
         .filter((mapInfo) => !!mapInfo)
         .map((mapInfo) => {
           let fullPath = [];
@@ -216,13 +216,30 @@ export default {
     },
 
     getMapAncestors(id, path) {
-      path.push(id);
-      if ($dataMapInfos[id].parentId === 0) {
+      const mapInfo =
+        Array.isArray($dataMapInfos) && id >= 0 ? $dataMapInfos[id] : null;
+
+      if (!mapInfo) {
         path.reverse();
         return;
       }
 
-      this.getMapAncestors($dataMapInfos[id].parentId, path);
+      path.push(id);
+
+      if (!mapInfo.parentId) {
+        path.reverse();
+        return;
+      }
+
+      if (path.includes(mapInfo.parentId)) {
+        console.warn(
+          `[TeleportPanel] Circular map parent chain detected for map ${id}`,
+        );
+        path.reverse();
+        return;
+      }
+
+      this.getMapAncestors(mapInfo.parentId, path);
     },
 
     async manualRefresh() {

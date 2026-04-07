@@ -7,6 +7,16 @@ import { migrateShortcutSettings } from "./ShortcutMigration.js";
 import { ShortcutStorage } from "./ShortcutStorage.js";
 import {
   defaultShortcutSettings,
+  isInValueInRange,
+  parseKeyObjectToString,
+  parseStringToKeyObject,
+  shortcutConfig,
+  ShortcutConfig,
+} from "./ShortcutConfig.js";
+
+export {
+  defaultShortcutSettings,
+  isInValueInRange,
   parseKeyObjectToString,
   parseStringToKeyObject,
   shortcutConfig,

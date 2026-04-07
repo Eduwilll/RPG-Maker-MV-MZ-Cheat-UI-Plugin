@@ -4,6 +4,8 @@ import { TRANSLATION_METRICS } from "./TranslationBank.js";
 
 /** @type {number | undefined} */
 let lastPublicRequestAt = undefined;
+/** @type {Set<string>} */
+const loggedLocalFailures = new Set();
 
 /**
  * @param {Record<string, any>} endPointData
@@ -18,7 +20,7 @@ export async function translateWithLingvaEndpoint(endPointData, text, rrIndex) {
     : ["https://lingva.ml"];
 
   let nextIndex = typeof rrIndex === "number" ? rrIndex : 0;
-  const maxAttempts = endPointData.isLocal ? 2 : 4;
+  const maxAttempts = endPointData.isLocal ? 2 : Math.max(domains.length, 4);
 
   if (!endPointData.isLocal) {
     const now = Date.now();
@@ -88,6 +90,16 @@ export async function translateWithLingvaEndpoint(endPointData, text, rrIndex) {
       }
 
       if (endPointData.isLocal) {
+        const hasMoreDomains = attempt < maxAttempts - 1;
+        if (hasMoreDomains) {
+          if (!loggedLocalFailures.has(baseDomain)) {
+            loggedLocalFailures.add(baseDomain);
+            console.info(
+              `[Lingva] Local endpoint failed on ${baseDomain}; trying next node`,
+            );
+          }
+          continue;
+        }
         return { translated: text, rrIndex: nextIndex };
       }
 

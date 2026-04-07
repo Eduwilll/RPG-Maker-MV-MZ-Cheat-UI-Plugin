@@ -69,12 +69,15 @@ export async function translateBulkOriginal(
 export function createBatches(texts, endPointId) {
   const config = BATCH_TRANSLATION;
   const maxLength = config.maxBatchLength[endPointId] || 1000;
+  const maxEncodedLength = config.maxBatchEncodedLength?.[endPointId] || null;
   const maxItems = config.maxBatchItems[endPointId] || 20;
   const delimiter = config.delimiter;
+  const encodedDelimiterLength = encodeURIComponent(delimiter).length;
 
   const batches = [];
   let currentBatch = [];
   let currentLength = 0;
+  let currentEncodedLength = 0;
 
   for (const text of texts) {
     if (!text || !text.trim()) {
@@ -82,19 +85,28 @@ export function createBatches(texts, endPointId) {
       continue;
     }
 
+    // Lingva-style GET endpoints are constrained by encoded URL length, not raw character count.
+    // Japanese text expands significantly under encodeURIComponent, so batch sizing must use the
+    // encoded payload size or local proxies/load balancers will drop the request.
     const textLength = text.length + delimiter.length;
+    const encodedTextLength =
+      encodeURIComponent(text).length + encodedDelimiterLength;
 
     if (
       currentBatch.length > 0 &&
       (currentLength + textLength > maxLength ||
+        (maxEncodedLength !== null &&
+          currentEncodedLength + encodedTextLength > maxEncodedLength) ||
         currentBatch.length >= maxItems)
     ) {
       batches.push(currentBatch);
       currentBatch = [text];
       currentLength = text.length;
+      currentEncodedLength = encodeURIComponent(text).length;
     } else {
       currentBatch.push(text);
       currentLength += textLength;
+      currentEncodedLength += encodedTextLength;
     }
   }
 

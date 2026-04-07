@@ -223,6 +223,14 @@ export const BATCH_TRANSLATION = {
     googleGemini: 4000,
     llmCustom: 3000,
   },
+  maxBatchEncodedLength: {
+    lingva: 1200,
+    lingvaJa: 1200,
+    lingvaLocal: 5000,
+    lingvaLocalAuto: 5000,
+    lingvaLocalBalanced: 7000,
+    lingvaLocalBalancedAuto: 7000,
+  },
   maxBatchItems: {
     lingva: 20,
     lingvaJa: 20,
