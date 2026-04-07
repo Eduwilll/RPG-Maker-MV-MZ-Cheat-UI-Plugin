@@ -1,9 +1,14 @@
 import { KEY_VALUE_STORAGE } from "../js/storage/KeyValueStorage.js";
-import { TRANSLATE_SETTINGS, TRANSLATOR } from "../js/TranslateHelper.js";
+import { TRANSLATE_SETTINGS } from "../js/TranslateHelper.js";
 import {
   buildMapPathText,
   matchesPanelSearch,
 } from "../js/panels/PanelGameState.js";
+import {
+  attachTranslateRefresh,
+  detachTranslateRefresh,
+  getTranslatedPanelText,
+} from "../js/panels/PanelTranslation.js";
 
 export default {
   name: "SaveRecallPanel",
@@ -161,17 +166,28 @@ export default {
     };
   },
 
-  mounted() {
+  created() {
     this.initializeVariables();
+    attachTranslateRefresh(this, () =>
+      TRANSLATE_SETTINGS.isMapTranslateEnabled(),
+    );
+  },
+
+  beforeDestroy() {
+    detachTranslateRefresh(this);
   },
 
   computed: {
     tableItems() {
+      const translateEnabled = TRANSLATE_SETTINGS.isMapTranslateEnabled();
+
       return this.locations.map((location, idx) => {
+        const mapInfo = $dataMapInfos[location.mapId];
+
         return {
           name: location.name,
-          mapName: $dataMapInfos[location.mapId]
-            ? $dataMapInfos[location.mapId].name
+          mapName: mapInfo
+            ? getTranslatedPanelText(mapInfo.name, translateEnabled)
             : "NULL",
           mapId: location.mapId,
           coord: {
@@ -194,22 +210,16 @@ export default {
   },
 
   methods: {
-    async initializeVariables() {
+    initializeVariables() {
       this.loadLocations();
-      this.currentMapName = await this.getMapFullPath($gameMap.mapId());
+      this.currentMapName = this.getMapFullPath($gameMap.mapId());
     },
 
-    async getMapFullPath(id) {
-      const fullPath = buildMapPathText($dataMapInfos, id);
-      if (fullPath === "NULL") {
-        return fullPath;
-      }
-
-      if (TRANSLATE_SETTINGS.isMapTranslateEnabled()) {
-        return await TRANSLATOR.translate(fullPath);
-      }
-
-      return fullPath;
+    getMapFullPath(id) {
+      const translateEnabled = TRANSLATE_SETTINGS.isMapTranslateEnabled();
+      return buildMapPathText($dataMapInfos, id, (name) =>
+        getTranslatedPanelText(name, translateEnabled),
+      );
     },
 
     saveLocations() {
