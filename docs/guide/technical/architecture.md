@@ -48,6 +48,7 @@ The UI is written in plain JavaScript modules, not single-file Vue components.
 - `MainComponent.js` is the top-level controller.
 - `CheatModal.js` defines the left navigation tree and panel container.
 - `cheat/panels/` contains the concrete feature panels such as stats, items, shortcuts, teleport, and translation.
+- shared panel conventions now live under `cheat/js/panels/` for reusable panel-safe state shaping and translation display helpers.
 - The UI listens for global key events so the overlay can be opened while gameplay is running.
 - In NW.js, the UI can also open as a separate window using `window.html` plus `window-init.js`.
 
@@ -95,21 +96,23 @@ The translation system has two separate responsibilities:
 Main modules:
 
 - `TranslateHelper.js`: translator orchestration, batching flow, and extraction entry points.
-- `TranslationConfig.js`: endpoint definitions and chunking limits.
-- `TranslationBank.js`: cached translation storage and translation metrics.
-- `TranslationBatching.js`: chunk sizing, batch splitting, recursive fallback, and Lingva batch concurrency.
-- `TranslationBasicRequest.js`: shared request helper for simple GET/POST translation endpoints.
-- `TranslationLingvaRequest.js`: shared request helper for Lingva and Lingva-style fallback handling.
-- `TranslationLlmRequest.js`: shared request helper for OpenAI-compatible and local LLM translation endpoints.
-- `TranslationExtractors.js`: game-data and event-text extraction helpers.
-- `TranslationPool.js`: builds the uncached translation pool from extracted target lists.
-- `TranslationWorkflow.js`: runs category-by-category translation work and progress updates for uncached strings.
-- `TranslateSettings.js`: persisted translation settings and endpoint selection state.
-- `TranslateProgress.js`: shared progress state used by the translation UI.
-- `RuntimeEnv.js`: small MV/MZ and NW.js environment helpers used by runtime modules.
-- `ShortcutConfig.js`: shortcut catalog, parameter validation, and action bindings used by the runtime shortcut manager.
-- `ShortcutMigration.js`: default-shortcut migration and conflict handling for older shortcut settings files.
-- `ShortcutStorage.js`: read/write helper for persisted shortcut mappings.
+- `translation/TranslationConfig.js`: endpoint definitions and chunking limits.
+- `translation/TranslationBank.js`: cached translation storage and translation metrics.
+- `translation/TranslationBatching.js`: chunk sizing, batch splitting, recursive fallback, and Lingva batch concurrency.
+- `translation/TranslationBasicRequest.js`: shared request helper for simple GET/POST translation endpoints.
+- `translation/TranslationLingvaRequest.js`: shared request helper for Lingva and Lingva-style fallback handling.
+- `translation/TranslationLlmRequest.js`: shared request helper for OpenAI-compatible and local LLM translation endpoints.
+- `translation/TranslationExtractors.js`: game-data and event-text extraction helpers.
+- `translation/TranslationPool.js`: builds the uncached translation pool from extracted target lists.
+- `translation/TranslationWorkflow.js`: runs category-by-category translation work and progress updates for uncached strings.
+- `translation/TranslateSettings.js`: persisted translation settings and endpoint selection state.
+- `translation/TranslateProgress.js`: shared progress state used by the translation UI.
+- `runtime/RuntimeEnv.js`: small MV/MZ and NW.js environment helpers used by runtime modules.
+- `storage/KeyValueStorage.js`: shared JSON/localStorage persistence helper used by settings and caches.
+- `shortcuts/ShortcutConfig.js`: shortcut catalog, parameter validation, and action bindings used by the runtime shortcut manager.
+- `shortcuts/ShortcutPanelState.js`: panel-safe view-state shaping for editing shortcut settings in the UI.
+- `shortcuts/ShortcutMigration.js`: default-shortcut migration and conflict handling for older shortcut settings files.
+- `shortcuts/ShortcutStorage.js`: read/write helper for persisted shortcut mappings.
 - `CheatGeneral.js`: general overlay, save, console, no-clip, and mouse-teleport helpers.
 - `CheatSpeed.js`: game-speed and message-skip helpers split out of the older shared cheat helper file.
 - `CheatBattle.js`: scene and battle-oriented cheat helpers split out of the shared cheat helper file.
@@ -129,6 +132,8 @@ The game is not translated live on every draw. The intended workflow is:
 That separation is important for both performance and stability.
 
 Recent cleanup in the fork moved most translation request, batching, and extraction details out of `TranslateHelper.js`. That file now acts mostly as the subsystem coordinator, which makes the request paths and cache flow easier to audit.
+
+Phase 3 moved the translation, shortcut, runtime, and storage implementations into dedicated subfolders such as `cheat-engine/www/cheat/js/translation/`, `cheat-engine/www/cheat/js/shortcuts/`, `cheat-engine/www/cheat/js/runtime/`, and `cheat-engine/www/cheat/js/storage/`. The old top-level module paths are currently kept as compatibility shims so the import migration can stay incremental without destabilizing the runtime.
 
 ## MV vs MZ compatibility
 

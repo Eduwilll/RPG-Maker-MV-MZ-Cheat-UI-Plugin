@@ -1,4 +1,10 @@
-import { GeneralCheat } from "../js/CheatGeneral.js";
+import { GeneralCheat } from "../js/CheatHelper.js";
+import {
+  coercePanelNumber,
+  extractActorParamValues,
+  findPartyActorById,
+  runPanelMutation,
+} from "../js/panels/PanelGameState.js";
 
 export default {
   name: "StatsSettingPanel",
@@ -114,21 +120,13 @@ export default {
 
   methods: {
     extractActorData(actor) {
-      // get actor param
-      const paramSize = actor._paramPlus.length;
-      const param = new Array(paramSize);
-
-      for (let paramId = 0; paramId < paramSize; ++paramId) {
-        param[paramId] = actor.param(paramId);
-      }
-
       return {
         id: actor._actorId,
         name: actor._name,
         godMode: GeneralCheat.isGodMode(actor),
         level: actor.level,
         exp: actor.currentExp(), // actor._exp contains exp data for each class (_exp[classId] = exp)
-        param: param,
+        param: extractActorParamValues(actor),
       };
     },
 
@@ -140,30 +138,54 @@ export default {
     },
 
     onLevelChange(item) {
-      const actor = $gameParty.members().find((a) => a._actorId === item.id);
-      if (actor) actor.changeLevel(Number(item.level), false);
-      this.initializeVariables();
+      const actor = findPartyActorById(item.id);
+      runPanelMutation(this, () => {
+        if (actor) {
+          actor.changeLevel(
+            coercePanelNumber(item.level, {
+              fallback: actor.level,
+              integer: true,
+            }),
+            false,
+          );
+        }
+      });
     },
 
     onExpChange(item) {
-      const actor = $gameParty.members().find((a) => a._actorId === item.id);
-      if (actor) actor.changeExp(Number(item.exp), false);
-      this.initializeVariables();
+      const actor = findPartyActorById(item.id);
+      runPanelMutation(this, () => {
+        if (actor) {
+          actor.changeExp(
+            coercePanelNumber(item.exp, {
+              fallback: actor.currentExp(),
+              integer: true,
+            }),
+            false,
+          );
+        }
+      });
     },
 
     onParamChange(item, paramIndex) {
-      const actor = $gameParty.members().find((a) => a._actorId === item.id);
-      if (actor) {
-        const diff = item.param[paramIndex] - actor.param(paramIndex);
-        actor.addParam(paramIndex, diff);
-      }
-      this.initializeVariables();
+      const actor = findPartyActorById(item.id);
+      runPanelMutation(this, () => {
+        if (actor) {
+          const nextValue = coercePanelNumber(item.param[paramIndex], {
+            fallback: actor.param(paramIndex),
+            integer: true,
+          });
+          const diff = nextValue - actor.param(paramIndex);
+          actor.addParam(paramIndex, diff);
+        }
+      });
     },
 
     onGodModeChange(item) {
-      const actor = $gameParty.members().find((a) => a._actorId === item.id);
-      if (actor) GeneralCheat.toggleGodMode(actor);
-      this.initializeVariables();
+      const actor = findPartyActorById(item.id);
+      runPanelMutation(this, () => {
+        if (actor) GeneralCheat.toggleGodMode(actor);
+      });
     },
   },
 };

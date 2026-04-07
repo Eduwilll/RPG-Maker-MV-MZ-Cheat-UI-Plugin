@@ -1,5 +1,9 @@
 import HealthSettingTab from "./HealthSettingTab.js";
-import { BattleCheat } from "../js/CheatBattle.js";
+import { BattleCheat } from "../js/CheatHelper.js";
+import {
+  coercePanelNumber,
+  runPanelMutation,
+} from "../js/panels/PanelGameState.js";
 
 export default {
   name: "HealthSettingPanel",
@@ -123,43 +127,35 @@ export default {
     },
 
     recoverAllEnemy() {
-      BattleCheat.recoverAllEnemy();
-      this.initializeVariables();
+      runPanelMutation(this, () => BattleCheat.recoverAllEnemy());
     },
 
     recoverAllParty() {
-      BattleCheat.recoverAllParty();
-      this.initializeVariables();
+      runPanelMutation(this, () => BattleCheat.recoverAllParty());
     },
 
     fillTpAllEnemy() {
-      BattleCheat.fillTpAllEnemy();
-      this.initializeVariables();
+      runPanelMutation(this, () => BattleCheat.fillTpAllEnemy());
     },
 
     fillTpAllParty() {
-      BattleCheat.fillTpAllParty();
-      this.initializeVariables();
+      runPanelMutation(this, () => BattleCheat.fillTpAllParty());
     },
 
     clearStatesAllEnemy() {
-      BattleCheat.clearStatesAllEnemy();
-      this.initializeVariables();
+      runPanelMutation(this, () => BattleCheat.clearStatesAllEnemy());
     },
 
     clearStatesAllParty() {
-      BattleCheat.clearStatesAllParty();
-      this.initializeVariables();
+      runPanelMutation(this, () => BattleCheat.clearStatesAllParty());
     },
 
     changeAllEnemyHealth(newHp) {
-      BattleCheat.changeAllEnemyHealth(newHp);
-      this.initializeVariables();
+      runPanelMutation(this, () => BattleCheat.changeAllEnemyHealth(newHp));
     },
 
     changeAllPartyHealth(newHp) {
-      BattleCheat.changeAllPartyHealth(newHp);
-      this.initializeVariables();
+      runPanelMutation(this, () => BattleCheat.changeAllPartyHealth(newHp));
     },
 
     encounterBattle() {
@@ -183,24 +179,34 @@ export default {
     },
 
     onDisableRandomEncounterChange() {
-      BattleCheat.toggleDisableRandomEncounter();
-      this.initializeVariables();
+      runPanelMutation(this, () => BattleCheat.toggleDisableRandomEncounter());
     },
 
     onDetailChange(items, type) {
-      for (const item of items) {
-        let member = null;
-        if (type === "party") {
-          member = $gameParty.members().find((a) => a.actorId() === item.id);
-        } else if (type === "enemy") {
-          member = $gameTroop.members()[item.id];
+      runPanelMutation(this, () => {
+        for (const item of items) {
+          let member = null;
+          if (type === "party") {
+            member = $gameParty.members().find((a) => a.actorId() === item.id);
+          } else if (type === "enemy") {
+            member = $gameTroop.members()[item.id];
+          }
+          if (member) {
+            member.setHp(
+              coercePanelNumber(item.hp.hp, {
+                fallback: member.hp,
+                integer: true,
+              }),
+            );
+            member.setMp(
+              coercePanelNumber(item.mp.mp, {
+                fallback: member.mp,
+                integer: true,
+              }),
+            );
+          }
         }
-        if (member) {
-          member.setHp(Number(item.hp.hp));
-          member.setMp(Number(item.mp.mp));
-        }
-      }
-      this.initializeVariables();
+      });
     },
   },
 };

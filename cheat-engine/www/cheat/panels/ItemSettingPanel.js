@@ -1,5 +1,10 @@
 import ItemTableTab from "./ItemTableTab.js";
-import { TRANSLATE_SETTINGS, TRANSLATION_BANK } from "../js/TranslateHelper.js";
+import { TRANSLATE_SETTINGS } from "../js/TranslateHelper.js";
+import {
+  attachTranslateRefresh,
+  buildTranslatedNameDescRow,
+  detachTranslateRefresh,
+} from "../js/panels/PanelTranslation.js";
 
 export default {
   name: "ItemSettingPanel",
@@ -39,25 +44,13 @@ export default {
 
   created() {
     this.initializeVariables();
-
-    this._translateListener = () => {
-      if (
-        TRANSLATE_SETTINGS.isItemTranslateEnabled &&
-        TRANSLATE_SETTINGS.isItemTranslateEnabled()
-      ) {
-        this.initializeVariables();
-      }
-    };
-    window.addEventListener("cheat-translate-finish", this._translateListener);
+    attachTranslateRefresh(this, () =>
+      TRANSLATE_SETTINGS.isItemTranslateEnabled(),
+    );
   },
 
   beforeDestroy() {
-    if (this._translateListener) {
-      window.removeEventListener(
-        "cheat-translate-finish",
-        this._translateListener,
-      );
-    }
+    detachTranslateRefresh(this);
   },
 
   methods: {
@@ -66,25 +59,10 @@ export default {
     },
 
     convertToTableData(item) {
-      let translatedName = item.name;
-      let translatedDesc = item.description;
-
-      if (TRANSLATE_SETTINGS.getTargets().items) {
-        if (item.name && item.name.trim()) {
-          const cachedName = TRANSLATION_BANK.get(item.name);
-          if (cachedName) translatedName = cachedName.translated;
-        }
-
-        if (item.description && item.description.trim()) {
-          const cachedDesc = TRANSLATION_BANK.get(item.description);
-          if (cachedDesc) translatedDesc = cachedDesc.translated;
-        }
-      }
-
-      return {
-        name: translatedName,
-        desc: translatedDesc,
-      };
+      return buildTranslatedNameDescRow(
+        item,
+        !!TRANSLATE_SETTINGS.getTargets().items,
+      );
     },
   },
 };

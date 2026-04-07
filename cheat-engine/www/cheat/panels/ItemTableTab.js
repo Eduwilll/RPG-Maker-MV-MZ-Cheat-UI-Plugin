@@ -1,3 +1,8 @@
+import {
+  coercePanelNumber,
+  matchesPanelSearch,
+} from "../js/panels/PanelGameState.js";
+
 export default {
   name: "ItemTableTab",
 
@@ -166,7 +171,11 @@ export default {
     onItemChange(item, newValue) {
       // modify amount
       if (newValue !== undefined) {
-        item.amount = Number(newValue) || 0;
+        item.amount = coercePanelNumber(newValue, {
+          fallback: item.amount,
+          integer: true,
+          min: 0,
+        });
       }
 
       const diff = item.amount - $gameParty.numItems(item._item);
@@ -179,18 +188,10 @@ export default {
     onTableFilterChange() {},
 
     tableItemFilter(value, search, item) {
-      if (search === null || search.trim() === "") {
-        return true;
-      }
-
-      search = search.toLowerCase();
-      for (const attr of this.searchableAttrs) {
-        if (item[attr] && item[attr].toLowerCase().includes(search)) {
-          return true;
-        }
-      }
-
-      return false;
+      return matchesPanelSearch(
+        search,
+        this.searchableAttrs.map((attr) => item[attr]),
+      );
     },
   },
 };

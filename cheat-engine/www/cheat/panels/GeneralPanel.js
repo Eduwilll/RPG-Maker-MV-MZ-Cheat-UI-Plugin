@@ -1,6 +1,14 @@
-import { GameSpeedCheat, SpeedCheat } from "../js/CheatSpeed.js";
-import { GeneralCheat } from "../js/CheatGeneral.js";
-import { SceneCheat } from "../js/CheatBattle.js";
+import {
+  GeneralCheat,
+  GameSpeedCheat,
+  SpeedCheat,
+  SceneCheat,
+} from "../js/CheatHelper.js";
+import {
+  coercePanelNumber,
+  readGeneralPanelState,
+  runPanelMutation,
+} from "../js/panels/PanelGameState.js";
 
 export default {
   name: "GeneralPanel",
@@ -207,16 +215,21 @@ export default {
 
   methods: {
     initializeVariables() {
-      this.noClip = $gamePlayer._through;
-      this.speed = $gamePlayer.moveSpeed();
+      const state = readGeneralPanelState();
+
+      this.noClip = state.noClip;
+      this.speed = state.moveSpeed;
       this.fixSpeed = SpeedCheat.isFixed();
-      this.gold = $gameParty._gold;
+      this.gold = state.gold;
 
-      this.forceSave = GeneralCheat.isForceSaveEnabled();
-      this.mouseTeleport = GeneralCheat.isMouseTeleportEnabled();
+      this.forceSave = state.forceSave;
+      this.mouseTeleport = state.mouseTeleport;
 
-      this.gameSpeed = GameSpeedCheat.getRate();
-      const gameSpeedSceneOption = GameSpeedCheat.getSceneOption();
+      this.gameSpeed = state.gameSpeed;
+      this.applyAllForGameSpeed = false;
+      this.applyBattleForGameSpeed = false;
+
+      const gameSpeedSceneOption = state.gameSpeedSceneOption;
       if (gameSpeedSceneOption === GameSpeedCheat.sceneOptions().all) {
         this.applyAllForGameSpeed = true;
       } else if (
@@ -227,14 +240,16 @@ export default {
     },
 
     onNoClipChange() {
-      GeneralCheat.toggleNoClip();
-      this.initializeVariables();
+      runPanelMutation(this, () => {
+        GeneralCheat.toggleNoClip();
+      });
     },
 
     onSpeedChange() {
-      SpeedCheat.setSpeed(this.speed, this.fixSpeed);
-      SpeedCheat.__writeSettings(this.speed, this.fixSpeed);
-      this.initializeVariables();
+      runPanelMutation(this, () => {
+        SpeedCheat.setSpeed(this.speed, this.fixSpeed);
+        SpeedCheat.__writeSettings(this.speed, this.fixSpeed);
+      });
     },
 
     addSpeed(amount) {
@@ -246,15 +261,14 @@ export default {
     },
 
     onGoldChange() {
-      if (
-        isNaN(this.gold) ||
-        !Number.isInteger(Number(this.gold)) ||
-        this.gold < 0
-      ) {
-        return;
-      }
+      this.gold = coercePanelNumber(this.gold, {
+        fallback: readGeneralPanelState().gold,
+        integer: true,
+        min: 0,
+      });
 
-      const diff = this.gold - $gameParty._gold;
+      const currentGold = readGeneralPanelState().gold;
+      const diff = this.gold - currentGold;
 
       if (diff < 0) {
         $gameParty.loseGold(-diff);
@@ -262,8 +276,9 @@ export default {
         $gameParty.gainGold(diff);
       }
 
-      this.gold = $gameParty._gold;
-      this.initializeVariables();
+      runPanelMutation(this, () => {
+        this.gold = readGeneralPanelState().gold;
+      });
     },
 
     gotoTitle() {
@@ -286,9 +301,10 @@ export default {
         sceneOption = GameSpeedCheat.sceneOptions().battle;
       }
 
-      GameSpeedCheat.setGameSpeed(this.gameSpeed, sceneOption);
-      GameSpeedCheat.__writeSettings(this.gameSpeed, sceneOption);
-      this.initializeVariables();
+      runPanelMutation(this, () => {
+        GameSpeedCheat.setGameSpeed(this.gameSpeed, sceneOption);
+        GameSpeedCheat.__writeSettings(this.gameSpeed, sceneOption);
+      });
     },
 
     addGameSpeed(amount) {
@@ -325,8 +341,9 @@ export default {
     },
 
     onForceSaveChange() {
-      GeneralCheat.forceEnableSave(this.forceSave);
-      this.initializeVariables();
+      runPanelMutation(this, () => {
+        GeneralCheat.forceEnableSave(this.forceSave);
+      });
     },
 
     openConsole() {
@@ -334,8 +351,9 @@ export default {
     },
 
     onMouseTeleportChange() {
-      GeneralCheat.toggleMouseTeleport(this.mouseTeleport);
-      this.initializeVariables();
+      runPanelMutation(this, () => {
+        GeneralCheat.toggleMouseTeleport(this.mouseTeleport);
+      });
     },
 
     openDebugMenu() {

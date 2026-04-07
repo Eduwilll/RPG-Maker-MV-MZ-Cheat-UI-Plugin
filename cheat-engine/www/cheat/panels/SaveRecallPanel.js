@@ -1,5 +1,9 @@
-import { KEY_VALUE_STORAGE } from "../js/KeyValueStorage.js";
+import { KEY_VALUE_STORAGE } from "../js/storage/KeyValueStorage.js";
 import { TRANSLATE_SETTINGS, TRANSLATOR } from "../js/TranslateHelper.js";
+import {
+  buildMapPathText,
+  matchesPanelSearch,
+} from "../js/panels/PanelGameState.js";
 
 export default {
   name: "SaveRecallPanel",
@@ -196,32 +200,16 @@ export default {
     },
 
     async getMapFullPath(id) {
-      if (!id || !$dataMapInfos[id]) {
-        return "NULL";
+      const fullPath = buildMapPathText($dataMapInfos, id);
+      if (fullPath === "NULL") {
+        return fullPath;
       }
-
-      let fullPath = [];
-      this.getMapAncestors(id, fullPath);
-
-      fullPath = fullPath.map((id) => $dataMapInfos[id].name).join(" / ");
 
       if (TRANSLATE_SETTINGS.isMapTranslateEnabled()) {
         return await TRANSLATOR.translate(fullPath);
       }
 
       return fullPath;
-    },
-
-    getMapAncestors(id, path) {
-      if (!id || !$dataMapInfos[id]) return;
-
-      path.push(id);
-      if ($dataMapInfos[id].parentId === 0) {
-        path.reverse();
-        return;
-      }
-
-      this.getMapAncestors($dataMapInfos[id].parentId, path);
     },
 
     saveLocations() {
@@ -275,17 +263,12 @@ export default {
     },
 
     tableItemFilter(value, search, item) {
-      if (search === null || search.trim() === "") {
-        return true;
-      }
-
-      search = search.toLowerCase();
-
-      return (
-        item.name.toLowerCase().contains(search) ||
-        item.mapName.toLowerCase().contains(search) ||
-        String(item.value).toLowerCase().contains(search)
-      );
+      return matchesPanelSearch(search, [
+        item.name,
+        item.mapName,
+        item.coord.x,
+        item.coord.y,
+      ]);
     },
   },
 };

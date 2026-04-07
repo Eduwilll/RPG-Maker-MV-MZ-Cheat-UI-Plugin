@@ -1,9 +1,14 @@
 import { ConfirmDialog } from "../js/DialogHelper.js";
+import { TRANSLATE_SETTINGS } from "../js/TranslateHelper.js";
 import {
-  TRANSLATOR,
-  TRANSLATE_SETTINGS,
-  TRANSLATION_BANK,
-} from "../js/TranslateHelper.js";
+  matchesPanelSearch,
+  refreshPanelState,
+} from "../js/panels/PanelGameState.js";
+import {
+  attachTranslateRefresh,
+  detachTranslateRefresh,
+  getTranslatedPanelText,
+} from "../js/panels/PanelTranslation.js";
 
 export default {
   name: "SwitchSettingPanel",
@@ -112,22 +117,13 @@ export default {
 
   created() {
     this.initializeVariables();
-
-    this._translateListener = () => {
-      if (TRANSLATE_SETTINGS.isSwitchTranslateEnabled()) {
-        this.manualRefresh();
-      }
-    };
-    window.addEventListener("cheat-translate-finish", this._translateListener);
+    attachTranslateRefresh(this, () =>
+      TRANSLATE_SETTINGS.isSwitchTranslateEnabled(),
+    );
   },
 
   beforeDestroy() {
-    if (this._translateListener) {
-      window.removeEventListener(
-        "cheat-translate-finish",
-        this._translateListener,
-      );
-    }
+    detachTranslateRefresh(this);
   },
 
   computed: {
@@ -190,24 +186,18 @@ export default {
       const translateEnabled = TRANSLATE_SETTINGS.isSwitchTranslateEnabled();
 
       return rawSwitchNames.map((name, idx) => {
-        if (translateEnabled && name && name.trim()) {
-          const cached = TRANSLATION_BANK.get(name);
-          if (cached) {
-            return cached.translated;
-          }
-        }
-        return name || `Switch ${idx}`;
+        return getTranslatedPanelText(
+          name || `Switch ${idx}`,
+          translateEnabled,
+        );
       });
     },
 
     async manualRefresh() {
-      console.log(
-        "🔄 Manual refresh triggered - reloading switches and translations",
-      );
-      this.switchNames = [];
-      this.tableItems = [];
-      await this.initializeVariables();
-      console.log("✅ Switch refresh completed");
+      await refreshPanelState(this, () => {
+        this.switchNames = [];
+        this.tableItems = [];
+      });
     },
 
     onItemChange(item) {
@@ -219,11 +209,7 @@ export default {
     },
 
     tableItemFilter(value, search, item) {
-      if (search === null || search.trim() === "") {
-        return true;
-      }
-
-      return item.name.toLowerCase().contains(search.toLowerCase());
+      return matchesPanelSearch(search, [item.name, item.id]);
     },
 
     toggleAllSwitches() {

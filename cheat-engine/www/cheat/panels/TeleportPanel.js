@@ -1,9 +1,15 @@
-import {
-  TRANSLATE_SETTINGS,
-  TRANSLATOR,
-  TRANSLATION_BANK,
-} from "../js/TranslateHelper.js";
+import { TRANSLATE_SETTINGS } from "../js/TranslateHelper.js";
 import { Alert } from "../js/AlertHelper.js";
+import {
+  buildMapRows,
+  matchesPanelSearch,
+  refreshPanelState,
+} from "../js/panels/PanelGameState.js";
+import {
+  attachTranslateRefresh,
+  detachTranslateRefresh,
+  getTranslatedPanelText,
+} from "../js/panels/PanelTranslation.js";
 
 export default {
   name: "TeleportPanel",
@@ -147,22 +153,13 @@ export default {
 
   created() {
     this.initializeVariables();
-
-    this._translateListener = () => {
-      if (TRANSLATE_SETTINGS.isMapTranslateEnabled()) {
-        this.manualRefresh();
-      }
-    };
-    window.addEventListener("cheat-translate-finish", this._translateListener);
+    attachTranslateRefresh(this, () =>
+      TRANSLATE_SETTINGS.isMapTranslateEnabled(),
+    );
   },
 
   beforeDestroy() {
-    if (this._translateListener) {
-      window.removeEventListener(
-        "cheat-translate-finish",
-        this._translateListener,
-      );
-    }
+    detachTranslateRefresh(this);
   },
 
   computed: {
@@ -179,76 +176,16 @@ export default {
 
   methods: {
     initializeVariables() {
-      const dataMapInfos = Array.isArray($dataMapInfos) ? $dataMapInfos : [];
-      const mapNames = this.getMapNames(dataMapInfos);
-
-      this.maps = dataMapInfos
-        .filter((mapInfo) => !!mapInfo)
-        .map((mapInfo) => {
-          let fullPath = [];
-
-          this.getMapAncestors(mapInfo.id, fullPath);
-          fullPath = fullPath.map((id) => mapNames[id]);
-
-          return {
-            _mapInfo: mapInfo,
-            id: mapInfo.id,
-            fullPath: fullPath,
-            fullPathJoin: fullPath.join(" / "),
-            name: mapNames[mapInfo.id],
-          };
-        });
-    },
-
-    getMapNames(dataMapInfos) {
       const translateEnabled = TRANSLATE_SETTINGS.isMapTranslateEnabled();
-
-      return dataMapInfos.map((m) => {
-        const name = m ? m.name : "";
-        if (translateEnabled && name && name.trim()) {
-          const cached = TRANSLATION_BANK.get(name);
-          if (cached) {
-            return cached.translated;
-          }
-        }
-        return name;
+      this.maps = buildMapRows($dataMapInfos, (name) => {
+        return getTranslatedPanelText(name, translateEnabled);
       });
     },
 
-    getMapAncestors(id, path) {
-      const mapInfo =
-        Array.isArray($dataMapInfos) && id >= 0 ? $dataMapInfos[id] : null;
-
-      if (!mapInfo) {
-        path.reverse();
-        return;
-      }
-
-      path.push(id);
-
-      if (!mapInfo.parentId) {
-        path.reverse();
-        return;
-      }
-
-      if (path.includes(mapInfo.parentId)) {
-        console.warn(
-          `[TeleportPanel] Circular map parent chain detected for map ${id}`,
-        );
-        path.reverse();
-        return;
-      }
-
-      this.getMapAncestors(mapInfo.parentId, path);
-    },
-
     async manualRefresh() {
-      console.log(
-        "🔄 Manual refresh triggered - reloading maps and translations",
-      );
-      this.maps = [];
-      await this.initializeVariables();
-      console.log("✅ Map refresh completed");
+      await refreshPanelState(this, () => {
+        this.maps = [];
+      });
     },
 
     teleportLocation(mapId, x, y) {
@@ -257,17 +194,11 @@ export default {
     },
 
     tableItemFilter(value, search, item) {
-      if (search === null || search.trim() === "") {
-        return true;
-      }
-
-      search = search.toLowerCase();
-
-      return (
-        item.name.toLowerCase().contains(search) ||
-        item.fullPathJoin.toLowerCase().contains(search) ||
-        String(item.id).toLowerCase().contains(search)
-      );
+      return matchesPanelSearch(search, [
+        item.name,
+        item.fullPathJoin,
+        item.id,
+      ]);
     },
   },
 };

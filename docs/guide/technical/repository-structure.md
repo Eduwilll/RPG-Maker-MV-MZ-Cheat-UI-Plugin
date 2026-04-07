@@ -23,6 +23,11 @@ Most contributor work happens under `cheat-engine/www/`.
 | `cheat-engine/www/cheat/` | Main cheat UI app |
 | `cheat-engine/www/cheat/panels/` | Individual UI panels and panel-specific logic |
 | `cheat-engine/www/cheat/js/` | Shared helpers, storage, shortcuts, translation, alerts, and runtime glue |
+| `cheat-engine/www/cheat/js/panels/` | Shared panel-safe state, search, refresh, and translation display helpers |
+| `cheat-engine/www/cheat/js/translation/` | Home of the translation subsystem implementation files |
+| `cheat-engine/www/cheat/js/shortcuts/` | Home of the shortcut subsystem implementation files |
+| `cheat-engine/www/cheat/js/runtime/` | Home of shared runtime and MV/MZ environment helpers |
+| `cheat-engine/www/cheat/js/storage/` | Home of shared persistence helpers |
 | `cheat-engine/www/cheat/init/` | App bootstrapping and RPG Maker customization hooks |
 | `cheat-engine/www/cheat/components/` | Shared Vue UI components such as dialogs and snackbars |
 | `cheat-engine/www/cheat/libs/` | Bundled front-end libraries used directly without a build step |
@@ -36,20 +41,22 @@ Most contributor work happens under `cheat-engine/www/`.
 | `cheat-engine/www/cheat/MainComponent.js` | Change top-level app lifecycle or global keyboard behavior |
 | `cheat-engine/www/cheat/panels/` | Build or update user-facing cheat features |
 | `cheat-engine/www/cheat/js/TranslateHelper.js` | Change translation orchestration, extraction flow, or batch execution |
-| `cheat-engine/www/cheat/js/TranslationConfig.js` | Change built-in endpoints and chunking defaults |
-| `cheat-engine/www/cheat/js/TranslationBank.js` | Change cached translation storage or metrics collection |
-| `cheat-engine/www/cheat/js/TranslationBatching.js` | Change batch sizing, split fallback behavior, and Lingva batch concurrency |
-| `cheat-engine/www/cheat/js/TranslationBasicRequest.js` | Change the simple GET/POST request path for non-Lingva, non-LLM endpoints |
-| `cheat-engine/www/cheat/js/TranslationLingvaRequest.js` | Change the Lingva retry, fallback, and round-robin request path |
-| `cheat-engine/www/cheat/js/TranslationLlmRequest.js` | Change the LLM-backed translation request path and retry behavior |
-| `cheat-engine/www/cheat/js/TranslationExtractors.js` | Change database, common-event, and map-dialogue extraction rules |
-| `cheat-engine/www/cheat/js/TranslationPool.js` | Change how extracted strings are deduplicated into the uncached translation pool |
-| `cheat-engine/www/cheat/js/TranslationWorkflow.js` | Change how uncached target groups are translated and how progress updates are reported |
-| `cheat-engine/www/cheat/js/TranslateSettings.js` | Change persisted translation settings and target selection |
-| `cheat-engine/www/cheat/js/RuntimeEnv.js` | Change shared MV/MZ path and environment helpers |
-| `cheat-engine/www/cheat/js/ShortcutConfig.js` | Change shortcut definitions, parameter validation, and action bindings |
-| `cheat-engine/www/cheat/js/ShortcutMigration.js` | Change how older shortcut settings are migrated and conflicts are resolved |
-| `cheat-engine/www/cheat/js/ShortcutStorage.js` | Change how shortcut mappings are loaded from and saved to disk or preview storage |
+| `cheat-engine/www/cheat/js/translation/TranslationConfig.js` | Change built-in endpoints and chunking defaults |
+| `cheat-engine/www/cheat/js/translation/TranslationBank.js` | Change cached translation storage or metrics collection |
+| `cheat-engine/www/cheat/js/translation/TranslationBatching.js` | Change batch sizing, split fallback behavior, and Lingva batch concurrency |
+| `cheat-engine/www/cheat/js/translation/TranslationBasicRequest.js` | Change the simple GET/POST request path for non-Lingva, non-LLM endpoints |
+| `cheat-engine/www/cheat/js/translation/TranslationLingvaRequest.js` | Change the Lingva retry, fallback, and round-robin request path |
+| `cheat-engine/www/cheat/js/translation/TranslationLlmRequest.js` | Change the LLM-backed translation request path and retry behavior |
+| `cheat-engine/www/cheat/js/translation/TranslationExtractors.js` | Change database, common-event, and map-dialogue extraction rules |
+| `cheat-engine/www/cheat/js/translation/TranslationPool.js` | Change how extracted strings are deduplicated into the uncached translation pool |
+| `cheat-engine/www/cheat/js/translation/TranslationWorkflow.js` | Change how uncached target groups are translated and how progress updates are reported |
+| `cheat-engine/www/cheat/js/translation/TranslateSettings.js` | Change persisted translation settings and target selection |
+| `cheat-engine/www/cheat/js/runtime/RuntimeEnv.js` | Change shared MV/MZ path and environment helpers |
+| `cheat-engine/www/cheat/js/storage/KeyValueStorage.js` | Change shared JSON/localStorage persistence behavior |
+| `cheat-engine/www/cheat/js/shortcuts/ShortcutConfig.js` | Change shortcut definitions, parameter validation, and action bindings |
+| `cheat-engine/www/cheat/js/shortcuts/ShortcutMigration.js` | Change how older shortcut settings are migrated and conflicts are resolved |
+| `cheat-engine/www/cheat/js/shortcuts/ShortcutPanelState.js` | Change how shortcut settings are shaped into panel-safe view rows |
+| `cheat-engine/www/cheat/js/shortcuts/ShortcutStorage.js` | Change how shortcut mappings are loaded from and saved to disk or preview storage |
 | `cheat-engine/www/cheat/js/CheatGeneral.js` | Change overlay toggles, save forcing, console/debug access, and movement helpers |
 | `cheat-engine/www/cheat/js/CheatSpeed.js` | Change game-speed tuning and message-skip behavior |
 | `cheat-engine/www/cheat/js/CheatBattle.js` | Change scene navigation and battle-related cheat actions |

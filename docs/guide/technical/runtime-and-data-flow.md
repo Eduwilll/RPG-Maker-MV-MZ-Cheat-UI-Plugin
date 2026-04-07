@@ -31,6 +31,7 @@ Global shortcuts are handled centrally.
 - Keydown and keyup events are captured by `MainComponent`.
 - Events are normalized into the internal key model.
 - `ShortcutConfig.js` defines the shortcut catalog, parameter rules, and bound actions.
+- `ShortcutPanelState.js` shapes runtime shortcut data into panel-safe view rows.
 - `ShortcutStorage.js` handles persisted shortcut settings.
 - `GlobalShortcut.js` loads those mappings and decides whether a shortcut should fire.
 - The target action can open the overlay, switch panels, or trigger a gameplay helper.

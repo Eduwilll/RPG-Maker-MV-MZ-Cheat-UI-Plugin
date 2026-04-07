@@ -1,3 +1,5 @@
+import { clonePanelState } from "../js/panels/PanelGameState.js";
+
 export default {
   name: "HealthSettingTab",
 
@@ -84,7 +86,7 @@ export default {
       immediate: true,
       handler() {
         // Dereference objects to prevent Vue from deeply injecting __ob__ into RPG Maker database/game objects.
-        this.editingItems = JSON.parse(JSON.stringify(this.items));
+        this.editingItems = clonePanelState(this.items);
       },
     },
   },
