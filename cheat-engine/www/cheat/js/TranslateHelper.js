@@ -8,23 +8,26 @@ import {
   MAX_CHUNK_SIZE,
   MAX_PARALLEL_REQUESTS,
   RECOMMEND_CHUNK_SIZE,
-} from "./TranslationConfig.js";
+} from "./translation/TranslationConfig.js";
 import {
   createBatches as createTranslationBatches,
   getAdaptiveChunkSize as getAdaptiveTranslationChunkSize,
   translateBatch as runTranslationBatch,
   translateBulkOriginal as runOriginalBulkTranslation,
   translateLingvaChunk as runLingvaTranslationChunk,
-} from "./TranslationBatching.js";
-import { translateWithBasicEndpoint } from "./TranslationBasicRequest.js";
-import { collectTranslationTargets } from "./TranslationExtractors.js";
-import { translateWithLingvaEndpoint } from "./TranslationLingvaRequest.js";
-import { translateWithLlmEndpoint } from "./TranslationLlmRequest.js";
-import { buildUncachedTranslationPool } from "./TranslationPool.js";
-import { translateUncachedSets } from "./TranslationWorkflow.js";
-import { TRANSLATE_PROGRESS } from "./TranslateProgress.js";
-import { TRANSLATE_SETTINGS } from "./TranslateSettings.js";
-import { TRANSLATION_BANK, TRANSLATION_METRICS } from "./TranslationBank.js";
+} from "./translation/TranslationBatching.js";
+import { translateWithBasicEndpoint } from "./translation/TranslationBasicRequest.js";
+import { collectTranslationTargets } from "./translation/TranslationExtractors.js";
+import { translateWithLingvaEndpoint } from "./translation/TranslationLingvaRequest.js";
+import { translateWithLlmEndpoint } from "./translation/TranslationLlmRequest.js";
+import { buildUncachedTranslationPool } from "./translation/TranslationPool.js";
+import { translateUncachedSets } from "./translation/TranslationWorkflow.js";
+import { TRANSLATE_PROGRESS } from "./translation/TranslateProgress.js";
+import { TRANSLATE_SETTINGS } from "./translation/TranslateSettings.js";
+import {
+  TRANSLATION_BANK,
+  TRANSLATION_METRICS,
+} from "./translation/TranslationBank.js";
 
 export {
   BATCH_TRANSLATION,
@@ -33,17 +36,20 @@ export {
   MAX_CHUNK_SIZE,
   MAX_PARALLEL_REQUESTS,
   RECOMMEND_CHUNK_SIZE,
-} from "./TranslationConfig.js";
-export { TRANSLATE_PROGRESS } from "./TranslateProgress.js";
-export { TRANSLATE_SETTINGS } from "./TranslateSettings.js";
-export { TRANSLATION_BANK, TRANSLATION_METRICS } from "./TranslationBank.js";
+} from "./translation/TranslationConfig.js";
+export { TRANSLATE_PROGRESS } from "./translation/TranslateProgress.js";
+export { TRANSLATE_SETTINGS } from "./translation/TranslateSettings.js";
+export {
+  TRANSLATION_BANK,
+  TRANSLATION_METRICS,
+} from "./translation/TranslationBank.js";
 
 class Translator {
   /**
-   * @param {import("./TranslateSettings.js").TranslateSettings} settings
+   * @param {import("./translation/TranslateSettings.js").TranslateSettings} settings
    */
   constructor(settings) {
-    /** @type {import("./TranslateSettings.js").TranslateSettings} */
+    /** @type {import("./translation/TranslateSettings.js").TranslateSettings} */
     this.settings = settings;
   }
 
