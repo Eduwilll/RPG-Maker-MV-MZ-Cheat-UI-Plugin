@@ -69,7 +69,14 @@ export async function translateBulkOriginal(
 export function createBatches(texts, endPointId) {
   const config = BATCH_TRANSLATION;
   const maxLength = config.maxBatchLength[endPointId] || 1000;
-  const maxEncodedLength = config.maxBatchEncodedLength?.[endPointId] || null;
+  const maxEncodedLength =
+    config.maxBatchEncodedLength &&
+    Object.prototype.hasOwnProperty.call(
+      config.maxBatchEncodedLength,
+      endPointId,
+    )
+      ? config.maxBatchEncodedLength[endPointId]
+      : null;
   const maxItems = config.maxBatchItems[endPointId] || 20;
   const delimiter = config.delimiter;
   const encodedDelimiterLength = encodeURIComponent(delimiter).length;
@@ -269,5 +276,5 @@ export async function translateLingvaChunk(
   }
 
   await Promise.all(workers);
-  return allResults.flat();
+  return [].concat(...allResults);
 }
