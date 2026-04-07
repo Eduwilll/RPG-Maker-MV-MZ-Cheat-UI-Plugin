@@ -7,6 +7,7 @@ output/
 tmp/
 tests/MV/*
 tests/MZ/*
+tests/XP/*
 __pycache__
 node_modules/
 docs/.vitepress/dist
