@@ -5,8 +5,7 @@ declare interface TranslationCacheEntry {
   source: string;
 }
 
-declare interface CheatDataEntry {
-  name?: string;
+declare interface CheatExtendedDataFields {
   description?: string;
   nickname?: string;
   profile?: string;
@@ -22,31 +21,31 @@ declare interface CheatDataEntry {
   _original_message2?: string;
   _original_message3?: string;
   _original_message4?: string;
+}
+
+declare interface CheatDataEntry extends CheatExtendedDataFields {
   [key: string]: any;
 }
 
-declare interface CheatMapInfoEntry {
-  name?: string;
+interface BaseData extends CheatExtendedDataFields {}
+interface DataActor extends CheatExtendedDataFields {}
+interface DataClass extends CheatExtendedDataFields {}
+interface DataEnemy extends CheatExtendedDataFields {}
+interface DataItem extends CheatExtendedDataFields {}
+interface DataWeapon extends CheatExtendedDataFields {}
+interface DataArmor extends CheatExtendedDataFields {}
+interface DataSkill extends CheatExtendedDataFields {}
+interface DataState extends CheatExtendedDataFields {}
+
+interface DataMapInfo {
   _originalName?: string;
+}
+
+declare interface CheatMapInfoEntry extends DataMapInfo {
   [key: string]: any;
 }
 
-declare interface CheatSystemTerms {
-  basic: string[];
-  commands: string[];
-  params: string[];
-  messages: Record<string, string>;
-}
-
-declare interface CheatSystemData {
-  gameTitle?: string;
-  variables: string[];
-  switches: string[];
-  armorTypes?: string[];
-  weaponTypes?: string[];
-  skillTypes?: string[];
-  elements?: string[];
-  terms: CheatSystemTerms;
+interface DataSystem {
   _originalTermsBasic?: string[];
   _originalTermsCommands?: string[];
   _originalTermsParams?: string[];
@@ -54,8 +53,10 @@ declare interface CheatSystemData {
   _originalGameTitle?: string;
   _originalVariables?: string[];
   _originalSwitches?: string[];
-  [key: string]: any;
 }
+
+declare interface CheatSystemTerms extends RPG.Terms {}
+declare interface CheatSystemData extends DataSystem {}
 
 declare interface TranslationBankLike {
   get(text: string): TranslationCacheEntry | null;
@@ -80,16 +81,6 @@ interface Window {
   TRANSLATION_BANK?: TranslationBankLike;
   TRANSLATE_SETTINGS?: TranslateSettingsLike;
   GeneralCheat?: GeneralCheatLike;
-  $dataItems?: Array<CheatDataEntry | null>;
-  $dataWeapons?: Array<CheatDataEntry | null>;
-  $dataArmors?: Array<CheatDataEntry | null>;
-  $dataSkills?: Array<CheatDataEntry | null>;
-  $dataStates?: Array<CheatDataEntry | null>;
-  $dataClasses?: Array<CheatDataEntry | null>;
-  $dataEnemies?: Array<CheatDataEntry | null>;
-  $dataActors?: Array<CheatDataEntry | null>;
-  $dataMapInfos?: Array<CheatMapInfoEntry | null>;
-  $dataSystem?: CheatSystemData;
 }
 
 declare module "nw.gui" {

@@ -17,7 +17,8 @@
   "include": [
     "cheat-engine/www/cheat/**/*.js",
     "preview/**/*.js",
-    "node_modules/@fenixengine/rmmz-ts/libs/**/*.d.ts",
+    "node_modules/@fenixengine/rmmz-ts/libs/external/**/*.d.ts",
+    "node_modules/@fenixengine/rmmz-ts/libs/rmmz/**/*.d.ts",
     "types/**/*.d.ts"
   ],
   "exclude": [

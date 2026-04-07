@@ -38,7 +38,11 @@ Used for preview, packaging, and dev-sync scripts.
 Phase 1 uses a lightweight TypeScript configuration for JavaScript projects:
 
 - `tsconfig.json` provides editor and `checkJs` groundwork without changing runtime packaging.
-- `types/` contains local declarations for RPG Maker globals, cheat-specific globals, and environment assumptions.
+- `@fenixengine/rmmz-ts` is already wired in as a development-only source of RPG Maker MZ engine declarations.
+- `types/` contains the local layer on top of that:
+  - MV compatibility gaps
+  - cheat-specific globals
+  - project-specific data augmentations used by translation and runtime patches
 - `@ts-check` is enabled file-by-file so we can improve safety incrementally instead of flooding the repo with errors all at once.
 - `pnpm run typecheck` is the main verification step for this foundation.
 
