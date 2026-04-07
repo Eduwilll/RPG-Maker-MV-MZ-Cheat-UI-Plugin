@@ -11,6 +11,7 @@ import TeleportPanel from "./panels/TeleportPanel.js";
 import MapEventPanel from "./panels/MapEventPanel.js";
 import ShortcutPanel from "./panels/ShortcutPanel.js";
 import TranslateSettingsPanel from "./panels/TranslateSettingsPanel.js";
+import AboutPanel from "./panels/AboutPanel.js";
 
 export default {
   name: "CheatModal",
@@ -29,6 +30,7 @@ export default {
     TeleportPanel,
     ShortcutPanel,
     TranslateSettingsPanel,
+    AboutPanel,
   },
 
   template: `
@@ -166,6 +168,11 @@ export default {
               name: "Translate",
               icon: "mdi-google-translate",
               component: "translate-settings-panel",
+            },
+            {
+              name: "About",
+              icon: "mdi-information-outline",
+              component: "about-panel",
             },
           ],
         },
