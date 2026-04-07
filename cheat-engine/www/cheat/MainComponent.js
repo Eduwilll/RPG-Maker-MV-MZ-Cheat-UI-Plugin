@@ -1,18 +1,11 @@
-// @ts-check
-
 import CheatModal from "./CheatModal.js";
 import { GLOBAL_SHORTCUT } from "./js/GlobalShortcut.js";
-import { GeneralCheat } from "./js/CheatGeneral.js";
+import { GeneralCheat } from "./js/CheatHelper.js";
 import AlertSnackbar from "./components/AlertSnackbar.js";
 import ConfirmDialog from "./components/ConfirmDialog.js";
 import { customizeRPGMakerFunctions } from "./init/customize_functions.js";
 import { Key } from "./js/KeyCodes.js";
 import { Alert } from "./js/AlertHelper.js";
-import {
-  getCheatRootDir,
-  getCheatVersionFilePath,
-  isDesktopRuntime,
-} from "./js/RuntimeEnv.js";
 
 export default {
   name: "MainComponent",
@@ -49,23 +42,19 @@ export default {
   },
 
   created() {
-    customizeRPGMakerFunctions(
-      /** @type {{ show: boolean }} */ (/** @type {unknown} */ (this)),
-    );
+    const self = this;
 
-    const cheatApi = /** @type {GeneralCheatLike} */ (
-      /** @type {unknown} */ (GeneralCheat)
-    );
+    customizeRPGMakerFunctions(self);
 
-    cheatApi.toggleCheatModal = (componentName = null) => {
+    GeneralCheat.toggleCheatModal = (componentName = null) => {
       this.toggleCheatModal(componentName);
     };
 
-    cheatApi.openCheatModal = (componentName = null) => {
+    GeneralCheat.openCheatModal = (componentName = null) => {
       this.openCheatModal(componentName);
     };
 
-    cheatApi.openCheatWindow = (componentName = null) => {
+    GeneralCheat.openCheatWindow = (componentName = null) => {
       this.openCheatWindow(componentName);
     };
 
@@ -88,10 +77,6 @@ export default {
   },
 
   methods: {
-    /**
-     * @param {KeyboardEvent} e
-     * @returns {void}
-     */
     onGlobalKeyDown(e) {
       if (e.repeat) {
         GLOBAL_SHORTCUT.runKeyRepeatEvent(e, Key.fromKey(this.currentKey));
@@ -99,24 +84,52 @@ export default {
         GLOBAL_SHORTCUT.runKeyLeaveEvent(e, Key.fromKey(this.currentKey));
         this.currentKey.add(e.keyCode);
         this.currentKey.adjustCombiningKey(e);
-        GLOBAL_SHORTCUT.runKeyEnterEvent(e, Key.fromKey(this.currentKey));
+        const key = Key.fromKey(this.currentKey);
+        const handled = GLOBAL_SHORTCUT.runKeyEnterEvent(e, key);
+        if (!handled) {
+          this.runOverlayShortcutFallback(e, key);
+        }
       }
     },
 
-    /**
-     * @param {KeyboardEvent} e
-     * @returns {void}
-     */
     onGlobalKeyUp(e) {
       GLOBAL_SHORTCUT.runKeyLeaveEvent(e, Key.fromKey(this.currentKey));
       this.currentKey.remove(e.keyCode);
       GLOBAL_SHORTCUT.runKeyEnterEvent(e, Key.fromKey(this.currentKey));
     },
 
-    /**
-     * @param {string | null} [componentName]
-     * @returns {void}
-     */
+    runOverlayShortcutFallback(e, key) {
+      const fallbackShortcuts = [
+        {
+          id: "toggleCheatModal",
+          action: () => this.toggleCheatModal(),
+        },
+        {
+          id: "toggleCheatModalToSaveLocationComponent",
+          action: () => this.toggleCheatModal("save-recall-panel"),
+        },
+        {
+          id: "toggleCheatModalToMapEventComponent",
+          action: () => this.toggleCheatModal("map-event-panel"),
+        },
+      ];
+
+      for (const shortcut of fallbackShortcuts) {
+        try {
+          const configuredKey = GLOBAL_SHORTCUT.getShortcut(shortcut.id);
+          if (configuredKey && configuredKey.equals(key)) {
+            shortcut.action();
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+            return true;
+          }
+        } catch (error) {}
+      }
+
+      return false;
+    },
+
     openCheatModal(componentName) {
       if (componentName) {
         this.currentComponentName = componentName;
@@ -125,10 +138,6 @@ export default {
       this.show = true;
     },
 
-    /**
-     * @param {string | null} [componentName]
-     * @returns {void}
-     */
     toggleCheatModal(componentName) {
       const prevComponentName = this.currentComponentName;
 
@@ -149,31 +158,25 @@ export default {
       this.show = true;
     },
 
-    /**
-     * @param {string | null} [componentName]
-     * @returns {void}
-     */
     openCheatWindow(componentName = null) {
-      const cheatApi = /** @type {GeneralCheatLike} */ (
-        /** @type {unknown} */ (GeneralCheat)
-      );
-
-      if (!isDesktopRuntime()) {
+      if (!Utils.isNwjs()) {
         Alert.error("Separate window mode only works in NW.js (PC version).");
         this.openCheatModal(componentName);
         return;
       }
 
-      if (cheatApi.__cheatWindow && !cheatApi.__cheatWindow.closed) {
-        cheatApi.__cheatWindow.focus();
+      if (GeneralCheat.__cheatWindow && !GeneralCheat.__cheatWindow.closed) {
+        GeneralCheat.__cheatWindow.focus();
         return;
       }
 
       // Hide the overlay if it was open
       this.show = false;
 
+      const targetDir = Utils.RPGMAKER_NAME === "MV" ? "www/cheat/" : "cheat/";
+
       nw.Window.open(
-        getCheatRootDir() + "window.html",
+        targetDir + "window.html",
         {
           title: "RPG Maker Cheat Engine",
           width: 700,
@@ -183,16 +186,16 @@ export default {
           always_on_top: false,
         },
         (win) => {
-          cheatApi.__cheatWindow = win.window;
+          GeneralCheat.__cheatWindow = win.window;
           win.on("closed", () => {
-            cheatApi.__cheatWindow = null;
+            GeneralCheat.__cheatWindow = null;
           });
         },
       );
     },
 
     async checkVersion() {
-      if (!isDesktopRuntime()) {
+      if (!Utils.isNwjs()) {
         return;
       }
 
@@ -221,8 +224,13 @@ export default {
 
     getCurrentCheatVersion() {
       try {
+        const targetDir = Utils.RPGMAKER_NAME === "MV" ? "www" : ".";
+
         const description = JSON.parse(
-          require("fs").readFileSync(getCheatVersionFilePath(), "utf-8"),
+          require("fs").readFileSync(
+            targetDir + "/cheat-version-description.json",
+            "utf-8",
+          ),
         );
 
         return description.version;

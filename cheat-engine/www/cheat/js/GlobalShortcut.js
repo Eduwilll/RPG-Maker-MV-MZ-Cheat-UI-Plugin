@@ -3,8 +3,8 @@
 import { Alert } from "./AlertHelper.js";
 import { Key } from "./KeyCodes.js";
 import { ShortcutMap } from "./ShortcutHelper.js";
-import { migrateShortcutSettings } from "./ShortcutMigration.js";
-import { ShortcutStorage } from "./ShortcutStorage.js";
+import { migrateShortcutSettings } from "./shortcuts/ShortcutMigration.js";
+import { ShortcutStorage } from "./shortcuts/ShortcutStorage.js";
 import {
   defaultShortcutSettings,
   isInValueInRange,
@@ -12,7 +12,7 @@ import {
   parseStringToKeyObject,
   shortcutConfig,
   ShortcutConfig,
-} from "./ShortcutConfig.js";
+} from "./shortcuts/ShortcutConfig.js";
 
 export {
   defaultShortcutSettings,
@@ -21,7 +21,7 @@ export {
   parseStringToKeyObject,
   shortcutConfig,
   ShortcutConfig,
-} from "./ShortcutConfig.js";
+} from "./shortcuts/ShortcutConfig.js";
 
 class GlobalShortcut {
   constructor() {
@@ -93,7 +93,10 @@ class GlobalShortcut {
       e.preventDefault();
       e.stopImmediatePropagation();
       e.stopPropagation();
+      return true;
     }
+
+    return false;
   }
 
   runKeyRepeatEvent(e, key) {
@@ -101,7 +104,10 @@ class GlobalShortcut {
       e.preventDefault();
       e.stopImmediatePropagation();
       e.stopPropagation();
+      return true;
     }
+
+    return false;
   }
 
   runKeyLeaveEvent(e, key) {
@@ -109,7 +115,10 @@ class GlobalShortcut {
       e.preventDefault();
       e.stopImmediatePropagation();
       e.stopPropagation();
+      return true;
     }
+
+    return false;
   }
 
   /**
