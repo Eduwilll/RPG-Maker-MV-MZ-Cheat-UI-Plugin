@@ -45,6 +45,7 @@ Phase 1 uses a lightweight TypeScript configuration for JavaScript projects:
   - project-specific data augmentations used by translation and runtime patches
 - `@ts-check` is enabled file-by-file so we can improve safety incrementally instead of flooding the repo with errors all at once.
 - `pnpm run typecheck` is the main verification step for this foundation.
+- `pnpm run check:mv-compat` scans the cheat runtime for newer syntax and array helpers that have caused older MV NW.js regressions before.
 
 The translation subsystem was also split into smaller contributor-focused modules during this phase:
 

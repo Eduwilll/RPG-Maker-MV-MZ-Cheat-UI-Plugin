@@ -255,12 +255,14 @@ export async function collectTranslationTargets(targets, progress) {
   const extractText = (arr) =>
     arr
       .filter((item) => item)
-      .flatMap((item) => [item.name, item.description].filter(Boolean));
+      .reduce((texts, item) => {
+        return texts.concat([item.name, item.description].filter(Boolean));
+      }, []);
 
   const extractTextFull = (arr) =>
     arr
       .filter((item) => item)
-      .flatMap((item) => {
+      .reduce((allTexts, item) => {
         const texts = [
           item.name,
           item.description,
@@ -270,8 +272,8 @@ export async function collectTranslationTargets(targets, progress) {
         for (let m = 1; m <= 4; m++) {
           if (item[`message${m}`]) texts.push(item[`message${m}`]);
         }
-        return texts.filter(Boolean);
-      });
+        return allTexts.concat(texts.filter(Boolean));
+      }, []);
 
   if (targets.items && window.$dataItems) {
     toTranslate.push({ type: "Items", list: extractText(window.$dataItems) });
