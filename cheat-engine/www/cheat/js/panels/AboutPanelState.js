@@ -13,6 +13,7 @@ import {
   isDesktopRuntime,
   isMvProject,
 } from "../runtime/RuntimeEnv.js";
+import { CHEAT_DIAGNOSTICS } from "../runtime/CheatDiagnostics.js";
 
 /**
  * @typedef {object} AboutPanelState
@@ -47,6 +48,11 @@ import {
  * @property {number} translationChunkSize
  * @property {number} translationBankEntries
  * @property {string[]} enabledTranslationTargets
+ * @property {string} diagnosticsLogPath
+ * @property {number} diagnosticsEntryCount
+ * @property {string} diagnosticsSessionId
+ * @property {string} latestDiagnosticsError
+ * @property {string} recentDiagnosticsText
  */
 
 const ABOUT_PANEL_PATHS = {
@@ -305,6 +311,11 @@ export function readAboutPanelState() {
     translationChunkSize: TRANSLATE_SETTINGS.getBulkTranslateChunkSize(),
     translationBankEntries: translationStats.totalEntries,
     enabledTranslationTargets: enabledTargets,
+    diagnosticsLogPath: CHEAT_DIAGNOSTICS.getLogFilePath(),
+    diagnosticsEntryCount: CHEAT_DIAGNOSTICS.getEntryCount(),
+    diagnosticsSessionId: CHEAT_DIAGNOSTICS.sessionId,
+    latestDiagnosticsError: CHEAT_DIAGNOSTICS.getLatestErrorText(),
+    recentDiagnosticsText: CHEAT_DIAGNOSTICS.getRecentLogText(20),
   };
 }
 
@@ -340,6 +351,12 @@ export function buildAboutPanelSummary(state) {
     "Chunk Size: " + state.translationChunkSize,
     "Cache Entries: " + state.translationBankEntries,
     "Targets: " + state.enabledTranslationTargets.join(", "),
+    "",
+    "[Diagnostics]",
+    "Session: " + state.diagnosticsSessionId,
+    "Log Path: " + state.diagnosticsLogPath,
+    "Entry Count: " + state.diagnosticsEntryCount,
+    "Latest Error: " + state.latestDiagnosticsError,
     "",
     "[Paths]",
     "Cheat Version File: " + state.cheatVersionPath,

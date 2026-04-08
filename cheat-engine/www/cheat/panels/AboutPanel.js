@@ -46,6 +46,10 @@ export default {
             <v-icon small left>mdi-content-copy</v-icon>
             Copy Summary
         </v-btn>
+        <v-btn small color="secondary" class="ml-2" @click="copyDiagnostics">
+            <v-icon small left>mdi-file-document-outline</v-icon>
+            Copy Diagnostics
+        </v-btn>
     </v-card-text>
 
     <v-card-subtitle class="pb-0 font-weight-bold">Cheat</v-card-subtitle>
@@ -96,6 +100,18 @@ export default {
         </v-simple-table>
     </v-card-text>
 
+    <v-card-subtitle class="pb-0 font-weight-bold">Diagnostics</v-card-subtitle>
+    <v-card-text class="pt-0 pb-2">
+        <v-simple-table dense>
+            <tbody>
+                <tr v-for="row in diagnosticsRows" :key="'diagnostics-' + row.label">
+                    <td class="caption font-weight-bold pr-4" style="width: 180px;">{{row.label}}</td>
+                    <td class="caption" style="word-break: break-word;">{{row.value}}</td>
+                </tr>
+            </tbody>
+        </v-simple-table>
+    </v-card-text>
+
     <v-card-subtitle class="pb-0 font-weight-bold">Paths</v-card-subtitle>
     <v-card-text class="pt-0 pb-2">
         <v-simple-table dense>
@@ -112,6 +128,19 @@ export default {
     <v-card-text class="pt-0">
         <v-textarea
             :value="summaryText"
+            readonly
+            auto-grow
+            solo
+            dense
+            hide-details
+            background-color="grey darken-3">
+        </v-textarea>
+    </v-card-text>
+
+    <v-card-subtitle class="pb-0 font-weight-bold">Recent Diagnostics</v-card-subtitle>
+    <v-card-text class="pt-0">
+        <v-textarea
+            :value="diagnosticsText"
             readonly
             auto-grow
             solo
@@ -187,6 +216,21 @@ export default {
       ];
     },
 
+    diagnosticsRows() {
+      return [
+        { label: "Session", value: this.info.diagnosticsSessionId },
+        {
+          label: "Entry Count",
+          value: String(this.info.diagnosticsEntryCount),
+        },
+        { label: "Log Path", value: this.info.diagnosticsLogPath },
+        {
+          label: "Latest Error",
+          value: this.info.latestDiagnosticsError,
+        },
+      ];
+    },
+
     pathRows() {
       return [
         { label: "Cheat Root", value: this.info.cheatRootDir },
@@ -206,6 +250,10 @@ export default {
     summaryText() {
       return buildAboutPanelSummary(this.info);
     },
+
+    diagnosticsText() {
+      return this.info.recentDiagnosticsText || "No diagnostics recorded yet.";
+    },
   },
 
   methods: {
@@ -214,8 +262,14 @@ export default {
     },
 
     copySummary() {
-      const text = this.summaryText;
+      this.copyText(this.summaryText, "About summary copied");
+    },
 
+    copyDiagnostics() {
+      this.copyText(this.diagnosticsText, "Diagnostics copied");
+    },
+
+    copyText(text, successMessage) {
       if (
         navigator.clipboard &&
         typeof navigator.clipboard.writeText === "function"
@@ -223,18 +277,18 @@ export default {
         navigator.clipboard
           .writeText(text)
           .then(() => {
-            Alert.success("About summary copied");
+            Alert.success(successMessage);
           })
           .catch(() => {
-            this.copySummaryLegacy(text);
+            this.copySummaryLegacy(text, successMessage);
           });
         return;
       }
 
-      this.copySummaryLegacy(text);
+      this.copySummaryLegacy(text, successMessage);
     },
 
-    copySummaryLegacy(text) {
+    copySummaryLegacy(text, successMessage) {
       const textarea = document.createElement("textarea");
       textarea.value = text;
       textarea.setAttribute("readonly", "readonly");
@@ -246,9 +300,9 @@ export default {
 
       try {
         document.execCommand("copy");
-        Alert.success("About summary copied");
+        Alert.success(successMessage);
       } catch (error) {
-        Alert.error("Failed to copy about summary");
+        Alert.error("Failed to copy text");
       }
 
       document.body.removeChild(textarea);

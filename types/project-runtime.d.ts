@@ -75,12 +75,21 @@ declare interface GeneralCheatLike {
   [key: string]: any;
 }
 
+declare interface CheatDiagnosticsLike {
+  sessionId: string;
+  getLogFilePath(): string;
+  getEntryCount(): number;
+  getLatestErrorText(): string;
+  getRecentLogText(limit?: number): string;
+}
+
 declare var event: WheelEvent;
 
 interface Window {
   TRANSLATION_BANK?: TranslationBankLike;
   TRANSLATE_SETTINGS?: TranslateSettingsLike;
   GeneralCheat?: GeneralCheatLike;
+  CHEAT_DIAGNOSTICS?: CheatDiagnosticsLike;
 }
 
 declare module "nw.gui" {

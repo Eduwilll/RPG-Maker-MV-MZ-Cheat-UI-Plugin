@@ -6,7 +6,10 @@
 import "../libs/vue.js";
 import "../libs/vuetify.js";
 
+import { initializeCheatDiagnostics } from "../js/runtime/CheatDiagnostics.js";
 import MainComponent from "../MainComponent.js";
+
+initializeCheatDiagnostics("overlay");
 
 // initialize vue
 new Vue({
