@@ -49,25 +49,25 @@ export class SceneCheat {
       return true;
     }
 
-    if (
-      currentScene.constructor === Scene_Map &&
-      (($gameMessage &&
-        typeof $gameMessage.isBusy === "function" &&
-        $gameMessage.isBusy()) ||
-        ($gameMap &&
-          typeof $gameMap.isEventRunning === "function" &&
-          $gameMap.isEventRunning()))
-    ) {
-      return true;
-    }
+    // this function block load and save while event is running
+    // if (
+    //   currentScene.constructor === Scene_Map &&
+    //   (($gameMessage &&
+    //     typeof $gameMessage.isBusy === "function" &&
+    //     $gameMessage.isBusy()) ||
+    //     ($gameMap &&
+    //       typeof $gameMap.isEventRunning === "function" &&
+    //       $gameMap.isEventRunning()))
+    // ) {
+    //   return true;
+    // }
 
     return false;
   }
 
   static warnSceneTransitionLocked(actionName) {
     Alert.warn(
-      actionName +
-        " is unavailable while a message, event, or scene transition is running.",
+      actionName + " is unavailable while a scene transition is running.",
     );
   }
 
