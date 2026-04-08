@@ -134,7 +134,7 @@ def merge_directory(src, dest, inplace=True):
 def create_cheat_version_file(version, paths):
     with open(os.path.join(paths.temp.root_dir, 'cheat-version-description.json'), 'w') as wf:
         data = {
-            'version': f'v{version}'
+            'version': f'{version}'
         }
         json.dump(data, wf, indent=2)
 
