@@ -21,6 +21,7 @@ declare interface AxiosLike {
 declare interface UtilsLike {
   RPGMAKER_NAME: EngineName;
   isNwjs(): boolean;
+  isOptionValid?(name: string): boolean;
 }
 
 declare interface MvTouchInputLike {
