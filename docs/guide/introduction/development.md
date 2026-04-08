@@ -110,6 +110,16 @@ Use this when you need to validate behavior inside an actual RPG Maker MV or MZ 
 ```
 :::
 
+### Validate an existing dev-sync target
+
+Use this when you want to confirm that a game still has the expected cheat bootstrap files without rewriting the target.
+
+::: code-group
+```sh [.py]
+.venv\Scripts\python.exe deploy\dev.py --game-path "C:/Games/MyTestGame" --validate-only
+```
+:::
+
 ### What dev-sync does
 
 - Detects whether the target is MV or MZ
@@ -117,6 +127,7 @@ Use this when you need to validate behavior inside an actual RPG Maker MV or MZ 
 - Merges support files into the target game
 - Links the source `cheat/` folder into the game
 - Writes a development version descriptor
+- Validates that the cheat bootstrap files are reachable after sync
 
 ### Typical edit loop
 
