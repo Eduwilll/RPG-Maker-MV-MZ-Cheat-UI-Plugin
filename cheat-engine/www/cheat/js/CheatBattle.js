@@ -7,8 +7,77 @@ export class SceneCheat {
     SceneManager.goto(Scene_Title);
   }
 
+  static getSceneManagerRuntime() {
+    return /** @type {any} */ (SceneManager);
+  }
+
+  static getCurrentScene() {
+    return this.getSceneManagerRuntime()._scene;
+  }
+
+  static isFileScene(scene) {
+    return (
+      !!scene &&
+      (scene.constructor === Scene_Save || scene.constructor === Scene_Load)
+    );
+  }
+
+  static isSceneTransitionLocked() {
+    const currentScene = this.getCurrentScene();
+
+    if (!currentScene) {
+      return false;
+    }
+
+    if (this.isFileScene(currentScene)) {
+      return false;
+    }
+
+    const sceneManager = this.getSceneManagerRuntime();
+
+    if (
+      typeof sceneManager.isSceneChanging === "function" &&
+      sceneManager.isSceneChanging()
+    ) {
+      return true;
+    }
+
+    if (
+      typeof sceneManager.isCurrentSceneBusy === "function" &&
+      sceneManager.isCurrentSceneBusy()
+    ) {
+      return true;
+    }
+
+    if (
+      currentScene.constructor === Scene_Map &&
+      (($gameMessage &&
+        typeof $gameMessage.isBusy === "function" &&
+        $gameMessage.isBusy()) ||
+        ($gameMap &&
+          typeof $gameMap.isEventRunning === "function" &&
+          $gameMap.isEventRunning()))
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  static warnSceneTransitionLocked(actionName) {
+    Alert.warn(
+      actionName +
+        " is unavailable while a message, event, or scene transition is running.",
+    );
+  }
+
   static toggleSaveScene() {
-    const currentScene = /** @type {any} */ (SceneManager)._scene;
+    const currentScene = this.getCurrentScene();
+    if (this.isSceneTransitionLocked()) {
+      this.warnSceneTransitionLocked("Save screen");
+      return false;
+    }
+
     if (currentScene.constructor === Scene_Save) {
       SceneManager.pop();
     } else if (currentScene.constructor === Scene_Load) {
@@ -16,10 +85,17 @@ export class SceneCheat {
     } else {
       SceneManager.push(Scene_Save);
     }
+
+    return true;
   }
 
   static toggleLoadScene() {
-    const currentScene = /** @type {any} */ (SceneManager)._scene;
+    const currentScene = this.getCurrentScene();
+    if (this.isSceneTransitionLocked()) {
+      this.warnSceneTransitionLocked("Load screen");
+      return false;
+    }
+
     if (currentScene.constructor === Scene_Load) {
       SceneManager.pop();
     } else if (currentScene.constructor === Scene_Save) {
@@ -27,6 +103,8 @@ export class SceneCheat {
     } else {
       SceneManager.push(Scene_Load);
     }
+
+    return true;
   }
 
   static quickSave(slot = 1) {
