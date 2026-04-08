@@ -3,7 +3,7 @@
 // customize mv functions
 import { MessageCheat } from "../js/CheatSpeed.js";
 import { IN_GAME_TRANSLATOR } from "../js/InGameTranslator.js";
-import { isMvProject } from "../js/RuntimeEnv.js";
+import { isMvProject } from "../js/runtime/RuntimeEnv.js";
 
 /**
  * Apply runtime patches needed for the overlay to coexist with RPG Maker.

@@ -1,6 +1,6 @@
 // @ts-check
 
-import { KeyValueStorage } from "./KeyValueStorage.js";
+import { KeyValueStorage } from "./storage/KeyValueStorage.js";
 
 export class GameSpeedCheat {
   static sceneOptions() {
