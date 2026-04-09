@@ -22,7 +22,7 @@ export default {
         :items="items"
         :headers="headers"
         :as-table-data="convertToTableData"
-        :searchable-attrs="['name', 'desc']">
+        :searchable-attrs="['name', 'desc', 'params']">
         
     </item-table-tab>
 </v-card>
@@ -40,6 +40,10 @@ export default {
         {
           text: "Description",
           value: "desc",
+        },
+        {
+          text: "Params",
+          value: "params",
         },
       ],
     };

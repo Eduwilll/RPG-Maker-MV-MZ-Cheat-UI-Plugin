@@ -8,6 +8,10 @@
 export function readItemTableTabState(headers, items, asTableData) {
   const tableHeaders = headers.slice(0);
   tableHeaders.push({
+    text: "Price",
+    value: "price",
+  });
+  tableHeaders.push({
     text: "Amount",
     value: "amount",
   });

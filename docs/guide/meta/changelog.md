@@ -1,6 +1,16 @@
 # Changelog
 
-## v1.3.0 - Latest
+## v1.3.1 - Latest
+
+### Inventory UI Improvements
+- [Feat] **Inventory Price Toggle**: Added an optional `Price` column for item, weapon, and armor tables.
+- [Feat] **Inventory Detail Columns**: Added optional `Effects` and `Params` columns with compact two-line previews and tooltips.
+- [Fix] **Inventory Sorting**: Improved `Effects` and `Params` sorting so high-value entries sort by numeric strength instead of raw text.
+- [Tweak] **Version Bump**: Bumped version to `1.3.1`.
+
+---
+
+## v1.3.0
 
 ### Stability & Compatibility
 - [Fix] **RPG Maker MV Compatibility**: Restored support for older MV NW.js runtimes by removing parser-incompatible syntax and hardening legacy bootstrap behavior.
@@ -18,7 +28,6 @@
 - [Refactor] **Translation Runtime**: Split translation runtime into focused modules and organized in-game translation files under the translation domain.
 - [Refactor] **Cheat & Shortcut Domains**: Organized cheat actions, shortcuts, runtime, storage, and UI helpers into clearer subsystem folders.
 - [Refactor] **Panel State Layer**: Introduced dedicated state modules for major panels and clarified the panel view/state architecture.
-- [Tweak] **Version Bump**: Bumped version to `1.3.0`.
 
 ---
 
