@@ -39,6 +39,12 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 - **[Full Engine Reference](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/features)**
 - **[Keyboard Shortcuts](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/shortcuts)**
 
+### Latest Release: v1.3.0
+- MV compatibility and legacy NW.js bootstrap fixes
+- New About panel and runtime diagnostics logging
+- Large internal refactor for translation, shortcuts, cheats, and panel state
+- Better deploy/dev validation and smoke-testing workflow
+
 ---
 
 ## 📸 UI Samples

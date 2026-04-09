@@ -1,6 +1,28 @@
 # Changelog
 
-## v1.2.2 — Latest
+## v1.3.0 - Latest
+
+### Stability & Compatibility
+- [Fix] **RPG Maker MV Compatibility**: Restored support for older MV NW.js runtimes by removing parser-incompatible syntax and hardening legacy bootstrap behavior.
+- [Fix] **Overlay Reliability**: Restored cheat modal shortcut wiring and improved overlay startup behavior across MV and MZ games.
+- [Fix] **Panel Stability**: Fixed General panel runtime sync issues and stopped Save Recall from triggering live translation requests on open.
+- [Fix] **Shortcuts & Scene Safety**: Improved save/load and general shortcut behavior during scene transitions and busy runtime states.
+
+### Diagnostics & Tooling
+- [Feat] **About Panel**: Added a runtime diagnostics panel with cheat, game, engine, translation, and environment details.
+- [Feat] **Diagnostics Logging**: Added runtime logging, session diagnostics, and support-oriented troubleshooting details.
+- [Feat] **Repository Checks**: Added MV compatibility scanning, smoke-testing guidance, and a combined repo verification workflow.
+- [Feat] **Deploy Validation**: Added deploy/dev-sync validation checks and improved packaging/version handling.
+
+### Architecture & Maintainability
+- [Refactor] **Translation Runtime**: Split translation runtime into focused modules and organized in-game translation files under the translation domain.
+- [Refactor] **Cheat & Shortcut Domains**: Organized cheat actions, shortcuts, runtime, storage, and UI helpers into clearer subsystem folders.
+- [Refactor] **Panel State Layer**: Introduced dedicated state modules for major panels and clarified the panel view/state architecture.
+- [Tweak] **Version Bump**: Bumped version to `1.3.0`.
+
+---
+
+## v1.2.2
 
 ### Metadata & Maintenance
 - [Tweak] **Project Keywords**: Added `"translation-tool"` and `"cheat-engine-program"` for better discoverability.
@@ -96,7 +118,7 @@
 - **Automated Releases**: New CI/CD pipeline that automatically builds and packages MV/MZ versions when tags are pushed.
 
 **Bug Fixes**
-- **Repo URL Correction**: Fixed the GitHub API path for version checking (Eduwill → Eduwilll).
+- **Repo URL Correction**: Fixed the GitHub API path for version checking (Eduwill -> Eduwilll).
 - **404 Handling**: Improved node rotation logic to gracefully handle 404/500 errors from specific failover endpoints.
 - **I/O Bottleneck**: Resolved a major performance hit caused by synchronous disk writes in the translation bank.
 - **Public API Stability**: Enhanced rate-limit handling (429 errors) with exponential backoff and 1.5s request gaps.
@@ -119,7 +141,7 @@
 ## v1.0.3
 
 - Added support for RPG Maker MZ games
-- Added game speed acceleration (×0.1 ~ ×10)
+- Added game speed acceleration (x0.1 ~ x10)
 - Added selectable speed scope: all scenes or battle only
 - Added random encounter on/off toggle
 - Added force encounter option
