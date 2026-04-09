@@ -18,6 +18,9 @@ Read these pages first:
 - [Development and Test](/guide/introduction/development)
 - [Architecture](/guide/technical/architecture)
 - [Repository Structure](/guide/technical/repository-structure)
+- [Roadmap](/guide/technical/roadmap)
+- [Panel Conventions](/guide/technical/panel-conventions)
+- [Shortcut Conventions](/guide/technical/shortcut-conventions)
 - [Runtime and Data Flow](/guide/technical/runtime-and-data-flow)
 
 ## Reporting bugs

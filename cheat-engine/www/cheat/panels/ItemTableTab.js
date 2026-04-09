@@ -1,3 +1,9 @@
+import {
+  coercePanelNumber,
+  matchesPanelSearch,
+} from "../js/panels/PanelGameState.js";
+import { readItemTableTabState } from "../js/panels/inventory/ItemTableTabState.js";
+
 export default {
   name: "ItemTableTab",
 
@@ -146,27 +152,23 @@ export default {
 
   methods: {
     initializeVariables() {
-      this.tableHeaders = this.headers.slice(0);
-      this.tableHeaders.push({
-        text: "Amount",
-        value: "amount",
-      });
-
-      this.tableItems = this.items
-        .filter((item) => !!item)
-        .map((item) => {
-          const tableItem = this.asTableData(item);
-          tableItem._item = item;
-          tableItem.amount = $gameParty.numItems(item);
-
-          return tableItem;
-        });
+      const state = readItemTableTabState(
+        this.headers,
+        this.items,
+        this.asTableData,
+      );
+      this.tableHeaders = state.tableHeaders;
+      this.tableItems = state.tableItems;
     },
 
     onItemChange(item, newValue) {
       // modify amount
       if (newValue !== undefined) {
-        item.amount = Number(newValue) || 0;
+        item.amount = coercePanelNumber(newValue, {
+          fallback: item.amount,
+          integer: true,
+          min: 0,
+        });
       }
 
       const diff = item.amount - $gameParty.numItems(item._item);
@@ -179,18 +181,10 @@ export default {
     onTableFilterChange() {},
 
     tableItemFilter(value, search, item) {
-      if (search === null || search.trim() === "") {
-        return true;
-      }
-
-      search = search.toLowerCase();
-      for (const attr of this.searchableAttrs) {
-        if (item[attr] && item[attr].toLowerCase().includes(search)) {
-          return true;
-        }
-      }
-
-      return false;
+      return matchesPanelSearch(
+        search,
+        this.searchableAttrs.map((attr) => item[attr]),
+      );
     },
   },
 };

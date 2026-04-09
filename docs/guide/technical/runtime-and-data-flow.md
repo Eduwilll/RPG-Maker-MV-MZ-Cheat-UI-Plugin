@@ -30,7 +30,10 @@ Global shortcuts are handled centrally.
 
 - Keydown and keyup events are captured by `MainComponent`.
 - Events are normalized into the internal key model.
-- `GlobalShortcut` and related helpers decide whether a shortcut should fire.
+- `ShortcutConfig.js` defines the shortcut catalog, parameter rules, and bound actions.
+- `ShortcutPanelState.js` shapes runtime shortcut data into panel-safe view rows.
+- `ShortcutStorage.js` handles persisted shortcut settings.
+- `GlobalShortcut.js` loads those mappings and decides whether a shortcut should fire.
 - The target action can open the overlay, switch panels, or trigger a gameplay helper.
 
 Because shortcuts are global, contributors should be careful to avoid conflicts with base game controls.
@@ -98,9 +101,18 @@ The translator:
 
 - checks the selected endpoint
 - removes already-cached strings
-- batches the remaining strings
-- sends requests to the configured service
+- builds one deduplicated uncached pool from the selected target groups
+- runs category-by-category translation work while updating progress state
+- batches the remaining strings through focused helpers
+- sends requests to the configured service through endpoint-specific request modules
 - stores the result in the translation bank
+
+Key split modules in this flow:
+
+- `TranslateHelper.js` coordinates the overall translation workflow.
+- `TranslationBatching.js` handles chunk sizing, batch grouping, and recursive batch fallback.
+- `TranslationBasicRequest.js`, `TranslationLingvaRequest.js`, and `TranslationLlmRequest.js` handle endpoint-family-specific requests.
+- `TranslationPool.js` and `TranslationWorkflow.js` handle uncached-pool construction and per-target progress flow.
 
 Supported endpoint families visible in the repo include:
 
@@ -111,7 +123,7 @@ Supported endpoint families visible in the repo include:
 
 ### Phase 3: apply cached translations
 
-`InGameTranslator.js` applies the cached results by:
+`translation/in-game/InGameTranslator.js` applies the cached results by:
 
 - patching RPG Maker data arrays
 - intercepting dialogue windows

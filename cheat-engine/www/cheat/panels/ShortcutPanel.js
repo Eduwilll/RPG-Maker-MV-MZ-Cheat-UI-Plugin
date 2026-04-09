@@ -1,7 +1,9 @@
 import KeyInputField from "../components/KeyInputField.js";
-import { GLOBAL_SHORTCUT } from "../js/GlobalShortcut.js";
-import { Key } from "../js/KeyCodes.js";
+import { GLOBAL_SHORTCUT } from "../js/shortcuts/GlobalShortcut.js";
+import { Key } from "../js/shortcuts/KeyCodes.js";
 import { Alert } from "../js/AlertHelper.js";
+import { matchesPanelSearch } from "../js/panels/PanelGameState.js";
+import { buildShortcutPanelItems } from "../js/shortcuts/ShortcutPanelState.js";
 
 export default {
   name: "ShortcutPanel",
@@ -243,54 +245,19 @@ export default {
       item.param[paramId].value = GLOBAL_SHORTCUT.getParam(item.id, paramId);
     },
 
-    convertToInternalData(settings, config) {
-      const param = {};
-
-      if (settings.param) {
-        for (const paramName of Object.keys(settings.param)) {
-          param[paramName] = {
-            id: paramName,
-            value: settings.param[paramName],
-          };
-        }
-      }
-
-      return {
-        id: config.id,
-        name: config.name,
-        desc: config.desc,
-        necessary: config.necessary,
-        combiningKeyAlone: config.combiningKeyAlone,
-        paramDesc: config.param,
-
-        // use deep copy of settings
-        shortcut: Key.fromKey(settings.shortcut),
-        param: param,
-      };
-    },
-
     initializeVariables() {
-      this.shortcuts = Object.keys(GLOBAL_SHORTCUT.shortcutConfig).map(
-        (key) => {
-          return this.convertToInternalData(
-            GLOBAL_SHORTCUT.shortcutSettings[key],
-            GLOBAL_SHORTCUT.shortcutConfig[key],
-          );
-        },
+      this.shortcuts = buildShortcutPanelItems(
+        GLOBAL_SHORTCUT.shortcutSettings,
+        GLOBAL_SHORTCUT.shortcutConfig,
       );
     },
 
     tableItemFilter(value, search, item) {
-      if (search === null || search.trim() === "") {
-        return true;
-      }
-
-      search = search.toLowerCase();
-      return (
-        item.name.toLowerCase().contains(search) ||
-        item.desc.toLowerCase().contains(search) ||
-        item.shortcut.asDisplayString().toLowerCase().contains(search)
-      );
+      return matchesPanelSearch(search, [
+        item.name,
+        item.desc,
+        item.shortcut.asDisplayString(),
+      ]);
     },
   },
 };

@@ -3,6 +3,8 @@
  * Original feature from Justype fork (https://github.com/Justype/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
  * 2024-03-20
  */
+import { coercePanelNumber } from "../js/panels/PanelGameState.js";
+
 export default {
   name: "MapEventPanel",
 
@@ -197,9 +199,12 @@ export default {
     },
     readInterval(newValue) {
       // Validate interval (100-1000ms)
-      let valid = parseInt(newValue);
-      if (isNaN(valid) || valid < 100) valid = 100;
-      if (valid > 1000) valid = 1000;
+      const valid = coercePanelNumber(newValue, {
+        fallback: this.readInterval,
+        integer: true,
+        min: 100,
+        max: 1000,
+      });
       if (valid !== this.readInterval) {
         this.readInterval = valid;
       }

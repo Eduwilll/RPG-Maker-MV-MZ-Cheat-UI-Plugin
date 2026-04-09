@@ -1,9 +1,16 @@
 import {
   TRANSLATE_SETTINGS,
-  TRANSLATOR,
-  TRANSLATION_BANK,
   TRANSLATE_PROGRESS,
 } from "../js/TranslateHelper.js";
+import {
+  matchesPanelSearch,
+  refreshPanelState,
+} from "../js/panels/PanelGameState.js";
+import {
+  attachTranslateRefresh,
+  detachTranslateRefresh,
+  getTranslatedPanelText,
+} from "../js/panels/PanelTranslation.js";
 
 export default {
   name: "VariableSettingPanel",
@@ -110,23 +117,13 @@ export default {
 
   created() {
     this.initializeVariables();
-
-    // Listen for global translation trigger
-    this._translateListener = () => {
-      if (TRANSLATE_SETTINGS.isVariableTranslateEnabled()) {
-        this.manualRefresh();
-      }
-    };
-    window.addEventListener("cheat-translate-finish", this._translateListener);
+    attachTranslateRefresh(this, () =>
+      TRANSLATE_SETTINGS.isVariableTranslateEnabled(),
+    );
   },
 
   beforeDestroy() {
-    if (this._translateListener) {
-      window.removeEventListener(
-        "cheat-translate-finish",
-        this._translateListener,
-      );
-    }
+    detachTranslateRefresh(this);
   },
 
   computed: {
@@ -182,10 +179,7 @@ export default {
             }
 
             if (translateEnabled && varName && varName.trim()) {
-              const cached = TRANSLATION_BANK.get(varName);
-              if (cached) {
-                displayName = cached.translated;
-              }
+              displayName = getTranslatedPanelText(varName, translateEnabled);
             }
 
             return {
@@ -214,13 +208,10 @@ export default {
     },
 
     async manualRefresh() {
-      console.log(
-        "🔄 Manual refresh triggered - reloading variables and translations",
-      );
-      this.isInitialized = false;
-      this.tableItems = [];
-      await this.initializeVariables();
-      console.log("✅ Manual refresh completed");
+      await refreshPanelState(this, () => {
+        this.isInitialized = false;
+        this.tableItems = [];
+      });
     },
 
     tableItemFilter(value, search, item) {
@@ -230,10 +221,11 @@ export default {
 
       search = search.toLowerCase();
 
-      return (
-        item.name.toLowerCase().contains(search) ||
-        String(item.value).toLowerCase().contains(search)
-      );
+      return matchesPanelSearch(search, [
+        item.displayName,
+        item.originalName,
+        item.value,
+      ]);
     },
   },
 };

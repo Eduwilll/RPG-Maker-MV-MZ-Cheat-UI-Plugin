@@ -1,9 +1,14 @@
+import { GeneralCheat } from "../js/cheats/GeneralCheat.js";
+import { SceneCheat } from "../js/cheats/SceneCheat.js";
+import { GameSpeedCheat, SpeedCheat } from "../js/cheats/SpeedCheat.js";
 import {
-  GeneralCheat,
-  GameSpeedCheat,
-  SpeedCheat,
-  SceneCheat,
-} from "../js/CheatHelper.js";
+  coercePanelNumber,
+  runPanelMutation,
+} from "../js/panels/PanelGameState.js";
+import {
+  readGeneralGold,
+  readGeneralPanelState,
+} from "../js/panels/general/GeneralPanelState.js";
 
 export default {
   name: "GeneralPanel",
@@ -208,36 +213,56 @@ export default {
     this.initializeVariables();
   },
 
+  mounted() {
+    window.addEventListener(
+      "cheat-move-speed-change",
+      this.initializeVariables,
+    );
+    window.addEventListener(
+      "cheat-game-speed-change",
+      this.initializeVariables,
+    );
+  },
+
+  beforeDestroy() {
+    window.removeEventListener(
+      "cheat-move-speed-change",
+      this.initializeVariables,
+    );
+    window.removeEventListener(
+      "cheat-game-speed-change",
+      this.initializeVariables,
+    );
+  },
+
   methods: {
     initializeVariables() {
-      this.noClip = $gamePlayer._through;
-      this.speed = $gamePlayer.moveSpeed();
-      this.fixSpeed = SpeedCheat.isFixed();
-      this.gold = $gameParty._gold;
+      const state = readGeneralPanelState();
 
-      this.forceSave = GeneralCheat.isForceSaveEnabled();
-      this.mouseTeleport = GeneralCheat.isMouseTeleportEnabled();
+      this.noClip = state.noClip;
+      this.speed = state.moveSpeed;
+      this.fixSpeed = state.fixSpeed;
+      this.gold = state.gold;
 
-      this.gameSpeed = GameSpeedCheat.getRate();
-      const gameSpeedSceneOption = GameSpeedCheat.getSceneOption();
-      if (gameSpeedSceneOption === GameSpeedCheat.sceneOptions().all) {
-        this.applyAllForGameSpeed = true;
-      } else if (
-        gameSpeedSceneOption === GameSpeedCheat.sceneOptions().battle
-      ) {
-        this.applyBattleForGameSpeed = true;
-      }
+      this.forceSave = state.forceSave;
+      this.mouseTeleport = state.mouseTeleport;
+
+      this.gameSpeed = state.gameSpeed;
+      this.applyAllForGameSpeed = state.applyAllForGameSpeed;
+      this.applyBattleForGameSpeed = state.applyBattleForGameSpeed;
     },
 
     onNoClipChange() {
-      GeneralCheat.toggleNoClip();
-      this.initializeVariables();
+      runPanelMutation(this, () => {
+        GeneralCheat.toggleNoClip();
+      });
     },
 
     onSpeedChange() {
-      SpeedCheat.setSpeed(this.speed, this.fixSpeed);
-      SpeedCheat.__writeSettings(this.speed, this.fixSpeed);
-      this.initializeVariables();
+      runPanelMutation(this, () => {
+        SpeedCheat.setSpeed(this.speed, this.fixSpeed);
+        SpeedCheat.__writeSettings(this.speed, this.fixSpeed);
+      });
     },
 
     addSpeed(amount) {
@@ -249,15 +274,14 @@ export default {
     },
 
     onGoldChange() {
-      if (
-        isNaN(this.gold) ||
-        !Number.isInteger(Number(this.gold)) ||
-        this.gold < 0
-      ) {
-        return;
-      }
+      this.gold = coercePanelNumber(this.gold, {
+        fallback: readGeneralGold(),
+        integer: true,
+        min: 0,
+      });
 
-      const diff = this.gold - $gameParty._gold;
+      const currentGold = readGeneralGold();
+      const diff = this.gold - currentGold;
 
       if (diff < 0) {
         $gameParty.loseGold(-diff);
@@ -265,8 +289,9 @@ export default {
         $gameParty.gainGold(diff);
       }
 
-      this.gold = $gameParty._gold;
-      this.initializeVariables();
+      runPanelMutation(this, () => {
+        this.gold = readGeneralGold();
+      });
     },
 
     gotoTitle() {
@@ -289,9 +314,10 @@ export default {
         sceneOption = GameSpeedCheat.sceneOptions().battle;
       }
 
-      GameSpeedCheat.setGameSpeed(this.gameSpeed, sceneOption);
-      GameSpeedCheat.__writeSettings(this.gameSpeed, sceneOption);
-      this.initializeVariables();
+      runPanelMutation(this, () => {
+        GameSpeedCheat.setGameSpeed(this.gameSpeed, sceneOption);
+        GameSpeedCheat.__writeSettings(this.gameSpeed, sceneOption);
+      });
     },
 
     addGameSpeed(amount) {
@@ -309,7 +335,7 @@ export default {
 
     onApplyAllForGameSpeedChange() {
       if (this.applyAllForGameSpeed) {
-        this.applyBattleForGameSpeed = false;
+        this.applyBattleForGameSpeed = true;
       } else {
         this.applyBattleForGameSpeed = true;
       }
@@ -319,17 +345,24 @@ export default {
 
     onApplyBattleForGameSpeedChange() {
       if (this.applyBattleForGameSpeed) {
+        return this.onGameSpeedChange();
+      }
+
+      if (this.applyAllForGameSpeed) {
         this.applyAllForGameSpeed = false;
+        this.applyBattleForGameSpeed = true;
       } else {
         this.applyAllForGameSpeed = true;
+        this.applyBattleForGameSpeed = true;
       }
 
       this.onGameSpeedChange();
     },
 
     onForceSaveChange() {
-      GeneralCheat.forceEnableSave(this.forceSave);
-      this.initializeVariables();
+      runPanelMutation(this, () => {
+        GeneralCheat.forceEnableSave(this.forceSave);
+      });
     },
 
     openConsole() {
@@ -337,8 +370,9 @@ export default {
     },
 
     onMouseTeleportChange() {
-      GeneralCheat.toggleMouseTeleport(this.mouseTeleport);
-      this.initializeVariables();
+      runPanelMutation(this, () => {
+        GeneralCheat.toggleMouseTeleport(this.mouseTeleport);
+      });
     },
 
     openDebugMenu() {

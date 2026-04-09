@@ -131,12 +131,28 @@ export default defineConfig({
             link: "/guide/technical/repository-structure",
           },
           {
+            text: "Roadmap",
+            link: "/guide/technical/roadmap",
+          },
+          {
+            text: "Panel Conventions",
+            link: "/guide/technical/panel-conventions",
+          },
+          {
+            text: "Shortcut Conventions",
+            link: "/guide/technical/shortcut-conventions",
+          },
+          {
             text: "Runtime and Data Flow",
             link: "/guide/technical/runtime-and-data-flow",
           },
           {
             text: "Build and Release",
             link: "/guide/technical/build-and-release",
+          },
+          {
+            text: "Smoke Testing",
+            link: "/guide/technical/smoke-testing",
           },
         ],
       },

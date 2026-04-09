@@ -1,19 +1,33 @@
-// customize mv functions
-import { MessageCheat } from "../js/CheatHelper.js";
-import { IN_GAME_TRANSLATOR } from "../js/InGameTranslator.js";
+// @ts-check
 
+// customize mv functions
+import { MessageCheat } from "../js/cheats/SpeedCheat.js";
+import { IN_GAME_TRANSLATOR } from "../js/translation/in-game/InGameTranslator.js";
+import { isMvProject } from "../js/runtime/RuntimeEnv.js";
+
+/**
+ * Apply runtime patches needed for the overlay to coexist with RPG Maker.
+ *
+ * @param {{ show: boolean }} mainComponent
+ * @returns {void}
+ */
 export function customizeRPGMakerFunctions(mainComponent) {
-  if (Utils.RPGMAKER_NAME === "MV") {
+  const touchInput = /** @type {MvTouchInputLike & MzTouchInputLike} */ (
+    /** @type {any} */ (TouchInput)
+  );
+
+  if (isMvProject()) {
     // WARN: directly changing engine code can be dangerous
     // remove preventDefault
-    TouchInput._onWheel = function () {
-      this._events.wheelX += event.deltaX;
-      this._events.wheelY += event.deltaY;
+    touchInput._onWheel = function () {
+      const wheelEvent = /** @type {WheelEvent} */ (event);
+      this._events.wheelX += wheelEvent.deltaX;
+      this._events.wheelY += wheelEvent.deltaY;
     };
 
     // ignore click event when cheat modal shown and click inside cheat modal
-    const TouchInput_onMouseDown = TouchInput._onMouseDown;
-    TouchInput._onMouseDown = function (event) {
+    const TouchInput_onMouseDown = touchInput._onMouseDown;
+    touchInput._onMouseDown = function (event) {
       if (mainComponent.show) {
         const bcr = document
           .querySelector("#cheat-modal")
@@ -34,14 +48,15 @@ export function customizeRPGMakerFunctions(mainComponent) {
     // MZ Settings
     // WARN: directly changing engine code can be dangerous
     // remove preventDefault
-    TouchInput._onWheel = function () {
-      this._newState.wheelX += event.deltaX;
-      this._newState.wheelY += event.deltaY;
+    touchInput._onWheel = function () {
+      const wheelEvent = /** @type {WheelEvent} */ (event);
+      this._newState.wheelX += wheelEvent.deltaX;
+      this._newState.wheelY += wheelEvent.deltaY;
     };
 
     // ignore click event when cheat modal shown and click inside cheat modal
-    const TouchInput_onMouseDown = TouchInput._onMouseDown;
-    TouchInput._onMouseDown = function (event) {
+    const TouchInput_onMouseDown = touchInput._onMouseDown;
+    touchInput._onMouseDown = function (event) {
       if (mainComponent.show) {
         const bcr = document
           .querySelector("#cheat-modal")

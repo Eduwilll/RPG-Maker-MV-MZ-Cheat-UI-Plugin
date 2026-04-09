@@ -1,5 +1,15 @@
+import { CHEAT_DIAGNOSTICS } from "./runtime/CheatDiagnostics.js";
+
 export class Alert {
   static alertInternal(level, msg, err = null, timeout = 1500) {
+    const diagnosticLevel = level === "success" ? "info" : level;
+    const diagnosticMessage = err ? msg + " | cause=" + err : msg;
+    CHEAT_DIAGNOSTICS.record(
+      /** @type {"info" | "warn" | "error" | "debug"} */ (diagnosticLevel),
+      "alert",
+      diagnosticMessage,
+    );
+
     if (err) {
       alert(`[cheat plugin ${level}] ${msg}\n\n[cause] ${err}`);
     } else {

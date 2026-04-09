@@ -3,7 +3,13 @@ import shutil
 import argparse
 import json
 import subprocess
-from main import GameTypes, CheatPaths, merge_directory
+from main import (
+    GameTypes,
+    CheatPaths,
+    merge_directory,
+    validate_required_paths,
+    validate_source_layout,
+)
 
 class DevPaths:
     def __init__(self, game_path):
@@ -38,6 +44,30 @@ class DevPaths:
         self.source_root = os.path.abspath(os.path.join(script_dir, '..', 'cheat-engine', 'www'))
         self.source = CheatPaths(self.source_root)
         self.target = CheatPaths(self.root)
+
+
+def validate_dev_sync_install(paths):
+    validate_required_paths(
+        paths.target.root_dir,
+        [
+            os.path.join('cheat', 'init', 'import.js'),
+            os.path.join('cheat', 'init', 'setup.js'),
+            os.path.join('cheat', 'CheatModal.js'),
+            os.path.join('cheat', 'MainComponent.js'),
+            os.path.join('js', 'main.js'),
+            'cheat-version-description.json',
+        ],
+        'Dev-sync target',
+    )
+
+    main_js_path = os.path.join(paths.target.get_js_source_path(), 'main.js')
+    with open(main_js_path, 'r', encoding='utf-8') as rf:
+        main_js = rf.read()
+
+    if 'cheat/init/import.js' not in main_js:
+        raise RuntimeError(
+            'Dev-sync target main.js is missing the cheat bootstrap import path.'
+        )
 
 def find_test_games(game_type):
     """
@@ -124,6 +154,7 @@ def setup_dev_sync(game_path, version='vDEV-SYNC'):
         print(f"Error: {e}")
         return
 
+    validate_source_layout(paths.source)
     print(f"Detected {paths.game_type.name} game at {paths.game_path}")
     
     # 1. Inject Core JS (main.js)
@@ -187,6 +218,8 @@ def setup_dev_sync(game_path, version='vDEV-SYNC'):
     # 5. Version file
     with open(os.path.join(paths.root, 'cheat-version-description.json'), 'w') as wf:
         json.dump({'version': version}, wf, indent=2)
+
+    validate_dev_sync_install(paths)
         
     print("\n" + "="*40)
     print("🚀 [SUCCESS] Dev-Sync setup complete!")
@@ -202,6 +235,7 @@ if __name__ == '__main__':
     parser.add_argument('--mv', action='store_true', help='Target local MV test game')
     parser.add_argument('--mz', action='store_true', help='Target local MZ test game')
     parser.add_argument('--version', type=str, default='vDEV-SYNC', help='Version string to write to cheat-version-description.json')
+    parser.add_argument('--validate-only', action='store_true', help='Validate an existing dev-sync target without changing files')
     args = parser.parse_args()
     
     # Auto-target common test paths if flags provided
@@ -220,5 +254,14 @@ if __name__ == '__main__':
         if not args.game_path:
             print("Error: Could not determine game target. Please provide --game-path or ensure test games are in the 'tests' folder.")
     else:
-        setup_dev_sync(target, args.version)
+        if args.validate_only:
+            try:
+                paths = DevPaths(target)
+                validate_source_layout(paths.source)
+                validate_dev_sync_install(paths)
+                print(f"Dev-sync validation passed for {paths.game_path}")
+            except Exception as error:
+                print(f"Dev-sync validation failed: {error}")
+        else:
+            setup_dev_sync(target, args.version)
 

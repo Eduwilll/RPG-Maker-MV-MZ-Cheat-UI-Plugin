@@ -1,11 +1,12 @@
 import CheatModal from "./CheatModal.js";
-import { GLOBAL_SHORTCUT } from "./js/GlobalShortcut.js";
-import { GeneralCheat } from "./js/CheatHelper.js";
+import { GLOBAL_SHORTCUT } from "./js/shortcuts/GlobalShortcut.js";
+import { GeneralCheat } from "./js/cheats/GeneralCheat.js";
 import AlertSnackbar from "./components/AlertSnackbar.js";
 import ConfirmDialog from "./components/ConfirmDialog.js";
 import { customizeRPGMakerFunctions } from "./init/customize_functions.js";
-import { Key } from "./js/KeyCodes.js";
+import { Key } from "./js/shortcuts/KeyCodes.js";
 import { Alert } from "./js/AlertHelper.js";
+import { CHEAT_DIAGNOSTICS } from "./js/runtime/CheatDiagnostics.js";
 
 export default {
   name: "MainComponent",
@@ -45,6 +46,7 @@ export default {
     const self = this;
 
     customizeRPGMakerFunctions(self);
+    CHEAT_DIAGNOSTICS.log("info", "overlay", "MainComponent created");
 
     GeneralCheat.toggleCheatModal = (componentName = null) => {
       this.toggleCheatModal(componentName);
@@ -84,7 +86,11 @@ export default {
         GLOBAL_SHORTCUT.runKeyLeaveEvent(e, Key.fromKey(this.currentKey));
         this.currentKey.add(e.keyCode);
         this.currentKey.adjustCombiningKey(e);
-        GLOBAL_SHORTCUT.runKeyEnterEvent(e, Key.fromKey(this.currentKey));
+        const key = Key.fromKey(this.currentKey);
+        const handled = GLOBAL_SHORTCUT.runKeyEnterEvent(e, key);
+        if (!handled) {
+          this.runOverlayShortcutFallback(e, key);
+        }
       }
     },
 
@@ -94,12 +100,50 @@ export default {
       GLOBAL_SHORTCUT.runKeyEnterEvent(e, Key.fromKey(this.currentKey));
     },
 
+    runOverlayShortcutFallback(e, key) {
+      const fallbackShortcuts = [
+        {
+          id: "toggleCheatModal",
+          action: () => this.toggleCheatModal(),
+        },
+        {
+          id: "toggleCheatModalToSaveLocationComponent",
+          action: () => this.toggleCheatModal("save-recall-panel"),
+        },
+        {
+          id: "toggleCheatModalToMapEventComponent",
+          action: () => this.toggleCheatModal("map-event-panel"),
+        },
+      ];
+
+      for (const shortcut of fallbackShortcuts) {
+        try {
+          const configuredKey = GLOBAL_SHORTCUT.getShortcut(shortcut.id);
+          if (configuredKey && configuredKey.equals(key)) {
+            shortcut.action();
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+            return true;
+          }
+        } catch (error) {}
+      }
+
+      return false;
+    },
+
     openCheatModal(componentName) {
       if (componentName) {
         this.currentComponentName = componentName;
       }
 
       this.show = true;
+      CHEAT_DIAGNOSTICS.log(
+        "info",
+        "overlay",
+        "Overlay opened",
+        componentName || "default",
+      );
     },
 
     toggleCheatModal(componentName) {
@@ -114,12 +158,19 @@ export default {
         // hide modal if only componentName unchanged
         if (!componentName || componentName === prevComponentName) {
           this.show = false;
+          CHEAT_DIAGNOSTICS.log("info", "overlay", "Overlay closed");
         }
         return;
       }
 
       // open
       this.show = true;
+      CHEAT_DIAGNOSTICS.log(
+        "info",
+        "overlay",
+        "Overlay toggled open",
+        this.currentComponentName || "default",
+      );
     },
 
     openCheatWindow(componentName = null) {
@@ -136,6 +187,12 @@ export default {
 
       // Hide the overlay if it was open
       this.show = false;
+      CHEAT_DIAGNOSTICS.log(
+        "info",
+        "overlay",
+        "Opening separate cheat window",
+        componentName || "default",
+      );
 
       const targetDir = Utils.RPGMAKER_NAME === "MV" ? "www/cheat/" : "cheat/";
 

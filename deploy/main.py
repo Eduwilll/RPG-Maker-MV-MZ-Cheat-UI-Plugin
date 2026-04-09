@@ -55,6 +55,52 @@ class Paths:
         return os.path.join(self.deploy_output_dir, self.output_files[game_type]).format(version)
 
 
+def validate_required_paths(root_dir, relative_paths, label):
+    missing_paths = []
+
+    for relative_path in relative_paths:
+        absolute_path = os.path.join(root_dir, relative_path)
+        if not os.path.exists(absolute_path):
+            missing_paths.append(relative_path)
+
+    if missing_paths:
+        missing_text = '\n'.join([f'  - {path}' for path in missing_paths])
+        raise FileNotFoundError(
+            f'{label} is missing required files:\n{missing_text}'
+        )
+
+
+def validate_source_layout(paths):
+    validate_required_paths(
+        paths.root_dir,
+        [
+            os.path.join('cheat', 'init', 'import.js'),
+            os.path.join('cheat', 'init', 'setup.js'),
+            os.path.join('cheat', 'CheatModal.js'),
+            os.path.join('cheat', 'MainComponent.js'),
+            os.path.join('cheat', 'js', 'window-init.js'),
+            os.path.join('_cheat_initialize', 'mv', 'js', 'main.js'),
+            os.path.join('_cheat_initialize', 'mz', 'js', 'main.js'),
+        ],
+        'Cheat source layout',
+    )
+
+
+def validate_packaged_layout(paths):
+    validate_required_paths(
+        paths.root_dir,
+        [
+            os.path.join('cheat', 'init', 'import.js'),
+            os.path.join('cheat', 'init', 'setup.js'),
+            os.path.join('cheat', 'CheatModal.js'),
+            os.path.join('cheat', 'MainComponent.js'),
+            os.path.join('js', 'main.js'),
+            'cheat-version-description.json',
+        ],
+        'Packaged cheat layout',
+    )
+
+
 def merge_directory(src, dest, inplace=True):
     if not os.path.exists(src) or not os.path.isdir(src):
         return
@@ -88,7 +134,7 @@ def merge_directory(src, dest, inplace=True):
 def create_cheat_version_file(version, paths):
     with open(os.path.join(paths.temp.root_dir, 'cheat-version-description.json'), 'w') as wf:
         data = {
-            'version': f'v{version}'
+            'version': f'{version}'
         }
         json.dump(data, wf, indent=2)
 
@@ -100,6 +146,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     paths = Paths()
+    validate_source_layout(paths.origin)
 
     for game_type in GameTypes:
         # copy js sources to temp directory
@@ -121,6 +168,7 @@ if __name__ == '__main__':
         # compress to zip file
         shutil.rmtree(os.path.join(paths.temp.root_dir, '.idea'), ignore_errors=True)
         create_cheat_version_file(args.version, paths)
+        validate_packaged_layout(paths.temp)
         if game_type == GameTypes.MV:
             shutil.make_archive(paths.get_output_file_path(game_type, args.version), 'gztar', paths.temp_root_path, 'www')
         else:

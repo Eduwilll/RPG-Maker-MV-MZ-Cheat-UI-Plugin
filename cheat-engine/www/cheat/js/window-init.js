@@ -3,6 +3,10 @@
  * Connects this standalone window to the main game window context.
  */
 
+import { initializeCheatDiagnostics } from "./runtime/CheatDiagnostics.js";
+
+initializeCheatDiagnostics("separate-window");
+
 // Error logging helper
 function showError(msg, err) {
   const display = document.getElementById("error-display");

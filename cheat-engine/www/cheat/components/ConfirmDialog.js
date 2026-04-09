@@ -1,4 +1,4 @@
-import { ConfirmDialog } from "../js/DialogHelper.js";
+import { ConfirmDialog } from "../js/ui/DialogHelper.js";
 
 export default {
   name: "ConfirmDialog",
