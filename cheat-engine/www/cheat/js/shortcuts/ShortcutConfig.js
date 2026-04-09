@@ -18,7 +18,7 @@ export const defaultShortcutSettings = {
   },
 
   toggleCheatModalToMapEventComponent: {
-    shortcut: "ctrl e",
+    shortcut: "Tab",
   },
 
   quickSave: {
