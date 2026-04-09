@@ -7,7 +7,7 @@ import {
   TRANSLATE_PROGRESS,
 } from "../js/TranslateHelper.js";
 import { TRANSLATOR } from "../js/TranslateHelper.js";
-import { isInValueInRange } from "../js/GlobalShortcut.js";
+import { isInValueInRange } from "../js/shortcuts/GlobalShortcut.js";
 import { Alert } from "../js/AlertHelper.js";
 import { IN_GAME_TRANSLATOR } from "../js/InGameTranslator.js";
 

@@ -2,7 +2,7 @@ import { Alert } from "../js/AlertHelper.js";
 import {
   buildAboutPanelSummary,
   readAboutPanelState,
-} from "../js/panels/AboutPanelState.js";
+} from "../js/panels/about/AboutPanelState.js";
 
 export default {
   name: "AboutPanel",

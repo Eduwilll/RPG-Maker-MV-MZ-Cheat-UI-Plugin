@@ -1,10 +1,9 @@
 // @ts-check
 
-import { Alert } from "./AlertHelper.js";
-import { Key } from "./KeyCodes.js";
+import { Alert } from "../AlertHelper.js";
 import { ShortcutMap } from "./ShortcutHelper.js";
-import { migrateShortcutSettings } from "./shortcuts/ShortcutMigration.js";
-import { ShortcutStorage } from "./shortcuts/ShortcutStorage.js";
+import { migrateShortcutSettings } from "./ShortcutMigration.js";
+import { ShortcutStorage } from "./ShortcutStorage.js";
 import {
   defaultShortcutSettings,
   isInValueInRange,
@@ -12,7 +11,7 @@ import {
   parseStringToKeyObject,
   shortcutConfig,
   ShortcutConfig,
-} from "./shortcuts/ShortcutConfig.js";
+} from "./ShortcutConfig.js";
 
 export {
   defaultShortcutSettings,
@@ -21,7 +20,7 @@ export {
   parseStringToKeyObject,
   shortcutConfig,
   ShortcutConfig,
-} from "./shortcuts/ShortcutConfig.js";
+} from "./ShortcutConfig.js";
 
 class GlobalShortcut {
   constructor() {
@@ -37,18 +36,14 @@ class GlobalShortcut {
       defaultShortcutSettings,
     );
 
-    // initialize shortcut settings
     this.shortcutSettings = {};
     this.readShortcutSettings();
 
-    // initialize shortcut config
     this.shortcutConfig = {};
     this.initializeShortcutConfig();
 
-    // migrate if settings file is old version
     this.migrateShortcutSettings();
 
-    // initialize shortcut map
     this.shortcutMap = new ShortcutMap();
     this.initializeShortcutMap();
   }
@@ -121,17 +116,10 @@ class GlobalShortcut {
     return false;
   }
 
-  /**
-   * read raw shortcut settings
-   *
-   */
   readRawShortcutSettings() {
     return this.storage.readRawSettings();
   }
 
-  /**
-   * read and parse shortcut settings
-   */
   readShortcutSettings() {
     const rawSettings = this.readRawShortcutSettings();
     this.shortcutSettings = {};
@@ -191,7 +179,6 @@ class GlobalShortcut {
   }
 
   setShortcut(shortcutId, newKey) {
-    // not need to change shortcut
     const prevKey = this.getShortcut(shortcutId);
     if (prevKey.equals(newKey)) {
       return;
@@ -204,10 +191,8 @@ class GlobalShortcut {
       );
     }
 
-    // remove prev key binding if prev key exists
     this.shortcutMap.remove(prevKey);
 
-    // bind key
     const currValue = this.getConfig(shortcutId);
     const currSettings = this.getSettings(shortcutId);
     this.shortcutMap.register(
@@ -218,10 +203,8 @@ class GlobalShortcut {
       currValue.getLeaveAction(currSettings),
     );
 
-    // change settings
     currSettings.shortcut = newKey;
 
-    // write changed settings
     this.writeShortcutSettings();
   }
 

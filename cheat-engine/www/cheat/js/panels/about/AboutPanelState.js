@@ -4,7 +4,7 @@ import {
   DEFAULT_END_POINTS,
   TRANSLATE_SETTINGS,
   TRANSLATION_BANK,
-} from "../TranslateHelper.js";
+} from "../../TranslateHelper.js";
 import {
   getCheatRootDir,
   getCheatVersionFilePath,
@@ -12,8 +12,8 @@ import {
   getGameRootDir,
   isDesktopRuntime,
   isMvProject,
-} from "../runtime/RuntimeEnv.js";
-import { CHEAT_DIAGNOSTICS } from "../runtime/CheatDiagnostics.js";
+} from "../../runtime/RuntimeEnv.js";
+import { CHEAT_DIAGNOSTICS } from "../../runtime/CheatDiagnostics.js";
 
 /**
  * @typedef {object} AboutPanelState
@@ -62,9 +62,6 @@ const ABOUT_PANEL_PATHS = {
   shortcuts: "./www/cheat-settings/shortcuts.json",
 };
 
-/**
- * @returns {string | null}
- */
 function readCheatVersion() {
   if (!isDesktopRuntime()) {
     return null;
@@ -80,10 +77,6 @@ function readCheatVersion() {
   }
 }
 
-/**
- * @param {string} relativePath
- * @returns {string}
- */
 function resolveDesktopPath(relativePath) {
   if (!isDesktopRuntime()) {
     return "Browser localStorage";
@@ -97,10 +90,6 @@ function resolveDesktopPath(relativePath) {
   }
 }
 
-/**
- * @param {string} key
- * @returns {string}
- */
 function readProcessVersion(key) {
   try {
     if (typeof process !== "object" || !process || !process.versions) {
@@ -113,9 +102,6 @@ function readProcessVersion(key) {
   }
 }
 
-/**
- * @returns {string}
- */
 function readExecutablePath() {
   try {
     if (typeof process !== "object" || !process || !process.execPath) {
@@ -128,9 +114,6 @@ function readExecutablePath() {
   }
 }
 
-/**
- * @returns {string}
- */
 function readWorkingDirectory() {
   try {
     if (
@@ -147,9 +130,6 @@ function readWorkingDirectory() {
   }
 }
 
-/**
- * @returns {string}
- */
 function readGameTitle() {
   try {
     if (typeof $dataSystem === "undefined" || !$dataSystem) {
@@ -162,9 +142,6 @@ function readGameTitle() {
   }
 }
 
-/**
- * @returns {string}
- */
 function readCurrentSceneName() {
   try {
     const rawSceneManager = /** @type {any} */ (SceneManager);
@@ -179,9 +156,6 @@ function readCurrentSceneName() {
   }
 }
 
-/**
- * @returns {{ id: number | null, name: string, text: string }}
- */
 function readCurrentMapInfo() {
   try {
     if (typeof $gameMap === "undefined" || !$gameMap) {
@@ -212,9 +186,6 @@ function readCurrentMapInfo() {
   }
 }
 
-/**
- * @returns {boolean}
- */
 function isPlaytestRuntime() {
   try {
     return (
@@ -225,10 +196,6 @@ function isPlaytestRuntime() {
   }
 }
 
-/**
- * @param {string} selection
- * @returns {string}
- */
 function readEndpointName(selection) {
   if (selection === "custom") {
     return "Custom";
@@ -244,9 +211,6 @@ function readEndpointName(selection) {
   return selection || "Unavailable";
 }
 
-/**
- * @returns {string[]}
- */
 function readEnabledTranslationTargets() {
   try {
     const targets = TRANSLATE_SETTINGS.getTargets();
@@ -256,9 +220,6 @@ function readEnabledTranslationTargets() {
   }
 }
 
-/**
- * @returns {string}
- */
 function readViewMode() {
   try {
     const pathname = String(window.location.pathname || "").toLowerCase();

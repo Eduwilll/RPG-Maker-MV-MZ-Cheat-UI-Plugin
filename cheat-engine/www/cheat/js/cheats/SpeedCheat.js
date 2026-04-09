@@ -1,6 +1,6 @@
 // @ts-check
 
-import { KeyValueStorage } from "./storage/KeyValueStorage.js";
+import { KeyValueStorage } from "../storage/KeyValueStorage.js";
 
 export class GameSpeedCheat {
   static sceneOptions() {
@@ -12,7 +12,9 @@ export class GameSpeedCheat {
 
         battle() {
           return (
-            /** @type {any} */ (SceneManager)._scene instanceof Scene_Battle
+            /** @type {SceneManagerRuntimeLike} */ (
+              /** @type {unknown} */ (SceneManager)
+            )._scene instanceof Scene_Battle
           );
         },
       };

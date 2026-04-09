@@ -49,6 +49,7 @@ The UI is written in plain JavaScript modules, not single-file Vue components.
 - `CheatModal.js` defines the left navigation tree and panel container.
 - `cheat/panels/` contains the concrete feature panels such as stats, items, shortcuts, teleport, and translation.
 - shared panel conventions now live under `cheat/js/panels/` for reusable panel-safe state shaping and translation display helpers.
+- feature-specific panel support modules can live under subfolders there, such as `cheat/js/panels/about/` for the About panel state reader.
 - The UI listens for global key events so the overlay can be opened while gameplay is running.
 - In NW.js, the UI can also open as a separate window using `window.html` plus `window-init.js`.
 
@@ -109,12 +110,14 @@ Main modules:
 - `translation/TranslateProgress.js`: shared progress state used by the translation UI.
 - `runtime/RuntimeEnv.js`: small MV/MZ and NW.js environment helpers used by runtime modules.
 - `storage/KeyValueStorage.js`: shared JSON/localStorage persistence helper used by settings and caches.
+- `shortcuts/GlobalShortcut.js`: runtime shortcut manager that binds configured shortcuts to actions.
 - `shortcuts/ShortcutConfig.js`: shortcut catalog, parameter validation, and action bindings used by the runtime shortcut manager.
+- `shortcuts/ShortcutHelper.js`: low-level key-table mapping used by the runtime shortcut manager.
 - `shortcuts/ShortcutPanelState.js`: panel-safe view-state shaping for editing shortcut settings in the UI.
 - `shortcuts/ShortcutMigration.js`: default-shortcut migration and conflict handling for older shortcut settings files.
 - `shortcuts/ShortcutStorage.js`: read/write helper for persisted shortcut mappings.
-- `CheatGeneral.js`: general overlay, save, console, no-clip, and mouse-teleport helpers.
-- `CheatSpeed.js`: game-speed and message-skip helpers split out of the older shared cheat helper file.
+- `cheats/GeneralCheat.js`: general overlay, save, console, no-clip, and mouse-teleport helpers.
+- `cheats/SpeedCheat.js`: game-speed and message-skip helpers split out of the older shared cheat helper file.
 - `cheats/SceneCheat.js`: scene navigation, quick save/load, and file-scene helpers.
 - `cheats/BattleCheat.js`: battle mutation and encounter-related cheat helpers.
 - `InGameTranslationData.js`: cache-backed patch and revert helpers for `$data*` arrays and system terms.

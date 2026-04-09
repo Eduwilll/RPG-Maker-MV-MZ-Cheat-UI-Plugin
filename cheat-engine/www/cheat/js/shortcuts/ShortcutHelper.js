@@ -1,4 +1,4 @@
-import { MAX_KEY_CODE, UNASSIGNED_KEY_CODE } from "./KeyCodes.js";
+import { MAX_KEY_CODE, UNASSIGNED_KEY_CODE } from "../KeyCodes.js";
 
 export class ShortcutMap {
   constructor() {
@@ -6,16 +6,9 @@ export class ShortcutMap {
   }
 
   static toInt(booleanVar) {
-    // Number(booleanVar) / booleanVar|0 ... can be slot
     return booleanVar === true ? 1 : 0;
   }
 
-  /**
-   * get flatten index of key
-   *
-   * @param key
-   * @returns {number}
-   */
   static tableIndex(key) {
     return (
       this.toInt(key.ctrl) +
@@ -26,12 +19,6 @@ export class ShortcutMap {
     );
   }
 
-  /**
-   * register key-action
-   *
-   * @param key
-   * @param action
-   */
   register(key, value, enterAction, repeatAction, leaveAction) {
     if (!key || key.isEmpty()) {
       return;
@@ -45,12 +32,6 @@ export class ShortcutMap {
     };
   }
 
-  /**
-   * remove key-action
-   *
-   * @param key
-   * @return: previous value of removed key
-   */
   remove(key) {
     if (!key || key.isEmpty()) {
       return null;
@@ -78,12 +59,6 @@ export class ShortcutMap {
     return null;
   }
 
-  /**
-   * run action on key
-   *
-   * @param key
-   * @type Key
-   */
   runEnterAction(key) {
     const item = this.getItem(key);
 

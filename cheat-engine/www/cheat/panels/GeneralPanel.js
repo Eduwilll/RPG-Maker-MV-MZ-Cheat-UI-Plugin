@@ -1,6 +1,6 @@
-import { GeneralCheat } from "../js/CheatGeneral.js";
+import { GeneralCheat } from "../js/cheats/GeneralCheat.js";
 import { SceneCheat } from "../js/cheats/SceneCheat.js";
-import { GameSpeedCheat, SpeedCheat } from "../js/CheatSpeed.js";
+import { GameSpeedCheat, SpeedCheat } from "../js/cheats/SpeedCheat.js";
 import {
   coercePanelNumber,
   readGeneralPanelState,

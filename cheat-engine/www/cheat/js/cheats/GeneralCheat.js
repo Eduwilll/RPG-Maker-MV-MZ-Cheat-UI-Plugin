@@ -1,6 +1,30 @@
 // @ts-check
 
-import { Alert } from "./AlertHelper.js";
+import { Alert } from "../AlertHelper.js";
+
+/**
+ * @typedef {Game_Actor & {
+ *   _actorId: number,
+ *   mhp: number,
+ *   mmp: number,
+ *   setHp(value: number): void,
+ *   setMp(value: number): void,
+ *   setTp(value: number): void,
+ *   maxTp(): number,
+ *   paySkillCost(skill: DataSkill): void,
+ *   gainHP_bkup?: (value: number) => void,
+ *   setHp_bkup?: (value: number) => void,
+ *   gainMp_bkup?: (value: number) => void,
+ *   setMp_bkup?: (value: number) => void,
+ *   gainTp_bkup?: (value: number) => void,
+ *   setTp_bkup?: (value: number) => void,
+ *   paySkillCost_bkup?: (skill: DataSkill) => void
+ * }} GodModeActorLike
+ */
+
+/**
+ * @typedef {Game_Player & { _through: boolean }} NoClipPlayerLike
+ */
 
 export class GeneralCheat {
   static toggleCheatModal(componentName = null) {}
@@ -8,7 +32,7 @@ export class GeneralCheat {
   static openCheatModal(componentName = null) {}
 
   static toggleNoClip(notify = false) {
-    const gamePlayer = /** @type {any} */ ($gamePlayer);
+    const gamePlayer = /** @type {NoClipPlayerLike} */ ($gamePlayer);
     gamePlayer._through = !gamePlayer._through;
     if (gamePlayer._through) {
       Alert.success(`No clip toggled: ${gamePlayer._through}`);
@@ -65,7 +89,7 @@ export class GeneralCheat {
     if (actor instanceof Game_Actor && !this.isGodMode(actor)) {
       const godModeData = this.getGodModeData(actor);
       godModeData.godMode = true;
-      const battler = /** @type {any} */ (actor);
+      const battler = /** @type {GodModeActorLike} */ (actor);
 
       battler.gainHP_bkup = battler.gainHp;
       battler.gainHp = function (value) {
@@ -120,7 +144,7 @@ export class GeneralCheat {
     if (actor instanceof Game_Actor && this.isGodMode(actor)) {
       const godModeData = this.getGodModeData(actor);
       godModeData.godMode = false;
-      const battler = /** @type {any} */ (actor);
+      const battler = /** @type {GodModeActorLike} */ (actor);
 
       clearInterval(godModeData.godModeInterval);
       godModeData.godModeInterval = null;
@@ -242,7 +266,9 @@ export class GeneralCheat {
 
   static openDebugMenu() {
     try {
-      const currentScene = /** @type {any} */ (SceneManager)._scene;
+      const currentScene = /** @type {SceneManagerRuntimeLike} */ (
+        /** @type {unknown} */ (SceneManager)
+      )._scene;
       if (currentScene instanceof Scene_Map) {
         SceneManager.push(Scene_Debug);
         Alert.success("Opening Debug Menu (F9)");

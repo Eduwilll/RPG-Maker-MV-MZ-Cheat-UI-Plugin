@@ -1,7 +1,7 @@
 // @ts-check
 
 // customize mv functions
-import { MessageCheat } from "../js/CheatSpeed.js";
+import { MessageCheat } from "../js/cheats/SpeedCheat.js";
 import { IN_GAME_TRANSLATOR } from "../js/InGameTranslator.js";
 import { isMvProject } from "../js/runtime/RuntimeEnv.js";
 

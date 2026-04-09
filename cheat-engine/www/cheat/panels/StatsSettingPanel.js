@@ -1,4 +1,4 @@
-import { GeneralCheat } from "../js/CheatGeneral.js";
+import { GeneralCheat } from "../js/cheats/GeneralCheat.js";
 import {
   coercePanelNumber,
   extractActorParamValues,
