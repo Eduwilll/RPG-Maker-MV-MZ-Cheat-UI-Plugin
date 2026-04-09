@@ -3,7 +3,8 @@
 import { Key } from "../KeyCodes.js";
 import { cloneObject } from "../Tools.js";
 import { SpeedCheat, MessageCheat } from "../CheatSpeed.js";
-import { SceneCheat, BattleCheat } from "../CheatBattle.js";
+import { SceneCheat } from "../cheats/SceneCheat.js";
+import { BattleCheat } from "../cheats/BattleCheat.js";
 import { GeneralCheat } from "../CheatGeneral.js";
 import { isDesktopRuntime } from "../runtime/RuntimeEnv.js";
 

@@ -1,5 +1,5 @@
 import HealthSettingTab from "./HealthSettingTab.js";
-import { BattleCheat } from "../js/CheatBattle.js";
+import { BattleCheat } from "../js/cheats/BattleCheat.js";
 import {
   coercePanelNumber,
   runPanelMutation,

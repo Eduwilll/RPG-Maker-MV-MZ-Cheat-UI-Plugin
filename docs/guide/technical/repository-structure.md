@@ -23,6 +23,7 @@ Most contributor work happens under `cheat-engine/www/`.
 | `cheat-engine/www/cheat/` | Main cheat UI app |
 | `cheat-engine/www/cheat/panels/` | Individual UI panels and panel-specific logic |
 | `cheat-engine/www/cheat/js/` | Shared helpers, storage, shortcuts, translation, alerts, and runtime glue |
+| `cheat-engine/www/cheat/js/cheats/` | Cheat action modules split by domain such as scene actions and battle actions |
 | `cheat-engine/www/cheat/js/panels/` | Shared panel-safe state, search, refresh, and translation display helpers |
 | `cheat-engine/www/cheat/js/translation/` | Home of the translation subsystem implementation files |
 | `cheat-engine/www/cheat/js/shortcuts/` | Home of the shortcut subsystem implementation files |
@@ -59,7 +60,8 @@ Most contributor work happens under `cheat-engine/www/`.
 | `cheat-engine/www/cheat/js/shortcuts/ShortcutStorage.js` | Change how shortcut mappings are loaded from and saved to disk or preview storage |
 | `cheat-engine/www/cheat/js/CheatGeneral.js` | Change overlay toggles, save forcing, console/debug access, and movement helpers |
 | `cheat-engine/www/cheat/js/CheatSpeed.js` | Change game-speed tuning and message-skip behavior |
-| `cheat-engine/www/cheat/js/CheatBattle.js` | Change scene navigation and battle-related cheat actions |
+| `cheat-engine/www/cheat/js/cheats/SceneCheat.js` | Change scene navigation, file scene toggles, and quick save/load behavior |
+| `cheat-engine/www/cheat/js/cheats/BattleCheat.js` | Change battle-related cheat actions and encounter helpers |
 | `cheat-engine/www/cheat/js/InGameTranslationData.js` | Change how cached translations are written back into game data arrays |
 | `cheat-engine/www/cheat/js/InGameTranslationLists.js` | Change how runtime command lists are translated in choices and menus |
 | `cheat-engine/www/cheat/js/InGameTranslationText.js` | Change runtime text normalization and cache lookup for dialogue and rich text |

@@ -83,6 +83,21 @@ declare interface CheatDiagnosticsLike {
   getRecentLogText(limit?: number): string;
 }
 
+declare interface SceneManagerRuntimeLike {
+  _scene?: Scene_Base | null;
+  isSceneChanging?(): boolean;
+  isCurrentSceneBusy?(): boolean;
+}
+
+declare interface BattleManagerRuntimeLike {
+  _phase?: string;
+  _escaped?: boolean;
+}
+
+declare interface GamePlayerEncounterLike extends Game_Player {
+  _encounterCount: number;
+}
+
 declare var event: WheelEvent;
 
 interface Window {

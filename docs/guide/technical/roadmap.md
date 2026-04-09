@@ -11,7 +11,8 @@ The original project was functional but under-documented, tightly coupled, and h
 - Phase 3 is complete:
   - Phase 3A finished the structure and typing pass for translation, shortcuts, runtime, and storage.
   - Phase 3B established panel and shortcut contributor conventions with shared helper layers.
-- Phase 4 is next: reliability checks and selective modernization.
+- Phase 4 is complete enough for normal development: diagnostics, validation, compatibility scanning, and smoke-testing workflows are now in place.
+- Phase 5 is next: type and domain alignment.
 
 ## Why the plan changed
 
@@ -155,6 +156,63 @@ The intended end state is still:
 - clearer contributor rules
 - safer packaging and translation workflows
 
+### Current checkpoint
+
+Phase 4 now includes:
+
+- diagnostics logging and About-panel support details
+- deploy and dev-sync validation
+- MV compatibility checks for older runtimes
+- smoke-testing workflow documentation
+- cleanup of temporary compatibility shims and leftover barrels
+
+This means the main reliability goals are already met, and remaining work in this area should be small follow-up polish instead of more large restructuring.
+
+## Phase 5: Type and Domain Alignment
+
+Goal: finish the partial modernization work so the code structure, helper conventions, and typing layer describe the same architecture instead of drifting apart.
+
+### Why this phase exists
+
+The repo is much healthier than before, but there are still a few areas where the cleanup stopped halfway:
+
+- `@fenixengine/rmmz-ts` is wired into the workspace, but it is not yet used consistently as a real development constraint across the runtime code.
+- some files still mix responsibilities, especially cheat action modules such as `CheatBattle.js`
+- the distinction between component panels and panel helper/state modules is real, but it is not yet formalized or applied everywhere
+- the root `cheat-engine/www/cheat/js/` folder still contains a mix of domains that are harder to reason about than the newer foldered areas
+
+### Main work
+
+- Audit the remaining root-level modules in `cheat-engine/www/cheat/js/` and classify which should move into clearer domains.
+- Strengthen typed JavaScript checking incrementally for stable helper modules instead of switching the whole runtime to strict checking at once.
+- Split mixed-responsibility files such as `CheatBattle.js` into clearer scene-action and battle-action modules.
+- Replace avoidable `any` usage with local type augmentations where the runtime intentionally uses MV/MZ internals.
+- Finish documenting the two-panel-folder architecture:
+  - `cheat-engine/www/cheat/panels/` for Vue component panels
+  - `cheat-engine/www/cheat/js/panels/` for panel state, translation, and shared helper logic
+- Migrate remaining panels that still only partially follow the shared helper pattern.
+
+### Concrete first targets
+
+- `cheat-engine/www/cheat/js/CheatBattle.js`
+- `cheat-engine/www/cheat/js/CheatGeneral.js`
+- `cheat-engine/www/cheat/js/CheatSpeed.js`
+- `cheat-engine/www/cheat/js/panels/`
+- `cheat-engine/www/cheat/panels/`
+- local declarations in `types/`
+
+### Constraints
+
+This is still not a plan to rewrite the runtime into TypeScript or to bundle the in-game UI differently.
+
+The intended outcome is:
+
+- clearer domain boundaries
+- fewer confusing runtime internals hidden behind `any`
+- more useful help from `@fenixengine/rmmz-ts`
+- more consistent panel architecture
+- safer future cleanup without destabilizing MV support
+
 ## Phase 3 result
 
 Phase 3 now leaves the repo in a much clearer state:
@@ -167,8 +225,8 @@ Phase 3 now leaves the repo in a much clearer state:
 
 ## Recommended next move
 
-Start Phase 4 with targeted reliability work:
+Start Phase 5 with a small, high-signal split:
 
-- translation regression checks
-- packaging and dev-sync validation
-- carefully chosen tests or stronger typing for stable pure-logic helpers
+- separate scene actions from battle actions in `CheatBattle.js`
+- add the minimum local typings needed to remove the most confusing `any` casts there
+- document the panel-layer architecture more explicitly while that cleanup is happening

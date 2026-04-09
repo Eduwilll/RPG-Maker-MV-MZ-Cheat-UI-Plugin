@@ -115,7 +115,8 @@ Main modules:
 - `shortcuts/ShortcutStorage.js`: read/write helper for persisted shortcut mappings.
 - `CheatGeneral.js`: general overlay, save, console, no-clip, and mouse-teleport helpers.
 - `CheatSpeed.js`: game-speed and message-skip helpers split out of the older shared cheat helper file.
-- `CheatBattle.js`: scene and battle-oriented cheat helpers split out of the shared cheat helper file.
+- `cheats/SceneCheat.js`: scene navigation, quick save/load, and file-scene helpers.
+- `cheats/BattleCheat.js`: battle mutation and encounter-related cheat helpers.
 - `InGameTranslationData.js`: cache-backed patch and revert helpers for `$data*` arrays and system terms.
 - `InGameTranslationLists.js`: shared helpers for translating runtime command-list entries.
 - `InGameTranslationText.js`: shared text-cleanup and cache-lookup helpers for runtime text hooks.
