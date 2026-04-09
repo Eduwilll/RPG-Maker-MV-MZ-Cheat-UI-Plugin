@@ -150,6 +150,10 @@ export default defineConfig({
             text: "Build and Release",
             link: "/guide/technical/build-and-release",
           },
+          {
+            text: "Smoke Testing",
+            link: "/guide/technical/smoke-testing",
+          },
         ],
       },
       {

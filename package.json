@@ -8,6 +8,7 @@
     "docs:preview": "vitepress preview docs",
     "typecheck": "tsc -p tsconfig.json",
     "check:mv-compat": "node tools/check-mv-compat.mjs",
+    "check:repo": "pnpm run typecheck && pnpm run check:mv-compat && pnpm run docs:build",
     "format": "prettier . --write",
     "prepare": "husky install"
   },

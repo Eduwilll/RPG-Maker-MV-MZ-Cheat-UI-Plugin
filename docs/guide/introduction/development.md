@@ -46,6 +46,7 @@ Phase 1 uses a lightweight TypeScript configuration for JavaScript projects:
 - `@ts-check` is enabled file-by-file so we can improve safety incrementally instead of flooding the repo with errors all at once.
 - `pnpm run typecheck` is the main verification step for this foundation.
 - `pnpm run check:mv-compat` scans the cheat runtime for newer syntax and array helpers that have caused older MV NW.js regressions before.
+- `pnpm run check:repo` runs the standard Phase 4 repository validation set: typecheck, MV compatibility scan, and docs build.
 
 The translation subsystem was also split into smaller contributor-focused modules during this phase:
 
@@ -157,9 +158,21 @@ Use this when you want to confirm that a game still has the expected cheat boots
 - Avoid introducing state patterns that store live RPG Maker objects inside Vue reactivity.
 - Update docs when behavior or workflow changes.
 
+## Smoke testing before shipping
+
+Phase 4 adds a lightweight regression workflow:
+
+1. Run `pnpm run check:repo`.
+2. Smoke-test one MV game and one MZ game when runtime behavior changed.
+3. Verify overlay open, About panel, and relevant shortcuts.
+4. If translation changed, verify translation startup in a real game.
+
+See [Smoke Testing](/guide/technical/smoke-testing) for the current checklist.
+
 ## Related technical references
 
 - [Architecture](/guide/technical/architecture)
 - [Repository Structure](/guide/technical/repository-structure)
 - [Runtime and Data Flow](/guide/technical/runtime-and-data-flow)
 - [Build and Release](/guide/technical/build-and-release)
+- [Smoke Testing](/guide/technical/smoke-testing)
