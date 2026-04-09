@@ -9,11 +9,9 @@ export function readGeneralGold() {
 
 export function readGeneralPanelState() {
   const rawPlayer = /** @type {any} */ ($gamePlayer);
-  const runtimeWindow = /** @type {any} */ (window);
-  const gameSpeedSceneOption =
-    runtimeWindow.GameSpeedCheat && runtimeWindow.GameSpeedCheat.getSceneOption
-      ? runtimeWindow.GameSpeedCheat.getSceneOption()
-      : null;
+  const gameSpeedSceneOption = GameSpeedCheat.getSceneOption();
+  const isAllGameSpeed =
+    gameSpeedSceneOption === GameSpeedCheat.sceneOptions().all;
 
   return {
     noClip: !!rawPlayer._through,
@@ -22,13 +20,10 @@ export function readGeneralPanelState() {
     fixSpeed: SpeedCheat.isFixed(),
     forceSave: GeneralCheat.isForceSaveEnabled(),
     mouseTeleport: GeneralCheat.isMouseTeleportEnabled(),
-    gameSpeed:
-      runtimeWindow.GameSpeedCheat && runtimeWindow.GameSpeedCheat.getRate
-        ? runtimeWindow.GameSpeedCheat.getRate()
-        : 1,
-    applyAllForGameSpeed:
-      gameSpeedSceneOption === GameSpeedCheat.sceneOptions().all,
+    gameSpeed: GameSpeedCheat.getRate(),
+    applyAllForGameSpeed: isAllGameSpeed,
     applyBattleForGameSpeed:
+      isAllGameSpeed ||
       gameSpeedSceneOption === GameSpeedCheat.sceneOptions().battle,
   };
 }

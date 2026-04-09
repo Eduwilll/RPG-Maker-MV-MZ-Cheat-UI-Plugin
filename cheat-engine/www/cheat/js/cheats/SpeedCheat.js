@@ -68,6 +68,7 @@ export class GameSpeedCheat {
     this.rate = rate;
     this.sceneOption = sceneOption;
     this.removeApplied();
+    this.emitChange();
 
     if (Math.abs(rate - 1.0) < Number.EPSILON) {
       return;
@@ -97,6 +98,17 @@ export class GameSpeedCheat {
     };
 
     this.isApplied = true;
+  }
+
+  static emitChange() {
+    window.dispatchEvent(
+      new CustomEvent("cheat-game-speed-change", {
+        detail: {
+          rate: this.getRate(),
+          sceneOption: this.getSceneOption(),
+        },
+      }),
+    );
   }
 
   static __writeSettings(rate, sceneOption) {
@@ -131,6 +143,18 @@ export class GameSpeedCheat {
 }
 
 export class SpeedCheat {
+  static getPlayer() {
+    if (
+      typeof $gamePlayer === "undefined" ||
+      !$gamePlayer ||
+      typeof $gamePlayer.setMoveSpeed !== "function"
+    ) {
+      return null;
+    }
+
+    return $gamePlayer;
+  }
+
   static isFixed() {
     return !!SpeedCheat.fixed;
   }
@@ -153,7 +177,13 @@ export class SpeedCheat {
   }
 
   static __setSpeed(speed) {
-    $gamePlayer.setMoveSpeed(speed);
+    const player = SpeedCheat.getPlayer();
+    if (!player) {
+      return false;
+    }
+
+    player.setMoveSpeed(speed);
+    return true;
   }
 
   static setSpeed(speed, fixed = false) {
@@ -164,6 +194,19 @@ export class SpeedCheat {
     } else {
       SpeedCheat.removeFixSpeedInterval();
     }
+
+    SpeedCheat.emitChange(speed, fixed);
+  }
+
+  static emitChange(speed, fixed) {
+    window.dispatchEvent(
+      new CustomEvent("cheat-move-speed-change", {
+        detail: {
+          speed,
+          fixed,
+        },
+      }),
+    );
   }
 
   static __writeSettings(speed, fixed) {

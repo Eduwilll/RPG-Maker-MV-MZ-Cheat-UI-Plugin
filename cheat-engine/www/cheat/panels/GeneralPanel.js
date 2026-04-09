@@ -213,6 +213,28 @@ export default {
     this.initializeVariables();
   },
 
+  mounted() {
+    window.addEventListener(
+      "cheat-move-speed-change",
+      this.initializeVariables,
+    );
+    window.addEventListener(
+      "cheat-game-speed-change",
+      this.initializeVariables,
+    );
+  },
+
+  beforeDestroy() {
+    window.removeEventListener(
+      "cheat-move-speed-change",
+      this.initializeVariables,
+    );
+    window.removeEventListener(
+      "cheat-game-speed-change",
+      this.initializeVariables,
+    );
+  },
+
   methods: {
     initializeVariables() {
       const state = readGeneralPanelState();
@@ -313,7 +335,7 @@ export default {
 
     onApplyAllForGameSpeedChange() {
       if (this.applyAllForGameSpeed) {
-        this.applyBattleForGameSpeed = false;
+        this.applyBattleForGameSpeed = true;
       } else {
         this.applyBattleForGameSpeed = true;
       }
@@ -323,9 +345,15 @@ export default {
 
     onApplyBattleForGameSpeedChange() {
       if (this.applyBattleForGameSpeed) {
+        return this.onGameSpeedChange();
+      }
+
+      if (this.applyAllForGameSpeed) {
         this.applyAllForGameSpeed = false;
+        this.applyBattleForGameSpeed = true;
       } else {
         this.applyAllForGameSpeed = true;
+        this.applyBattleForGameSpeed = true;
       }
 
       this.onGameSpeedChange();
