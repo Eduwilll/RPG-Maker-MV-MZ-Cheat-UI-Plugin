@@ -7,7 +7,7 @@ import {
   TRANSLATE_SETTINGS,
   TRANSLATION_BANK,
 } from "../../TranslateHelper.js";
-import { IN_GAME_TRANSLATOR } from "../../InGameTranslator.js";
+import { IN_GAME_TRANSLATOR } from "../../translation/in-game/InGameTranslator.js";
 
 export const TRANSLATE_SETTINGS_REST_API_METHODS = [
   { name: "GET", value: "get" },

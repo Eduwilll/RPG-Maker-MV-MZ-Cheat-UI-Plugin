@@ -1,4 +1,4 @@
-import { ConfirmDialog } from "../js/DialogHelper.js";
+import { ConfirmDialog } from "../js/ui/DialogHelper.js";
 import { TRANSLATE_SETTINGS } from "../js/TranslateHelper.js";
 import {
   matchesPanelSearch,

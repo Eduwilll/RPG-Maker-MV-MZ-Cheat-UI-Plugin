@@ -1,7 +1,7 @@
 // @ts-check
 
-import { Key } from "../KeyCodes.js";
-import { cloneObject } from "../Tools.js";
+import { Key } from "./KeyCodes.js";
+import { cloneObject } from "./Tools.js";
 import { SpeedCheat, MessageCheat } from "../cheats/SpeedCheat.js";
 import { SceneCheat } from "../cheats/SceneCheat.js";
 import { BattleCheat } from "../cheats/BattleCheat.js";

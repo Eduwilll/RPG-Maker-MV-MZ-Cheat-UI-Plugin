@@ -1,6 +1,6 @@
 // @ts-check
 
-import { Key } from "../KeyCodes.js";
+import { Key } from "./KeyCodes.js";
 import {
   defaultShortcutSettings,
   parseStringToKeyObject,

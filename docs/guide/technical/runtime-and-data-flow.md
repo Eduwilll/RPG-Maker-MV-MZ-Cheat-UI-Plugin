@@ -123,7 +123,7 @@ Supported endpoint families visible in the repo include:
 
 ### Phase 3: apply cached translations
 
-`InGameTranslator.js` applies the cached results by:
+`translation/in-game/InGameTranslator.js` applies the cached results by:
 
 - patching RPG Maker data arrays
 - intercepting dialogue windows

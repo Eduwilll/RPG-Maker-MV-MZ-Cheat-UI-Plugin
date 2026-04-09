@@ -113,6 +113,8 @@ Main modules:
 - `shortcuts/GlobalShortcut.js`: runtime shortcut manager that binds configured shortcuts to actions.
 - `shortcuts/ShortcutConfig.js`: shortcut catalog, parameter validation, and action bindings used by the runtime shortcut manager.
 - `shortcuts/ShortcutHelper.js`: low-level key-table mapping used by the runtime shortcut manager.
+- `shortcuts/KeyCodes.js`: shared key parsing and normalization used by shortcut editing and runtime matching.
+- `shortcuts/Tools.js`: small shortcut-support helpers such as deep cloning for shortcut config data.
 - `shortcuts/ShortcutPanelState.js`: panel-safe view-state shaping for editing shortcut settings in the UI.
 - `shortcuts/ShortcutMigration.js`: default-shortcut migration and conflict handling for older shortcut settings files.
 - `shortcuts/ShortcutStorage.js`: read/write helper for persisted shortcut mappings.
@@ -120,10 +122,10 @@ Main modules:
 - `cheats/SpeedCheat.js`: game-speed and message-skip helpers split out of the older shared cheat helper file.
 - `cheats/SceneCheat.js`: scene navigation, quick save/load, and file-scene helpers.
 - `cheats/BattleCheat.js`: battle mutation and encounter-related cheat helpers.
-- `InGameTranslationData.js`: cache-backed patch and revert helpers for `$data*` arrays and system terms.
-- `InGameTranslationLists.js`: shared helpers for translating runtime command-list entries.
-- `InGameTranslationText.js`: shared text-cleanup and cache-lookup helpers for runtime text hooks.
-- `InGameTranslator.js`: runtime hooks that patch cached text into the game UI and data.
+- `translation/in-game/InGameTranslationData.js`: cache-backed patch and revert helpers for `$data*` arrays and system terms.
+- `translation/in-game/InGameTranslationLists.js`: shared helpers for translating runtime command-list entries.
+- `translation/in-game/InGameTranslationText.js`: shared text-cleanup and cache-lookup helpers for runtime text hooks.
+- `translation/in-game/InGameTranslator.js`: runtime hooks that patch cached text into the game UI and data.
 - `KeyValueStorage.js`: persistence for translation settings and the translation bank.
 
 The game is not translated live on every draw. The intended workflow is:

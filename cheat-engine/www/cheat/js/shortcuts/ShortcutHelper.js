@@ -1,4 +1,4 @@
-import { MAX_KEY_CODE, UNASSIGNED_KEY_CODE } from "../KeyCodes.js";
+import { MAX_KEY_CODE, UNASSIGNED_KEY_CODE } from "./KeyCodes.js";
 
 export class ShortcutMap {
   constructor() {

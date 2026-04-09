@@ -27,9 +27,11 @@ Most contributor work happens under `cheat-engine/www/`.
 | `cheat-engine/www/cheat/js/panels/` | Shared panel-safe state, search, refresh, and translation display helpers |
 | `cheat-engine/www/cheat/js/panels/about/` | Feature-specific support modules for the About panel |
 | `cheat-engine/www/cheat/js/translation/` | Home of the translation subsystem implementation files |
+| `cheat-engine/www/cheat/js/translation/in-game/` | Runtime cache-application helpers used after bulk translation completes |
 | `cheat-engine/www/cheat/js/shortcuts/` | Home of the shortcut subsystem implementation files |
 | `cheat-engine/www/cheat/js/runtime/` | Home of shared runtime and MV/MZ environment helpers |
 | `cheat-engine/www/cheat/js/storage/` | Home of shared persistence helpers |
+| `cheat-engine/www/cheat/js/ui/` | Small UI-facing services that bridge components and panel actions |
 | `cheat-engine/www/cheat/init/` | App bootstrapping and RPG Maker customization hooks |
 | `cheat-engine/www/cheat/components/` | Shared Vue UI components such as dialogs and snackbars |
 | `cheat-engine/www/cheat/libs/` | Bundled front-end libraries used directly without a build step |
@@ -58,6 +60,8 @@ Most contributor work happens under `cheat-engine/www/`.
 | `cheat-engine/www/cheat/js/shortcuts/GlobalShortcut.js` | Change runtime shortcut handling, binding, and persistence flow |
 | `cheat-engine/www/cheat/js/shortcuts/ShortcutConfig.js` | Change shortcut definitions, parameter validation, and action bindings |
 | `cheat-engine/www/cheat/js/shortcuts/ShortcutHelper.js` | Change low-level key table behavior used by the shortcut runtime |
+| `cheat-engine/www/cheat/js/shortcuts/KeyCodes.js` | Change shared key parsing, labels, and normalized key-code handling |
+| `cheat-engine/www/cheat/js/shortcuts/Tools.js` | Change small shortcut-support helpers such as object cloning |
 | `cheat-engine/www/cheat/js/shortcuts/ShortcutMigration.js` | Change how older shortcut settings are migrated and conflicts are resolved |
 | `cheat-engine/www/cheat/js/shortcuts/ShortcutPanelState.js` | Change how shortcut settings are shaped into panel-safe view rows |
 | `cheat-engine/www/cheat/js/shortcuts/ShortcutStorage.js` | Change how shortcut mappings are loaded from and saved to disk or preview storage |
@@ -65,10 +69,10 @@ Most contributor work happens under `cheat-engine/www/`.
 | `cheat-engine/www/cheat/js/cheats/SpeedCheat.js` | Change game-speed tuning and message-skip behavior |
 | `cheat-engine/www/cheat/js/cheats/SceneCheat.js` | Change scene navigation, file scene toggles, and quick save/load behavior |
 | `cheat-engine/www/cheat/js/cheats/BattleCheat.js` | Change battle-related cheat actions and encounter helpers |
-| `cheat-engine/www/cheat/js/InGameTranslationData.js` | Change how cached translations are written back into game data arrays |
-| `cheat-engine/www/cheat/js/InGameTranslationLists.js` | Change how runtime command lists are translated in choices and menus |
-| `cheat-engine/www/cheat/js/InGameTranslationText.js` | Change runtime text normalization and cache lookup for dialogue and rich text |
-| `cheat-engine/www/cheat/js/InGameTranslator.js` | Change how cached translations are applied at runtime |
+| `cheat-engine/www/cheat/js/translation/in-game/InGameTranslationData.js` | Change how cached translations are written back into game data arrays |
+| `cheat-engine/www/cheat/js/translation/in-game/InGameTranslationLists.js` | Change how runtime command lists are translated in choices and menus |
+| `cheat-engine/www/cheat/js/translation/in-game/InGameTranslationText.js` | Change runtime text normalization and cache lookup for dialogue and rich text |
+| `cheat-engine/www/cheat/js/translation/in-game/InGameTranslator.js` | Change how cached translations are applied at runtime |
 | `cheat-engine/www/cheat/js/CheatHelper.js` | Thin compatibility barrel that re-exports split cheat helper modules |
 | `cheat-engine/www/cheat/init/customize_functions.js` | Patch RPG Maker behavior or initialize runtime hooks |
 | `cheat-engine/www/cheat/css/main.css` | Style the in-game overlay |

@@ -6,7 +6,7 @@ import {
 import { TRANSLATOR } from "../js/TranslateHelper.js";
 import { isInValueInRange } from "../js/shortcuts/GlobalShortcut.js";
 import { Alert } from "../js/AlertHelper.js";
-import { IN_GAME_TRANSLATOR } from "../js/InGameTranslator.js";
+import { IN_GAME_TRANSLATOR } from "../js/translation/in-game/InGameTranslator.js";
 import {
   buildChunkSizeWarning,
   buildTranslateEndPointList,

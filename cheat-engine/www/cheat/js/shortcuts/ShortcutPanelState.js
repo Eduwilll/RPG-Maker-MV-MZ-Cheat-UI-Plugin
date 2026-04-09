@@ -1,6 +1,6 @@
 // @ts-check
 
-import { Key } from "../KeyCodes.js";
+import { Key } from "./KeyCodes.js";
 
 /**
  * @param {Record<string, any> | undefined} paramSettings

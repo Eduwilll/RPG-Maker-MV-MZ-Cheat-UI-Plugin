@@ -1,6 +1,6 @@
 // @ts-check
 
-import { TRANSLATION_BANK, TRANSLATE_SETTINGS } from "./TranslateHelper.js";
+import { TRANSLATION_BANK, TRANSLATE_SETTINGS } from "../../TranslateHelper.js";
 
 /**
  * @param {Array<CheatDataEntry | null> | undefined} dataArray

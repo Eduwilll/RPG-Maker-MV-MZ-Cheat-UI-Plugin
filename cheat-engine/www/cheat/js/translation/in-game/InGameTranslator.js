@@ -11,7 +11,7 @@
  * then this module patches game data and intercepts text rendering.
  */
 
-import { TRANSLATION_BANK, TRANSLATE_SETTINGS } from "./TranslateHelper.js";
+import { TRANSLATION_BANK, TRANSLATE_SETTINGS } from "../../TranslateHelper.js";
 import {
   applyTranslationsToGameData,
   revertGameData,
