@@ -1,10 +1,10 @@
 import { GeneralCheat } from "../js/cheats/GeneralCheat.js";
 import {
   coercePanelNumber,
-  extractActorParamValues,
   findPartyActorById,
   runPanelMutation,
 } from "../js/panels/PanelGameState.js";
+import { readStatsSettingPanelState } from "../js/panels/stats/StatsSettingPanelState.js";
 
 export default {
   name: "StatsSettingPanel",
@@ -119,22 +119,10 @@ export default {
   },
 
   methods: {
-    extractActorData(actor) {
-      return {
-        id: actor._actorId,
-        name: actor._name,
-        godMode: GeneralCheat.isGodMode(actor),
-        level: actor.level,
-        exp: actor.currentExp(), // actor._exp contains exp data for each class (_exp[classId] = exp)
-        param: extractActorParamValues(actor),
-      };
-    },
-
     initializeVariables() {
-      this.paramNames = $dataSystem.terms.params;
-      this.actors = $gameParty
-        .members()
-        .map((actor) => this.extractActorData(actor));
+      const state = readStatsSettingPanelState();
+      this.paramNames = state.paramNames;
+      this.actors = state.actors;
     },
 
     onLevelChange(item) {

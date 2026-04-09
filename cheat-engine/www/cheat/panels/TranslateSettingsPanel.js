@@ -1,8 +1,5 @@
 import {
   TRANSLATE_SETTINGS,
-  DEFAULT_END_POINTS,
-  RECOMMEND_CHUNK_SIZE,
-  MAX_CHUNK_SIZE,
   TRANSLATION_BANK,
   TRANSLATE_PROGRESS,
 } from "../js/TranslateHelper.js";
@@ -10,6 +7,18 @@ import { TRANSLATOR } from "../js/TranslateHelper.js";
 import { isInValueInRange } from "../js/shortcuts/GlobalShortcut.js";
 import { Alert } from "../js/AlertHelper.js";
 import { IN_GAME_TRANSLATOR } from "../js/InGameTranslator.js";
+import {
+  buildChunkSizeWarning,
+  buildTranslateEndPointList,
+  getRecommendedChunkSizeDescription,
+  getSelectedDefaultTranslateEndPoint,
+  isCustomTranslateEndPoint,
+  isJpToKrTranslateEndPoint,
+  isLlmTranslateEndPoint,
+  readTranslateSettingsPanelState,
+  readTranslationBankStats,
+  TRANSLATE_SETTINGS_REST_API_METHODS,
+} from "../js/panels/translation-settings/TranslateSettingsPanelState.js";
 
 export default {
   name: "TranslateSettingsPanel",
@@ -505,16 +514,7 @@ export default {
 
       endPointSelection: "",
 
-      restApiMethods: [
-        {
-          name: "GET",
-          value: "get",
-        },
-        {
-          name: "POST",
-          value: "post",
-        },
-      ],
+      restApiMethods: TRANSLATE_SETTINGS_REST_API_METHODS,
 
       customEndPointData: {},
 
@@ -613,65 +613,45 @@ export default {
     },
 
     endPointList() {
-      const ret = Object.values(DEFAULT_END_POINTS).map((ep) => ({
-        id: ep.id,
-        name: ep.name,
-      }));
-      ret.push({ id: "custom", name: "Custom" });
-
-      return ret;
+      return buildTranslateEndPointList();
     },
 
     isCustomEndPoint() {
-      return this.endPointSelection === "custom";
+      return isCustomTranslateEndPoint(this.endPointSelection);
     },
 
     isLLMEndPoint() {
-      const ep = DEFAULT_END_POINTS[this.endPointSelection];
-      return ep && ep.data && ep.data.isLLM;
+      return isLlmTranslateEndPoint(this.endPointSelection);
     },
 
     selectedDefaultEndPoint() {
-      return DEFAULT_END_POINTS[this.endPointSelection];
+      return getSelectedDefaultTranslateEndPoint(this.endPointSelection);
     },
 
     recommendChunkSizeDesc() {
-      if (
-        this.isCustomEndPoint ||
-        !RECOMMEND_CHUNK_SIZE[this.endPointSelection]
-      ) {
-        return null;
-      }
-
-      return `Recommended chunk size for ${this.selectedDefaultEndPoint.name} : ${RECOMMEND_CHUNK_SIZE[this.endPointSelection]}`;
+      return getRecommendedChunkSizeDescription(this.endPointSelection);
     },
 
     isJpToKrEndpoint() {
-      return (
-        this.endPointSelection === "ezTransWeb" ||
-        this.endPointSelection === "ezTransServer"
-      );
+      return isJpToKrTranslateEndPoint(this.endPointSelection);
     },
   },
 
   methods: {
     async initializeVariables() {
-      this.enabled = TRANSLATE_SETTINGS.isEnabled();
+      const state = readTranslateSettingsPanelState();
 
-      this.endPointSelection = TRANSLATE_SETTINGS.getEndPointSelection();
-      this.customEndPointData = TRANSLATE_SETTINGS.getCustomEndPointData();
-      this.llmConfig = TRANSLATE_SETTINGS.getLLMConfig();
-
-      this.targets = TRANSLATE_SETTINGS.getTargets();
-      this.bulkTranslateChunkSize =
-        TRANSLATE_SETTINGS.getBulkTranslateChunkSize();
-
-      // Load batch translation preference
-      this.useBatchTranslation =
-        localStorage.getItem("useBatchTranslation") !== "false";
-
-      this.updateBankStats();
-      this.checkChunkSize();
+      this.enabled = state.enabled;
+      this.endPointSelection = state.endPointSelection;
+      this.customEndPointData = state.customEndPointData;
+      this.llmConfig = state.llmConfig;
+      this.targets = state.targets;
+      this.bulkTranslateChunkSize = state.bulkTranslateChunkSize;
+      this.useBatchTranslation = state.useBatchTranslation;
+      this.bankStats = state.bankStats;
+      this.chunkSizeWarning = state.chunkSizeWarning;
+      this.isDataPatched = state.isDataPatched;
+      this.inGamePatchCount = state.inGamePatchCount;
       this.checkTranslatorAvailable();
     },
 
@@ -725,6 +705,12 @@ export default {
     },
 
     checkChunkSize() {
+      this.chunkSizeWarning = buildChunkSizeWarning(
+        this.bulkTranslateChunkSize,
+        this.endPointSelection,
+      );
+      return;
+
       const chunkSize = Number(this.bulkTranslateChunkSize);
       const endPointId = this.endPointSelection;
       const maxSafe = MAX_CHUNK_SIZE[endPointId] || 50;
@@ -783,20 +769,7 @@ export default {
     },
 
     updateBankStats() {
-      const stats = TRANSLATION_BANK.getStats();
-      this.bankStats.totalEntries = stats.totalEntries;
-
-      if (stats.newestEntry) {
-        const age = Date.now() - stats.newestEntry;
-        const days = Math.floor(age / (24 * 60 * 60 * 1000));
-        if (days > 0) {
-          this.bankStats.ageText = `${days} days old`;
-        } else {
-          this.bankStats.ageText = "Recent";
-        }
-      } else {
-        this.bankStats.ageText = "No data";
-      }
+      this.bankStats = readTranslationBankStats();
     },
 
     clearTranslationBank() {

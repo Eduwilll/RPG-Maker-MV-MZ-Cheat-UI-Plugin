@@ -2,9 +2,12 @@ import ItemTableTab from "./ItemTableTab.js";
 import { TRANSLATE_SETTINGS } from "../js/TranslateHelper.js";
 import {
   attachTranslateRefresh,
-  buildTranslatedNameDescRow,
   detachTranslateRefresh,
 } from "../js/panels/PanelTranslation.js";
+import {
+  buildInventoryTableRow,
+  readInventoryPanelItems,
+} from "../js/panels/inventory/InventoryPanelState.js";
 
 export default {
   name: "ItemSettingPanel",
@@ -55,11 +58,11 @@ export default {
 
   methods: {
     initializeVariables() {
-      this.items = $dataItems.slice();
+      this.items = readInventoryPanelItems($dataItems);
     },
 
     convertToTableData(item) {
-      return buildTranslatedNameDescRow(
+      return buildInventoryTableRow(
         item,
         !!TRANSLATE_SETTINGS.getTargets().items,
       );

@@ -1,4 +1,7 @@
-import { clonePanelState } from "../js/panels/PanelGameState.js";
+import {
+  cloneHealthSettingItems,
+  HEALTH_SETTING_TABLE_HEADERS,
+} from "../js/panels/health/HealthSettingTabState.js";
 
 export default {
   name: "HealthSettingTab",
@@ -55,20 +58,7 @@ export default {
 
   data() {
     return {
-      tableHeaders: [
-        {
-          text: "Name",
-          value: "name",
-        },
-        {
-          text: "Hp",
-          value: "hp",
-        },
-        {
-          text: "Mp",
-          value: "mp",
-        },
-      ],
+      tableHeaders: HEALTH_SETTING_TABLE_HEADERS,
 
       editingItems: [],
     };
@@ -86,7 +76,7 @@ export default {
       immediate: true,
       handler() {
         // Dereference objects to prevent Vue from deeply injecting __ob__ into RPG Maker database/game objects.
-        this.editingItems = clonePanelState(this.items);
+        this.editingItems = cloneHealthSettingItems(this.items);
       },
     },
   },

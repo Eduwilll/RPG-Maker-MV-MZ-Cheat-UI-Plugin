@@ -4,6 +4,10 @@ import {
   coercePanelNumber,
   runPanelMutation,
 } from "../js/panels/PanelGameState.js";
+import {
+  findHealthPanelMember,
+  readHealthSettingPanelState,
+} from "../js/panels/health/HealthSettingPanelState.js";
 
 export default {
   name: "HealthSettingPanel",
@@ -111,19 +115,10 @@ export default {
 
   methods: {
     initializeVariables() {
-      this.enemy = $gameTroop.members().map((member, index) => ({
-        id: index,
-        name: member.name(),
-        hp: { hp: member.hp, mhp: member.mhp },
-        mp: { mp: member.mp, mmp: member.mmp },
-      }));
-      this.party = $gameParty.members().map((member) => ({
-        id: member.actorId(),
-        name: member.name(),
-        hp: { hp: member.hp, mhp: member.mhp },
-        mp: { mp: member.mp, mmp: member.mmp },
-      }));
-      this.disableRandomEncounter = BattleCheat.isDisableRandomEncounter();
+      const state = readHealthSettingPanelState();
+      this.enemy = state.enemy;
+      this.party = state.party;
+      this.disableRandomEncounter = state.disableRandomEncounter;
     },
 
     recoverAllEnemy() {
@@ -185,12 +180,7 @@ export default {
     onDetailChange(items, type) {
       runPanelMutation(this, () => {
         for (const item of items) {
-          let member = null;
-          if (type === "party") {
-            member = $gameParty.members().find((a) => a.actorId() === item.id);
-          } else if (type === "enemy") {
-            member = $gameTroop.members()[item.id];
-          }
+          const member = findHealthPanelMember(type, item.id);
           if (member) {
             member.setHp(
               coercePanelNumber(item.hp.hp, {

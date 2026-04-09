@@ -128,45 +128,6 @@ export function clonePanelState(value) {
 }
 
 /**
- * @returns {{
- *   noClip: boolean,
- *   gold: number,
- *   moveSpeed: number,
- *   forceSave: boolean,
- *   mouseTeleport: boolean,
- *   gameSpeed: number,
- *   gameSpeedSceneOption: Function | null
- * }}
- */
-export function readGeneralPanelState() {
-  const rawPlayer = /** @type {any} */ ($gamePlayer);
-  const rawParty = /** @type {any} */ ($gameParty);
-  const runtimeWindow = /** @type {any} */ (window);
-
-  return {
-    noClip: !!rawPlayer._through,
-    gold: Number(rawParty._gold || 0),
-    moveSpeed: $gamePlayer.moveSpeed(),
-    forceSave: !!(window.GeneralCheat && window.GeneralCheat.isForceSaveEnabled
-      ? window.GeneralCheat.isForceSaveEnabled()
-      : false),
-    mouseTeleport: !!(window.GeneralCheat &&
-    window.GeneralCheat.isMouseTeleportEnabled
-      ? window.GeneralCheat.isMouseTeleportEnabled()
-      : false),
-    gameSpeed:
-      runtimeWindow.GameSpeedCheat && runtimeWindow.GameSpeedCheat.getRate
-        ? runtimeWindow.GameSpeedCheat.getRate()
-        : 1,
-    gameSpeedSceneOption:
-      runtimeWindow.GameSpeedCheat &&
-      runtimeWindow.GameSpeedCheat.getSceneOption
-        ? runtimeWindow.GameSpeedCheat.getSceneOption()
-        : null,
-  };
-}
-
-/**
  * @param {Array<DataMapInfo | null> | undefined} dataMapInfos
  * @param {(name: string) => string} translateName
  * @returns {Array<{ id: number, name: string, fullPath: string[], fullPathJoin: string }>}

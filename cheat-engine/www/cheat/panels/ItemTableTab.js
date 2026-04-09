@@ -2,6 +2,7 @@ import {
   coercePanelNumber,
   matchesPanelSearch,
 } from "../js/panels/PanelGameState.js";
+import { readItemTableTabState } from "../js/panels/inventory/ItemTableTabState.js";
 
 export default {
   name: "ItemTableTab",
@@ -151,21 +152,13 @@ export default {
 
   methods: {
     initializeVariables() {
-      this.tableHeaders = this.headers.slice(0);
-      this.tableHeaders.push({
-        text: "Amount",
-        value: "amount",
-      });
-
-      this.tableItems = this.items
-        .filter((item) => !!item)
-        .map((item) => {
-          const tableItem = this.asTableData(item);
-          tableItem._item = item;
-          tableItem.amount = $gameParty.numItems(item);
-
-          return tableItem;
-        });
+      const state = readItemTableTabState(
+        this.headers,
+        this.items,
+        this.asTableData,
+      );
+      this.tableHeaders = state.tableHeaders;
+      this.tableItems = state.tableItems;
     },
 
     onItemChange(item, newValue) {

@@ -3,9 +3,12 @@ import { SceneCheat } from "../js/cheats/SceneCheat.js";
 import { GameSpeedCheat, SpeedCheat } from "../js/cheats/SpeedCheat.js";
 import {
   coercePanelNumber,
-  readGeneralPanelState,
   runPanelMutation,
 } from "../js/panels/PanelGameState.js";
+import {
+  readGeneralGold,
+  readGeneralPanelState,
+} from "../js/panels/general/GeneralPanelState.js";
 
 export default {
   name: "GeneralPanel",
@@ -216,24 +219,15 @@ export default {
 
       this.noClip = state.noClip;
       this.speed = state.moveSpeed;
-      this.fixSpeed = SpeedCheat.isFixed();
+      this.fixSpeed = state.fixSpeed;
       this.gold = state.gold;
 
       this.forceSave = state.forceSave;
       this.mouseTeleport = state.mouseTeleport;
 
       this.gameSpeed = state.gameSpeed;
-      this.applyAllForGameSpeed = false;
-      this.applyBattleForGameSpeed = false;
-
-      const gameSpeedSceneOption = state.gameSpeedSceneOption;
-      if (gameSpeedSceneOption === GameSpeedCheat.sceneOptions().all) {
-        this.applyAllForGameSpeed = true;
-      } else if (
-        gameSpeedSceneOption === GameSpeedCheat.sceneOptions().battle
-      ) {
-        this.applyBattleForGameSpeed = true;
-      }
+      this.applyAllForGameSpeed = state.applyAllForGameSpeed;
+      this.applyBattleForGameSpeed = state.applyBattleForGameSpeed;
     },
 
     onNoClipChange() {
@@ -259,12 +253,12 @@ export default {
 
     onGoldChange() {
       this.gold = coercePanelNumber(this.gold, {
-        fallback: readGeneralPanelState().gold,
+        fallback: readGeneralGold(),
         integer: true,
         min: 0,
       });
 
-      const currentGold = readGeneralPanelState().gold;
+      const currentGold = readGeneralGold();
       const diff = this.gold - currentGold;
 
       if (diff < 0) {
@@ -274,7 +268,7 @@ export default {
       }
 
       runPanelMutation(this, () => {
-        this.gold = readGeneralPanelState().gold;
+        this.gold = readGeneralGold();
       });
     },
 
