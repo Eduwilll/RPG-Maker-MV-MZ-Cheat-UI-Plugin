@@ -21,6 +21,10 @@ If you want to modify the UI or work on the project itself, start with [Developm
 Use the installation guide that matches the game you want to patch:
 
 <div class="doc-card-grid">
+  <a class="doc-card" href="/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/installation/installer">
+    <strong>Installer</strong>
+    <span>Detect the game, back up `main.js`, and copy the plugin files with one command.</span>
+  </a>
   <a class="doc-card" href="/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/installation/install-mv">
     <strong>🗂️ RPG Maker MV</strong>
     <span>Copy the packaged files into the game's `www/` folder and replace `www/js/main.js`.</span>
@@ -59,6 +63,7 @@ Once the overlay is visible, you can move through the main panels right away:
 
 ## Recommended next pages
 
+- [Installer](/guide/installation/installer)
 - [Install on RPG Maker MV](/guide/installation/install-mv)
 - [Install on RPG Maker MZ](/guide/installation/install-mz)
 - [Feature Reference](/guide/features/features)

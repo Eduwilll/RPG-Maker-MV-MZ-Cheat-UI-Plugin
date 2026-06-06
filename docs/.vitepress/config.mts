@@ -102,6 +102,7 @@ export default defineConfig({
       {
         text: "Installation",
         items: [
+          { text: "Installer", link: "/guide/installation/installer" },
           { text: "Install on RPG Maker MV", link: "/guide/installation/install-mv" },
           { text: "Install on RPG Maker MZ", link: "/guide/installation/install-mz" },
           { text: "Update NW.js", link: "/guide/installation/update-nwjs" },
