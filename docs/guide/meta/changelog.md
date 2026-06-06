@@ -1,6 +1,18 @@
 # Changelog
 
-## v1.3.1 - Latest
+## v1.3.2 - Latest
+
+### Windows Installer
+- [Feat] **Installer GUI**: Added a Tkinter-based installer for RPG Maker MV/MZ games with game detection, install, status, restore, and uninstall actions.
+- [Feat] **Portable Windows Package**: Added a PyInstaller build that creates `RPGMakerCheatInstaller-v{version}-windows.zip` with the installer EXE and MV/MZ release archives.
+- [Feat] **Installer Backups**: Added separate `original-game` and `plugin-version` backups so uninstall restores original game files while Restore Old Plugin can roll back plugin updates.
+- [Fix] **Safe Uninstall Fallback**: If no original backup exists, uninstall disables the cheat loader while keeping the patched game bootable.
+- [Fix] **Installer Version Metadata**: Installer, deploy, and dev-sync now normalize version metadata with a `v` prefix.
+- [Tweak] **Version Bump**: Bumped version to `1.3.2`.
+
+---
+
+## v1.3.1
 
 ### Inventory UI Improvements
 - [Feat] **Inventory Price Toggle**: Added an optional `Price` column for item, weapon, and armor tables.

@@ -30,9 +30,15 @@ def main():
     status_parser = subparsers.add_parser("status", help="Show current install status")
     status_parser.add_argument("--game-path", required=True, help="Path to the game folder")
 
-    uninstall_parser = subparsers.add_parser("uninstall", help="Restore the latest installer backup")
+    uninstall_parser = subparsers.add_parser(
+        "uninstall",
+        help="Uninstall the cheat, restoring the original-game backup when available",
+    )
     uninstall_parser.add_argument("--game-path", required=True, help="Path to the game folder")
-    uninstall_parser.add_argument("--backup-path", help="Specific backup folder to restore")
+    uninstall_parser.add_argument(
+        "--backup-path",
+        help="Specific backup folder to restore manually instead of the original-game backup",
+    )
 
     args = parser.parse_args()
 
@@ -57,7 +63,8 @@ def main():
         print(f"Game type: {target.game_type.value}")
         print(f"Install root: {target.root_path}")
         print(f"Version: {result['version'] or 'archive default'}")
-        print(f"Backup: {result['backup_path']}")
+        print(f"Original backup: {result['original_backup_path'] or 'not available'}")
+        print(f"Plugin-version backup: {result['plugin_backup_path'] or 'not created'}")
         return
 
     if args.command == "status":
@@ -66,9 +73,9 @@ def main():
 
     if args.command == "uninstall":
         result = uninstall(args.game_path, backup_path=args.backup_path)
-        print("Restore complete")
+        print("Uninstall complete")
         print(f"Install root: {result['target'].root_path}")
-        print(f"Backup: {result['backup_path']}")
+        print(f"Original backup: {result['backup_path'] or 'not available'}")
 
 
 if __name__ == "__main__":

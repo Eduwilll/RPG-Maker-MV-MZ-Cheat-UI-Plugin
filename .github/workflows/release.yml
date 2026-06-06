@@ -3,21 +3,17 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'  # Triggers on version tags like v1.0.22
+      - 'v*'
 
 jobs:
-  release:
+  build-packages:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Full history for changelog generation
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -26,17 +22,92 @@ jobs:
 
       - name: Extract version from tag
         id: version
-        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
       - name: Build release packages
         run: python deploy/main.py --version ${{ steps.version.outputs.VERSION }}
+
+      - name: Upload release packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-packages
+          path: |
+            output/rpg-mv-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz
+            output/rpg-mz-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz
+
+  build-windows-installer:
+    runs-on: windows-latest
+    needs: build-packages
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Extract version from tag
+        id: version
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Download release packages
+        uses: actions/download-artifact@v4
+        with:
+          name: release-packages
+          path: output
+
+      - name: Install PyInstaller
+        run: python -m pip install pyinstaller pillow
+
+      - name: Build Windows installer ZIP
+        run: python tools/installer/build_windows.py --version ${{ steps.version.outputs.VERSION }}
+
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: output/RPGMakerCheatInstaller-v${{ steps.version.outputs.VERSION }}-windows.zip
+
+  release:
+    runs-on: ubuntu-latest
+    needs:
+      - build-packages
+      - build-windows-installer
+    permissions:
+      contents: write
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: Extract version from tag
+        id: version
+        shell: bash
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Download release packages
+        uses: actions/download-artifact@v4
+        with:
+          name: release-packages
+          path: output
+
+      - name: Download Windows installer
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-installer
+          path: output
 
       - name: Create GitHub Release (Draft)
         uses: softprops/action-gh-release@v2
         with:
           name: "v${{ steps.version.outputs.VERSION }}"
-          draft: true  # Created as draft — edit release notes before publishing
-          generate_release_notes: true  # Auto-generates changelog from commits as starting point
+          draft: true
+          generate_release_notes: true
           body: |
             ## What's New in v${{ steps.version.outputs.VERSION }}
 
@@ -54,14 +125,20 @@ jobs:
             ---
 
             ### Installation
-            1. Download the package for your RPG Maker version below
-            2. Extract and copy contents to your game directory
-            3. Launch game and press **Ctrl + C** for the cheat menu
+            Recommended for most users:
+            1. Download `RPGMakerCheatInstaller-v${{ steps.version.outputs.VERSION }}-windows.zip`
+            2. Extract the ZIP
+            3. Run `RPGMakerCheatInstaller.exe`
+            4. Select your RPG Maker MV/MZ game folder and click **Install**
+
+            Manual packages are also available:
 
             | File | For |
             |---|---|
-            | `rpg-mv-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz` | RPG Maker **MV** |
-            | `rpg-mz-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz` | RPG Maker **MZ** |
+            | `RPGMakerCheatInstaller-v${{ steps.version.outputs.VERSION }}-windows.zip` | Windows installer for **MV/MZ** |
+            | `rpg-mv-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz` | Manual RPG Maker **MV** install |
+            | `rpg-mz-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz` | Manual RPG Maker **MZ** install |
           files: |
             output/rpg-mv-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz
             output/rpg-mz-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz
+            output/RPGMakerCheatInstaller-v${{ steps.version.outputs.VERSION }}-windows.zip

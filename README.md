@@ -39,11 +39,11 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 - **[Full Engine Reference](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/features)**
 - **[Keyboard Shortcuts](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/shortcuts)**
 
-### Latest Release: v1.3.1
-- Optional Price, Effects, and Params columns for inventory tables
-- Compact two-line previews with tooltips for long inventory text
-- Better numeric sorting for Effects and Params columns
-- Keeps the larger v1.3.0 architecture and stability improvements
+### Latest Release: v1.3.2
+- Windows installer ZIP with `RPGMakerCheatInstaller.exe`
+- Automatic MV/MZ game detection and archive selection
+- Safer install, restore, and uninstall backup handling
+- Version metadata now stores the `v` prefix consistently
 
 ---
 
@@ -78,9 +78,11 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 ## 🛠️ Installation
 
 ### Step 1: Download
-Get the latest `-core.tar.gz` package for your engine from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page.
+Recommended: download `RPGMakerCheatInstaller-v1.3.2-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
 
-### Step 2: Copy Files
+Manual install is still available: download the latest `-core.tar.gz` package for your engine from the same Releases page.
+
+### Step 2: Manual Copy Files
 Extract the archive and copy the `js/` and `cheat/` folders into your game directory:
 
 | Engine | Copy To | File to Backup/Replace |
