@@ -11,6 +11,8 @@ from main import (
     validate_source_layout,
 )
 
+EPHEMERAL_RUNTIME_DIRS = ['cheat-settings']
+
 class DevPaths:
     def __init__(self, game_path):
         self.game_path = os.path.abspath(game_path)
@@ -156,6 +158,12 @@ def setup_dev_sync(game_path, version='vDEV-SYNC'):
 
     validate_source_layout(paths.source)
     print(f"Detected {paths.game_type.name} game at {paths.game_path}")
+
+    for runtime_dir in EPHEMERAL_RUNTIME_DIRS:
+        target_runtime_path = os.path.join(paths.root, runtime_dir)
+        if os.path.exists(target_runtime_path):
+            print(f"Removing persisted runtime directory: {target_runtime_path}")
+            shutil.rmtree(target_runtime_path, ignore_errors=True)
     
     # 1. Inject Core JS (main.js)
     # This is the entry point that bootstraps the cheat
@@ -169,7 +177,7 @@ def setup_dev_sync(game_path, version='vDEV-SYNC'):
     # 2. Sync secondary files (libs, components, etc.)
     # We copy everything EXCEPT 'cheat' and 'js' which we handle specially
     for item in os.listdir(paths.source_root):
-        if item in ['cheat', 'js', '_cheat_initialize']:
+        if item in ['cheat', 'js', '_cheat_initialize', *EPHEMERAL_RUNTIME_DIRS]:
             continue
         
         src_item = os.path.join(paths.source_root, item)

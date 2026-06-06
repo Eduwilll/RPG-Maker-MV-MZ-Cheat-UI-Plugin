@@ -5,6 +5,8 @@ import zipfile
 import argparse
 import json
 
+EPHEMERAL_RUNTIME_DIRS = ['cheat-settings']
+
 
 class GameTypes(Enum):
     MV = 0
@@ -151,6 +153,12 @@ if __name__ == '__main__':
     for game_type in GameTypes:
         # copy js sources to temp directory
         shutil.copytree(paths.origin.root_dir, paths.temp.root_dir)
+
+        for runtime_dir in EPHEMERAL_RUNTIME_DIRS:
+            shutil.rmtree(
+                os.path.join(paths.temp.root_dir, runtime_dir),
+                ignore_errors=True,
+            )
 
         # merge cheat sources
         merge_directory(
