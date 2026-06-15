@@ -649,11 +649,15 @@ def safe_extract_archive(archive, target_dir):
     target_dir = os.path.abspath(target_dir)
 
     for member in archive.getmembers():
-        member_path = os.path.abspath(os.path.join(target_dir, member.name))
-        if not member_path.startswith(target_dir + os.sep):
+        if not is_safe_archive_member_path(target_dir, member.name):
             raise RuntimeError(f"Archive contains an unsafe path: {member.name}")
 
     archive.extractall(target_dir)
+
+
+def is_safe_archive_member_path(target_dir, member_name):
+    member_path = os.path.abspath(os.path.join(target_dir, member_name))
+    return member_path == target_dir or member_path.startswith(target_dir + os.sep)
 
 
 def write_version_file(version_path, version):

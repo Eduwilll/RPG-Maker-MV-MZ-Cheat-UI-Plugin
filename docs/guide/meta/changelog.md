@@ -1,6 +1,14 @@
 # Changelog
 
-## v1.3.2 - Latest
+## v1.3.3 - Latest
+
+### Installer Patch
+- [Fix] **Archive Extraction**: Fixed installer rejection of valid release archives containing a root `.` tar entry.
+- [Tweak] **Version Bump**: Bumped version to `1.3.3`.
+
+---
+
+## v1.3.2
 
 ### Windows Installer
 - [Feat] **Installer GUI**: Added a Tkinter-based installer for RPG Maker MV/MZ games with game detection, install, status, restore, and uninstall actions.
