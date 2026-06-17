@@ -13,6 +13,9 @@ from main import (
 
 EPHEMERAL_RUNTIME_DIRS = ['cheat-settings']
 
+def quote_cmd_arg(value):
+    return '"' + value.replace('"', '\\"') + '"'
+
 class DevPaths:
     def __init__(self, game_path):
         self.game_path = os.path.abspath(game_path)
@@ -219,7 +222,8 @@ def setup_dev_sync(game_path, version='vDEV-SYNC'):
     # Use Junctions on Windows (/J) as they don't require Admin privileges 
     # in most local developer environments.
     if os.name == 'nt':
-        subprocess.run(['mklink', '/J', cheat_dst, cheat_src], shell=True)
+        command = f'mklink /J {quote_cmd_arg(cheat_dst)} {quote_cmd_arg(cheat_src)}'
+        subprocess.run(command, shell=True, check=True)
     else:
         os.symlink(cheat_src, cheat_dst, target_is_directory=True)
 
@@ -230,7 +234,7 @@ def setup_dev_sync(game_path, version='vDEV-SYNC'):
     validate_dev_sync_install(paths)
         
     print("\n" + "="*40)
-    print("🚀 [SUCCESS] Dev-Sync setup complete!")
+    print("[SUCCESS] Dev-Sync setup complete!")
     print("="*40)
     print("1. Your UI source is now LINKED to the game.")
     print("2. Simply EDIT your .js files in 'cheat-engine/www/cheat/'.")
