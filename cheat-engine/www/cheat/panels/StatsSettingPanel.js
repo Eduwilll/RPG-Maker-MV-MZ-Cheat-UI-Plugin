@@ -4,7 +4,10 @@ import {
   findPartyActorById,
   runPanelMutation,
 } from "../js/panels/PanelGameState.js";
-import { readStatsSettingPanelState } from "../js/panels/stats/StatsSettingPanelState.js";
+import {
+  readStatsSettingPanelState,
+  changeName,
+} from "../js/panels/stats/StatsSettingPanelState.js";
 
 export default {
   name: "StatsSettingPanel",
@@ -17,9 +20,37 @@ export default {
         background-color="grey darken-3"
         show-arrows>
         <v-tab
-            v-for="actor in actors"
+            v-for="(actor, actorIdx) in actors"
             :key="actor.id">
-            {{actor.name}}
+            <div
+                v-if="editingNameActorId !== actor.id"
+                class="d-flex align-center">
+                <span>{{actor.name}}</span>
+                <v-icon
+                    x-small
+                    class="ml-2"
+                    title="Edit name"
+                    @click.stop.prevent="startNameEdit(actor, actorIdx)">
+                    mdi-pencil
+                </v-icon>
+            </div>
+            <v-text-field
+                v-else
+                ref="nameEditField"
+                v-model="nameEditDraft"
+                class="stats-actor-name-field"
+                solo
+                dense
+                flat
+                hide-details
+                single-line
+                @click.stop
+                @mousedown.stop
+                @keydown.stop
+                @keyup.enter.stop="finishNameEdit(actor)"
+                @keyup.esc.stop="cancelNameEdit"
+                @blur="finishNameEdit(actor)">
+            </v-text-field>
         </v-tab>
     </v-tabs>
     <v-tabs-items
@@ -111,6 +142,8 @@ export default {
       selectedTab: null,
       paramNames: [], // name of stats (Max HP, ATK, ...)
       actors: [],
+      editingNameActorId: null,
+      nameEditDraft: "",
     };
   },
 
@@ -123,6 +156,35 @@ export default {
       const state = readStatsSettingPanelState();
       this.paramNames = state.paramNames;
       this.actors = state.actors;
+    },
+
+    startNameEdit(actor, actorIdx) {
+      this.selectedTab = actorIdx;
+      this.editingNameActorId = actor.id;
+      this.nameEditDraft = actor.name;
+      this.$nextTick(() => {
+        const field = this.$refs.nameEditField;
+        const input = Array.isArray(field) ? field[0] : field;
+        if (input && input.focus) input.focus();
+      });
+    },
+
+    finishNameEdit(actor) {
+      if (this.editingNameActorId !== actor.id) return;
+
+      const nextName = String(this.nameEditDraft || "").trim();
+      if (nextName && nextName !== actor.name) {
+        actor.name = nextName;
+        changeName(actor.id, nextName);
+      }
+
+      this.editingNameActorId = null;
+      this.nameEditDraft = "";
+    },
+
+    cancelNameEdit() {
+      this.editingNameActorId = null;
+      this.nameEditDraft = "";
     },
 
     onLevelChange(item) {

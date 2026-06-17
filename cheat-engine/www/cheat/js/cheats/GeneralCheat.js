@@ -41,6 +41,12 @@ export class GeneralCheat {
     }
   }
 
+  static changeName(actor, newName) {
+    if (actor && typeof actor.setName === "function") {
+      actor.setName(newName);
+    }
+  }
+
   static getGodModeOnActorIds() {
     if (!this.godModeMap) {
       return [];

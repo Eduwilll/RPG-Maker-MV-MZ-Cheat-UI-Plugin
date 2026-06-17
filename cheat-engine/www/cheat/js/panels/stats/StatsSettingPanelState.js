@@ -28,6 +28,11 @@ export function readStatsSettingPanelState() {
   };
 }
 
+export function changeName(actorId, newName) {
+  const actor = $gameActors.actor(actorId);
+  GeneralCheat.changeName(actor, newName);
+}
+
 /**
  * @param {Game_Battler} actor
  * @returns {Game_Actor}
