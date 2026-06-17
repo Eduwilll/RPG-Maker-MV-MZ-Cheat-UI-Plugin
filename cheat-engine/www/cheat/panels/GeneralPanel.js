@@ -50,6 +50,14 @@ export default {
             </v-col>
             <v-col cols="auto" class="ml-3">
                 <v-checkbox
+                    v-model="mouseMove"
+                    label="Enable Mouse Controls"
+                    hide-details
+                    dense
+                    @change="onMouseMoveChange" />
+            </v-col>
+            <v-col cols="auto" class="ml-3">
+                <v-checkbox
                     v-model="mouseTeleport"
                     label="Mouse Tele"
                     hide-details
@@ -203,6 +211,7 @@ export default {
       applyAllForGameSpeed: false,
       applyBattleForGameSpeed: false,
       forceSave: false,
+      mouseMove: false,
       mouseTeleport: false,
       canOpenConsole:
         typeof nw !== "undefined" || typeof require === "function",
@@ -245,6 +254,7 @@ export default {
       this.gold = state.gold;
 
       this.forceSave = state.forceSave;
+      this.mouseMove = state.mouseMove;
       this.mouseTeleport = state.mouseTeleport;
 
       this.gameSpeed = state.gameSpeed;
@@ -372,6 +382,14 @@ export default {
     onMouseTeleportChange() {
       runPanelMutation(this, () => {
         GeneralCheat.toggleMouseTeleport(this.mouseTeleport);
+        this.mouseMove = GeneralCheat.isMouseMoveEnabled();
+      });
+    },
+
+    onMouseMoveChange() {
+      runPanelMutation(this, () => {
+        GeneralCheat.toggleMouseMove(this.mouseMove);
+        this.mouseTeleport = GeneralCheat.isMouseTeleportEnabled();
       });
     },
 

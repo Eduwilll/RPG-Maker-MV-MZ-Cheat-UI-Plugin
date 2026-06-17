@@ -293,25 +293,223 @@ export class GeneralCheat {
     }
     this._mouseTeleport = enabled;
     if (enabled) {
-      if (!this._orig_onMapTouch) {
-        this._orig_onMapTouch = Scene_Map.prototype.onMapTouch;
-      }
-      Scene_Map.prototype.onMapTouch = function () {
-        const touchInput = /** @type {any} */ (TouchInput);
-        const x = $gameMap.canvasToMapX(touchInput.x);
-        const y = $gameMap.canvasToMapY(touchInput.y);
-        $gamePlayer.locate(x, y);
-      };
-      Alert.success("Mouse Teleport: Enabled");
-    } else {
-      if (this._orig_onMapTouch) {
-        Scene_Map.prototype.onMapTouch = this._orig_onMapTouch;
-      }
-      Alert.info("Mouse Teleport: Disabled");
+      this._mouseMove = false;
     }
+
+    this.__applyTouchInputPatch();
+    this.__applyMouseMapTouchPatch();
+    Alert[enabled ? "success" : "info"](
+      `Mouse Teleport: ${enabled ? "Enabled" : "Disabled"}`,
+    );
   }
 
   static isMouseTeleportEnabled() {
     return !!this._mouseTeleport;
+  }
+
+  static toggleMouseMove(enabled) {
+    if (enabled === undefined) {
+      enabled = !this.isMouseMoveEnabled();
+    }
+    this._mouseMove = enabled;
+    if (enabled) {
+      this._mouseTeleport = false;
+    }
+
+    this.__applyTouchInputPatch();
+    this.__applyMouseMapTouchPatch();
+    Alert[enabled ? "success" : "info"](
+      `Mouse Move: ${enabled ? "Enabled" : "Disabled"}`,
+    );
+  }
+
+  static isMouseMoveEnabled() {
+    return !!this._mouseMove;
+  }
+
+  static isMouseInputPatchEnabled() {
+    return this.isMouseMoveEnabled() || this.isMouseTeleportEnabled();
+  }
+
+  static __storeTouchInputOriginals() {
+    if (typeof TouchInput === "undefined") return false;
+
+    if (!this._orig_touchInput) {
+      this._orig_touchInput = {
+        isPressed: TouchInput.isPressed,
+        isTriggered: TouchInput.isTriggered,
+        isRepeated: TouchInput.isRepeated,
+        isLongPressed: TouchInput.isLongPressed,
+        isCancelled: TouchInput.isCancelled,
+        isMoved: TouchInput.isMoved,
+        isReleased: TouchInput.isReleased,
+        wheelX: Object.getOwnPropertyDescriptor(TouchInput, "wheelX"),
+        wheelY: Object.getOwnPropertyDescriptor(TouchInput, "wheelY"),
+      };
+    }
+
+    return true;
+  }
+
+  static __applyTouchInputPatch() {
+    if (!this.__storeTouchInputOriginals()) return;
+
+    if (!this.isMouseInputPatchEnabled()) {
+      TouchInput.isPressed = this._orig_touchInput.isPressed;
+      TouchInput.isTriggered = this._orig_touchInput.isTriggered;
+      TouchInput.isRepeated = this._orig_touchInput.isRepeated;
+      TouchInput.isLongPressed = this._orig_touchInput.isLongPressed;
+      TouchInput.isCancelled = this._orig_touchInput.isCancelled;
+      TouchInput.isMoved = this._orig_touchInput.isMoved;
+      TouchInput.isReleased = this._orig_touchInput.isReleased;
+      if (this._orig_touchInput.wheelX) {
+        Object.defineProperty(
+          TouchInput,
+          "wheelX",
+          this._orig_touchInput.wheelX,
+        );
+      }
+      if (this._orig_touchInput.wheelY) {
+        Object.defineProperty(
+          TouchInput,
+          "wheelY",
+          this._orig_touchInput.wheelY,
+        );
+      }
+      return;
+    }
+
+    TouchInput.isPressed = function () {
+      const input = /** @type {any} */ (this);
+      return !!(input._mousePressed || input._screenPressed);
+    };
+    TouchInput.isTriggered = function () {
+      const input = /** @type {any} */ (this);
+      return !!input._triggered;
+    };
+    TouchInput.isRepeated = function () {
+      const input = /** @type {any} */ (this);
+      return (
+        this.isPressed() &&
+        (input._triggered ||
+          (input._pressedTime >= this.keyRepeatWait &&
+            input._pressedTime % this.keyRepeatInterval === 0))
+      );
+    };
+    TouchInput.isLongPressed = function () {
+      const input = /** @type {any} */ (this);
+      return this.isPressed() && input._pressedTime >= this.keyRepeatWait;
+    };
+    TouchInput.isCancelled = function () {
+      const input = /** @type {any} */ (this);
+      return !!input._cancelled;
+    };
+    TouchInput.isMoved = function () {
+      const input = /** @type {any} */ (this);
+      return !!input._moved;
+    };
+    TouchInput.isReleased = function () {
+      const input = /** @type {any} */ (this);
+      return !!input._released;
+    };
+
+    Object.defineProperty(TouchInput, "wheelX", {
+      get: function () {
+        return this._wheelX || 0;
+      },
+      configurable: true,
+    });
+    Object.defineProperty(TouchInput, "wheelY", {
+      get: function () {
+        return this._wheelY || 0;
+      },
+      configurable: true,
+    });
+  }
+
+  static __storeMouseMapTouchOriginals() {
+    if (typeof Scene_Map === "undefined") return false;
+
+    if (!this._orig_updateDestination) {
+      this._orig_updateDestination = Scene_Map.prototype.updateDestination;
+    }
+    if (!this._orig_processMapTouch) {
+      this._orig_processMapTouch = Scene_Map.prototype.processMapTouch;
+    }
+    if (!this._orig_onMapTouch) {
+      this._orig_onMapTouch = Scene_Map.prototype.onMapTouch;
+    }
+
+    return true;
+  }
+
+  static __applyMouseMapTouchPatch() {
+    if (!this.__storeMouseMapTouchOriginals()) return;
+
+    if (!this.isMouseMoveEnabled() && !this.isMouseTeleportEnabled()) {
+      if (this._orig_updateDestination) {
+        Scene_Map.prototype.updateDestination = this._orig_updateDestination;
+      }
+      if (this._orig_processMapTouch) {
+        Scene_Map.prototype.processMapTouch = this._orig_processMapTouch;
+      }
+      if (this._orig_onMapTouch) {
+        Scene_Map.prototype.onMapTouch = this._orig_onMapTouch;
+      }
+      return;
+    }
+
+    Scene_Map.prototype.updateDestination = function () {
+      const canTouchMap =
+        (!this.isActive || this.isActive()) &&
+        (!$gamePlayer ||
+          typeof $gamePlayer.canMove !== "function" ||
+          $gamePlayer.canMove());
+
+      if (canTouchMap) {
+        this.processMapTouch();
+      } else if (
+        $gameTemp &&
+        typeof $gameTemp.clearDestination === "function"
+      ) {
+        $gameTemp.clearDestination();
+      }
+    };
+
+    Scene_Map.prototype.processMapTouch = function () {
+      const touchInput = /** @type {any} */ (TouchInput);
+      if (typeof this._touchCount !== "number") {
+        this._touchCount = 0;
+      }
+
+      const isTriggered =
+        typeof touchInput.isTriggered === "function" &&
+        touchInput.isTriggered();
+      const isPressed =
+        typeof touchInput.isPressed === "function" && touchInput.isPressed();
+
+      if (isTriggered || this._touchCount > 0) {
+        if (isPressed) {
+          this._touchCount += 1;
+          if (this._touchCount === 1 || this._touchCount >= 15) {
+            this.onMapTouch();
+          }
+        } else {
+          this._touchCount = 0;
+        }
+      }
+    };
+
+    Scene_Map.prototype.onMapTouch = function () {
+      const touchInput = /** @type {any} */ (TouchInput);
+      const x = $gameMap.canvasToMapX(touchInput.x);
+      const y = $gameMap.canvasToMapY(touchInput.y);
+
+      if (GeneralCheat.isMouseTeleportEnabled()) {
+        $gamePlayer.locate(x, y);
+      } else if ($gameTemp && typeof $gameTemp.setDestination === "function") {
+        $gameTemp.setDestination(x, y);
+      }
+    };
   }
 }

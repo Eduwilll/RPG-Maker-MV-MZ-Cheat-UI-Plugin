@@ -19,6 +19,7 @@ export function readGeneralPanelState() {
     moveSpeed: $gamePlayer.moveSpeed(),
     fixSpeed: SpeedCheat.isFixed(),
     forceSave: GeneralCheat.isForceSaveEnabled(),
+    mouseMove: GeneralCheat.isMouseMoveEnabled(),
     mouseTeleport: GeneralCheat.isMouseTeleportEnabled(),
     gameSpeed: GameSpeedCheat.getRate(),
     applyAllForGameSpeed: isAllGameSpeed,
