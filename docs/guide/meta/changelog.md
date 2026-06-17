@@ -1,6 +1,16 @@
 # Changelog
 
-## v1.3.3 - Latest
+## v1.3.4 - Latest
+
+### Mouse Controls & Dev Sync
+- [Feat] **Enable Mouse Controls**: Added a General panel toggle that restores mouse/touch menu interaction and click-to-move in games that disable RPG Maker touch input.
+- [Fix] **YEP TouchInput Disabler Compatibility**: Bypasses disabled `TouchInput` checks while mouse controls or mouse teleport are enabled, then restores the game's original behavior when disabled.
+- [Fix] **Dev-Sync Windows Paths**: Fixed junction creation for test games whose folder paths contain shell-special characters such as `&`.
+- [Tweak] **Version Bump**: Bumped version to `1.3.4`.
+
+---
+
+## v1.3.3
 
 ### Installer Patch
 - [Fix] **Archive Extraction**: Fixed installer rejection of valid release archives containing a root `.` tar entry.

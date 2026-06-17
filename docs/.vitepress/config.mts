@@ -71,7 +71,7 @@ export default defineConfig({
       { text: "Features", link: "/guide/features/features" },
       { text: "Translation", link: "/guide/translation/translation-usage" },
       { text: "Development", link: "/guide/introduction/development" },
-      { text: "v1.3.3", link: "/guide/meta/changelog" },
+      { text: "v1.3.4", link: "/guide/meta/changelog" },
       {
         text: "More",
         items: [

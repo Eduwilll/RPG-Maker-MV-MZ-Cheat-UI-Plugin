@@ -39,10 +39,12 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 - **[Full Engine Reference](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/features)**
 - **[Keyboard Shortcuts](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/shortcuts)**
 
-### Latest Release: v1.3.3
+### Latest Release: v1.3.4
 - Windows installer ZIP with `RPGMakerCheatInstaller.exe`
 - Automatic MV/MZ game detection and archive selection
-- Fixed installer archive extraction for release packages with a root `.` entry
+- Added **Enable Mouse Controls** for games that disable mouse/touch input
+- Improved compatibility with Yanfly's Touch Input Disabler
+- Fixed dev-sync setup for test game paths containing special characters such as `&`
 - Safer install, restore, and uninstall backup handling
 - Version metadata now stores the `v` prefix consistently
 
@@ -65,6 +67,7 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
   - **Force Save**: Overrides game-level save restrictions.
   - **Debug Access**: Instant access to NW.js Console and RPG Maker Debug (F9) Menu.
   - **Map Events Panel**: Interactive map overlay with real-time tracking of player, events, enemies, and treasures.
+  - **Enable Mouse Controls**: Restores mouse/touch menus and click-to-move in games that disable RPG Maker touch input.
   - **Mouse Teleport**: Move your player instantly with map clicks or `Alt + M` (toggle).
   - **Toast Notifications**: Interactive feedback for No Clip, Force Save, and Encounter toggles.
   - **Pop Out Window**: Launch the Cheat UI in a separate standalone window for better multitasking.
@@ -79,7 +82,7 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 ## 🛠️ Installation
 
 ### Step 1: Download
-Recommended: download `RPGMakerCheatInstaller-v1.3.3-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
+Recommended: download `RPGMakerCheatInstaller-v1.3.4-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
 
 Manual install is still available: download the latest `-core.tar.gz` package for your engine from the same Releases page.
 
