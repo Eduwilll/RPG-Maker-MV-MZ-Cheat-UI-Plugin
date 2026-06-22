@@ -1,6 +1,17 @@
 # Changelog
 
-## v1.3.4 - Latest
+## v1.4.0 - Latest
+
+### Variable & Switch Watcher
+- [Feat] **Watcher Panel**: Added a new Watcher panel for live tracking RPG Maker variables and switches while playing.
+- [Feat] **Nearby Map References**: Added contextual discovery for map events that reference switches, variables, and self switches, sorted with the closest events first.
+- [Feat] **Optional Watch Overlay**: Added a compact in-game overlay for watched values, disabled by default and only enabled when the user opts in.
+- [Feat] **Variable/Switch Panel Integration**: Added watch-list buttons directly to the Variables and Switches panels.
+- [Tweak] **Version Bump**: Bumped version to `1.4.0`.
+
+---
+
+## v1.3.4
 
 ### Mouse Controls & Dev Sync
 - [Feat] **Enable Mouse Controls**: Added a General panel toggle that restores mouse/touch menu interaction and click-to-move in games that disable RPG Maker touch input.

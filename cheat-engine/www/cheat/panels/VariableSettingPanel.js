@@ -11,6 +11,7 @@ import {
   detachTranslateRefresh,
   getTranslatedPanelText,
 } from "../js/panels/PanelTranslation.js";
+import { addWatcherTarget } from "../js/panels/watcher/WatcherPanelState.js";
 
 export default {
   name: "VariableSettingPanel",
@@ -67,6 +68,16 @@ export default {
                 @focus="$event.target.select()">
             </v-text-field>
         </template>
+        <template
+            v-slot:item.watch="{ item }">
+            <v-btn
+                x-small
+                icon
+                title="Add variable to Watch"
+                @click="addToWatchList(item)">
+                <v-icon small>mdi-eye-plus</v-icon>
+            </v-btn>
+        </template>
     </v-data-table>
     
     <v-tooltip
@@ -109,6 +120,12 @@ export default {
         {
           text: "Value",
           value: "value",
+        },
+        {
+          text: "",
+          value: "watch",
+          sortable: false,
+          width: 36,
         },
       ],
       tableItems: [],
@@ -205,6 +222,10 @@ export default {
 
       // refresh
       item.value = $gameVariables.value(item.id);
+    },
+
+    addToWatchList(item) {
+      addWatcherTarget("variable", item.id);
     },
 
     async manualRefresh() {

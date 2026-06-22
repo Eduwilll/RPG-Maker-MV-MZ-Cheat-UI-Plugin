@@ -9,6 +9,7 @@ import {
   detachTranslateRefresh,
   getTranslatedPanelText,
 } from "../js/panels/PanelTranslation.js";
+import { addWatcherTarget } from "../js/panels/watcher/WatcherPanelState.js";
 
 export default {
   name: "SwitchSettingPanel",
@@ -69,6 +70,16 @@ export default {
                 @change="onItemChange(item)">
             </v-switch>
         </template>
+        <template
+            v-slot:item.watch="{ item }">
+            <v-btn
+                x-small
+                icon
+                title="Add switch to Watch"
+                @click="addToWatchList(item)">
+                <v-icon small>mdi-eye-plus</v-icon>
+            </v-btn>
+        </template>
     </v-data-table>
     
     <v-tooltip
@@ -109,6 +120,12 @@ export default {
         {
           text: "Value",
           value: "value",
+        },
+        {
+          text: "",
+          value: "watch",
+          sortable: false,
+          width: 36,
         },
       ],
       tableItems: [],
@@ -206,6 +223,10 @@ export default {
 
       // refresh
       item.value = $gameSwitches.value(item.id);
+    },
+
+    addToWatchList(item) {
+      addWatcherTarget("switch", item.id);
     },
 
     tableItemFilter(value, search, item) {

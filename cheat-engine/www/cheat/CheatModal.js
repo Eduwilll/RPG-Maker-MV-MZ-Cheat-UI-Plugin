@@ -6,6 +6,7 @@ import WeaponSettingPanel from "./panels/WeaponSettingPanel.js";
 import ArmorSettingPanel from "./panels/ArmorSettingPanel.js";
 import VariableSettingPanel from "./panels/VariableSettingPanel.js";
 import SwitchSettingPanel from "./panels/SwitchSettingPanel.js";
+import WatcherPanel from "./panels/WatcherPanel.js";
 import SaveRecallPanel from "./panels/SaveRecallPanel.js";
 import TeleportPanel from "./panels/TeleportPanel.js";
 import MapEventPanel from "./panels/MapEventPanel.js";
@@ -25,6 +26,7 @@ export default {
     ArmorSettingPanel,
     VariableSettingPanel,
     SwitchSettingPanel,
+    WatcherPanel,
     SaveRecallPanel,
     MapEventPanel,
     TeleportPanel,
@@ -144,6 +146,11 @@ export default {
           name: "Switches",
           icon: "mdi-toggle-switch",
           component: "switch-setting-panel",
+        },
+        {
+          name: "Watch",
+          icon: "mdi-eye-outline",
+          component: "watcher-panel",
         },
         {
           name: "Save Locations",
