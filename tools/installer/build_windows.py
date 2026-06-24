@@ -101,6 +101,8 @@ def run_pyinstaller(project_root, dist_dir, work_dir, spec_dir):
         installer_dir,
         "--hidden-import",
         "core",
+        "--hidden-import",
+        "save_editor",
     ]
 
     if os.path.exists(favicon_path):

@@ -9,10 +9,10 @@ This document tracks planned features and enhancements for the RPG Maker MV/MZ C
 - **Priority**: High
 - **Status**: Shipped in v1.4.0
 
-### 💾 2. Built-in Save File Editor
-- **Description**: Directly edit save slots, modify JSON data via UI, and export/import saves for sharing.
+### 💾 2. Save File Editor in the RPGMakerCheatInstaller
+- **Description**: Directly edit save slots, and make backup of the files before changing. I want the user be able to save edit the His save failes.
 - **Priority**: Medium-High
-- **Status**: Tagged for v1.5.0
+- **Status**: Shipped in v1.5.0
 
 ### 📦 3. "Safe Patch" Export
 - **Description**: Generate a standalone `data/` patch from translations that can be used without the full cheat engine installed.

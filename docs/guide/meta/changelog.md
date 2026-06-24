@@ -1,6 +1,17 @@
 # Changelog
 
-## v1.4.0 - Latest
+## v1.5.0 - Latest
+
+### Installer Save Editor
+- [Feat] **Save File Editor**: Added a Save Editor to the Windows installer for RPG Maker MV/MZ local save files.
+- [Feat] **Structured Save Editing**: Added human-friendly fields for gold, actor basics, actor parameter bonuses, and inventory quantities.
+- [Feat] **Raw JSON Editor**: Added a raw JSON editor for advanced save edits while keeping structured editing available.
+- [Fix] **Safe Save Writes**: Save edits now create a timestamped backup, flush changes to disk, and verify by reading the save back.
+- [Tweak] **Version Bump**: Bumped version to `1.5.0`.
+
+---
+
+## v1.4.0
 
 ### Variable & Switch Watcher
 - [Feat] **Watcher Panel**: Added a new Watcher panel for live tracking RPG Maker variables and switches while playing.
