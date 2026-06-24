@@ -62,7 +62,7 @@ export default {
 
   methods: {
     initializeVariables() {
-      this.items = readInventoryPanelItems($dataItems);
+      this.items = readInventoryPanelItems($dataItems, "item");
     },
 
     convertToTableData(item) {

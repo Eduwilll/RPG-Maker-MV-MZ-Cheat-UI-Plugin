@@ -2,7 +2,10 @@ import {
   coercePanelNumber,
   matchesPanelSearch,
 } from "../js/panels/PanelGameState.js";
-import { readItemTableTabState } from "../js/panels/inventory/ItemTableTabState.js";
+import {
+  readItemTableTabState,
+  resolveInventoryTableItem,
+} from "../js/panels/inventory/ItemTableTabState.js";
 
 export default {
   name: "ItemTableTab",
@@ -295,7 +298,11 @@ export default {
     },
 
     onItemChange(item, newValue) {
-      // modify amount
+      const gameItem = resolveInventoryTableItem(item);
+      if (!gameItem) {
+        return;
+      }
+
       if (newValue !== undefined) {
         item.amount = coercePanelNumber(newValue, {
           fallback: item.amount,
@@ -304,11 +311,12 @@ export default {
         });
       }
 
-      const diff = item.amount - $gameParty.numItems(item._item);
-      $gameParty.gainItem(item._item, diff);
+      const diff = item.amount - $gameParty.numItems(gameItem);
+      if (diff !== 0) {
+        $gameParty.gainItem(gameItem, diff);
+      }
 
-      // refresh
-      item.amount = $gameParty.numItems(item._item);
+      item.amount = $gameParty.numItems(gameItem);
     },
 
     onTableFilterChange() {},

@@ -14,12 +14,21 @@ const DEFAULT_PARAM_NAMES = [
 ];
 
 /**
- * @template T
- * @param {Array<T> | null | undefined} items
- * @returns {Array<T>}
+ * @param {Array<any> | null | undefined} items
+ * @param {"item" | "weapon" | "armor"} kind
+ * @returns {Array<{ _itemId: number, _itemKind: "item" | "weapon" | "armor" }>}
  */
-export function readInventoryPanelItems(items) {
-  return Array.isArray(items) ? items.slice() : [];
+export function readInventoryPanelItems(items, kind) {
+  if (!Array.isArray(items)) {
+    return [];
+  }
+
+  return items
+    .filter((item) => !!item)
+    .map((item) => ({
+      _itemId: Number(item.id) || 0,
+      _itemKind: kind,
+    }));
 }
 
 /**
@@ -35,6 +44,26 @@ export function buildInventoryTableRow(item, isTranslated) {
     effectsSort: getInventoryEffectSortValue(item),
     price: typeof item.price === "number" ? item.price : 0,
   };
+}
+
+/**
+ * @param {any} item
+ * @returns {"item" | "weapon" | "armor" | ""}
+ */
+export function getInventoryItemKind(item) {
+  if (item && $dataItems && $dataItems[item.id] === item) {
+    return "item";
+  }
+
+  if (item && $dataWeapons && $dataWeapons[item.id] === item) {
+    return "weapon";
+  }
+
+  if (item && $dataArmors && $dataArmors[item.id] === item) {
+    return "armor";
+  }
+
+  return "";
 }
 
 /**
