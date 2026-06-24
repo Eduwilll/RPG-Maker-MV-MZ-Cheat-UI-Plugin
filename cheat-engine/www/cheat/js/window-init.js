@@ -47,6 +47,7 @@ async function init() {
     "$gameSystem",
     "$gameVariables",
     "$gameSwitches",
+    "$gameSelfSwitches",
     "$gameTemp",
     "$gameActors",
     "$gameMap",
@@ -91,9 +92,7 @@ async function init() {
   ];
 
   globals.forEach((g) => {
-    if (opener[g]) {
-      window[g] = opener[g];
-    }
+    bridgeGlobal(opener, g);
   });
 
   // Provide a mocked/proxied Alert system
@@ -158,3 +157,30 @@ async function init() {
 init().catch((err) => {
   console.error("Critical Init Error:", err);
 });
+
+/**
+ * Keep separate-window game globals live instead of copying a snapshot.
+ * RPG Maker replaces values like $dataMap during map loads/transfers, and the
+ * Watch panel needs the current game-window objects to detect nearby refs.
+ *
+ * @param {Window} opener
+ * @param {string} name
+ */
+function bridgeGlobal(opener, name) {
+  try {
+    Object.defineProperty(window, name, {
+      configurable: true,
+      enumerable: true,
+      get() {
+        return opener[name];
+      },
+      set(value) {
+        opener[name] = value;
+      },
+    });
+  } catch (error) {
+    if (opener[name]) {
+      window[name] = opener[name];
+    }
+  }
+}

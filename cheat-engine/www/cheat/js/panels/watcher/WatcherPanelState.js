@@ -1,8 +1,14 @@
 // @ts-check
 
+import { getGameRootDir } from "../../runtime/RuntimeEnv.js";
+import { KeyValueStorage } from "../../storage/KeyValueStorage.js";
+
 const WATCHER_STORAGE_KEY = "cheat.variableSwitchWatcher.items";
 const WATCHER_OVERLAY_STORAGE_KEY =
   "cheat.variableSwitchWatcher.overlayEnabled";
+const WATCHER_STORAGE = new KeyValueStorage(
+  `./${getGameRootDir()}/cheat-settings/watcher.json`,
+);
 
 /**
  * @typedef {"variable" | "switch" | "selfSwitch"} WatchType
@@ -12,7 +18,7 @@ const WATCHER_OVERLAY_STORAGE_KEY =
 
 export function readWatcherTargets() {
   try {
-    const raw = localStorage.getItem(WATCHER_STORAGE_KEY);
+    const raw = readWatcherStorageItem(WATCHER_STORAGE_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
     if (!Array.isArray(parsed)) return [];
 
@@ -27,7 +33,7 @@ export function readWatcherTargets() {
  * @param {WatchTarget[]} targets
  */
 export function writeWatcherTargets(targets) {
-  localStorage.setItem(WATCHER_STORAGE_KEY, JSON.stringify(targets));
+  writeWatcherStorageItem(WATCHER_STORAGE_KEY, JSON.stringify(targets));
 }
 
 /**
@@ -97,14 +103,43 @@ export function readWatcherOverlayRows() {
 }
 
 export function readWatcherOverlayEnabled() {
-  return localStorage.getItem(WATCHER_OVERLAY_STORAGE_KEY) === "true";
+  return readWatcherStorageItem(WATCHER_OVERLAY_STORAGE_KEY) === "true";
 }
 
 /**
  * @param {boolean} enabled
  */
 export function writeWatcherOverlayEnabled(enabled) {
-  localStorage.setItem(WATCHER_OVERLAY_STORAGE_KEY, enabled ? "true" : "false");
+  writeWatcherStorageItem(
+    WATCHER_OVERLAY_STORAGE_KEY,
+    enabled ? "true" : "false",
+  );
+}
+
+/**
+ * @param {string} key
+ */
+function readWatcherStorageItem(key) {
+  const stored = WATCHER_STORAGE.getItem(key);
+  if (stored !== undefined && stored !== null) {
+    return stored;
+  }
+
+  const legacyStored = localStorage.getItem(key);
+  if (legacyStored !== null) {
+    WATCHER_STORAGE.setItem(key, legacyStored);
+  }
+
+  return legacyStored;
+}
+
+/**
+ * @param {string} key
+ * @param {string} value
+ */
+function writeWatcherStorageItem(key, value) {
+  WATCHER_STORAGE.setItem(key, value);
+  localStorage.setItem(key, value);
 }
 
 /**
@@ -264,9 +299,12 @@ function isValidWatchTarget(target) {
 export function writeWatchRowValue(row, value) {
   if (row.type === "selfSwitch") {
     if (!row.mapId || !row.eventId || !row.selfSwitchKey) return false;
+    const selfSwitches = getGameSelfSwitches();
+    if (!selfSwitches) return false;
+
     const key = [row.mapId, row.eventId, row.selfSwitchKey];
-    $gameSelfSwitches.setValue(/** @type {any} */ (key), !!value);
-    return $gameSelfSwitches.value(/** @type {any} */ (key));
+    selfSwitches.setValue(/** @type {any} */ (key), !!value);
+    return selfSwitches.value(/** @type {any} */ (key));
   }
 
   return writeTargetValue(row.type, row.id, value);
@@ -542,7 +580,11 @@ function buildContextRow(type, id, options = {}) {
 
 function buildSelfSwitchRow(mapId, eventId, selfSwitchKey, options = {}) {
   const key = [mapId, eventId, selfSwitchKey];
-  const value = $gameSelfSwitches.value(/** @type {any} */ (key));
+  const selfSwitches = getGameSelfSwitches();
+  const value = selfSwitches
+    ? selfSwitches.value(/** @type {any} */ (key))
+    : false;
+
   return {
     type: "selfSwitch",
     id: eventId,
@@ -556,6 +598,10 @@ function buildSelfSwitchRow(mapId, eventId, selfSwitchKey, options = {}) {
     source: options.source || "",
     distance: options.distance,
   };
+}
+
+function getGameSelfSwitches() {
+  return typeof $gameSelfSwitches !== "undefined" ? $gameSelfSwitches : null;
 }
 
 function buildCurrentMapEventDistanceRows() {

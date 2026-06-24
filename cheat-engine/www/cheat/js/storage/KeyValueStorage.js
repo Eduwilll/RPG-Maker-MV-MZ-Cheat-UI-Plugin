@@ -1,9 +1,11 @@
 export class KeyValueStorage {
   constructor(filePath) {
+    this.filePath = filePath;
+
     if (Utils.isNwjs()) {
-      this.filePath = filePath;
       this.fileEncoding = "utf-8";
       this.fileSystem = require("fs");
+      this.path = require("path");
     }
   }
 
@@ -29,9 +31,16 @@ export class KeyValueStorage {
       return {};
     }
 
-    return JSON.parse(
-      this.fileSystem.readFileSync(this.filePath, this.fileEncoding),
-    );
+    try {
+      const text = this.fileSystem.readFileSync(
+        this.filePath,
+        this.fileEncoding,
+      );
+      return text ? JSON.parse(text) : {};
+    } catch (error) {
+      console.warn("[KeyValueStorage] Failed to read settings file", error);
+      return {};
+    }
   }
 
   __getItemFromFile(key) {
@@ -42,6 +51,11 @@ export class KeyValueStorage {
     const data = this.__readFile();
 
     data[key] = value;
+
+    const parentDir = this.path.dirname(this.filePath);
+    if (!this.fileSystem.existsSync(parentDir)) {
+      this.fileSystem.mkdirSync(parentDir, { recursive: true });
+    }
 
     this.fileSystem.writeFileSync(this.filePath, JSON.stringify(data));
   }
