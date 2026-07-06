@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, Response, request
-import re
 import random
 import time
 
@@ -14,7 +13,35 @@ def decode_text(txt):
     return txt
 
 def encode_text(txt):
-    return re.sub(r'(?i)(?<!\\)(?:\\\\)*\\u([0-9a-f]{4})', lambda m: chr(int(m.group(1), 16)), txt)
+    result = []
+    index = 0
+    length = len(txt)
+
+    while index < length:
+        if txt[index] != "\\":
+            result.append(txt[index])
+            index += 1
+            continue
+
+        run_start = index
+        while index < length and txt[index] == "\\":
+            index += 1
+
+        run_length = index - run_start
+        unicode_digits = txt[index + 1:index + 5]
+        if (
+            run_length % 2 == 1
+            and index < length
+            and txt[index].lower() == "u"
+            and len(unicode_digits) == 4
+            and all(char in "0123456789abcdefABCDEF" for char in unicode_digits)
+        ):
+            result.append(chr(int(unicode_digits, 16)))
+            index += 5
+        else:
+            result.append("\\" * run_length)
+
+    return "".join(result)
 
 def main():
     app.run()
