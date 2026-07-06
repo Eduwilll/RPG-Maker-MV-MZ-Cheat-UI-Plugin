@@ -39,15 +39,14 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 - **[Full Engine Reference](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/features)**
 - **[Keyboard Shortcuts](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/shortcuts)**
 
-### Latest Release: v1.5.0
+### Latest Release: v1.5.1
 - Windows installer ZIP with `RPGMakerCheatInstaller.exe`
 - Automatic MV/MZ game detection and archive selection
-- Added **Save Editor** to the installer for RPG Maker MV/MZ local save files
-- Added structured save editing for gold, actors, parameters, and inventory
-- Added raw JSON save editing for advanced users
-- Save edits create backups and verify the written file
-- Safer install, restore, and uninstall backup handling
-- Version metadata now stores the `v` prefix consistently
+- Fixed MV/Yanfly item-category crashes after editing inventory from the cheat UI
+- Fixed Watch panel data in separate window mode, including self switches and nearby map references
+- Watch list now persists through shared `cheat-settings/watcher.json`
+- Made Facing Event and Nearby Map References tables more compact
+- Includes the installer Save Editor for RPG Maker MV/MZ local save files
 
 ---
 
@@ -85,7 +84,7 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 ## 🛠️ Installation
 
 ### Step 1: Download
-Recommended: download `RPGMakerCheatInstaller-v1.5.0-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
+Recommended: download `RPGMakerCheatInstaller-v1.5.1-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
 
 Manual install is still available: download the latest `-core.tar.gz` package for your engine from the same Releases page.
 

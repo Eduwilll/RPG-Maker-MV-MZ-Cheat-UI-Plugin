@@ -1,6 +1,17 @@
 # Changelog
 
-## v1.5.0 - Latest
+## v1.5.1 - Latest
+
+### Watcher & Inventory Stability
+- [Fix] **Inventory/Yanfly Compatibility**: Avoided observing live RPG Maker item database objects in Vue state, fixing Yanfly item category crashes in MV games.
+- [Fix] **Separate Window Watcher**: Restored Watch panel behavior in pop-out window mode by bridging live RPG Maker globals, including self switches.
+- [Fix] **Shared Watch Storage**: Moved Watch list persistence to shared `cheat-settings/watcher.json` with legacy localStorage migration.
+- [Tweak] **Compact Watch Tables**: Reduced Facing Event and Nearby Map References table spacing for better visibility in the cheat window.
+- [Tweak] **Version Bump**: Bumped version to `1.5.1`.
+
+---
+
+## v1.5.0
 
 ### Installer Save Editor
 - [Feat] **Save File Editor**: Added a Save Editor to the Windows installer for RPG Maker MV/MZ local save files.
