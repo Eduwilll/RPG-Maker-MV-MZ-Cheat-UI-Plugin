@@ -158,6 +158,10 @@
     return hasOwnProperty.call(obj, key)
   }
 
+  function isUnsafePropertyKey (key) {
+    return key === '__proto__' || key === 'constructor' || key === 'prototype'
+  }
+
   /**
    * Create a cached version of a pure function.
    */
@@ -1018,6 +1022,10 @@
     customSetter,
     shallow
   ) {
+    if (isUnsafePropertyKey(key)) {
+      return
+    }
+
     var dep = new Dep();
 
     var property = Object.getOwnPropertyDescriptor(obj, key);
@@ -1190,7 +1198,7 @@
     for (var i = 0; i < keys.length; i++) {
       key = keys[i];
       // in case the object is already observed...
-      if (key === '__ob__') { continue }
+      if (key === '__ob__' || isUnsafePropertyKey(key)) { continue }
       toVal = to[key];
       fromVal = from[key];
       if (!hasOwn(to, key)) {
