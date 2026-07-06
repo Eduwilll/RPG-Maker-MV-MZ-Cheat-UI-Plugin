@@ -1,6 +1,19 @@
 # Changelog
 
-## v1.5.1 - Latest
+## v1.5.2 - Latest
+
+### Security Maintenance
+- [Security] **CodeQL Hardening**: Restricted release workflow token permissions to least privilege.
+- [Security] **Preview Server Path Safety**: Removed the manual preview file-open path that depended on request input.
+- [Security] **Dummy Translator Responses**: Returned dummy translator output as plain text to avoid reflected HTML/script interpretation.
+- [Security] **Dummy Translator Parser**: Replaced the Unicode escape regex with a linear parser to avoid ReDoS risk.
+- [Security] **Vue Runtime Guard**: Blocked unsafe reactive keys such as `__proto__`, `constructor`, and `prototype` in the bundled Vue runtime.
+- [Security] **Dependency Cleanup**: Removed unused Mermaid dependencies and moved the docs toolchain off vulnerable Vite 5.
+- [Tweak] **Version Bump**: Bumped version to `1.5.2`.
+
+---
+
+## v1.5.1
 
 ### Watcher & Inventory Stability
 - [Fix] **Inventory/Yanfly Compatibility**: Avoided observing live RPG Maker item database objects in Vue state, fixing Yanfly item category crashes in MV games.

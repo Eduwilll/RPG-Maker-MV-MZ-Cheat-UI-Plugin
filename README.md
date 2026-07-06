@@ -39,9 +39,12 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 - **[Full Engine Reference](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/features)**
 - **[Keyboard Shortcuts](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/shortcuts)**
 
-### Latest Release: v1.5.1
+### Latest Release: v1.5.2
 - Windows installer ZIP with `RPGMakerCheatInstaller.exe`
 - Automatic MV/MZ game detection and archive selection
+- Security maintenance release with CodeQL hardening and dependency cleanup
+- Preview server and dummy translator security fixes
+- Docs toolchain moved off vulnerable Vite 5 and unused Mermaid dependencies removed
 - Fixed MV/Yanfly item-category crashes after editing inventory from the cheat UI
 - Fixed Watch panel data in separate window mode, including self switches and nearby map references
 - Watch list now persists through shared `cheat-settings/watcher.json`
@@ -84,7 +87,7 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 ## 🛠️ Installation
 
 ### Step 1: Download
-Recommended: download `RPGMakerCheatInstaller-v1.5.1-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
+Recommended: download `RPGMakerCheatInstaller-v1.5.2-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
 
 Manual install is still available: download the latest `-core.tar.gz` package for your engine from the same Releases page.
 
