@@ -34,13 +34,5 @@
   },
   "lint-staged": {
     "**/*.{js,json,css}": "prettier --write"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ],
-    "overrides": {
-      "vite": "8.1.3"
-    }
   }
 }
