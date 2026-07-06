@@ -18,25 +18,6 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Origin', '*')
         super().end_headers()
 
-    def do_GET(self):
-        # Standardize modern JS modules loading
-        # SimpleHTTPRequestHandler sometimes fails to serve ES modules correctly with the right mime type
-        if ".js" in self.path:
-            # Normalize path (remove leading slash)
-            file_path = self.path[1:] if self.path.startswith('/') else self.path
-            # If path has query params like ?v=123, remove them
-            file_path = file_path.split('?')[0]
-            
-            if os.path.exists(file_path):
-                self.send_response(200)
-                self.send_header("Content-type", "application/javascript")
-                self.end_headers()
-                with open(file_path, 'rb') as f:
-                    self.wfile.write(f.read())
-                return
-        
-        return super().do_GET()
-
 def start_server():
     # Ensure current directory is project root
     script_dir = os.path.dirname(os.path.abspath(__file__))
