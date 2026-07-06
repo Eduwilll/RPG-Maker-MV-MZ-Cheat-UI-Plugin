@@ -15,19 +15,11 @@ At a high level, the project has four layers:
 
 ## High-level flow
 
-```mermaid
-flowchart LR
-  A["Packaged main.js (MV or MZ)"] --> B["cheat/init/import.js"]
-  B --> C["Mount Vue app into #app"]
-  C --> D["MainComponent"]
-  D --> E["CheatModal + panels"]
-  D --> F["Global shortcut listeners"]
-  D --> G["RPG Maker function customizations"]
-  G --> H["InGameTranslator hooks"]
-  E --> I["Cheat helpers and game globals"]
-  E --> J["KeyValueStorage JSON files"]
-  E --> K["Translation endpoints / cache"]
-```
+1. `Packaged main.js` for MV or MZ loads `cheat/init/import.js`.
+2. `cheat/init/import.js` mounts the Vue app into `#app`.
+3. `MainComponent` wires the cheat modal, global shortcuts, and RPG Maker function customizations.
+4. `CheatModal` renders feature panels that talk to cheat helpers, game globals, persisted JSON settings, and translation endpoints.
+5. Runtime customizations install hooks such as `InGameTranslator` so translated text and cheat behavior can affect the running game.
 
 ## Boot and injection model
 
