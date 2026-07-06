@@ -71,6 +71,46 @@ body {
   z-index: 1011 !important;
 }
 
+.watcher-compact-panel .v-expansion-panel-content__wrap {
+  padding: 0 8px 8px;
+}
+
+.watcher-context-table table {
+  table-layout: fixed;
+}
+
+.watcher-context-table td,
+.watcher-context-table th {
+  height: 28px !important;
+  padding: 0 6px !important;
+  font-size: 12px !important;
+}
+
+.watcher-context-table .v-input__slot {
+  min-height: 24px !important;
+  margin-bottom: 0 !important;
+}
+
+.watcher-context-table .v-text-field__slot input {
+  padding: 0 !important;
+  font-size: 12px !important;
+}
+
+.watcher-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.watcher-name-cell {
+  max-width: 160px;
+}
+
+.watcher-source-cell {
+  max-width: 280px;
+}
+
 /*.x-small-field .v-input__control {*/
 /*    height: 35px;*/
 /*    width: 1px;*/
