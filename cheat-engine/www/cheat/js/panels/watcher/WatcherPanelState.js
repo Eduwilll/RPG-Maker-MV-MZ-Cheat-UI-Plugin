@@ -268,7 +268,7 @@ function formatTargetValue(type, value) {
 /**
  * @param {any} value
  */
-function coerceVariableValue(value) {
+export function coerceVariableValue(value) {
   if (typeof value === "number") return value;
   if (typeof value !== "string") return value;
 

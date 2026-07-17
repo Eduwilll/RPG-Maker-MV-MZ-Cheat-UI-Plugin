@@ -39,9 +39,10 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 - **[Full Engine Reference](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/features)**
 - **[Keyboard Shortcuts](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/shortcuts)**
 
-### Latest Release: v1.5.2
+### Latest Release: v1.5.3
 - Windows installer ZIP with `RPGMakerCheatInstaller.exe`
 - Automatic MV/MZ game detection and archive selection
+- Fixed Variables panel numeric edits so game events add numbers instead of concatenating strings
 - Security maintenance release with CodeQL hardening and dependency cleanup
 - Preview server and dummy translator security fixes
 - Docs toolchain moved off vulnerable Vite 5 and unused Mermaid dependencies removed
@@ -87,7 +88,7 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 ## 🛠️ Installation
 
 ### Step 1: Download
-Recommended: download `RPGMakerCheatInstaller-v1.5.2-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
+Recommended: download `RPGMakerCheatInstaller-v1.5.3-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
 
 Manual install is still available: download the latest `-core.tar.gz` package for your engine from the same Releases page.
 
@@ -156,12 +157,38 @@ Link your development folder to a test game. Any saved changes in your IDE are i
 .venv\Scripts\python.exe deploy\dev.py --mz --version v1.2.3-alpha
 ```
 
-### 3. Automated Formatting (Prettier & Husky)
+### 3. Build Release Packages
+Generate the MV/MZ manual cheat packages from the repository root:
+
+```powershell
+py -3 deploy\main.py --version 1.5.3
+```
+
+This creates:
+
+```text
+output\rpg-mv-cheat-1.5.3-core.tar.gz
+output\rpg-mz-cheat-1.5.3-core.tar.gz
+```
+
+After generating the manual packages, build the Windows installer ZIP:
+
+```powershell
+py -3 tools\installer\build_windows.py --version 1.5.3
+```
+
+This creates:
+
+```text
+output\RPGMakerCheatInstaller-v1.5.3-windows.zip
+```
+
+### 4. Automated Formatting (Prettier & Husky)
 We use **Prettier** for consistent code styling and **Husky** to ensure all commits are formatted automatically.
 - **Manual Format**: `pnpm run format`
 - **Pre-commit Hook**: Any `git commit` will automatically trigger `lint-staged` to format your changes.
 
-### 4. Technical Architecture
+### 5. Technical Architecture
 For developers and contributors, please refer to our **[Architecture Overview](docs/guide/technical/architecture.md)** for details on the core engine, UI hooking, and data management best practices.
 
 ---

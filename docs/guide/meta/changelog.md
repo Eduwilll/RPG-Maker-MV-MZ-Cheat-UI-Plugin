@@ -1,6 +1,15 @@
 # Changelog
 
-## v1.5.2 - Latest
+## v1.5.3 - Latest
+
+### Variable Editing Fix
+- [Fix] **Variable Numeric Values**: Coerced numeric-looking values entered in the Variables panel before writing to `$gameVariables`, preventing game events from concatenating strings such as `99` + `10` into `9910`.
+- [Docs] **Build Commands**: Added release package and Windows installer build commands to the README.
+- [Tweak] **Version Bump**: Bumped version to `1.5.3`.
+
+---
+
+## v1.5.2
 
 ### Security Maintenance
 - [Security] **CodeQL Hardening**: Restricted release workflow token permissions to least privilege.

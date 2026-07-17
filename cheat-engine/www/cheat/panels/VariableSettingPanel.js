@@ -11,7 +11,10 @@ import {
   detachTranslateRefresh,
   getTranslatedPanelText,
 } from "../js/panels/PanelTranslation.js";
-import { addWatcherTarget } from "../js/panels/watcher/WatcherPanelState.js";
+import {
+  addWatcherTarget,
+  coerceVariableValue,
+} from "../js/panels/watcher/WatcherPanelState.js";
 
 export default {
   name: "VariableSettingPanel",
@@ -217,10 +220,9 @@ export default {
     },
 
     onItemChange(item) {
-      // modify value
-      $gameVariables.setValue(item.id, item.value);
+      const value = coerceVariableValue(item.value);
+      $gameVariables.setValue(item.id, value);
 
-      // refresh
       item.value = $gameVariables.value(item.id);
     },
 
