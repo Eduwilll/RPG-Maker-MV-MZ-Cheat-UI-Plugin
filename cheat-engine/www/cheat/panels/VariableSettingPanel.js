@@ -49,7 +49,7 @@ export default {
                         v-model="excludeNameless"
                         dense
                         hide-details
-                        label="Hide Nameless Items">
+                        label="Hide Nameless Variables">
                     </v-checkbox>
                 </v-col>
             </v-row>
@@ -149,7 +149,7 @@ export default {
   computed: {
     filteredTableItems() {
       return this.tableItems.filter((item) => {
-        if (this.excludeNameless && !item.name) {
+        if (this.excludeNameless && !item.hasName) {
           return false;
         }
 
@@ -190,7 +190,8 @@ export default {
 
         this.tableItems = this.originalVariableNames
           .map((varName, idx) => {
-            let displayName = varName || `Variable ${idx}`;
+            const hasName = !!(varName && varName.trim());
+            let displayName = hasName ? varName : `Variable ${idx}`;
             let val = 0;
             try {
               val = $gameVariables.value(idx);
@@ -204,8 +205,9 @@ export default {
 
             return {
               id: idx,
-              originalName: varName || `Variable ${idx}`,
+              originalName: varName || "",
               displayName: displayName,
+              hasName,
               value: val,
             };
           })
