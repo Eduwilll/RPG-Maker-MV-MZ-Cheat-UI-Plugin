@@ -6,7 +6,9 @@ venv/
 output/
 tmp/
 tests/MV/*
+!tests/MV/.gitkeep
 tests/MZ/*
+!tests/MZ/.gitkeep
 tests/XP/*
 __pycache__
 node_modules/
