@@ -40,7 +40,7 @@ export default {
                     v-model="excludeNameless"
                     dense
                     hide-details
-                    label="Hide Nameless Items">
+                    label="Hide Nameless Switches">
                 </v-checkbox>
                 <v-spacer></v-spacer>
                 <v-tooltip
@@ -148,7 +148,7 @@ export default {
       return this.tableItems.filter((item) => {
         if (
           item.id === 0 ||
-          (this.excludeNameless && !item.name) ||
+          (this.excludeNameless && !item.hasName) ||
           !this.tableItemFilter(item.name, this.search, item)
         ) {
           return false;
@@ -181,9 +181,11 @@ export default {
         return;
       }
 
-      this.switchNames = this.getSwitchNames();
+      this.switchNames = $dataSystem.switches.slice();
 
       this.tableItems = this.switchNames.map((switchName, idx) => {
+        const hasName = !!(switchName && switchName.trim());
+        const name = this.getSwitchDisplayName(switchName, idx, hasName);
         let val = false;
         try {
           val = $gameSwitches.value(idx);
@@ -192,22 +194,21 @@ export default {
         }
         return {
           id: idx,
-          name: switchName,
+          name,
+          originalName: switchName || "",
+          hasName,
           value: val,
         };
       });
     },
 
-    getSwitchNames() {
-      const rawSwitchNames = $dataSystem.switches.slice();
+    getSwitchDisplayName(name, idx, hasName) {
       const translateEnabled = TRANSLATE_SETTINGS.isSwitchTranslateEnabled();
 
-      return rawSwitchNames.map((name, idx) => {
-        return getTranslatedPanelText(
-          name || `Switch ${idx}`,
-          translateEnabled,
-        );
-      });
+      return getTranslatedPanelText(
+        hasName ? name : `Switch ${idx}`,
+        translateEnabled,
+      );
     },
 
     async manualRefresh() {
@@ -230,7 +231,11 @@ export default {
     },
 
     tableItemFilter(value, search, item) {
-      return matchesPanelSearch(search, [item.name, item.id]);
+      return matchesPanelSearch(search, [
+        item.name,
+        item.originalName,
+        item.id,
+      ]);
     },
 
     toggleAllSwitches() {
