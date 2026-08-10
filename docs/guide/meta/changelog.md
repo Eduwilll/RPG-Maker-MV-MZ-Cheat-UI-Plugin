@@ -1,6 +1,16 @@
 # Changelog
 
-## v1.5.3 - Latest
+## v1.5.4 - Latest
+
+### Nameless Filter Fix
+- [Fix] **Variables Hide Nameless**: Fixed Issue #3 where enabling Hide Nameless in the Variables panel hid every variable.
+- [Fix] **Switches Hide Nameless**: Fixed the sibling Switches panel behavior so placeholder names stay visible while truly nameless switches can be hidden.
+- [Chore] **Test Folder Placeholders**: Added tracked `tests/MV` and `tests/MZ` placeholders without committing local game folders.
+- [Tweak] **Version Bump**: Bumped version to `1.5.4`.
+
+---
+
+## v1.5.3
 
 ### Variable Editing Fix
 - [Fix] **Variable Numeric Values**: Coerced numeric-looking values entered in the Variables panel before writing to `$gameVariables`, preventing game events from concatenating strings such as `99` + `10` into `9910`.
