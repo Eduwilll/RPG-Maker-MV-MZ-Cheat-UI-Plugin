@@ -13,6 +13,12 @@ import MapEventPanel from "./panels/MapEventPanel.js";
 import ShortcutPanel from "./panels/ShortcutPanel.js";
 import TranslateSettingsPanel from "./panels/TranslateSettingsPanel.js";
 import AboutPanel from "./panels/AboutPanel.js";
+import {
+  readBooleanSetting,
+  writeBooleanSetting,
+} from "./js/ui/CheatUiSettings.js";
+
+const SIDEBAR_VISIBLE_SETTING = "cheatModal.sidebarVisible";
 
 export default {
   name: "CheatModal",
@@ -42,9 +48,21 @@ export default {
     style="position: fixed; top: 0; left: 0;"
     :width="isWindow ? '100vw' : '700'" 
     :height="isWindow ? '100vh' : '400'">
+    <v-btn
+        style="top: 4px; left: 4px; z-index: 3;"
+        color="grey darken-2"
+        dark
+        x-small
+        absolute
+        fab
+        :title="isSidebarVisible ? 'Hide sidebar' : 'Show sidebar'"
+        @click="toggleSidebar">
+        <v-icon small>{{ isSidebarVisible ? 'mdi-menu-open' : 'mdi-menu' }}</v-icon>
+    </v-btn>
     <v-row 
         class="fill-height ma-0 pa-0">
         <div
+            v-if="isSidebarVisible"
             :style="'width: ' + navWidth + 'px;'"
             class="fill-height d-inline pa-2 overflow-y-auto hide-scrollbar">
             <v-treeview
@@ -64,9 +82,9 @@ export default {
                 </template>
             </v-treeview>
         </div>
-        <v-divider vertical></v-divider>
+        <v-divider v-if="isSidebarVisible" vertical></v-divider>
         <div
-            :style="'width: calc(100% - ' + navWidth + 'px - 1px);'"
+            :style="'width: ' + contentWidth + ';'"
             class="fill-height d-inline pa-2 overflow-y-auto hide-scrollbar">
             <component :is="currentComponentName"></component>
         </div>
@@ -92,6 +110,7 @@ export default {
   data() {
     return {
       navWidth: 200,
+      isSidebarVisible: readBooleanSetting(SIDEBAR_VISIBLE_SETTING, true),
 
       navTreeModel: undefined,
 
@@ -188,6 +207,14 @@ export default {
   },
 
   computed: {
+    contentWidth() {
+      if (!this.isSidebarVisible) {
+        return "100%";
+      }
+
+      return `calc(100% - ${this.navWidth}px - 1px)`;
+    },
+
     componentNameToNavItem() {
       const ret = {};
       this.iterateLeaf(this.navTreeItems, (item) => {
@@ -212,6 +239,11 @@ export default {
       if (data && data.length === 1) {
         this.$emit("change", data[0].component);
       }
+    },
+
+    toggleSidebar() {
+      this.isSidebarVisible = !this.isSidebarVisible;
+      writeBooleanSetting(SIDEBAR_VISIBLE_SETTING, this.isSidebarVisible);
     },
 
     iterateLeaf(node, leafFunc) {

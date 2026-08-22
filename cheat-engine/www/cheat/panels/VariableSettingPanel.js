@@ -44,13 +44,26 @@ export default {
                 class="ma-0 pa-0">
                 <v-col
                     cols="12"
-                    md="12">
+                    md="6">
                     <v-checkbox
                         v-model="excludeNameless"
                         dense
                         hide-details
                         label="Hide Nameless Variables">
                     </v-checkbox>
+                </v-col>
+                <v-col
+                    cols="12"
+                    md="6">
+                    <v-select
+                        v-model="valueFilter"
+                        :items="valueFilterOptions"
+                        dense
+                        hide-details
+                        solo
+                        background-color="grey darken-3"
+                        label="Value Filter">
+                    </v-select>
                 </v-col>
             </v-row>
         </template>
@@ -110,6 +123,15 @@ export default {
     return {
       search: "",
       excludeNameless: false,
+      valueFilter: "all",
+      valueFilterOptions: [
+        { text: "All Values", value: "all" },
+        { text: "Positive", value: "positive" },
+        { text: "Negative", value: "negative" },
+        { text: "Zero / Empty", value: "empty" },
+        { text: "Non-zero", value: "nonZero" },
+        { text: "Text / Other", value: "other" },
+      ],
 
       // Store original data separately from display data
       originalVariableNames: [],
@@ -153,7 +175,7 @@ export default {
           return false;
         }
 
-        return true;
+        return this.matchesValueFilter(item.value);
       });
     },
   },
@@ -230,6 +252,37 @@ export default {
 
     addToWatchList(item) {
       addWatcherTarget("variable", item.id);
+    },
+
+    matchesValueFilter(value) {
+      const numberValue =
+        typeof value === "number"
+          ? value
+          : typeof value === "string" && value.trim() !== ""
+            ? Number(value)
+            : NaN;
+      const isNumeric = Number.isFinite(numberValue);
+      const isEmpty =
+        value === null ||
+        value === undefined ||
+        value === "" ||
+        (isNumeric && numberValue === 0) ||
+        value === false;
+
+      switch (this.valueFilter) {
+        case "positive":
+          return isNumeric && numberValue > 0;
+        case "negative":
+          return isNumeric && numberValue < 0;
+        case "empty":
+          return isEmpty;
+        case "nonZero":
+          return !isEmpty;
+        case "other":
+          return !isNumeric && !isEmpty;
+        default:
+          return true;
+      }
     },
 
     async manualRefresh() {

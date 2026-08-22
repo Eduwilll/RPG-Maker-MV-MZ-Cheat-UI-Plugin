@@ -27,6 +27,7 @@ export function readHealthSettingPanelState() {
       .map((member) =>
         buildHealthMemberRow(member, /** @type {any} */ (member).actorId()),
       ),
+    oneHitKill: BattleCheat.isOneHitKillEnabled(),
     disableRandomEncounter: BattleCheat.isDisableRandomEncounter(),
   };
 }

@@ -189,6 +189,58 @@ export class BattleCheat {
     return false;
   }
 
+  static toggleOneHitKill(enabled) {
+    if (enabled === undefined) {
+      enabled = !this.isOneHitKillEnabled();
+    }
+
+    this.oneHitKill = !!enabled;
+    this.__applyOneHitKillPatch();
+    Alert[this.oneHitKill ? "success" : "info"](
+      `One-Hit Kill: ${this.oneHitKill ? "Enabled" : "Disabled"}`,
+    );
+  }
+
+  static isOneHitKillEnabled() {
+    return !!this.oneHitKill;
+  }
+
+  static __applyOneHitKillPatch() {
+    if (typeof Game_Action === "undefined") {
+      return;
+    }
+
+    if (!this.executeHpDamage_bkup) {
+      this.executeHpDamage_bkup = Game_Action.prototype.executeHpDamage;
+    }
+
+    if (!this.isOneHitKillEnabled()) {
+      Game_Action.prototype.executeHpDamage = this.executeHpDamage_bkup;
+      return;
+    }
+
+    Game_Action.prototype.executeHpDamage = function (target, value) {
+      const rawTarget = /** @type {BattleCheatBattlerLike} */ (target);
+      const subject =
+        typeof this.subject === "function" ? this.subject() : null;
+      const isActorAttack =
+        typeof Game_Actor !== "undefined" && subject instanceof Game_Actor;
+      const isEnemyTarget =
+        typeof Game_Enemy !== "undefined" && target instanceof Game_Enemy;
+
+      if (
+        isActorAttack &&
+        isEnemyTarget &&
+        typeof rawTarget.hp === "number" &&
+        value > 0
+      ) {
+        value = Math.max(value, rawTarget.hp);
+      }
+
+      return BattleCheat.executeHpDamage_bkup.call(this, target, value);
+    };
+  }
+
   static toggleDisableRandomEncounter() {
     if (this.isDisableRandomEncounter()) {
       if (this.canEncounter_bkup) {

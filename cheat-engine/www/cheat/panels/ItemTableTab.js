@@ -6,6 +6,12 @@ import {
   readItemTableTabState,
   resolveInventoryTableItem,
 } from "../js/panels/inventory/ItemTableTabState.js";
+import {
+  readBooleanSetting,
+  writeBooleanSetting,
+} from "../js/ui/CheatUiSettings.js";
+
+const HIDE_NAMELESS_ITEMS_SETTING = "itemTable.hideNamelessItems";
 
 export default {
   name: "ItemTableTab",
@@ -194,7 +200,7 @@ export default {
   data() {
     return {
       search: "",
-      excludeNameless: false,
+      excludeNameless: readBooleanSetting(HIDE_NAMELESS_ITEMS_SETTING, true),
       onlyOwnedItems: false,
       showPriceColumn: false,
       showDetailColumn: false,
@@ -319,7 +325,9 @@ export default {
       item.amount = $gameParty.numItems(gameItem);
     },
 
-    onTableFilterChange() {},
+    onTableFilterChange() {
+      writeBooleanSetting(HIDE_NAMELESS_ITEMS_SETTING, this.excludeNameless);
+    },
 
     tableItemFilter(value, search, item) {
       return matchesPanelSearch(

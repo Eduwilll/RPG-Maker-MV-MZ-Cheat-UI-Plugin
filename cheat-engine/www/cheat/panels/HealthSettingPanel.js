@@ -33,6 +33,17 @@ export default {
                 <span class="caption">Disable Random Encounter</span>
             </template>
         </v-checkbox>
+        <v-checkbox
+            v-model="oneHitKill"
+            hide-details
+            dense
+            x-small
+            class="my-0 py-0"
+            @change="onOneHitKillChange">
+            <template v-slot:label>
+                <span class="caption">One-Hit Kill</span>
+            </template>
+        </v-checkbox>
         <v-btn small @click.prevent="encounterBattle">Encounter</v-btn>
         <v-btn small @click.prevent="victory">Victory</v-btn>
         <v-btn small @click.prevent="defeat">Defeat</v-btn>
@@ -104,6 +115,7 @@ export default {
   data() {
     return {
       disableRandomEncounter: false,
+      oneHitKill: false,
       enemy: [],
       party: [],
     };
@@ -118,6 +130,7 @@ export default {
       const state = readHealthSettingPanelState();
       this.enemy = state.enemy;
       this.party = state.party;
+      this.oneHitKill = state.oneHitKill;
       this.disableRandomEncounter = state.disableRandomEncounter;
     },
 
@@ -175,6 +188,12 @@ export default {
 
     onDisableRandomEncounterChange() {
       runPanelMutation(this, () => BattleCheat.toggleDisableRandomEncounter());
+    },
+
+    onOneHitKillChange() {
+      runPanelMutation(this, () =>
+        BattleCheat.toggleOneHitKill(this.oneHitKill),
+      );
     },
 
     onDetailChange(items, type) {
