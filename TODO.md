@@ -61,3 +61,65 @@ Maintainability planning:
   - `cheat-engine/www/cheat/panels` = Vue component/view layer
   - `cheat-engine/www/cheat/js/panels` = shared panel state/helper layer
 - Migrate remaining panels that still only partially follow the shared helper conventions.
+
+ New Features & Enhancements
+# 🌍 Advanced Translation System
+6 Optimized Translation Services ranked by performance and reliability
+- TranslateShellProxy (478 texts/sec) - Default ultra-fast service
+- Lingva Translate (445 texts/sec) - Privacy-focused open-source alternative
+- Google Translate (225 texts/sec) - Most reliable and accurate option
+- LibreTranslate - Self-hosted unlimited usage with Docker support
+- SugoiTranslator - Local Japanese specialist for anime/game content
+- Mock Translator - Development and testing mode
+- Real-time translation of variables, switches, maps, and game text
+- Open-source integration with community-driven translation services
+- DeepL 
+🎨 Enhanced User Interface
+- Modern Vuetify-based design with Material Design principles
+- Minimizable interface - Clean, unobtrusive gameplay experience
+- Smooth transitions and animations for better user interaction
+- Responsive layout that adapts to different screen sizes
+- Semi-transparent background when not in focus to avoid gameplay obstruction
+- Improved accessibility with better contrast and readable fonts
+- Advanced input validation with real-time feedback and error prevention
+- Organized panel system with logical grouping of related features
+🔧 Bug Fixes & Quality Improvements
+- Fixed translation service timeouts and connection issues
+- Resolved UI scaling problems on high-DPI displays
+- Corrected shortcut conflicts with game controls
+- Fixed save/load functionality reliability issues
+- Improved variable search performance for large game databases
+- Enhanced stability during rapid cheat toggling
+- Better error messages with actionable troubleshooting steps
+⚡ Performance Improvements
+- Streamlined service selection (top 6 fastest services only)
+- Optimized UI components with better responsiveness
+- Enhanced error handling and recovery
+- Improved memory management
+📋 Original Features
+- GUI based cheat interface for RPG Maker MV/MZ games
+- Stats, gold, speed, items, variables, switches editing
+- Game speed control (x0.1 ~ x10)
+- No clip mode and god mode
+- Random encounter disable
+- Battle control (victory/defeat/escape/abort)
+- Customizable shortcuts
+- Save/load location system
+- Developer tools integration
+
+
+
+
+# Others modifications
+- toggle to hide side bar
+- option to teleport in the center of the map
+- pre-load items
+- hide nameless item default and persist that mode even when the user change tabs
+- save location give the user give flags to his saves locations like boss area, shop, checkpoint etc.
+- in variables possible to user filter them by value like positive, nagative, non-values etc.
+- the toggle bar in items more compacts
+- make an tab with only actors in a list and when click show besides all the var we can chage in him, if possible show what skills he can learn
+- make the ui more compact in general
+- Add game speed and with the ctrl keyboard butom holding foward the game speed 2x, with the possibility to chenge the speed value
+- other cheats, one-hit kill, no random encounters. Check if i already have them
+- List all communEv. And possibility to run;

@@ -25,6 +25,11 @@ RPG Maker MV/MZ 게임을 위한 강력한 GUI 기반 치트 툴이며, **실시
   - **Installer Save Editor**: 백업을 만든 뒤 MV/MZ 저장 파일을 구조화된 필드 또는 Raw JSON으로 편집합니다.
   - **토스트 알림**: 노클립, 강제 저장, 인카운트 상태 변경 시 화면 레이어 알림.
   - **팝업 윈도우**: 치트 UI를 별도의 독립된 창에서 실행하여 멀티태스킹 최적화.
+  - **원 히트 킬(One-Hit Kill)**: 배틀 패널에서 모든 플레이어 공격이 적을 즉시 격파하도록 하는 토글.
+  - **사이드바 가시성 토글**: CheatModal 사이드바를 표시/숨겨 게임 화면 공간을 확보하는 토글.
+  - **맵 중심 텔레포트**: 텔레포트 패널에서 현재 맵의 중심으로 즉시 워프하는 옵션.
+  - **변수 값 유형 필터**: 변수 패널에서 양수, 음수, 또는 0/미설정 값만 표시하도록 필터링.
+  - **이름 없는 아이템 기본 숨김**: 아이템 패널이 이름 없는 항목을 기본으로 숨기고 탭 전환 시에도 설정을 유지.
 - **스마트 번역**: 실시간으로 변수, 스위치, 맵 이름, 아이템 설명 번역.
   - **Lingva Translate** 지원 (개인 정보 보호 및 무료 구글 번역 대안).
   - **Translation Bank**: 번역된 내용을 캐시하여 다음 로드 시 즉시 반영.
@@ -113,6 +118,4 @@ docker-compose up -d
 - **Translation Idea**: [sieucapoccho3717](https://github.com/sieucapoccho3717/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 - **Maintained & Enhanced by**: [Eduwilll](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 
-Latest Release: v1.5.4
-
-Security maintenance release with CodeQL hardening and dependency cleanup.
+Latest Release: v1.5.5

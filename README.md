@@ -39,20 +39,13 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 - **[Full Engine Reference](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/features)**
 - **[Keyboard Shortcuts](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/shortcuts)**
 
-### Latest Release: v1.5.4
+### Latest Release: v1.5.5
 - Windows installer ZIP with `RPGMakerCheatInstaller.exe`
-- Automatic MV/MZ game detection and archive selection
-- Fixed Hide Nameless filtering in Variables and Switches panels
-- Added tracked placeholder folders for local MV/MZ test games without committing game files
-- Fixed Variables panel numeric edits so game events add numbers instead of concatenating strings
-- Security maintenance release with CodeQL hardening and dependency cleanup
-- Preview server and dummy translator security fixes
-- Docs toolchain moved off vulnerable Vite 5 and unused Mermaid dependencies removed
-- Fixed MV/Yanfly item-category crashes after editing inventory from the cheat UI
-- Fixed Watch panel data in separate window mode, including self switches and nearby map references
-- Watch list now persists through shared `cheat-settings/watcher.json`
-- Made Facing Event and Nearby Map References tables more compact
-- Includes the installer Save Editor for RPG Maker MV/MZ local save files
+- **One-Hit Kill**: Battle panel toggle that forces all player hits to instantly defeat enemies
+- **Sidebar Toggle**: Show/hide the CheatModal sidebar for more screen space during gameplay
+- **Teleport to Map Center**: Instantly warp the player to the center of the current map
+- **Variable Value Filter**: Filter the Variables panel by value type (positive, negative, zero/unset)
+- **Hide Nameless Items Default**: Items panel hides nameless entries by default, persisted across tab switches
 
 ---
 
@@ -79,6 +72,11 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
   - **Installer Save Editor**: Edit local MV/MZ save files with structured fields or raw JSON, with backups before writing.
   - **Toast Notifications**: Interactive feedback for No Clip, Force Save, and Encounter toggles.
   - **Pop Out Window**: Launch the Cheat UI in a separate standalone window for better multitasking.
+  - **One-Hit Kill**: Battle panel toggle that forces all player hits to instantly defeat enemies.
+  - **Sidebar Toggle**: Show/hide the CheatModal sidebar for more screen space during gameplay.
+  - **Teleport to Map Center**: Instantly warp the player to the center of the current map.
+  - **Variable Value Filter**: Filter variables by value type (positive, negative, zero/unset).
+  - **Hide Nameless Items Default**: Items panel hides nameless entries by default, persisted across tab switches.
 - **Smart Translation**: Real-time translation for Variables, Switches, Maps, and Items.
   - Supports **Lingva Translate** (Free/Private Google Translate alternative).
   - **Translation Bank**: Caches results for instant loading.
@@ -90,7 +88,7 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 ## 🛠️ Installation
 
 ### Step 1: Download
-Recommended: download `RPGMakerCheatInstaller-v1.5.4-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
+Recommended: download `RPGMakerCheatInstaller-v1.5.5-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
 
 Manual install is still available: download the latest `-core.tar.gz` package for your engine from the same Releases page.
 

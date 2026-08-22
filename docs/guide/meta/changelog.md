@@ -1,6 +1,18 @@
 # Changelog
 
-## v1.5.4 - Latest
+## v1.5.5 - Latest
+
+### Battle, UI & Panel Enhancements
+- [Feat] **One-Hit Kill**: Added a One-Hit Kill toggle to the Battle panel that forces all player hits to instantly defeat enemies.
+- [Feat] **Sidebar Visibility Toggle**: Added a toggle to show/hide the CheatModal sidebar, giving more screen space during gameplay.
+- [Feat] **Teleport to Map Center**: Added an option in the Teleport panel to instantly warp the player to the center of the current map.
+- [Feat] **Hide Nameless Items Default**: Items panel now hides nameless entries by default, with the setting persisted across tab switches.
+- [Feat] **Variable Value Type Filter**: Added filter controls in the Variables panel to show only positive, negative, or zero/unset values.
+- [Tweak] **Version Bump**: Bumped version to `1.5.5`.
+
+---
+
+## v1.5.4
 
 ### Nameless Filter Fix
 - [Fix] **Variables Hide Nameless**: Fixed Issue #3 where enabling Hide Nameless in the Variables panel hid every variable.
