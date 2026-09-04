@@ -1,8 +1,10 @@
 // @ts-check
 
+import { getGameRootDir } from "./RuntimeEnv.js";
+
 const DIAGNOSTICS_MAX_ENTRIES = 200;
 const DIAGNOSTICS_MAX_FILE_BYTES = 256 * 1024;
-const DIAGNOSTICS_LOG_PATH = "./www/cheat-settings/cheat-diagnostics.log";
+const DIAGNOSTICS_LOG_PATH = `./${getGameRootDir()}/cheat-settings/cheat-diagnostics.log`;
 
 /**
  * @typedef {"debug" | "info" | "warn" | "error"} DiagnosticsLevel

@@ -1,6 +1,7 @@
 // @ts-check
 
 import { KeyValueStorage } from "../storage/KeyValueStorage.js";
+import { getGameRootDir } from "../runtime/RuntimeEnv.js";
 import {
   DEFAULT_END_POINTS,
   END_POINT_URL_PATTERN_TEXT_SYMBOL,
@@ -9,7 +10,9 @@ import {
 export class TranslateSettings {
   constructor() {
     /** @type {KeyValueStorage} */
-    this.kvStorage = new KeyValueStorage("./www/cheat-settings/translate.json");
+    this.kvStorage = new KeyValueStorage(
+      `./${getGameRootDir()}/cheat-settings/translate.json`,
+    );
     /** @type {any} */
     this.data = null;
     this.__readSettings();

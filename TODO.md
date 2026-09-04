@@ -111,15 +111,16 @@ Maintainability planning:
 
 
 # Others modifications
-- toggle to hide side bar
-- option to teleport in the center of the map
+- toggle to hide side bar (x)
+- option to teleport in the center of the map (X)
 - pre-load items
-- hide nameless item default and persist that mode even when the user change tabs
+- hide nameless item default and persist that mode even when the user change tabs (x)
 - save location give the user give flags to his saves locations like boss area, shop, checkpoint etc.
-- in variables possible to user filter them by value like positive, nagative, non-values etc.
-- the toggle bar in items more compacts
+- in variables possible to user filter them by value like positive, nagative, non-values etc.(x)
+- the toggle bar in items more compacts (x)
 - make an tab with only actors in a list and when click show besides all the var we can chage in him, if possible show what skills he can learn
 - make the ui more compact in general
 - Add game speed and with the ctrl keyboard butom holding foward the game speed 2x, with the possibility to chenge the speed value
-- other cheats, one-hit kill, no random encounters. Check if i already have them
+- other cheats, one-hit kill, no random encounters. Check if i already have them (X)
 - List all communEv. And possibility to run;
+- let user change the opacity of the window.

@@ -4,6 +4,7 @@ import { Alert } from "../AlertHelper.js";
 import { ShortcutMap } from "./ShortcutHelper.js";
 import { migrateShortcutSettings } from "./ShortcutMigration.js";
 import { ShortcutStorage } from "./ShortcutStorage.js";
+import { getGameRootDir } from "../runtime/RuntimeEnv.js";
 import {
   defaultShortcutSettings,
   isInValueInRange,
@@ -30,7 +31,7 @@ class GlobalShortcut {
   initialize() {
     console.log("__global shortcut initialized");
 
-    this.shortcutSettingsFile = "./www/cheat-settings/shortcuts.json";
+    this.shortcutSettingsFile = `./${getGameRootDir()}/cheat-settings/shortcuts.json`;
     this.storage = new ShortcutStorage(
       this.shortcutSettingsFile,
       defaultShortcutSettings,

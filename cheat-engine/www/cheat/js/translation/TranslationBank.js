@@ -1,6 +1,7 @@
 // @ts-check
 
 import { KeyValueStorage } from "../storage/KeyValueStorage.js";
+import { getGameRootDir } from "../runtime/RuntimeEnv.js";
 
 /**
  * TranslationBank caches translated strings on disk so in-game translation
@@ -10,7 +11,7 @@ class TranslationBank {
   constructor() {
     /** @type {KeyValueStorage} */
     this.storage = new KeyValueStorage(
-      "./www/cheat-settings/translation-bank.json",
+      `./${getGameRootDir()}/cheat-settings/translation-bank.json`,
     );
     /** @type {Record<string, TranslationCacheEntry>} */
     this.cache = this.loadCache();

@@ -19,3 +19,14 @@ export function readBooleanSetting(key, fallback) {
 export function writeBooleanSetting(key, value) {
   KEY_VALUE_STORAGE.setItem(key, value ? "true" : "false");
 }
+
+export function readNumberSetting(key, fallback) {
+  const val = KEY_VALUE_STORAGE.getItem(key);
+  if (val === null || val === undefined) return fallback;
+  const num = Number(val);
+  return isNaN(num) ? fallback : num;
+}
+
+export function writeNumberSetting(key, value) {
+  KEY_VALUE_STORAGE.setItem(key, String(value));
+}

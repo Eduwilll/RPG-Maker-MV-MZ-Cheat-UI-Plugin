@@ -30,6 +30,9 @@ RPG Maker MV/MZ 게임을 위한 강력한 GUI 기반 치트 툴이며, **실시
   - **맵 중심 텔레포트**: 텔레포트 패널에서 현재 맵의 중심으로 즉시 워프하는 옵션.
   - **변수 값 유형 필터**: 변수 패널에서 양수, 음수, 또는 0/미설정 값만 표시하도록 필터링.
   - **이름 없는 아이템 기본 숨김**: 아이템 패널이 이름 없는 항목을 기본으로 숨기고 탭 전환 시에도 설정을 유지.
+  - **외관 패널**: 창 투명도, 다크 모드, 강조 색상 사용자화.
+  - **이벤트 분석 패널**: 커먼/맵/배틀 이벤트 시퀀스 검사 및 분기 시각화.
+  - **저장 위치 플래그**: 저장 위치에 프리셋 또는 커스텀 플래그 태그.
 - **스마트 번역**: 실시간으로 변수, 스위치, 맵 이름, 아이템 설명 번역.
   - **Lingva Translate** 지원 (개인 정보 보호 및 무료 구글 번역 대안).
   - **Translation Bank**: 번역된 내용을 캐시하여 다음 로드 시 즉시 반영.
@@ -118,4 +121,4 @@ docker-compose up -d
 - **Translation Idea**: [sieucapoccho3717](https://github.com/sieucapoccho3717/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 - **Maintained & Enhanced by**: [Eduwilll](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 
-Latest Release: v1.5.5
+Latest Release: v1.6.0

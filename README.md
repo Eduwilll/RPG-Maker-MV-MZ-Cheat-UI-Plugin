@@ -39,13 +39,11 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 - **[Full Engine Reference](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/features)**
 - **[Keyboard Shortcuts](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/shortcuts)**
 
-### Latest Release: v1.5.5
+### Latest Release: v1.6.0
 - Windows installer ZIP with `RPGMakerCheatInstaller.exe`
-- **One-Hit Kill**: Battle panel toggle that forces all player hits to instantly defeat enemies
-- **Sidebar Toggle**: Show/hide the CheatModal sidebar for more screen space during gameplay
-- **Teleport to Map Center**: Instantly warp the player to the center of the current map
-- **Variable Value Filter**: Filter the Variables panel by value type (positive, negative, zero/unset)
-- **Hide Nameless Items Default**: Items panel hides nameless entries by default, persisted across tab switches
+- **Appearance Panel**: Window opacity slider, dark mode toggle, and primary accent color picker
+- **Event Analyzer Panel**: Common/Map/Battle event sequence analyzer with command tree and tracing
+- **SaveRecall Flags**: Preset + custom flags (Boss Area, shop, checkpoint) for saved locations
 
 ---
 
@@ -77,6 +75,9 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
   - **Teleport to Map Center**: Instantly warp the player to the center of the current map.
   - **Variable Value Filter**: Filter variables by value type (positive, negative, zero/unset).
   - **Hide Nameless Items Default**: Items panel hides nameless entries by default, persisted across tab switches.
+  - **Appearance Panel**: Window opacity, dark mode, and accent color customization.
+  - **Event Analyzer Panel**: Inspect Common/Map/Battle event sequences with branch visualization.
+  - **SaveRecall Flags**: Tag saved locations with preset or custom flags.
 - **Smart Translation**: Real-time translation for Variables, Switches, Maps, and Items.
   - Supports **Lingva Translate** (Free/Private Google Translate alternative).
   - **Translation Bank**: Caches results for instant loading.
@@ -88,7 +89,7 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 ## 🛠️ Installation
 
 ### Step 1: Download
-Recommended: download `RPGMakerCheatInstaller-v1.5.5-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
+Recommended: download `RPGMakerCheatInstaller-v1.6.0-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
 
 Manual install is still available: download the latest `-core.tar.gz` package for your engine from the same Releases page.
 
@@ -161,26 +162,26 @@ Link your development folder to a test game. Any saved changes in your IDE are i
 Generate the MV/MZ manual cheat packages from the repository root:
 
 ```powershell
-py -3 deploy\main.py --version 1.5.4
+py -3 deploy\main.py --version 1.6.0
 ```
 
 This creates:
 
 ```text
-output\rpg-mv-cheat-1.5.4-core.tar.gz
-output\rpg-mz-cheat-1.5.4-core.tar.gz
+output\rpg-mv-cheat-1.6.0-core.tar.gz
+output\rpg-mz-cheat-1.6.0-core.tar.gz
 ```
 
 After generating the manual packages, build the Windows installer ZIP:
 
 ```powershell
-py -3 tools\installer\build_windows.py --version 1.5.4
+py -3 tools\installer\build_windows.py --version 1.6.0
 ```
 
 This creates:
 
 ```text
-output\RPGMakerCheatInstaller-v1.5.4-windows.zip
+output\RPGMakerCheatInstaller-v1.6.0-windows.zip
 ```
 
 ### 4. Automated Formatting (Prettier & Husky)

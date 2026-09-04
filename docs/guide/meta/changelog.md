@@ -1,6 +1,19 @@
 # Changelog
 
-## v1.5.5 - Latest
+## v1.6.0 - Latest
+
+### Appearance & Event Analysis
+- [Feat] **Appearance Panel**: Added window opacity slider (10–100%), dark mode toggle, and primary accent color picker, persisted via `CheatUiSettings`.
+- [Feat] **Event Analyzer Panel**: Added Event Sequence Analyzer for Common, Map, and Battle events with command tree, branch/choice visualization, and sequence tracing (`EventDatabase`, `SequenceTracer`, `CommandParser`).
+- [Feat] **SaveRecall Flags**: Added preset flags (e.g. Boss Area, shop, checkpoint) plus custom flag input to Save/Recall locations, shown as chips in the location table.
+- [Tweak] **CheatModal Polish**: Binds Vuetify dark theme, hover-to-opaque window fading, larger default size (750x450), and registers Appearance/EventAnalyzer panels.
+- [Fix] **Game Root Paths**: Replaced hardcoded `./www/cheat-settings` with `getGameRootDir()` across SpeedCheat, diagnostics, shortcuts, storage, and translation settings for correct MV (`www/`) vs MZ (`/`) resolution.
+- [Chore] **Ignore Opencode**: Added `.opencode/` to `.gitignore`.
+- [Tweak] **Version Bump**: Bumped version to `1.6.0`.
+
+---
+
+## v1.5.5
 
 ### Battle, UI & Panel Enhancements
 - [Feat] **One-Hit Kill**: Added a One-Hit Kill toggle to the Battle panel that forces all player hits to instantly defeat enemies.

@@ -1,6 +1,7 @@
 // @ts-check
 
 import { KeyValueStorage } from "../storage/KeyValueStorage.js";
+import { getGameRootDir } from "../runtime/RuntimeEnv.js";
 
 export class GameSpeedCheat {
   static sceneOptions() {
@@ -117,7 +118,9 @@ export class GameSpeedCheat {
       (key) => options[key] === sceneOption,
     );
 
-    const storage = new KeyValueStorage("./www/cheat-settings/gameSpeed.json");
+    const storage = new KeyValueStorage(
+      `./${getGameRootDir()}/cheat-settings/gameSpeed.json`,
+    );
 
     storage.setItem(
       "data",
@@ -126,7 +129,9 @@ export class GameSpeedCheat {
   }
 
   static __readSettings() {
-    const storage = new KeyValueStorage("./www/cheat-settings/gameSpeed.json");
+    const storage = new KeyValueStorage(
+      `./${getGameRootDir()}/cheat-settings/gameSpeed.json`,
+    );
     const json = storage.getItem("data");
 
     if (!json) {
@@ -210,12 +215,16 @@ export class SpeedCheat {
   }
 
   static __writeSettings(speed, fixed) {
-    const storage = new KeyValueStorage("./www/cheat-settings/speed.json");
+    const storage = new KeyValueStorage(
+      `./${getGameRootDir()}/cheat-settings/speed.json`,
+    );
     storage.setItem("data", JSON.stringify({ speed: speed, fixed: fixed }));
   }
 
   static __readSettings() {
-    const storage = new KeyValueStorage("./www/cheat-settings/speed.json");
+    const storage = new KeyValueStorage(
+      `./${getGameRootDir()}/cheat-settings/speed.json`,
+    );
     const json = storage.getItem("data");
 
     if (!json) {

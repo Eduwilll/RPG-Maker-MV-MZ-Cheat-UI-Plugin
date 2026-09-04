@@ -1,3 +1,5 @@
+import { getGameRootDir } from "../runtime/RuntimeEnv.js";
+
 export class KeyValueStorage {
   constructor(filePath) {
     this.filePath = filePath;
@@ -62,5 +64,5 @@ export class KeyValueStorage {
 }
 
 export const KEY_VALUE_STORAGE = new KeyValueStorage(
-  "./www/cheat-settings/kv-storage.json",
+  `./${getGameRootDir()}/cheat-settings/kv-storage.json`,
 );

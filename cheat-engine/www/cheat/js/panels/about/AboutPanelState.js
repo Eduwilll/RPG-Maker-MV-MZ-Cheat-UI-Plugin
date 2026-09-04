@@ -56,10 +56,10 @@ import { CHEAT_DIAGNOSTICS } from "../../runtime/CheatDiagnostics.js";
  */
 
 const ABOUT_PANEL_PATHS = {
-  settingsDir: "./www/cheat-settings",
-  translateSettings: "./www/cheat-settings/translate.json",
-  translationBank: "./www/cheat-settings/translation-bank.json",
-  shortcuts: "./www/cheat-settings/shortcuts.json",
+  settingsDir: `./${getGameRootDir()}/cheat-settings`,
+  translateSettings: `./${getGameRootDir()}/cheat-settings/translate.json`,
+  translationBank: `./${getGameRootDir()}/cheat-settings/translation-bank.json`,
+  shortcuts: `./${getGameRootDir()}/cheat-settings/shortcuts.json`,
 };
 
 function readCheatVersion() {

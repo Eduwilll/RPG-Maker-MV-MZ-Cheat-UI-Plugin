@@ -13,12 +13,16 @@ import MapEventPanel from "./panels/MapEventPanel.js";
 import ShortcutPanel from "./panels/ShortcutPanel.js";
 import TranslateSettingsPanel from "./panels/TranslateSettingsPanel.js";
 import AboutPanel from "./panels/AboutPanel.js";
+import EventAnalyzerPanel from "./panels/EventAnalyzerPanel.js";
+import AppearancePanel from "./panels/AppearancePanel.js";
 import {
   readBooleanSetting,
   writeBooleanSetting,
+  readNumberSetting,
 } from "./js/ui/CheatUiSettings.js";
 
 const SIDEBAR_VISIBLE_SETTING = "cheatModal.sidebarVisible";
+const WINDOW_OPACITY_SETTING = "cheatModal.windowOpacity";
 
 export default {
   name: "CheatModal",
@@ -39,15 +43,21 @@ export default {
     ShortcutPanel,
     TranslateSettingsPanel,
     AboutPanel,
+    EventAnalyzerPanel,
+    AppearancePanel,
   },
 
   template: `
 <v-card 
-    dark
-    class="z-index-cheat-0"
-    style="position: fixed; top: 0; left: 0;"
-    :width="isWindow ? '100vw' : '700'" 
-    :height="isWindow ? '100vh' : '400'">
+    :dark="$vuetify.theme.dark"
+    :color="$vuetify.theme.dark ? '#212121' : '#FFFFFF'"
+    class="z-index-cheat-0 elevation-12"
+    :style="{ position: 'fixed', top: 0, left: 0, opacity: isHovered ? 1.0 : windowOpacity, transition: 'opacity 0.2s' }"
+    :width="isWindow ? '100vw' : '750'" 
+    :height="isWindow ? '100vh' : '450'"
+    @mouseenter="isHovered = true"
+    @mouseleave="isHovered = false"
+>
     <v-btn
         style="top: 4px; left: 4px; z-index: 3;"
         color="grey darken-2"
@@ -64,7 +74,7 @@ export default {
         <div
             v-if="isSidebarVisible"
             :style="'width: ' + navWidth + 'px;'"
-            class="fill-height d-inline pa-2 overflow-y-auto hide-scrollbar">
+            class="fill-height d-inline pa-2 overflow-y-auto">
             <v-treeview
                 :active.sync="navTreeModel"
                 transition
@@ -85,7 +95,7 @@ export default {
         <v-divider v-if="isSidebarVisible" vertical></v-divider>
         <div
             :style="'width: ' + contentWidth + ';'"
-            class="fill-height d-inline pa-2 overflow-y-auto hide-scrollbar">
+            class="fill-height d-inline pa-2 overflow-y-auto">
             <component :is="currentComponentName"></component>
         </div>
     </v-row>
@@ -111,6 +121,8 @@ export default {
     return {
       navWidth: 200,
       isSidebarVisible: readBooleanSetting(SIDEBAR_VISIBLE_SETTING, true),
+      windowOpacity: readNumberSetting(WINDOW_OPACITY_SETTING, 1.0),
+      isHovered: false,
 
       navTreeModel: undefined,
 
@@ -182,6 +194,11 @@ export default {
           component: "map-event-panel",
         },
         {
+          name: "Event Analyzer",
+          icon: "mdi-transit-connection-variant",
+          component: "event-analyzer-panel",
+        },
+        {
           name: "Teleport",
           icon: "mdi-run-fast",
           component: "teleport-panel",
@@ -190,6 +207,11 @@ export default {
           name: "Settings",
           icon: "mdi-cog",
           children: [
+            {
+              name: "Appearance",
+              icon: "mdi-palette",
+              component: "appearance-panel",
+            },
             {
               name: "Translate",
               icon: "mdi-google-translate",
@@ -232,6 +254,23 @@ export default {
       this.$emit("change", navItem.component);
     }
     this.navTreeModel = [navItem];
+
+    this._onAppearanceChange = (e) => {
+      this.windowOpacity = e.detail.windowOpacity;
+    };
+    window.addEventListener(
+      "cheat-appearance-change",
+      this._onAppearanceChange,
+    );
+  },
+
+  beforeDestroy() {
+    if (this._onAppearanceChange) {
+      window.removeEventListener(
+        "cheat-appearance-change",
+        this._onAppearanceChange,
+      );
+    }
   },
 
   methods: {

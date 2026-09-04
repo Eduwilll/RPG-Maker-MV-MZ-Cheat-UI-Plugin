@@ -1,6 +1,7 @@
 .idea/
 .vscode/
 .agents/
+.opencode/
 venv/
 .venv/
 output/
