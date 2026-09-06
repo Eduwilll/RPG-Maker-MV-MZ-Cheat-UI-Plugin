@@ -1,6 +1,17 @@
 # Changelog
 
-## v1.6.0 - Latest
+## v1.6.1 - Latest
+
+### Actors Tab & Old-Look Restore
+- [Feat] **Actors Panel**: Added Actors tab listing every actor in the game database, grouped as Controlled (party leader), Party, and Other Actors, with side-by-side editing of name, nickname, class, level, EXP, HP/MP/TP, all 8 params, learnable/learned skills, and states.
+- [Fix] **Dark Theme Default**: Overlay now boots with the saved Appearance theme (dark by default), matching the old version and the pop-out/preview windows.
+- [Fix] **Idle Opacity Default**: Restored the old translucent idle look (30% opacity, opaque on hover) instead of 100%.
+- [Fix] **Themed Scrollbars**: Restored `hide-scrollbar` on the sidebar and content panes so scrolling blends with the dark UI instead of showing native Windows bars.
+- [Tweak] **Version Bump**: Bumped version to `1.6.1`.
+
+---
+
+## v1.6.0
 
 ### Appearance & Event Analysis
 - [Feat] **Appearance Panel**: Added window opacity slider (10–100%), dark mode toggle, and primary accent color picker, persisted via `CheatUiSettings`.
