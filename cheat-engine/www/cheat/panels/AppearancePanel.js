@@ -80,7 +80,7 @@ export default {
 
   data() {
     return {
-      windowOpacity: readNumberSetting(WINDOW_OPACITY_SETTING, 1.0),
+      windowOpacity: readNumberSetting(WINDOW_OPACITY_SETTING, 0.3),
       isDarkMode: readBooleanSetting(THEME_DARK_MODE_SETTING, true),
       primaryColor: KEY_VALUE_STORAGE.getItem(THEME_PRIMARY_COLOR) || "#1976D2", // default blue
       colorOptions: [

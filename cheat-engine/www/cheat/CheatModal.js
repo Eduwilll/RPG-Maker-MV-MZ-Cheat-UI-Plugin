@@ -1,4 +1,5 @@
 import GeneralPanel from "./panels/GeneralPanel.js";
+import ActorSettingPanel from "./panels/ActorSettingPanel.js";
 import HealthSettingPanel from "./panels/HealthSettingPanel.js";
 import StatsSettingPanel from "./panels/StatsSettingPanel.js";
 import ItemSettingPanel from "./panels/ItemSettingPanel.js";
@@ -29,6 +30,7 @@ export default {
 
   components: {
     GeneralPanel,
+    ActorSettingPanel,
     HealthSettingPanel,
     StatsSettingPanel,
     ItemSettingPanel,
@@ -74,7 +76,7 @@ export default {
         <div
             v-if="isSidebarVisible"
             :style="'width: ' + navWidth + 'px;'"
-            class="fill-height d-inline pa-2 overflow-y-auto">
+            class="fill-height d-inline pa-2 overflow-y-auto hide-scrollbar">
             <v-treeview
                 :active.sync="navTreeModel"
                 transition
@@ -95,7 +97,7 @@ export default {
         <v-divider v-if="isSidebarVisible" vertical></v-divider>
         <div
             :style="'width: ' + contentWidth + ';'"
-            class="fill-height d-inline pa-2 overflow-y-auto">
+            class="fill-height d-inline pa-2 overflow-y-auto hide-scrollbar">
             <component :is="currentComponentName"></component>
         </div>
     </v-row>
@@ -121,7 +123,7 @@ export default {
     return {
       navWidth: 200,
       isSidebarVisible: readBooleanSetting(SIDEBAR_VISIBLE_SETTING, true),
-      windowOpacity: readNumberSetting(WINDOW_OPACITY_SETTING, 1.0),
+      windowOpacity: readNumberSetting(WINDOW_OPACITY_SETTING, 0.3),
       isHovered: false,
 
       navTreeModel: undefined,
@@ -141,6 +143,11 @@ export default {
           name: "HP/MP/Battle",
           icon: "mdi-battery-70",
           component: "health-setting-panel",
+        },
+        {
+          name: "Actors",
+          icon: "mdi-account-group",
+          component: "actor-setting-panel",
         },
         {
           name: "Stats/Level",
