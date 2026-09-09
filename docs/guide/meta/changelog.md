@@ -1,6 +1,19 @@
 # Changelog
 
-## v1.6.1 - Latest
+## v1.7.0 - Latest
+
+### Realistic Minimap
+- [Feat] **Minimap Overlay**: Added a realistic minimap that renders actual map tile graphics (B–E/A5 exact, autotile textures approximated) with player dot and event markers, placeable in any corner or at custom X/Y.
+- [Feat] **Minimap Settings**: Added Minimap panel with on/off, follow vs full-map mode, window size (96–320px), content zoom (50–400%), opacity, and event marker toggle, all persisted.
+- [Feat] **Minimap Toggle**: Added `Alt+N` shortcut to show/hide the minimap in-game (remappable in Shortcuts).
+- [Fix] **Tileset Resilience**: Empty tileset slots no longer block rendering, and slow/encrypted loads fall back to partial rendering after 8s instead of hiding the map forever.
+- [Feat] **Minimap Diagnostics**: Added live status line in the panel plus `[minimap]` log stages for troubleshooting.
+- [Tweak] **Off By Default**: Minimap and event markers now start disabled on fresh installs.
+- [Tweak] **Version Bump**: Bumped version to `1.7.0`.
+
+---
+
+## v1.6.1
 
 ### Actors Tab & Old-Look Restore
 - [Feat] **Actors Panel**: Added Actors tab listing every actor in the game database, grouped as Controlled (party leader), Party, and Other Actors, with side-by-side editing of name, nickname, class, level, EXP, HP/MP/TP, all 8 params, learnable/learned skills, and states.
