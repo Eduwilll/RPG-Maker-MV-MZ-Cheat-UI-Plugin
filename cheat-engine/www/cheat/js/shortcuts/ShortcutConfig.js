@@ -3,6 +3,7 @@
 import { Key } from "./KeyCodes.js";
 import { cloneObject } from "./Tools.js";
 import { SpeedCheat, MessageCheat } from "../cheats/SpeedCheat.js";
+import { toggleMinimapEnabled } from "../panels/minimap/MinimapPanelState.js";
 import { SceneCheat } from "../cheats/SceneCheat.js";
 import { BattleCheat } from "../cheats/BattleCheat.js";
 import { GeneralCheat } from "../cheats/GeneralCheat.js";
@@ -19,6 +20,10 @@ export const defaultShortcutSettings = {
 
   toggleCheatModalToMapEventComponent: {
     shortcut: "Tab",
+  },
+
+  toggleMinimap: {
+    shortcut: "alt n",
   },
 
   quickSave: {
@@ -143,6 +148,14 @@ export const shortcutConfig = {
     desc: "",
     enterAction(param) {
       GeneralCheat.toggleCheatModal("map-event-panel");
+    },
+  },
+
+  toggleMinimap: {
+    name: "Toggle minimap",
+    desc: "Show/hide the realistic minimap overlay",
+    enterAction(param) {
+      toggleMinimapEnabled();
     },
   },
 

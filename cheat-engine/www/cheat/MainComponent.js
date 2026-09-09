@@ -4,6 +4,7 @@ import { GeneralCheat } from "./js/cheats/GeneralCheat.js";
 import AlertSnackbar from "./components/AlertSnackbar.js";
 import ConfirmDialog from "./components/ConfirmDialog.js";
 import WatcherOverlay from "./components/WatcherOverlay.js";
+import MinimapOverlay from "./components/MinimapOverlay.js";
 import { customizeRPGMakerFunctions } from "./init/customize_functions.js";
 import { Key } from "./js/shortcuts/KeyCodes.js";
 import { Alert } from "./js/AlertHelper.js";
@@ -11,7 +12,13 @@ import { CHEAT_DIAGNOSTICS } from "./js/runtime/CheatDiagnostics.js";
 
 export default {
   name: "MainComponent",
-  components: { CheatModal, AlertSnackbar, ConfirmDialog, WatcherOverlay },
+  components: {
+    CheatModal,
+    AlertSnackbar,
+    ConfirmDialog,
+    WatcherOverlay,
+    MinimapOverlay,
+  },
   template: `
 <div 
     class="pa-2"
@@ -28,6 +35,7 @@ export default {
     <alert-snackbar></alert-snackbar>
     <confirm-dialog></confirm-dialog>
     <watcher-overlay :hide-while-modal="show"></watcher-overlay>
+    <minimap-overlay></minimap-overlay>
 </div>`,
 
   style: `

@@ -11,6 +11,7 @@ import WatcherPanel from "./panels/WatcherPanel.js";
 import SaveRecallPanel from "./panels/SaveRecallPanel.js";
 import TeleportPanel from "./panels/TeleportPanel.js";
 import MapEventPanel from "./panels/MapEventPanel.js";
+import MinimapPanel from "./panels/MinimapPanel.js";
 import ShortcutPanel from "./panels/ShortcutPanel.js";
 import TranslateSettingsPanel from "./panels/TranslateSettingsPanel.js";
 import AboutPanel from "./panels/AboutPanel.js";
@@ -41,6 +42,7 @@ export default {
     WatcherPanel,
     SaveRecallPanel,
     MapEventPanel,
+    MinimapPanel,
     TeleportPanel,
     ShortcutPanel,
     TranslateSettingsPanel,
@@ -199,6 +201,11 @@ export default {
           name: "Map Events",
           icon: "mdi-map-marker-plus",
           component: "map-event-panel",
+        },
+        {
+          name: "Minimap",
+          icon: "mdi-map",
+          component: "minimap-panel",
         },
         {
           name: "Event Analyzer",
