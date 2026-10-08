@@ -56,7 +56,7 @@ export default {
     :dark="$vuetify.theme.dark"
     :color="$vuetify.theme.dark ? '#212121' : '#FFFFFF'"
     class="z-index-cheat-0 elevation-12"
-    :style="{ position: 'fixed', top: 0, left: 0, opacity: isHovered ? 1.0 : windowOpacity, transition: 'opacity 0.2s' }"
+    :style="{ position: 'fixed', top: 0, left: 0, opacity: effectiveOpacity, transition: 'opacity 0.2s' }"
     :width="isWindow ? '100vw' : '750'" 
     :height="isWindow ? '100vh' : '450'"
     @mouseenter="isHovered = true"
@@ -243,6 +243,15 @@ export default {
   },
 
   computed: {
+    effectiveOpacity() {
+      // The separate window is a dedicated cheat window: always fully opaque.
+      if (this.isWindow) {
+        return 1.0;
+      }
+
+      return this.isHovered ? 1.0 : this.windowOpacity;
+    },
+
     contentWidth() {
       if (!this.isSidebarVisible) {
         return "100%";

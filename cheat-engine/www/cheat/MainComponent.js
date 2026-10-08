@@ -58,6 +58,14 @@ export default {
     customizeRPGMakerFunctions(self);
     CHEAT_DIAGNOSTICS.log("info", "overlay", "MainComponent created");
 
+    try {
+      // Exposed for the separate cheat window (nw.Window.open does not
+      // reliably set window.opener, so the popup reads this instead).
+      window.GeneralCheat = GeneralCheat;
+    } catch (error) {
+      // no-op
+    }
+
     GeneralCheat.toggleCheatModal = (componentName = null) => {
       this.toggleCheatModal(componentName);
     };
@@ -218,6 +226,12 @@ export default {
         },
         (win) => {
           GeneralCheat.__cheatWindow = win.window;
+          try {
+            // Explicit opener reference: window.opener is not reliable here.
+            win.window.__cheatOpener = window;
+          } catch (error) {
+            // no-op
+          }
           win.on("closed", () => {
             GeneralCheat.__cheatWindow = null;
           });

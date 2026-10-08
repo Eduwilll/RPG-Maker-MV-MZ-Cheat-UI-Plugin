@@ -1,27 +1,70 @@
 import { getGameRootDir } from "../runtime/RuntimeEnv.js";
 
+const DEFAULT_STORAGE_FILE = "cheat-settings/kv-storage.json";
+
 export class KeyValueStorage {
   constructor(filePath) {
-    this.filePath = filePath;
+    // filePath is optional: when omitted it is resolved lazily on first use.
+    // RPG Maker globals (Utils) do not exist yet while separate-window
+    // modules are being evaluated, so nothing may touch them here.
+    this.filePath = filePath || null;
+    this.fileEncoding = "utf-8";
+    this.fileSystem = null;
+    this.path = null;
+  }
 
-    if (Utils.isNwjs()) {
-      this.fileEncoding = "utf-8";
-      this.fileSystem = require("fs");
-      this.path = require("path");
+  isDesktopRuntime() {
+    try {
+      return typeof Utils !== "undefined" && !!Utils && Utils.isNwjs();
+    } catch (error) {
+      return false;
+    }
+  }
+
+  __resolveFilePath() {
+    if (!this.filePath) {
+      try {
+        this.filePath = `./${getGameRootDir()}/${DEFAULT_STORAGE_FILE}`;
+      } catch (error) {
+        this.filePath = `./${DEFAULT_STORAGE_FILE}`;
+      }
+    }
+
+    return this.filePath;
+  }
+
+  __resolveFileSystem() {
+    if (!this.isDesktopRuntime()) {
+      return null;
+    }
+
+    try {
+      if (!this.fileSystem) {
+        this.fileSystem = require("fs");
+        this.path = require("path");
+      }
+
+      return this.fileSystem;
+    } catch (error) {
+      return null;
     }
   }
 
   getItem(key) {
-    if (!Utils.isNwjs()) {
-      return localStorage.getItem(this.filePath + ":" + key);
+    const filePath = this.__resolveFilePath();
+
+    if (!this.__resolveFileSystem()) {
+      return localStorage.getItem(filePath + ":" + key);
     }
 
     return this.__getItemFromFile(key);
   }
 
   setItem(key, value) {
-    if (!Utils.isNwjs()) {
-      localStorage.setItem(this.filePath + ":" + key, value);
+    const filePath = this.__resolveFilePath();
+
+    if (!this.__resolveFileSystem()) {
+      localStorage.setItem(filePath + ":" + key, value);
       return;
     }
 
@@ -63,6 +106,4 @@ export class KeyValueStorage {
   }
 }
 
-export const KEY_VALUE_STORAGE = new KeyValueStorage(
-  `./${getGameRootDir()}/cheat-settings/kv-storage.json`,
-);
+export const KEY_VALUE_STORAGE = new KeyValueStorage();

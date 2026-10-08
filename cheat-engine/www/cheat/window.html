@@ -78,6 +78,53 @@
     <script src="./libs/vuetify.js"></script>
     <script src="./libs/axios.min.js"></script>
 
+    <!-- Watchdog: module scripts fail silently (no window.onerror from the
+         module itself), so surface load failures and stalls here. -->
+    <script>
+      (function () {
+        function showBootError(text) {
+          var display = document.getElementById("error-display");
+          var status = document.getElementById("status-text");
+          if (display) {
+            display.textContent = text;
+            display.style.display = "block";
+          }
+          if (status) {
+            status.textContent = "Initialization Failed";
+            status.style.color = "#ff5252";
+          }
+        }
+
+        window.addEventListener(
+          "error",
+          function (event) {
+            var src =
+              (event && event.target && event.target.src) || "";
+            if (src.indexOf("window-init.js") !== -1) {
+              showBootError(
+                "Failed to load js/window-init.js. Reinstall the cheat files."
+              );
+            }
+          },
+          true
+        );
+
+        setTimeout(function () {
+          var app = document.getElementById("app");
+          var status = document.getElementById("status-text");
+          if (
+            app &&
+            app.style.display === "none" &&
+            status &&
+            status.textContent.indexOf("Initializing") !== -1
+          ) {
+            status.textContent =
+              "Still initializing after 15s - open DevTools (F12) and look for [Cheat] errors.";
+          }
+        }, 15000);
+      })();
+    </script>
+
     <!-- Bridge script -->
     <script type="module" src="./js/window-init.js"></script>
   </body>

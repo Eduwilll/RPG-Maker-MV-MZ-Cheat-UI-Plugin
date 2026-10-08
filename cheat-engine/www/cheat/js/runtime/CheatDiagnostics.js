@@ -4,7 +4,22 @@ import { getGameRootDir } from "./RuntimeEnv.js";
 
 const DIAGNOSTICS_MAX_ENTRIES = 200;
 const DIAGNOSTICS_MAX_FILE_BYTES = 256 * 1024;
-const DIAGNOSTICS_LOG_PATH = `./${getGameRootDir()}/cheat-settings/cheat-diagnostics.log`;
+const DIAGNOSTICS_LOG_FILE = "cheat-settings/cheat-diagnostics.log";
+
+/**
+ * The log path is resolved lazily (not at module top-level) because the RPG
+ * Maker globals needed for path resolution do not exist yet while
+ * separate-window modules are being evaluated.
+ *
+ * @returns {string}
+ */
+function getDiagnosticsLogPath() {
+  try {
+    return `./${getGameRootDir()}/${DIAGNOSTICS_LOG_FILE}`;
+  } catch (error) {
+    return `./${DIAGNOSTICS_LOG_FILE}`;
+  }
+}
 
 /**
  * @typedef {"debug" | "info" | "warn" | "error"} DiagnosticsLevel
@@ -135,9 +150,9 @@ class CheatDiagnostics {
     }
 
     try {
-      return runtimeInfo.path.resolve(DIAGNOSTICS_LOG_PATH);
+      return runtimeInfo.path.resolve(getDiagnosticsLogPath());
     } catch (error) {
-      return DIAGNOSTICS_LOG_PATH;
+      return getDiagnosticsLogPath();
     }
   }
 
@@ -381,7 +396,7 @@ class CheatDiagnostics {
     }
 
     try {
-      const logPath = runtimeInfo.path.resolve(DIAGNOSTICS_LOG_PATH);
+      const logPath = runtimeInfo.path.resolve(getDiagnosticsLogPath());
       const logDir = runtimeInfo.path.dirname(logPath);
 
       if (!runtimeInfo.fs.existsSync(logDir)) {

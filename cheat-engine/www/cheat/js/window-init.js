@@ -11,8 +11,9 @@ initializeCheatDiagnostics("separate-window");
 function showError(msg, err) {
   const display = document.getElementById("error-display");
   const status = document.getElementById("status-text");
+  const details = err && err.stack ? err.stack : err;
   if (display) {
-    display.textContent = msg + (err ? "\n\nDetails: " + err.stack || err : "");
+    display.textContent = msg + (details ? "\n\nDetails: " + details : "");
     display.style.display = "block";
   }
   if (status) {
@@ -29,14 +30,16 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 async function init() {
   const status = document.getElementById("status-text");
 
-  if (!window.opener) {
+  // nw.Window.open does not reliably set window.opener, so the game window
+  // passes an explicit reference (see MainComponent.openCheatWindow).
+  const opener = window.__cheatOpener || window.opener;
+
+  if (!opener) {
     showError(
       "Error: Game window not found. Please open the cheat from within the game.",
     );
     return;
   }
-
-  const opener = window.opener;
 
   // --- 1. Proxy RPG Maker Globals IMMEDIATELY ---
   // We do this before importing anything because the imports might
