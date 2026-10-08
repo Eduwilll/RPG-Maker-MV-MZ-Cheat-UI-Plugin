@@ -1,6 +1,19 @@
 # Changelog
 
-## v1.7.0 - Latest
+## v1.7.1 - Latest
+
+### FOSSIL Support & Stability Fixes
+- [Feat] **FOSSIL Game Support**: Games using the FOSSIL plugin boot from `FOSSILindex.html` instead of `js/main.js`, which silently bypassed the cheat. The installer now patches `index.html` (inherited automatically when FOSSIL regenerates its file) and any existing `FOSSILindex.html`; manual installs add one `<script>` tag to both files. See the install and troubleshooting guides.
+- [Feat] **Startup Failure Warning**: If the cheat fails to inject or `setup.js` never reports a successful start, the game now shows a dismissible warning banner plus `[Cheat]` console output instead of failing silently. Duplicate bootstrap injection is guarded.
+- [Fix] **Cursor Visibility**: The OS cursor is now forced back on inside the cheat UI (`#app`-scoped), so games with a custom transparent cursor no longer leave you pointer-less over the panel. The game's own cursor is untouched, and the click-to-teleport crosshair still works.
+- [Fix] **Separate Window Boot**: The pop-out window no longer stalls at "Initializing…". Module-level `Utils` touches (diagnostics log path, settings storage) are resolved lazily so the fresh window can evaluate its imports, the game window passes an explicit opener reference, and `window.html` reports load failures instead of hanging.
+- [Fix] **Separate Window Opacity**: The pop-out window is now always fully opaque; hover-fade only applies to the in-game overlay.
+- [Fix] **Fixed Move Speed Enforcement**: "Fix speed" is re-applied every frame via a `Game_Player.update` hook instead of a 1s timer, so heavy plugins can no longer drag movement back to 4.0 between pulses (no more jerk/stutter). The panel also shows your target speed instead of flickering to the game default.
+- [Tweak] **Version Bump**: Bumped version to `1.7.1`.
+
+---
+
+## v1.7.0
 
 ### Realistic Minimap
 - [Feat] **Minimap Overlay**: Added a realistic minimap that renders actual map tile graphics (B–E/A5 exact, autotile textures approximated) with player dot and event markers, placeable in any corner or at custom X/Y.

@@ -124,4 +124,4 @@ docker-compose up -d
 - **Translation Idea**: [sieucapoccho3717](https://github.com/sieucapoccho3717/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 - **Maintained & Enhanced by**: [Eduwilll](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 
-Latest Release: v1.7.0
+Latest Release: v1.7.1

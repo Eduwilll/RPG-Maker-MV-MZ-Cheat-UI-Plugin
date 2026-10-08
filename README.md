@@ -39,10 +39,12 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 - **[Full Engine Reference](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/features)**
 - **[Keyboard Shortcuts](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/shortcuts)**
 
-### Latest Release: v1.7.0
+### Latest Release: v1.7.1
 - Windows installer ZIP with `RPGMakerCheatInstaller.exe`
-- **Realistic Minimap**: Live map overlay with actual tile graphics, custom placement, zoom, and event markers (`Alt+N` to toggle)
-- **Actors Panel**: Full actor roster grouped as Controlled / Party / Other Actors, with editing of identity, vitals, params, skills, and states
+- **FOSSIL Support**: Games using the FOSSIL plugin now boot the cheat correctly (installer patches entry HTML automatically)
+- **Separate Window Fix**: Pop-out window no longer stalls at "Initializing…" and stays fully opaque
+- **Fixed Speed That Sticks**: Move speed is enforced every frame, so heavy plugins can't drag it back to 4.0
+- **Startup Warning**: Visible banner + console output if the cheat fails to inject, instead of silence
 
 ---
 
@@ -90,7 +92,7 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 ## 🛠️ Installation
 
 ### Step 1: Download
-Recommended: download `RPGMakerCheatInstaller-v1.7.0-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
+Recommended: download `RPGMakerCheatInstaller-v1.7.1-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
 
 Manual install is still available: download the latest `-core.tar.gz` package for your engine from the same Releases page.
 
@@ -163,26 +165,26 @@ Link your development folder to a test game. Any saved changes in your IDE are i
 Generate the MV/MZ manual cheat packages from the repository root:
 
 ```powershell
-py -3 deploy\main.py --version 1.7.0
+py -3 deploy\main.py --version 1.7.1
 ```
 
 This creates:
 
 ```text
-output\rpg-mv-cheat-1.7.0-core.tar.gz
-output\rpg-mz-cheat-1.7.0-core.tar.gz
+output\rpg-mv-cheat-1.7.1-core.tar.gz
+output\rpg-mz-cheat-1.7.1-core.tar.gz
 ```
 
 After generating the manual packages, build the Windows installer ZIP:
 
 ```powershell
-py -3 tools\installer\build_windows.py --version 1.7.0
+py -3 tools\installer\build_windows.py --version 1.7.1
 ```
 
 This creates:
 
 ```text
-output\RPGMakerCheatInstaller-v1.7.0-windows.zip
+output\RPGMakerCheatInstaller-v1.7.1-windows.zip
 ```
 
 ### 4. Automated Formatting (Prettier & Husky)
