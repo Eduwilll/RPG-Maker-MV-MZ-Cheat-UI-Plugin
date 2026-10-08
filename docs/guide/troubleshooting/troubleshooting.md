@@ -22,6 +22,16 @@ If updating NW.js doesn't help, the game may be fundamentally incompatible. Try 
 
 Double-check you used the right install guide for your engine version.
 
+**Check 4 — FOSSIL game boots without the cheat**: Games using the FOSSIL plugin don't boot from `js/main.js`. FOSSIL loads `index.html`, then regenerates `FOSSILindex.html` (replacing `main.js` with `plugins/FOSSIL.js`) and redirects the game to it — so a `js/main.js`-only install never runs. Symptoms: no `[Cheat]` lines in the DevTools console, no `cheat-settings/` folder, no red warning banner.
+
+**Fix:** The installer patches `index.html` (which FOSSIL copies into `FOSSILindex.html`) and any existing `FOSSILindex.html` automatically — re-run it. For manual installs, add this line to both `index.html` and `FOSSILindex.html`, right before the existing `<script>` tag:
+
+```html
+<script type="text/javascript" src="cheat/init/import.js"></script>
+```
+
+Note: if you delete `FOSSILindex.html`, FOSSIL recreates it from `index.html` on next launch, so keep the tag in `index.html`.
+
 ---
 
 ## Errors after updating the plugin

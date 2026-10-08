@@ -37,11 +37,53 @@ body {
   min-height: 24px !important;
 }
 
+/* Keep the OS cursor visible over the cheat UI.
+   Games with a custom mouse cursor usually hide the system cursor
+   document-wide (e.g. a transparent 1x1 cursor with `none` fallback plus a
+   canvas-drawn sprite), which leaves nothing visible once the opaque cheat
+   window covers the sprite. These rules are scoped to #app so the game's
+   own cursor is untouched everywhere else. The !important flags are required
+   because games typically hide the cursor with an !important rule of their
+   own; the cheat's own dynamic cursors are re-applied below with
+   equally-weighted exceptions. */
+#app,
+#app * {
+  cursor: auto !important;
+}
+
+#app button,
+#app a,
+#app input[type="button"],
+#app input[type="submit"],
+#app input[type="checkbox"],
+#app input[type="radio"],
+#app select,
+#app label,
+#app .v-btn,
+#app .cursor-pointer,
+#app [role="button"] {
+  cursor: pointer !important;
+}
+
+#app input[type="text"],
+#app input[type="number"],
+#app input[type="password"],
+#app input[type="search"],
+#app textarea,
+#app [contenteditable="true"] {
+  cursor: text !important;
+}
+
+/* Click-to-teleport map preview keeps its crosshair (toggled by
+   MapEventPanel via the cheat-canvas-crosshair class). */
+#app .cheat-canvas-crosshair {
+  cursor: crosshair !important;
+}
+
 /* z-index */
 .z-index-cheat-0 {
   z-index: 1001 !important;
 }
-
 .z-index-cheat-1 {
   z-index: 1010 !important;
 }

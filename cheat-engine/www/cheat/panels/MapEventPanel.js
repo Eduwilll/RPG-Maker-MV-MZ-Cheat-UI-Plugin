@@ -18,6 +18,7 @@ export default {
                     :width="canvasWidth"
                     :height="canvasHeight"
                     :style="canvasStyle"
+                    :class="{ 'cheat-canvas-crosshair': clickToTeleportEnabled }"
                     @click="onCanvasClick"
                     @mousemove="onCanvasMouseMove"
                     @mouseleave="onCanvasMouseLeave">
@@ -272,7 +273,6 @@ export default {
       return {
         border: "1px solid #555",
         backgroundColor: "#000",
-        cursor: this.clickToTeleportEnabled ? "crosshair" : "default",
         width: "100%",
         maxWidth: "600px",
         height: "auto",

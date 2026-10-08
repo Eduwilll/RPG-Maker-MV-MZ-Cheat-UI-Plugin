@@ -79,6 +79,17 @@ class Main {
   }
 
   onScriptError(e) {
+    const failedUrl =
+      e && e.target && e.target._url ? e.target._url : "unknown";
+    if (typeof console !== "undefined" && console.error) {
+      console.error("[Cheat] Failed to load " + failedUrl);
+    }
+    try {
+      if (typeof window !== "undefined") {
+        window.__cheatBoot = window.__cheatBoot || {};
+        window.__cheatBoot.error = "Failed to load " + failedUrl;
+      }
+    } catch (ignored) {}
     this.printError("Failed to load", e.target._url);
   }
 

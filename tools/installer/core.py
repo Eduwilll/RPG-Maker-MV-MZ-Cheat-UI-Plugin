@@ -13,6 +13,10 @@ BACKUP_DIR_NAME = "cheat-installer-backups"
 BACKUP_REASON_ORIGINAL = "original-game"
 BACKUP_REASON_PLUGIN = "plugin-version"
 
+INDEX_HTML_NAME = "index.html"
+FOSSIL_INDEX_HTML_NAME = "FOSSILindex.html"
+CHEAT_HTML_BOOTSTRAP_SRC = "cheat/init/import.js"
+
 
 class GameType(Enum):
     MV = "MV"
@@ -28,6 +32,14 @@ class GameTarget:
     @property
     def main_js_path(self):
         return os.path.join(self.root_path, "js", "main.js")
+
+    @property
+    def index_html_path(self):
+        return os.path.join(self.root_path, INDEX_HTML_NAME)
+
+    @property
+    def fossil_index_html_path(self):
+        return os.path.join(self.root_path, FOSSIL_INDEX_HTML_NAME)
 
     @property
     def cheat_path(self):
@@ -111,6 +123,22 @@ def validate_installed_layout(target):
     if "cheat/init/import.js" not in main_js:
         raise RuntimeError("Installed main.js does not include the cheat bootstrap import.")
 
+    if target.game_type == GameType.MZ:
+        if os.path.exists(target.index_html_path) and not html_has_cheat_bootstrap(
+            target.index_html_path
+        ):
+            raise RuntimeError(
+                "Installed index.html does not include the cheat bootstrap import. "
+                "FOSSIL-based games regenerate FOSSILindex.html from it."
+            )
+
+        if os.path.exists(target.fossil_index_html_path) and not html_has_cheat_bootstrap(
+            target.fossil_index_html_path
+        ):
+            raise RuntimeError(
+                "Installed FOSSILindex.html does not include the cheat bootstrap import."
+            )
+
 
 def validate_required_paths(root_dir, relative_paths, label):
     missing_paths = []
@@ -163,6 +191,10 @@ def install_from_source(
     log(logger, f"Detected {target.game_type.value} game at {target.game_path}")
     validate_source_root(source_root)
     affected_paths = get_source_install_paths(source_root, clean_settings=clean_settings)
+    if target.game_type == GameType.MZ:
+        affected_paths.append(INDEX_HTML_NAME)
+        if os.path.exists(target.fossil_index_html_path):
+            affected_paths.append(FOSSIL_INDEX_HTML_NAME)
     backups = prepare_install_backups(target, affected_paths, logger=logger)
 
     if clean_settings:
@@ -173,6 +205,9 @@ def install_from_source(
     replace_directory(os.path.join(source_root, "cheat"), target.cheat_path)
     log(logger, "Installing engine bootstrap")
     install_main_js_from_source(source_root, target)
+    if target.game_type == GameType.MZ:
+        log(logger, "Patching HTML entry points (FOSSIL-safe)")
+        ensure_mz_html_bootstraps(target, logger=logger)
     copy_extra_source_files(source_root, target.root_path)
     write_version_file(target.version_path, version)
     validate_installed_layout(target)
@@ -215,6 +250,10 @@ def install_from_archive(
             clean_settings=clean_settings,
             writes_version_override=bool(version),
         )
+        if target.game_type == GameType.MZ:
+            affected_paths.append(INDEX_HTML_NAME)
+            if os.path.exists(target.fossil_index_html_path):
+                affected_paths.append(FOSSIL_INDEX_HTML_NAME)
         backups = prepare_install_backups(target, affected_paths, logger=logger)
 
         if clean_settings:
@@ -223,6 +262,10 @@ def install_from_archive(
 
         log(logger, "Copying packaged plugin files")
         install_package_root(package_root, target.root_path)
+
+        if target.game_type == GameType.MZ:
+            log(logger, "Patching HTML entry points (FOSSIL-safe)")
+            ensure_mz_html_bootstraps(target, logger=logger)
 
         if version:
             write_version_file(target.version_path, version)
@@ -478,6 +521,107 @@ def install_main_js_from_source(source_root, target):
     shutil.copy2(src_main, target.main_js_path)
 
 
+def build_html_bootstrap_tag(indent=""):
+    return f'{indent}<script type="text/javascript" src="{CHEAT_HTML_BOOTSTRAP_SRC}"></script>'
+
+
+def html_has_cheat_bootstrap(html_path):
+    try:
+        with open(html_path, "r", encoding="utf-8") as rf:
+            return CHEAT_HTML_BOOTSTRAP_SRC in rf.read()
+    except OSError:
+        return False
+
+
+def ensure_html_bootstrap(html_path, anchor_substring=None, logger=None):
+    """Insert the cheat bootstrap <script> tag into a game HTML file (idempotent).
+
+    Returns True when the file was modified, False when it already had the tag.
+    """
+    with open(html_path, "r", encoding="utf-8") as rf:
+        text = rf.read()
+
+    if CHEAT_HTML_BOOTSTRAP_SRC in text:
+        return False
+
+    newline = "\r\n" if "\r\n" in text else "\n"
+    lines = text.split("\n")
+
+    insert_at = None
+    for index, line in enumerate(lines):
+        if anchor_substring and anchor_substring in line:
+            stripped = line.strip()
+            if stripped.startswith("<script") or stripped.startswith("</"):
+                insert_at = index
+                break
+
+    if insert_at is None:
+        for index, line in enumerate(lines):
+            if "</body>" in line.lower():
+                insert_at = index
+                break
+
+    if insert_at is None:
+        lines.append(build_html_bootstrap_tag())
+    else:
+        indent = lines[insert_at][: len(lines[insert_at]) - len(lines[insert_at].lstrip())]
+        lines.insert(insert_at, build_html_bootstrap_tag(indent))
+
+    with open(html_path, "w", encoding="utf-8", newline="") as wf:
+        wf.write(newline.join(lines))
+
+    log(logger, f"Added cheat bootstrap to {os.path.basename(html_path)}")
+    return True
+
+
+def remove_html_bootstrap(html_path):
+    """Remove lines added by ensure_html_bootstrap. Returns True when modified."""
+    try:
+        with open(html_path, "r", encoding="utf-8") as rf:
+            text = rf.read()
+    except OSError:
+        return False
+
+    if CHEAT_HTML_BOOTSTRAP_SRC not in text:
+        return False
+
+    newline = "\r\n" if "\r\n" in text else "\n"
+    kept = [
+        line
+        for line in text.split("\n")
+        if not (CHEAT_HTML_BOOTSTRAP_SRC in line and "<script" in line)
+    ]
+
+    with open(html_path, "w", encoding="utf-8", newline="") as wf:
+        wf.write(newline.join(kept))
+
+    return True
+
+
+def ensure_mz_html_bootstraps(target, logger=None):
+    """Patch index.html (and FOSSILindex.html when present) for MZ games.
+
+    FOSSIL regenerates FOSSILindex.html from index.html on boot, so the tag in
+    index.html is inherited automatically; patching an existing FOSSILindex.html
+    covers games launched directly from that file. Returns patched paths.
+    """
+    patched = []
+
+    if os.path.exists(target.index_html_path):
+        if ensure_html_bootstrap(target.index_html_path, anchor_substring="js/main.js", logger=logger):
+            patched.append(target.index_html_path)
+    else:
+        log(logger, "index.html not found; skipping HTML bootstrap patch")
+
+    if os.path.exists(target.fossil_index_html_path):
+        if ensure_html_bootstrap(
+            target.fossil_index_html_path, anchor_substring="FOSSIL.js", logger=logger
+        ):
+            patched.append(target.fossil_index_html_path)
+
+    return patched
+
+
 def copy_extra_source_files(source_root, target_root):
     for name in os.listdir(source_root):
         if name in {"cheat", "js", "_cheat_initialize"} or name in EPHEMERAL_RUNTIME_DIRS:
@@ -598,6 +742,8 @@ def remove_installed_cheat(target, keep_disabled_loader=False):
     remove_path(target.cheat_path)
     remove_path(target.version_path)
     remove_path(target.settings_path)
+    remove_html_bootstrap(target.index_html_path)
+    remove_html_bootstrap(target.fossil_index_html_path)
 
     if keep_disabled_loader:
         write_disabled_loader(target)

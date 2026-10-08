@@ -3,6 +3,7 @@ import shutil
 import argparse
 import json
 import subprocess
+import sys
 from main import (
     GameTypes,
     CheatPaths,
@@ -10,6 +11,14 @@ from main import (
     validate_required_paths,
     validate_source_layout,
 )
+
+sys.path.insert(
+    0,
+    os.path.abspath(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "tools", "installer")
+    ),
+)
+from core import GameTarget, GameType, ensure_mz_html_bootstraps
 
 EPHEMERAL_RUNTIME_DIRS = ['cheat-settings']
 
@@ -73,6 +82,18 @@ def validate_dev_sync_install(paths):
         raise RuntimeError(
             'Dev-sync target main.js is missing the cheat bootstrap import path.'
         )
+
+    if paths.game_type == GameTypes.MZ:
+        for html_name in ('index.html', 'FOSSILindex.html'):
+            html_path = os.path.join(paths.root, html_name)
+            if not os.path.exists(html_path):
+                continue
+            with open(html_path, 'r', encoding='utf-8') as rf:
+                if 'cheat/init/import.js' not in rf.read():
+                    raise RuntimeError(
+                        f'Dev-sync target {html_name} is missing the cheat bootstrap import. '
+                        'FOSSIL-based games boot from FOSSILindex.html instead of js/main.js.'
+                    )
 
 def find_test_games(game_type):
     """
@@ -176,6 +197,14 @@ def setup_dev_sync(game_path, version='vDEV-SYNC'):
     print(f"Injecting {init_js_path} -> {target_js_path}")
     os.makedirs(os.path.dirname(target_js_path), exist_ok=True)
     shutil.copy2(init_js_path, target_js_path)
+
+    # 1b. Patch HTML entry points (MZ only, FOSSIL-safe).
+    # FOSSIL games boot from FOSSILindex.html (which FOSSIL regenerates from
+    # index.html), bypassing js/main.js, so the bootstrap tag must live in the
+    # HTML files. import.js guards against double injection in one document.
+    if paths.game_type == GameTypes.MZ:
+        installer_target = GameTarget(paths.game_path, paths.root, GameType.MZ)
+        ensure_mz_html_bootstraps(installer_target, logger=print)
     
     # 2. Sync secondary files (libs, components, etc.)
     # We copy everything EXCEPT 'cheat' and 'js' which we handle specially

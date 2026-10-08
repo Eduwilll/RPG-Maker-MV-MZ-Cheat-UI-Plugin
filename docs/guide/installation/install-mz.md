@@ -44,6 +44,18 @@ MZ: copy into `{game}/` (root)
 Getting this wrong is the most common install mistake.
 :::
 
+## Step 4b — FOSSIL games (if applicable)
+
+If the game uses the FOSSIL plugin (it has a `FOSSILindex.html` file, or FOSSIL appears first in the plugin list), the game boots from `FOSSILindex.html` instead of `js/main.js` — a `main.js`-only install will silently do nothing (no cheat UI, no `cheat-settings/` folder).
+
+The installer handles this automatically. For manual installs, add this line to **both** `index.html` and `FOSSILindex.html`, right before the existing `<script>` tag:
+
+```html
+<script type="text/javascript" src="cheat/init/import.js"></script>
+```
+
+FOSSIL regenerates `FOSSILindex.html` from `index.html` on boot, so the tag in `index.html` keeps working even if `FOSSILindex.html` is deleted.
+
 ## Step 5 — Launch and verify
 
 Run the game executable. Press <kbd>Ctrl</kbd> + <kbd>C</kbd> to open the cheat window in the upper-right corner.
