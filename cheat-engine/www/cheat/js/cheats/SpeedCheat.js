@@ -161,24 +161,44 @@ export class SpeedCheat {
   }
 
   static isFixed() {
-    return !!SpeedCheat.fixed;
+    return (
+      SpeedCheat.fixedSpeed !== null && SpeedCheat.fixedSpeed !== undefined
+    );
   }
 
-  static setFixSpeedInterval(speed) {
-    if (SpeedCheat.isFixed()) {
-      SpeedCheat.removeFixSpeedInterval();
+  static applyFixedSpeed(speed) {
+    SpeedCheat.fixedSpeed = speed;
+    SpeedCheat.__installFixedSpeedHook();
+    SpeedCheat.__setSpeed(speed);
+  }
+
+  static __installFixedSpeedHook() {
+    if (
+      SpeedCheat.origin_Game_Player_update ||
+      typeof Game_Player === "undefined" ||
+      !Game_Player
+    ) {
+      return;
     }
 
-    SpeedCheat.fixed = setInterval(() => {
-      SpeedCheat.__setSpeed(speed);
-    }, 1000);
+    const originUpdate = Game_Player.prototype.update;
+    SpeedCheat.origin_Game_Player_update = originUpdate;
+
+    // Re-apply after the original update every frame so per-frame plugin
+    // overrides (dash handling, follower sync, region effects, transfers)
+    // lose. The hook stays installed permanently: restoring the prototype
+    // could break other plugins that patched update after us.
+    Game_Player.prototype.update = function () {
+      originUpdate.apply(this, arguments);
+
+      if (SpeedCheat.isFixed()) {
+        SpeedCheat.__setSpeed(SpeedCheat.fixedSpeed);
+      }
+    };
   }
 
   static removeFixSpeedInterval() {
-    if (SpeedCheat.isFixed()) {
-      clearInterval(SpeedCheat.fixed);
-      SpeedCheat.fixed = undefined;
-    }
+    SpeedCheat.fixedSpeed = null;
   }
 
   static __setSpeed(speed) {
@@ -192,12 +212,11 @@ export class SpeedCheat {
   }
 
   static setSpeed(speed, fixed = false) {
-    SpeedCheat.__setSpeed(speed);
-
     if (fixed) {
-      SpeedCheat.setFixSpeedInterval(speed);
+      SpeedCheat.applyFixedSpeed(speed);
     } else {
       SpeedCheat.removeFixSpeedInterval();
+      SpeedCheat.__setSpeed(speed);
     }
 
     SpeedCheat.emitChange(speed, fixed);
@@ -239,8 +258,11 @@ export class SpeedCheat {
   }
 }
 
-/** @type {ReturnType<typeof setInterval> | undefined} */
-SpeedCheat.fixed = undefined;
+/** @type {number | null | undefined} */
+SpeedCheat.fixedSpeed = null;
+
+/** @type {Function | null} */
+SpeedCheat.origin_Game_Player_update = null;
 
 export class MessageCheat {
   static initialize() {

@@ -16,7 +16,12 @@ export function readGeneralPanelState() {
   return {
     noClip: !!rawPlayer._through,
     gold: readGeneralGold(),
-    moveSpeed: $gamePlayer.moveSpeed(),
+    // When fixed, show the cheat's target speed: heavy plugins constantly
+    // reset the live player speed (usually back to 4.0), which made the UI
+    // flicker back to the game default.
+    moveSpeed: SpeedCheat.isFixed()
+      ? /** @type {number} */ (SpeedCheat.fixedSpeed)
+      : $gamePlayer.moveSpeed(),
     fixSpeed: SpeedCheat.isFixed(),
     forceSave: GeneralCheat.isForceSaveEnabled(),
     mouseMove: GeneralCheat.isMouseMoveEnabled(),
