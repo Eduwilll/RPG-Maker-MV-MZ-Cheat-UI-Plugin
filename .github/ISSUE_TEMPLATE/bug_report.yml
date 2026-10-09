@@ -44,17 +44,18 @@ body:
     validations:
       required: true
 
-  - type: dropdown
-    id: fossil
+  - type: textarea
+    id: plugins
     attributes:
-      label: Does the game use FOSSIL?
-      description: Check for a `FOSSILindex.html` file in the game folder, or FOSSIL as the first plugin in the Plugin Manager.
-      options:
-        - "No"
-        - "Yes"
-        - "I don't know"
+      label: Plugin list (especially heavy ones, you can find in js/plugin.js folder) 
+      description: "Paste the plugin names from the Plugin Manager (a screenshot works too), or at least the big ones — e.g. FOSSIL, VisuMZ Core + VisuMZ plugins, Yanfly Engine Plugins, Terrax Lighting, GALV plugins, MOG plugins, SRD plugins. Script-heavy plugins are the most common conflict source."
+      placeholder: |
+        FOSSIL
+        VisuMZ_0_CoreEngine
+        TerraxLighting
+        ...
     validations:
-      required: true
+      required: false
 
   - type: input
     id: nwjs
@@ -115,5 +116,5 @@ body:
       description: Confirm the common pitfalls before submitting.
       options:
         - label: I copied the files to the right place (MV → `www/`, MZ → game root)
-        - label: I backed up the original `main.js`
+        - label: I backed up the original `main.js` (the installer does this automatically, but manual installs must do it themselves)
         - label: I read the troubleshooting guide (docs → More → Troubleshooting)
