@@ -125,3 +125,9 @@ docker-compose up -d
 - **Maintained & Enhanced by**: [Eduwilll](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 
 Latest Release: v1.7.1
+
+---
+
+## 💡 문제 신고 및 기능 요청
+- **버그?** [버그 리포트](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/issues/new?template=bug_report.yml)를 열어주세요 — 게임, 엔진, 버전, 로그를 묻습니다.
+- **아이디어?** [기능 요청](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/issues/new?template=feature_request.yml)을 열어주세요.

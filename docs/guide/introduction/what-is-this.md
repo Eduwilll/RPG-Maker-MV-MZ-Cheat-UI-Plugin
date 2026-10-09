@@ -24,6 +24,10 @@ Because the plugin runs inside the game process, it has full access to `$gamePar
 The game must be the PC (NW.js) version. Browser or mobile builds of RPG Maker games are not supported.
 :::
 
+## Get the plugin
+
+Download the installer or manual packages from the [Releases page](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases), then follow [Getting Started](/guide/introduction/getting-started).
+
 ## License
 
 Released under the [MIT License](/guide/meta/license). Originally created by [paramonos](https://github.com/paramonos). This fork is maintained by [Eduwilll](https://github.com/Eduwilll).

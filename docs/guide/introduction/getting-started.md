@@ -2,6 +2,13 @@
 
 This guide helps you install the plugin, launch your game, and confirm that the cheat UI is working.
 
+## Download the plugin
+
+Get the files from the [Releases page](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases):
+
+- **Recommended:** `RPGMakerCheatInstaller-v*-windows.zip` — extract, run the EXE, pick your game folder, click Install.
+- **Manual install:** `rpg-mv-cheat-*-core.tar.gz` (MV) or `rpg-mz-cheat-*-core.tar.gz` (MZ) — copy the files yourself (see below).
+
 ## Before you install
 
 - Use a desktop RPG Maker MV or MZ game that runs through NW.js.

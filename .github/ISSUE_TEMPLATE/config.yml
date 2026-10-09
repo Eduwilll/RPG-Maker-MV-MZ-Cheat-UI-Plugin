@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/
+    about: Install guides, features, translation, and troubleshooting.
+  - name: Troubleshooting
+    url: https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/troubleshooting/troubleshooting
+    about: The cheat doesn't appear, wrong folder, FOSSIL games, and other common fixes.
+  - name: Download (Releases)
+    url: https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases
+    about: Get the Windows installer or manual MV/MZ packages.

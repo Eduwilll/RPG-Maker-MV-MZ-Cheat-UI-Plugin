@@ -10,6 +10,9 @@ hero:
     alt: RPG Maker Cheat UI overlay preview
   actions:
     - theme: brand
+      text: Download
+      link: https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases
+    - theme: alt
       text: Install the Plugin
       link: /guide/introduction/getting-started
     - theme: alt

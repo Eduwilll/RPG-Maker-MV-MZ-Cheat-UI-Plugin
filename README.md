@@ -245,5 +245,11 @@ After each translation, a detailed metrics report is printed to the developer co
 ## 📜 Credits
 - **Original Plugin**: [paramonos](https://github.com/paramonos/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 - **Translation Idea**: [sieucapoccho3717](https://github.com/sieucapoccho3717/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
+
+---
+
+## 💡 Issues & Feature Requests
+- **Bug?** Open a [bug report](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/issues/new?template=bug_report.yml) — the form asks for game, engine, versions, and logs.
+- **Idea?** Open a [feature request](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/issues/new?template=feature_request.yml) describing the problem and what it should do.
 - **Map Event Panel Feature**: [Justype](https://github.com/Justype/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 - **Maintained & Enhanced by**: [Eduwilll](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin)

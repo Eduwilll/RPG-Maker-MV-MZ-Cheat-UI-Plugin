@@ -2,6 +2,10 @@
 
 The installer is a helper for users who do not want to manually copy the `cheat/` and `js/` folders into an RPG Maker game.
 
+::: tip Download
+Grab `RPGMakerCheatInstaller-v*-windows.zip` from the [Releases page](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases), extract it, and run the EXE — no repository clone needed. The rest of this page covers running it from source and the command line.
+:::
+
 It can:
 
 - detect RPG Maker MV or MZ automatically
@@ -67,7 +71,7 @@ To force a clean plugin settings state:
 
 ## Install from a release archive
 
-Use this when the installer is run beside a packaged release archive.
+Use this when the installer is run beside a packaged release archive downloaded from the [Releases page](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases).
 
 ```powershell
 .venv\Scripts\python.exe tools\installer\cli.py install --game-path "C:\Games\MyGame" --archive "output\rpg-mv-cheat-1.3.1-core.tar.gz"

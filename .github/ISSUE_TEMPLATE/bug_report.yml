@@ -1,0 +1,119 @@
+name: Bug report
+description: The cheat doesn't work in a game. Fill in everything — most delays come from missing details.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: input
+    id: game
+    attributes:
+      label: Game
+      description: Full game title as shown in its folder or title screen.
+      placeholder: e.g. Welcome to Elderfield
+    validations:
+      required: true
+
+  - type: dropdown
+    id: engine
+    attributes:
+      label: Engine
+      description: MV games keep data in a `www/` folder; MZ games keep `js/` at the root.
+      options:
+        - RPG Maker MV
+        - RPG Maker MZ
+        - I don't know
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Cheat version
+      description: From `cheat-version-description.json` next to the game folder (e.g. v1.7.1).
+      placeholder: e.g. v1.7.1
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: Install method
+      options:
+        - Windows installer (RPGMakerCheatInstaller.exe)
+        - Manual copy of js/ + cheat/ folders
+        - I don't know
+    validations:
+      required: true
+
+  - type: dropdown
+    id: fossil
+    attributes:
+      label: Does the game use FOSSIL?
+      description: Check for a `FOSSILindex.html` file in the game folder, or FOSSIL as the first plugin in the Plugin Manager.
+      options:
+        - "No"
+        - "Yes"
+        - "I don't know"
+    validations:
+      required: true
+
+  - type: input
+    id: nwjs
+    attributes:
+      label: NW.js version
+      description: Copy the `nwjs=` value from the `Environment:` line in cheat-settings/cheat-diagnostics.log (e.g. 0.94.0). If the folder was never created, write "no cheat-settings folder".
+      placeholder: e.g. 0.94.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: symptom
+    attributes:
+      label: What fails?
+      options:
+        - Cheat never starts (no window, no cheat-settings folder)
+        - In-game overlay doesn't appear
+        - Separate (pop-out) window is broken
+        - A value doesn't stick (speed, stats, etc.)
+        - Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened, step by step
+      description: What you did, what you expected, and what you saw instead. Mention the toggle key you pressed and anything on screen.
+      placeholder: |
+        1. Installed with ...
+        2. Started the game, pressed Ctrl+C ...
+        3. Expected ..., but saw ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics log
+      description: "Paste the content of cheat-settings/cheat-diagnostics.log from the game folder (MV: inside www/). If the folder does not exist, write that explicitly — it tells us the cheat never booted."
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Console errors (DevTools)
+      description: Press F12 in the game, open the Console tab, and paste any red errors or lines starting with [Cheat]. If F12 does nothing, say so.
+      render: shell
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Quick checks
+      description: Confirm the common pitfalls before submitting.
+      options:
+        - label: I copied the files to the right place (MV → `www/`, MZ → game root)
+        - label: I backed up the original `main.js`
+        - label: I read the troubleshooting guide (docs → More → Troubleshooting)
