@@ -36,7 +36,10 @@ export default defineConfig({
       },
     ],
     ["meta", { property: "og:type", content: "website" }],
-    ["meta", { property: "og:image", content: `${repoBase}images/general-panel.png` }],
+    [
+      "meta",
+      { property: "og:image", content: `${repoBase}images/general-panel.png` },
+    ],
     [
       "link",
       {
@@ -71,12 +74,15 @@ export default defineConfig({
       { text: "Features", link: "/guide/features/features" },
       { text: "Translation", link: "/guide/translation/translation-usage" },
       { text: "Development", link: "/guide/introduction/development" },
-      { text: "v1.7.1", link: "/guide/meta/changelog" },
+      { text: "v1.8.0", link: "/guide/meta/changelog" },
       {
         text: "More",
         items: [
           { text: "Architecture", link: "/guide/technical/architecture" },
-          { text: "Troubleshooting", link: "/guide/troubleshooting/troubleshooting" },
+          {
+            text: "Troubleshooting",
+            link: "/guide/troubleshooting/troubleshooting",
+          },
           { text: "Changelog", link: "/guide/meta/changelog" },
           {
             text: "GitHub",
@@ -95,16 +101,28 @@ export default defineConfig({
         text: "Introduction",
         items: [
           { text: "What Is This?", link: "/guide/introduction/what-is-this" },
-          { text: "Getting Started", link: "/guide/introduction/getting-started" },
-          { text: "Development & Test", link: "/guide/introduction/development" },
+          {
+            text: "Getting Started",
+            link: "/guide/introduction/getting-started",
+          },
+          {
+            text: "Development & Test",
+            link: "/guide/introduction/development",
+          },
         ],
       },
       {
         text: "Installation",
         items: [
           { text: "Installer", link: "/guide/installation/installer" },
-          { text: "Install on RPG Maker MV", link: "/guide/installation/install-mv" },
-          { text: "Install on RPG Maker MZ", link: "/guide/installation/install-mz" },
+          {
+            text: "Install on RPG Maker MV",
+            link: "/guide/installation/install-mv",
+          },
+          {
+            text: "Install on RPG Maker MZ",
+            link: "/guide/installation/install-mz",
+          },
           { text: "Update NW.js", link: "/guide/installation/update-nwjs" },
         ],
       },
@@ -113,15 +131,27 @@ export default defineConfig({
         items: [
           { text: "Feature Reference", link: "/guide/features/features" },
           { text: "Shortcuts", link: "/guide/features/shortcuts" },
-          { text: "Sharing Settings", link: "/guide/features/sharing-settings" },
+          {
+            text: "Sharing Settings",
+            link: "/guide/features/sharing-settings",
+          },
         ],
       },
       {
         text: "Translation",
         items: [
-          { text: "Translation Usage", link: "/guide/translation/translation-usage" },
-          { text: "Translation Engines", link: "/guide/translation/translation-engines" },
-          { text: "Server Setup", link: "/guide/translation/translation-setup" },
+          {
+            text: "Translation Usage",
+            link: "/guide/translation/translation-usage",
+          },
+          {
+            text: "Translation Engines",
+            link: "/guide/translation/translation-engines",
+          },
+          {
+            text: "Server Setup",
+            link: "/guide/translation/translation-setup",
+          },
         ],
       },
       {
@@ -160,7 +190,12 @@ export default defineConfig({
       },
       {
         text: "Help",
-        items: [{ text: "Troubleshooting", link: "/guide/troubleshooting/troubleshooting" }],
+        items: [
+          {
+            text: "Troubleshooting",
+            link: "/guide/troubleshooting/troubleshooting",
+          },
+        ],
       },
       {
         text: "Project",
@@ -181,7 +216,8 @@ export default defineConfig({
 
     footer: {
       message: "Released under the MIT License.",
-      copyright: "Original plugin by paramonos. Maintained and expanded by Eduwilll.",
+      copyright:
+        "Original plugin by paramonos. Maintained and expanded by Eduwilll.",
     },
 
     editLink: {

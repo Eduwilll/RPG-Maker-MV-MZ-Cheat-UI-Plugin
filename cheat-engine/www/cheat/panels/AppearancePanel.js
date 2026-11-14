@@ -5,6 +5,7 @@ import {
   writeBooleanSetting,
 } from "../js/ui/CheatUiSettings.js";
 import { KEY_VALUE_STORAGE } from "../js/storage/KeyValueStorage.js";
+import { getGameWindow } from "../js/runtime/FeatureRuntime.js";
 
 const WINDOW_OPACITY_SETTING = "cheatModal.windowOpacity";
 const THEME_DARK_MODE_SETTING = "cheatModal.themeDarkMode";
@@ -23,8 +24,13 @@ export default {
     </v-row>
 
     <v-row align="center">
+        <v-col cols="12"><v-switch v-model="useGameFont" label="Use game font in cheat UI" @change="onLayoutChange"/><div class="caption">Uses available game fonts, with a readable fallback.</div></v-col>
+        <v-col cols="6"><v-text-field v-model="overlayWidth" type="number" label="Overlay width (px)" dense outlined @keydown.stop @change="onLayoutChange"/></v-col>
+        <v-col cols="6"><v-text-field v-model="overlayHeight" type="number" label="Overlay height (px)" dense outlined @keydown.stop @change="onLayoutChange"/></v-col>
+        <v-col cols="12"><v-btn small text @click="overlayWidth = 750; overlayHeight = 450; onLayoutChange()">Reset overlay size</v-btn></v-col>
         <v-col cols="12">
             <v-slider
+                data-feature="window-opacity"
                 v-model="windowOpacity"
                 label="Window Opacity"
                 min="0.1"
@@ -80,6 +86,9 @@ export default {
 
   data() {
     return {
+      useGameFont: readBooleanSetting("cheatModal.gameFont", false),
+      overlayWidth: readNumberSetting("cheatModal.width", 750),
+      overlayHeight: readNumberSetting("cheatModal.height", 450),
       windowOpacity: readNumberSetting(WINDOW_OPACITY_SETTING, 0.3),
       isDarkMode: readBooleanSetting(THEME_DARK_MODE_SETTING, true),
       primaryColor: KEY_VALUE_STORAGE.getItem(THEME_PRIMARY_COLOR) || "#1976D2", // default blue
@@ -109,6 +118,21 @@ export default {
   },
 
   methods: {
+    onLayoutChange() {
+      writeBooleanSetting("cheatModal.gameFont", this.useGameFont);
+      writeNumberSetting(
+        "cheatModal.width",
+        Math.max(320, Math.min(4096, Number(this.overlayWidth) || 750)),
+      );
+      writeNumberSetting(
+        "cheatModal.height",
+        Math.max(240, Math.min(2160, Number(this.overlayHeight) || 450)),
+      );
+      window.dispatchEvent(new CustomEvent("cheat-layout-change"));
+      const game = getGameWindow();
+      if (game && game !== window)
+        game.dispatchEvent(new game.CustomEvent("cheat-layout-change"));
+    },
     onOpacityChange(val) {
       writeNumberSetting(WINDOW_OPACITY_SETTING, val);
       window.dispatchEvent(

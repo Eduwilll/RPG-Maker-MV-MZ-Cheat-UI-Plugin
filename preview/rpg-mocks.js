@@ -8,7 +8,9 @@ window.Utils = {
   isNwjs: () => false,
   isMobileDevice: () => false,
   isAndroidChrome: () => false,
-  RPGMAKER_NAME: "MZ", // Default to MZ for preview
+  RPGMAKER_NAME:
+    new URLSearchParams(location.search).get("engine") === "MV" ? "MV" : "MZ",
+  RPGMAKER_VERSION: "preview",
 };
 
 window.Graphics = {

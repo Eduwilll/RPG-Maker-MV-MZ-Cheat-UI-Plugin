@@ -11,9 +11,15 @@ import {
   changeActorNickname,
   changeActorProfile,
 } from "../js/panels/actors/ActorPanelState.js";
+import DatabaseTooltip from "../components/DatabaseTooltip.js";
+import LockFavoriteControls from "../components/LockFavoriteControls.js";
+import { favoriteSort } from "../js/panels/locks/LockPanelState.js";
+import GameAsset from "../components/GameAsset.js";
+import { getFeatureRuntime } from "../js/runtime/FeatureRuntime.js";
 
 export default {
   name: "ActorSettingPanel",
+  components: { DatabaseTooltip, LockFavoriteControls, GameAsset },
 
   template: `
 <v-card flat class="ma-0 pa-0">
@@ -28,6 +34,7 @@ export default {
                         :key="actor.id"
                         :input-value="actor.id === selectedActorId"
                         @click="selectActor(actor.id)">
+                        <game-asset kind="actor" :record-id="actor.id" :label="actor.name" :size="40" :navigate="false" class="mr-2"/>
                         <v-list-item-content>
                             <v-list-item-title>{{ actor.name }} <span class="caption grey--text">Lv{{ actor.level }}</span></v-list-item-title>
                             <v-list-item-subtitle>{{ actor.className }}<span v-if="actor.nickname"> · {{ actor.nickname }}</span></v-list-item-subtitle>
@@ -50,6 +57,7 @@ export default {
         </v-col>
         <v-col cols="12" sm="8" class="pa-1" v-if="detail">
             <v-card-subtitle class="pa-1">Identity — {{ detail.name }}</v-card-subtitle>
+            <div class="pa-1"><v-btn x-small :color="selectedInParty ? 'warning' : 'primary'" @click="partyConfirmation = true">{{ selectedInParty ? 'Remove from Party' : 'Add to Party' }}</v-btn><span class="caption ml-2">{{ selectedInParty ? 'Current party member' : 'Not in party' }}</span></div>
             <v-row dense class="ma-0">
                 <v-col cols="12" md="6">
                     <v-text-field
@@ -163,7 +171,7 @@ export default {
                     :key="skill.id"
                     x-small label close
                     @click:close="onForgetSkill(skill.id)">
-                    {{ skill.name }}
+                    <database-tooltip kind="skill" :record-id="skill.id" :label="skill.name"/>
                 </v-chip>
                 <span v-if="detail.learnedSkills.length === 0" class="caption grey--text">No skills learned</span>
             </div>
@@ -189,14 +197,15 @@ export default {
                 </v-col>
             </v-row>
 
-            <v-card-subtitle class="pa-1 mt-2">States ({{ detail.activeStates.length }})</v-card-subtitle>
+            <v-card-subtitle class="pa-1 mt-2">Status Effects ({{ detail.activeStates.length }})</v-card-subtitle>
             <div class="d-flex flex-wrap" style="gap: 4px;">
                 <v-chip
-                    v-for="st in detail.activeStates"
+                    v-for="st in favoriteStates"
                     :key="st.id"
                     x-small label close color="orange darken-2"
                     @click:close="onRemoveState(st.id)">
-                    {{ st.name }}
+                    <database-tooltip kind="state" :record-id="st.id" :label="st.name"/>
+                    <lock-favorite-controls :target="{kind:'state',actorId:detail.id,id:st.id}" :value="true" @change="initializeVariables"/>
                 </v-chip>
                 <span v-if="detail.activeStates.length === 0" class="caption grey--text">No active states</span>
             </div>
@@ -212,7 +221,7 @@ export default {
                 </v-col>
                 <v-col cols="12">
                     <v-btn x-small :disabled="!stateToAdd" @click="onAddState">Add</v-btn>
-                    <v-btn x-small class="ml-2" @click="onClearStates">Clear All</v-btn>
+                    <v-btn x-small class="ml-2" @click="clearStatesConfirmation = true">Clear All</v-btn>
                 </v-col>
             </v-row>
         </v-col>
@@ -220,6 +229,9 @@ export default {
             <p class="caption grey--text pa-2">No actor selected. Open a game with a party first.</p>
         </v-col>
     </v-row>
+    <v-alert v-if="partyError" type="error" dense>{{ partyError }}</v-alert>
+    <v-dialog v-model="partyConfirmation" max-width="400"><v-card><v-card-text class="pt-4">{{ selectedInParty ? 'Remove this actor from your party?' : 'Recruit this actor? This may bypass story progression and does not override battle-party limits.' }}</v-card-text><v-card-actions><v-btn text @click="partyConfirmation = false">Cancel</v-btn><v-btn text @click="changeParty">Confirm</v-btn></v-card-actions></v-card></v-dialog>
+    <v-dialog v-model="clearStatesConfirmation" max-width="360"><v-card><v-card-text class="pt-4">Remove all status effects from this actor?</v-card-text><v-card-actions><v-btn text @click="clearStatesConfirmation = false">Cancel</v-btn><v-btn text @click="clearStatesConfirmation = false; onClearStates()">Clear effects</v-btn></v-card-actions></v-card></v-dialog>
 </v-card>
     `,
 
@@ -235,10 +247,28 @@ export default {
       skillSearch: "",
       skillToLearn: null,
       stateToAdd: null,
+      partyConfirmation: false,
+      clearStatesConfirmation: false,
+      partyError: "",
     };
   },
 
   computed: {
+    selectedInParty() {
+      const row = this.actors.find(
+        (actor) => actor.id === this.selectedActorId,
+      );
+      return !!(row && row.isInParty);
+    },
+    favoriteStates() {
+      return this.detail
+        ? favoriteSort(this.detail.activeStates, (row) => ({
+            kind: "state",
+            actorId: this.detail.id,
+            id: row.id,
+          }))
+        : [];
+    },
     groupedActors() {
       var leader = null;
       var party = [];
@@ -315,6 +345,19 @@ export default {
   },
 
   methods: {
+    changeParty() {
+      this.partyConfirmation = false;
+      try {
+        getFeatureRuntime().actors.setPartyMember(
+          this.selectedActorId,
+          !this.selectedInParty,
+        );
+        this.partyError = "";
+        this.initializeVariables();
+      } catch (error) {
+        this.partyError = error.message;
+      }
+    },
     initializeVariables() {
       var keepSelected = this.selectedActorId;
       var state = readActorPanelState();

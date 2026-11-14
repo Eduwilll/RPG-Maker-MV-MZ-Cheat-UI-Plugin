@@ -1,4 +1,7 @@
 import { GeneralCheat } from "../js/cheats/GeneralCheat.js";
+import GameAsset from "../components/GameAsset.js";
+import PartyRecruitment from "../components/PartyRecruitment.js";
+import { requestActorNavigation } from "../js/ui/RecordNavigation.js";
 import {
   coercePanelNumber,
   findPartyActorById,
@@ -11,9 +14,11 @@ import {
 
 export default {
   name: "StatsSettingPanel",
+  components: { GameAsset, PartyRecruitment },
 
   template: `
 <v-card flat class="ma-0 pa-0">
+    <party-recruitment @change="onPartyRecruitmentChange"/>
     <v-tabs
         v-model="selectedTab"
         dark
@@ -25,7 +30,7 @@ export default {
             <div
                 v-if="editingNameActorId !== actor.id"
                 class="d-flex align-center">
-                <span>{{actor.name}}</span>
+                <game-asset kind="actor" :record-id="actor.id" :label="actor.name" :size="32" class="mr-1"/><span>{{actor.name}}</span>
                 <v-icon
                     x-small
                     class="ml-2"
@@ -64,6 +69,7 @@ export default {
                 class="ma-0">
                 <v-card-actions
                     class="pa-0">
+                    <v-btn x-small text @click="manageActor(actor.id)">Party / Skills / Status</v-btn>
                     <v-checkbox
                         v-model="actor.godMode"
                         label="God Mode"
@@ -152,6 +158,18 @@ export default {
   },
 
   methods: {
+    onPartyRecruitmentChange(actorId) {
+      this.cancelNameEdit();
+      this.initializeVariables();
+      // Wait for Vuetify to register the refreshed tabs, including the first one.
+      this.$nextTick(() => {
+        const index = this.actors.findIndex((actor) => actor.id === actorId);
+        if (index >= 0) this.selectedTab = index;
+      });
+    },
+    manageActor(id) {
+      requestActorNavigation(id);
+    },
     initializeVariables() {
       const state = readStatsSettingPanelState();
       this.paramNames = state.paramNames;

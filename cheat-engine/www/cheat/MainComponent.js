@@ -9,6 +9,11 @@ import { customizeRPGMakerFunctions } from "./init/customize_functions.js";
 import { Key } from "./js/shortcuts/KeyCodes.js";
 import { Alert } from "./js/AlertHelper.js";
 import { CHEAT_DIAGNOSTICS } from "./js/runtime/CheatDiagnostics.js";
+import { handleFeatureShortcut } from "./js/ui/FeatureShortcuts.js";
+import {
+  readNumberSetting,
+  writeNumberSetting,
+} from "./js/ui/CheatUiSettings.js";
 
 export default {
   name: "MainComponent",
@@ -78,15 +83,29 @@ export default {
       this.openCheatWindow(componentName);
     };
 
+    GeneralCheat.openFeatureFinder = () => {
+      this.openCheatModal();
+      this.$nextTick(() =>
+        window.dispatchEvent(new CustomEvent("cheat-open-finder")),
+      );
+    };
+
     window.addEventListener("keydown", this.onGlobalKeyDown);
     window.addEventListener("keyup", this.onGlobalKeyUp);
+    window.addEventListener("keydown", this.onFeatureKeyDown, true);
+    this._returnToGame = () => {
+      this.show = false;
+    };
+    window.addEventListener("cheat-return-to-game", this._returnToGame);
 
     this.checkVersion();
   },
 
   beforeDestroy() {
+    window.removeEventListener("cheat-return-to-game", this._returnToGame);
     window.removeEventListener("keydown", this.onGlobalKeyDown);
     window.removeEventListener("keyup", this.onGlobalKeyUp);
+    window.removeEventListener("keydown", this.onFeatureKeyDown, true);
   },
 
   watch: {
@@ -97,6 +116,12 @@ export default {
   },
 
   methods: {
+    onFeatureKeyDown(event) {
+      handleFeatureShortcut(event, GLOBAL_SHORTCUT, {
+        openFeatureFinder: () => GeneralCheat.openFeatureFinder(),
+        openMessageLog: () => this.openCheatModal("message-log-panel"),
+      });
+    },
     onGlobalKeyDown(e) {
       if (e.repeat) {
         GLOBAL_SHORTCUT.runKeyRepeatEvent(e, Key.fromKey(this.currentKey));
@@ -218,13 +243,36 @@ export default {
         targetDir + "window.html",
         {
           title: "RPG Maker Cheat Engine",
-          width: 700,
-          height: 800,
+          width: Math.max(
+            320,
+            Math.min(
+              window.screen.availWidth,
+              readNumberSetting("cheatWindow.width", 700),
+            ),
+          ),
+          height: Math.max(
+            240,
+            Math.min(
+              window.screen.availHeight,
+              readNumberSetting("cheatWindow.height", 800),
+            ),
+          ),
+          resizable: true,
           frame: true,
           focus: true,
           always_on_top: false,
         },
         (win) => {
+          let resizeTimer;
+          win.on("resize", (width, height) => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+              if (width >= 320 && height >= 240) {
+                writeNumberSetting("cheatWindow.width", width);
+                writeNumberSetting("cheatWindow.height", height);
+              }
+            }, 250);
+          });
           GeneralCheat.__cheatWindow = win.window;
           try {
             // Explicit opener reference: window.opener is not reliable here.
@@ -233,6 +281,7 @@ export default {
             // no-op
           }
           win.on("closed", () => {
+            clearTimeout(resizeTimer);
             GeneralCheat.__cheatWindow = null;
           });
         },

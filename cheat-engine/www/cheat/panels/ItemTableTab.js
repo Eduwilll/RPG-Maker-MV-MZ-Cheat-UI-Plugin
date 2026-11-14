@@ -12,9 +12,13 @@ import {
 } from "../js/ui/CheatUiSettings.js";
 
 const HIDE_NAMELESS_ITEMS_SETTING = "itemTable.hideNamelessItems";
+import LockFavoriteControls from "../components/LockFavoriteControls.js";
+import DatabaseTooltip from "../components/DatabaseTooltip.js";
+import { favoriteSort } from "../js/panels/locks/LockPanelState.js";
 
 export default {
   name: "ItemTableTab",
+  components: { LockFavoriteControls, DatabaseTooltip },
 
   template: `
 <v-card flat class="ma-0 pa-0">
@@ -92,19 +96,9 @@ export default {
         </template>
         <template
             v-slot:item.name="{ item }">
-            <v-tooltip
-                bottom
-                max-width="420">
-                <template v-slot:activator="{ on, attrs }">
-                    <div
-                        style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; max-width: 120px; line-height: 1.2; max-height: 2.4em; word-break: break-word;"
-                        v-bind="attrs"
-                        v-on="on">
-                        {{ item.name }}
-                    </div>
-                </template>
-                <span>{{ item.name }}</span>
-            </v-tooltip>
+            <div style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; max-width: 120px; line-height: 1.2; max-height: 2.4em; word-break: break-word;">
+                <database-tooltip :kind="item._itemKind" :record-id="item._itemId" :label="item.name"/>
+            </div>
         </template>
         <template
             v-slot:item.desc="{ item }">
@@ -153,6 +147,10 @@ export default {
                 </template>
                 <span>{{ item.params }}</span>
             </v-tooltip>
+        </template>
+        <template
+            v-slot:item.controls="{ item }">
+            <lock-favorite-controls :target="{kind:item._itemKind,id:item._itemId}" :value="item.amount" @change="initializeVariables"/>
         </template>
         <template
             v-slot:item.amount="{ item }">
@@ -338,10 +336,13 @@ export default {
 
     sortTableItems(items, sortBy, sortDesc) {
       if (!Array.isArray(sortBy) || !sortBy.length) {
-        return items;
+        return favoriteSort(items, (row) => ({
+          kind: row._itemKind,
+          id: row._itemId,
+        }));
       }
 
-      return items.slice().sort((leftItem, rightItem) => {
+      const sorted = items.slice().sort((leftItem, rightItem) => {
         for (let index = 0; index < sortBy.length; index += 1) {
           const sortKey = sortBy[index];
           const isDescending = !!sortDesc[index];
@@ -356,6 +357,10 @@ export default {
 
         return 0;
       });
+      return favoriteSort(sorted, (row) => ({
+        kind: row._itemKind,
+        id: row._itemId,
+      }));
     },
 
     getSortableTableValue(item, sortKey) {

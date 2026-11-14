@@ -5,6 +5,7 @@ export default {
 
   template: `
 <v-text-field
+    class="cheat-shortcut-input"
     v-model="showingText"
     :label="label"
     :solo="solo"

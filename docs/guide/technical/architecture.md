@@ -79,6 +79,56 @@ Safe pattern:
 - Store primitive IDs or lightweight values in component state.
 - Resolve `$gameActors`, `$gameParty`, `$dataItems`, `$gameVariables`, and similar globals only when reading or writing.
 
+## Shared feature runtime
+
+`js/runtime/FeatureRuntime.js` initializes once in the game window and exposes the
+database editor, battle actions, locks, dialogue history, and game options. Panel
+state helpers use `getFeatureRuntime()` rather than installing another set of hooks
+in the pop-out. The pop-out also shares the game-owned shortcut manager; its view
+models retain local Key snapshots because constructor identity differs by realm.
+
+`DatabaseOverrides.js` chains normal DataManager save/load/new-game hooks, stores
+versioned patches in save contents, and restores only edited fields between slots.
+`ValueLocks.js` combines setter hooks with a budgeted 250 ms reconciliation pass.
+`MessageHistory.js` records queue delivery rather than render frames.
+`GameOptions.js` safely discovers option controls and writes through their setters;
+`SettingsProfile.js` restricts portable import/export to validated preferences.
+
+Live game/database objects never enter Vue state. Mutating operations execute in
+the game-owned runtime, creating replacement arrays in the game realm to preserve
+older MV plugin prototype extensions. The browser smoke suite checks this explicitly.
+
+## Game-Native UI Modules
+
+`FeatureRuntime` owns assets, actor party actions and destination previews as well
+as the existing battle/database/history features. The popup consumes the same
+game-owned runtime instead of creating a second cache or mutation layer.
+
+`GameAssets` describes records using primitive IDs and paints face/character/icon
+frames or enemy battlers onto view-owned canvases. Private engine Bitmaps and
+`EncryptedImage` use the engine's decryption algorithms inside guarded asynchronous
+callbacks, without placing optional preview failures into ImageManager's required
+image cache. Requests are bounded and stale paints are
+discarded. `GameAsset` defers off-screen artwork until it becomes visible.
+
+`RecordNavigation` passes a primitive actor ID to `CheatModal`, which switches to
+the actor editor and selects after mounting. `ActorActions` uses native party
+methods, not replacement arrays. `MapBattleEvents` scans bounded active-page and
+common-event references without evaluating scripts, then revalidates the selected
+event before invoking its normal `start()` method. Standalone battles remain a
+separate temporary-troop path.
+
+`MapPreviews` reads detached destination JSON with a four-entry cache and a
+separate bounded artwork canvas. Its renderer accepts an explicit map context;
+it never swaps `$dataMap` or runs game-map setup. Views keep map/Bitmap/canvas
+references in non-reactive instance fields, not Vue data.
+
+`LayoutGeometry` provides viewport clamps and a teardown-safe pointer lifecycle.
+Overlay resizing and explicit minimap Move mode share it. Settings writes happen
+at gesture completion, while normal minimap mode retains click-through behavior.
+`GameFont` scopes font choice to the cheat root and registers available font sources
+in the popup's separate document.
+
 ## Translation architecture
 
 The translation system has two separate responsibilities:

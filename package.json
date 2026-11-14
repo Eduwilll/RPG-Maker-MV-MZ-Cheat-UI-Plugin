@@ -1,14 +1,17 @@
 {
   "name": "rpg-cheat-ui-plugin-docs",
-  "version": "1.7.1",
+  "version": "1.8.0",
   "description": "Documentation for RPG Maker MV/MZ Cheat UI Plugin",
   "scripts": {
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "typecheck": "tsc -p tsconfig.json",
+    "test:unit": "node --experimental-default-type=module --experimental-test-isolation=none --test tests/unit/*.test.mjs",
+    "test:browser": "node tools/test-browser.mjs",
+    "test:preview": "node tools/test-browser.mjs --preview",
     "check:mv-compat": "node tools/check-mv-compat.mjs",
-    "check:repo": "pnpm run typecheck && pnpm run check:mv-compat && pnpm run docs:build",
+    "check:repo": "pnpm run test:unit && pnpm run typecheck && pnpm run check:mv-compat && pnpm run docs:build",
     "format": "prettier . --write",
     "prepare": "husky install"
   },

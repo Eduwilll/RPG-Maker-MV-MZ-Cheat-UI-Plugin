@@ -17,6 +17,18 @@ import TranslateSettingsPanel from "./panels/TranslateSettingsPanel.js";
 import AboutPanel from "./panels/AboutPanel.js";
 import EventAnalyzerPanel from "./panels/EventAnalyzerPanel.js";
 import AppearancePanel from "./panels/AppearancePanel.js";
+import DatabaseEditorPanel from "./panels/DatabaseEditorPanel.js";
+import MessageLogPanel from "./panels/MessageLogPanel.js";
+import LocksPanel from "./panels/LocksPanel.js";
+import GameOptionsPanel from "./panels/GameOptionsPanel.js";
+import FeatureFinder from "./components/FeatureFinder.js";
+import OverlayResize from "./components/OverlayResize.js";
+import { boundedSize } from "./js/ui/LayoutGeometry.js";
+import { applyGameFont } from "./js/ui/GameFont.js";
+import { createFeatureCatalog } from "./js/ui/FeatureCatalog.js";
+import { GLOBAL_SHORTCUT } from "./js/shortcuts/GlobalShortcut.js";
+import { KEY_VALUE_STORAGE } from "./js/storage/KeyValueStorage.js";
+import { getGameWindow } from "./js/runtime/FeatureRuntime.js";
 import {
   readBooleanSetting,
   writeBooleanSetting,
@@ -49,6 +61,12 @@ export default {
     AboutPanel,
     EventAnalyzerPanel,
     AppearancePanel,
+    DatabaseEditorPanel,
+    MessageLogPanel,
+    LocksPanel,
+    GameOptionsPanel,
+    FeatureFinder,
+    OverlayResize,
   },
 
   template: `
@@ -57,8 +75,8 @@ export default {
     :color="$vuetify.theme.dark ? '#212121' : '#FFFFFF'"
     class="z-index-cheat-0 elevation-12"
     :style="{ position: 'fixed', top: 0, left: 0, opacity: effectiveOpacity, transition: 'opacity 0.2s' }"
-    :width="isWindow ? '100vw' : '750'" 
-    :height="isWindow ? '100vh' : '450'"
+    :width="isWindow ? '100vw' : overlaySize.width"
+    :height="isWindow ? '100vh' : overlaySize.height"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
 >
@@ -100,9 +118,11 @@ export default {
         <div
             :style="'width: ' + contentWidth + ';'"
             class="fill-height d-inline pa-2 overflow-y-auto hide-scrollbar">
-            <component :is="currentComponentName"></component>
+            <component ref="panel" :is="activePanelComponent" :key="currentComponentName" v-bind="activePanelProps"></component>
         </div>
     </v-row>
+    <feature-finder v-model="finderOpen" :catalog="featureCatalog" @navigate="navigateFeature"></feature-finder>
+    <overlay-resize v-if="!isWindow" :width="overlaySize.width" :height="overlaySize.height" @resize="resizeOverlay"/>
 </v-card>
     `,
 
@@ -124,6 +144,12 @@ export default {
   data() {
     return {
       navWidth: 200,
+      overlayWidth: readNumberSetting("cheatModal.width", 750),
+      overlayHeight: readNumberSetting("cheatModal.height", 450),
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      finderOpen: false,
+      featureCatalog: [],
       isSidebarVisible: readBooleanSetting(SIDEBAR_VISIBLE_SETTING, true),
       windowOpacity: readNumberSetting(WINDOW_OPACITY_SETTING, 0.3),
       isHovered: false,
@@ -131,6 +157,11 @@ export default {
       navTreeModel: undefined,
 
       navTreeItems: [
+        {
+          name: "Find a Feature",
+          icon: "mdi-magnify",
+          component: "feature-finder",
+        },
         {
           name: "General",
           icon: "mdi-hammer-screwdriver",
@@ -183,6 +214,31 @@ export default {
           component: "variable-setting-panel",
         },
         {
+          name: "Enemies",
+          icon: "mdi-skull-outline",
+          component: "enemy-editor-panel",
+        },
+        {
+          name: "Skills",
+          icon: "mdi-auto-fix",
+          component: "skill-editor-panel",
+        },
+        {
+          name: "Classes",
+          icon: "mdi-school",
+          component: "class-editor-panel",
+        },
+        {
+          name: "Locks & Favorites",
+          icon: "mdi-lock-star",
+          component: "locks-panel",
+        },
+        {
+          name: "Message Log",
+          icon: "mdi-message-text-outline",
+          component: "message-log-panel",
+        },
+        {
           name: "Switches",
           icon: "mdi-toggle-switch",
           component: "switch-setting-panel",
@@ -198,14 +254,9 @@ export default {
           component: "save-recall-panel",
         },
         {
-          name: "Map Events",
-          icon: "mdi-map-marker-plus",
-          component: "map-event-panel",
-        },
-        {
-          name: "Minimap",
+          name: "Map / Minimap",
           icon: "mdi-map",
-          component: "minimap-panel",
+          component: "map-event-panel",
         },
         {
           name: "Event Analyzer",
@@ -221,6 +272,11 @@ export default {
           name: "Settings",
           icon: "mdi-cog",
           children: [
+            {
+              name: "Game Options",
+              icon: "mdi-tune",
+              component: "game-options-panel",
+            },
             {
               name: "Appearance",
               icon: "mdi-palette",
@@ -242,7 +298,41 @@ export default {
     };
   },
 
+  watch: {
+    currentComponentName(name) {
+      const item = this.componentNameToNavItem[name];
+      if (item) this.navTreeModel = [item];
+    },
+  },
+
   computed: {
+    overlaySize() {
+      return boundedSize(
+        this.overlayWidth,
+        this.overlayHeight,
+        this.viewportWidth,
+        this.viewportHeight,
+      );
+    },
+    activePanelComponent() {
+      return [
+        "enemy-editor-panel",
+        "skill-editor-panel",
+        "class-editor-panel",
+      ].includes(this.currentComponentName)
+        ? "database-editor-panel"
+        : this.currentComponentName;
+    },
+    activePanelProps() {
+      const kinds = {
+        "enemy-editor-panel": "enemy",
+        "skill-editor-panel": "skill",
+        "class-editor-panel": "class",
+      };
+      return kinds[this.currentComponentName]
+        ? { kind: kinds[this.currentComponentName] }
+        : {};
+    },
     effectiveOpacity() {
       // The separate window is a dedicated cheat window: always fully opaque.
       if (this.isWindow) {
@@ -263,13 +353,67 @@ export default {
     componentNameToNavItem() {
       const ret = {};
       this.iterateLeaf(this.navTreeItems, (item) => {
-        ret[item.component] = item;
+        if (item.component !== "feature-finder") ret[item.component] = item;
       });
+      ret["minimap-panel"] = ret["map-event-panel"];
       return ret;
     },
   },
 
   mounted() {
+    this._layoutChanged = () => {
+      this.overlayWidth = readNumberSetting("cheatModal.width", 750);
+      this.overlayHeight = readNumberSetting("cheatModal.height", 450);
+      applyGameFont(
+        this.$el,
+        getGameWindow(),
+        readBooleanSetting("cheatModal.gameFont", false),
+      );
+    };
+    this._viewportChanged = () => {
+      this.viewportWidth = window.innerWidth;
+      this.viewportHeight = window.innerHeight;
+    };
+    window.addEventListener("cheat-layout-change", this._layoutChanged);
+    window.addEventListener("resize", this._viewportChanged);
+    this._layoutChanged();
+    this._openFinder = () => {
+      this.featureCatalog = createFeatureCatalog(
+        GLOBAL_SHORTCUT.shortcutSettings,
+        GLOBAL_SHORTCUT.shortcutConfig,
+      );
+      this.finderOpen = true;
+    };
+    window.addEventListener("cheat-open-finder", this._openFinder);
+    this._navigateActor = (event) => {
+      const id = Number(event.detail);
+      if (!Number.isInteger(id) || id < 1) return;
+      this.navigateFeature({ panel: "actor-setting-panel" });
+      this.$nextTick(() => {
+        const panel = this.$refs.panel;
+        if (panel && panel.selectActor) panel.selectActor(id);
+      });
+    };
+    window.addEventListener("cheat-navigate-actor", this._navigateActor);
+    this._profileChanged = () => {
+      this.windowOpacity = readNumberSetting(WINDOW_OPACITY_SETTING, 0.3);
+      this.isSidebarVisible = readBooleanSetting(SIDEBAR_VISIBLE_SETTING, true);
+      this.$vuetify.theme.dark = readBooleanSetting(
+        "cheatModal.themeDarkMode",
+        true,
+      );
+      const color = KEY_VALUE_STORAGE.getItem("cheatModal.themePrimaryColor");
+      if (typeof color === "string" && /^#[0-9a-f]{6}$/i.test(color)) {
+        this.$vuetify.theme.themes.dark.primary = color;
+        this.$vuetify.theme.themes.light.primary = color;
+      }
+    };
+    window.addEventListener("cheat-profile-change", this._profileChanged);
+    const gameWindow = getGameWindow();
+    if (gameWindow && gameWindow !== window)
+      gameWindow.addEventListener("cheat-layout-change", this._layoutChanged);
+    if (gameWindow && gameWindow !== window)
+      gameWindow.addEventListener("cheat-profile-change", this._profileChanged);
     let navItem = this.componentNameToNavItem[this.currentComponentName];
 
     if (!navItem) {
@@ -288,6 +432,22 @@ export default {
   },
 
   beforeDestroy() {
+    window.removeEventListener("cheat-layout-change", this._layoutChanged);
+    window.removeEventListener("resize", this._viewportChanged);
+    window.removeEventListener("cheat-navigate-actor", this._navigateActor);
+    window.removeEventListener("cheat-open-finder", this._openFinder);
+    window.removeEventListener("cheat-profile-change", this._profileChanged);
+    const gameWindow = getGameWindow();
+    if (gameWindow && gameWindow !== window)
+      gameWindow.removeEventListener(
+        "cheat-layout-change",
+        this._layoutChanged,
+      );
+    if (gameWindow && gameWindow !== window)
+      gameWindow.removeEventListener(
+        "cheat-profile-change",
+        this._profileChanged,
+      );
     if (this._onAppearanceChange) {
       window.removeEventListener(
         "cheat-appearance-change",
@@ -297,10 +457,57 @@ export default {
   },
 
   methods: {
+    resizeOverlay(size) {
+      const value = boundedSize(
+        size.width,
+        size.height,
+        window.innerWidth,
+        window.innerHeight,
+      );
+      this.overlayWidth = value.width;
+      this.overlayHeight = value.height;
+      if (size.commit) {
+        KEY_VALUE_STORAGE.setItem("cheatModal.width", value.width);
+        KEY_VALUE_STORAGE.setItem("cheatModal.height", value.height);
+      }
+    },
     onNavTreeUpdate(data) {
       if (data && data.length === 1) {
+        if (data[0].component === "feature-finder") {
+          this._openFinder();
+          return;
+        }
         this.$emit("change", data[0].component);
       }
+    },
+
+    navigateFeature(entry) {
+      this.$emit("change", entry.panel);
+      const nav = this.componentNameToNavItem[entry.panel];
+      if (nav) this.navTreeModel = [nav];
+      if (entry.anchor)
+        this.$nextTick(() => {
+          const panel = this.$refs.panel;
+          if (panel && typeof panel.focusFeature === "function")
+            panel.focusFeature(entry.anchor);
+          this.$nextTick(() => {
+            const nodes = this.$el.querySelectorAll("[data-feature]");
+            const target = Array.prototype.find.call(
+              nodes,
+              (node) => node.getAttribute("data-feature") === entry.anchor,
+            );
+            if (target) {
+              target.scrollIntoView({ block: "nearest" });
+              target.classList.add("cheat-feature-highlight");
+              setTimeout(
+                () => target.classList.remove("cheat-feature-highlight"),
+                1800,
+              );
+              const input = target.querySelector("input,button");
+              if (input) input.focus();
+            }
+          });
+        });
     },
 
     toggleSidebar() {

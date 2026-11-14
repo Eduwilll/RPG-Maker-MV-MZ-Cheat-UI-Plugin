@@ -1,6 +1,24 @@
 # Changelog
 
-## v1.7.1 - Latest
+## v1.8.0 - Latest
+
+### Features
+- [Feat] **Feature Finder**: Find panels, settings and shortcuts with `Ctrl+P`.
+- [Feat] **Database Editors**: Edit enemies, skills and classes with save-specific overrides; manage party members, skills and states directly from the UI.
+- [Feat] **Encounter Roots**: Browse multipart enemies as complete authored encounters, start confirmed battles or matching map events, and summon supported enemies during battle.
+- [Feat] **Locks & Favorites**: Lock supported values and pin frequently used rows; inspect the active locks in one panel.
+- [Feat] **Message Log**: Search captured dialogue with `Ctrl+H`, including speaker portraits and only the chosen player responses. Game fonts remain the default, with readable 16px text, custom sizing and a plugin-font fallback.
+- [Feat] **Map / Minimap**: Combined map controls, live NPC sprites, destination previews, movable minimap, and saved toggles for shadows, upper tiles, marker categories, labels and grid.
+- [Feat] **Game-Native Details**: Item icons, actor portraits, detailed tooltips, resizable overlay, and game-specific options with portable settings.
+
+### Compatibility And Developer Tools
+- [Fix] **MV/MZ Plugin Compatibility**: Keep game data and bitmaps outside Vue observation, preserve game-realm actions in separate windows, and improve Yanfly/FOSSIL-style dialogue and composite artwork handling.
+- [Dev] **Standalone UI Preview**: Updated MV/MZ demo data, scene/panel selectors, live reload and a localhost-only Python launcher; no game required for UI development.
+- [Docs] **Public Documentation**: Updated feature/development guides and moved internal agent plans outside the VitePress website.
+
+---
+
+## v1.7.1
 
 ### FOSSIL Support & Stability Fixes
 - [Feat] **FOSSIL Game Support**: Games using the FOSSIL plugin boot from `FOSSILindex.html` instead of `js/main.js`, which silently bypassed the cheat. The installer now patches `index.html` (inherited automatically when FOSSIL regenerates its file) and any existing `FOSSILindex.html`; manual installs add one `<script>` tag to both files. See the install and troubleshooting guides.

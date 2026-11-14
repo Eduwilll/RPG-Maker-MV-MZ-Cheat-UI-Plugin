@@ -9,6 +9,7 @@ import {
 } from "../../ui/CheatUiSettings.js";
 
 export var MINIMAP_ENABLED = "minimap.enabled";
+export var MINIMAP_MOVE_MODE = "minimap.moveMode";
 export var MINIMAP_POSITION = "minimap.position";
 export var MINIMAP_CUSTOM_X = "minimap.customX";
 export var MINIMAP_CUSTOM_Y = "minimap.customY";
@@ -54,6 +55,7 @@ export function readMinimapSettings() {
 
   return {
     enabled: readBooleanSetting(MINIMAP_ENABLED, false),
+    moveMode: readBooleanSetting(MINIMAP_MOVE_MODE, false),
     position: position,
     customX: readNumberSetting(MINIMAP_CUSTOM_X, 8),
     customY: readNumberSetting(MINIMAP_CUSTOM_Y, 8),
@@ -61,12 +63,15 @@ export function readMinimapSettings() {
     zoom: readNumberSetting(MINIMAP_ZOOM, 1),
     mode: mode,
     opacity: readNumberSetting(MINIMAP_OPACITY, 0.85),
-    showEvents: readBooleanSetting(MINIMAP_SHOW_EVENTS, false),
+    showEvents: readBooleanSetting(MINIMAP_SHOW_EVENTS, true),
   };
 }
 
 export function writeMinimapEnabled(value) {
   writeBooleanSetting(MINIMAP_ENABLED, value);
+}
+export function writeMinimapMoveMode(value) {
+  writeBooleanSetting(MINIMAP_MOVE_MODE, value);
 }
 
 /**

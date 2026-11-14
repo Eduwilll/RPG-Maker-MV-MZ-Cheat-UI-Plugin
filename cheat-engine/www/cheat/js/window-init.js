@@ -56,6 +56,7 @@ async function init() {
     "$gameMap",
     "$gameTroop",
     "$gameMessage",
+    "$gameTimer",
     "$gameEnemies",
     "$gameData",
     "SceneManager",
@@ -68,6 +69,16 @@ async function init() {
     "Input",
     "TouchInput",
     "Game_Actor",
+    "Game_Enemy",
+    "Game_Message",
+    "Game_Party",
+    "Game_Variables",
+    "Game_Switches",
+    "Game_Timer",
+    "Sprite_Enemy",
+    "ConfigManager",
+    "Window_Options",
+    "Rectangle",
     "Scene_Base",
     "Scene_Map",
     "Scene_Battle",
@@ -121,6 +132,10 @@ async function init() {
     const CheatModal = (await import("../CheatModal.js")).default;
     const AlertSnackbar = (await import("../components/AlertSnackbar.js"))
       .default;
+    const ConfirmDialog = (await import("../components/ConfirmDialog.js"))
+      .default;
+    const { GLOBAL_SHORTCUT } = await import("./shortcuts/GlobalShortcut.js");
+    const { handleFeatureShortcut } = await import("./ui/FeatureShortcuts.js");
 
     status.textContent = "Mounting UI...";
 
@@ -133,14 +148,27 @@ async function init() {
       components: {
         CheatModal,
         AlertSnackbar,
+        ConfirmDialog,
       },
       data: {
         activeComponentName: null,
       },
       mounted() {
+        this._onFeatureKey = (event) =>
+          handleFeatureShortcut(event, GLOBAL_SHORTCUT, {
+            openFeatureFinder: () =>
+              window.dispatchEvent(new CustomEvent("cheat-open-finder")),
+            openMessageLog: () => {
+              this.activeComponentName = "message-log-panel";
+            },
+          });
+        window.addEventListener("keydown", this._onFeatureKey, true);
         // Success! Hide the overlay
         document.getElementById("status-overlay").style.display = "none";
         document.getElementById("app").style.display = "block";
+      },
+      beforeDestroy() {
+        window.removeEventListener("keydown", this._onFeatureKey, true);
       },
     });
   } catch (err) {

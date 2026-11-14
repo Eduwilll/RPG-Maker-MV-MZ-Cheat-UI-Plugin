@@ -1,4 +1,16 @@
 /* hide body scrollbar */
+.cheat-feature-highlight {
+  outline: 2px solid #ffb74d !important;
+  outline-offset: 2px;
+}
+
+.database-detail-label {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  cursor: help;
+}
+
 body::-webkit-scrollbar {
   display: none;
 }
@@ -178,3 +190,13 @@ body {
 /*.x-small-field .v-text-field__slot .v-label--active {*/
 /*    top: 16px;*/
 /*}*/
+.cheat-game-font,
+.cheat-game-font input,
+.cheat-game-font textarea,
+.cheat-game-font button,
+.cheat-game-font .caption,
+.cheat-game-font .subtitle-1,
+.cheat-game-font .subtitle-2,
+.cheat-game-font .v-list-item__title {
+  font-family: var(--cheat-game-font) !important;
+}

@@ -46,7 +46,24 @@ Phase 1 uses a lightweight TypeScript configuration for JavaScript projects:
 - `@ts-check` is enabled file-by-file so we can improve safety incrementally instead of flooding the repo with errors all at once.
 - `pnpm run typecheck` is the main verification step for this foundation.
 - `pnpm run check:mv-compat` scans the cheat runtime for newer syntax and array helpers that have caused older MV NW.js regressions before.
-- `pnpm run check:repo` runs the standard Phase 4 repository validation set: typecheck, MV compatibility scan, and docs build.
+- `pnpm run test:unit` runs the behavioral runtime tests (Node 22.14 or newer).
+- `pnpm run check:repo` runs unit tests, typecheck, MV compatibility scan, and docs build.
+
+### Automated UI smoke tests
+
+```sh
+pnpm run test:browser
+```
+
+This launches an installed Chromium/Edge in an isolated headless profile and serves
+local fixtures over loopback. On other installations, set `CHEAT_TEST_BROWSER` to
+the browser executable. It exercises rendered Vue panels plus the real pop-out
+bootstrap in a separate browser realm, without changing any game installation or
+save. The temporary browser profile is removed when unlocked. A sandbox may require
+permission to launch the browser process.
+
+These checks complement, but do not replace, manual MV/MZ NW.js testing, particularly
+for third-party battle systems, filesystem persistence, and game-specific options.
 
 The translation subsystem was also split into smaller contributor-focused modules during this phase:
 
@@ -62,7 +79,7 @@ Use this when you are changing layout, panel interactions, or other UI behavior 
 
 ::: code-group
 ```sh [.py]
-.venv\Scripts\python.exe start-preview.py
+py -3 start-preview.py
 ```
 :::
 
@@ -74,14 +91,55 @@ http://localhost:8080/preview/index.html
 
 ### What preview mode gives you
 
-- Fast reloads with cache disabled
+- Automatic reload after JS/CSS/HTML/JSON changes, plus cache-disabled responses
 - A browser-based rendering surface for the cheat UI
 - Mocked RPG Maker objects and helper services
 - No need to relaunch a full game for every CSS or panel tweak
+- Representative original map tiles, NPC sprites, portraits, icons, inventory,
+  multipart enemy encounters and selected dialogue responses
+- A developer toolbar for any current panel, MV/MZ UI branches, and exploration,
+  battle or title/no-save scenes
+- Current-panel URL persistence, an **Add dialogue** button and visible Vue errors
+
+The launcher uses the Python standard library, so a virtual environment is optional.
+To use your existing virtual environment, run `.venv\Scripts\python.exe start-preview.py`.
+
+```powershell
+py -3 start-preview.py --port 8081 --no-browser
+py -3 start-preview.py --no-reload
+```
+
+`--port 0` selects a free port and prints its URL. Stop with Ctrl+C. The server is
+loopback-only and exposes preview, cheat UI and public documentation assets, not
+test games, hidden files or arbitrary repository paths. Reload detection scans
+only preview/UI source metadata with a bounded, cached fingerprint.
+
+You can open a panel directly:
+
+```text
+http://localhost:8080/preview/index.html?panel=map-event-panel
+http://localhost:8080/preview/index.html?panel=message-log-panel&engine=MV
+```
+
+**Reload demo** resets simulated game data, not stored browser display preferences.
+Preview key/value settings use their own browser namespace. The real cheat UI is
+mounted, including floating minimap and font/size controls; no game is installed,
+launched or read. Translation requests use placeholder responses.
+
+```powershell
+pnpm run test:preview
+py -3 -B -m unittest discover -s tests -p test_start_preview.py
+```
+
+The preview regression loads the actual preview entry point and mounts all current
+panels in both engine UI modes. As with the regular smoke runner, it omits remote
+skin stylesheets to avoid a network-dependent test. Full visual styling still
+uses the Vuetify, icon and font CDNs in your normal browser.
 
 ### Limitations of preview mode
 
 Preview mode is not a replacement for in-game testing.
+The engine selector changes mock UI contracts, not a complete MV/MZ engine.
 
 Use a real game when your change affects:
 

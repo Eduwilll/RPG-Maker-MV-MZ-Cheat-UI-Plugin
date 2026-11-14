@@ -1,0 +1,127 @@
+html,
+body {
+  margin: 0;
+  background: #14262b;
+  color: #e1e8e5;
+}
+.preview-loading {
+  padding: 24px;
+  font:
+    16px Consolas,
+    monospace;
+}
+.preview-shell {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(ellipse at top right, #345e59, #14262b 65%);
+}
+.preview-shell .v-application--wrap {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.preview-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding: 10px 16px;
+  background: #152327;
+  border-bottom: 1px solid #617f71;
+  flex: 0 0 auto;
+  z-index: 20;
+  font:
+    13px Consolas,
+    monospace;
+}
+.preview-brand {
+  color: #bce6b9;
+  letter-spacing: 0.12em;
+  font-size: 16px;
+}
+.preview-toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.preview-toolbar select,
+.preview-toolbar button {
+  background: #263b3e;
+  color: #f0f3e9;
+  padding: 5px 9px;
+  border: 1px solid #58716e;
+  border-radius: 4px;
+  font: inherit;
+  max-width: 210px;
+}
+.preview-toolbar :focus-visible {
+  outline: 2px solid #d9bd78;
+  outline-offset: 2px;
+}
+.preview-status {
+  color: #b0c1b9;
+  font-size: 11px;
+  margin-left: auto;
+}
+.preview-stage {
+  position: relative;
+  transform: translateZ(0);
+  isolation: isolate;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.preview-backdrop {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.65;
+  image-rendering: pixelated;
+}
+.preview-modal {
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
+.preview-errors {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  max-width: min(600px, 90%);
+  max-height: 30%;
+  overflow: auto;
+  z-index: 50;
+  background: #4c2224;
+  color: #fff1df;
+  border: 1px solid #c88e77;
+  padding: 12px;
+  font:
+    12px Consolas,
+    monospace;
+  white-space: pre-wrap;
+}
+.preview-notice {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  pointer-events: none;
+  background: #14262be6;
+  padding: 6px 10px;
+  font:
+    12px Consolas,
+    monospace;
+}
+@media (max-width: 650px) {
+  .preview-toolbar {
+    gap: 8px;
+    padding: 8px;
+  }
+  .preview-status {
+    width: 100%;
+    margin: 0;
+  }
+  .preview-toolbar select {
+    max-width: 150px;
+  }
+}

@@ -4,9 +4,26 @@
  * 2024-03-20
  */
 import { coercePanelNumber } from "../js/panels/PanelGameState.js";
+import {
+  renderBaseMap,
+  getMinimapStatus,
+  clearMinimapCache,
+} from "../js/panels/minimap/MinimapRenderer.js";
+import { mapViewport, tileAtPointer } from "../js/panels/map/MapViewport.js";
+import MapLayers from "../components/MapLayers.js";
+import { readMapLayers } from "../js/panels/map/MapLayersState.js";
+import {
+  readMapMarkers,
+  markerVisible,
+  drawMapGrid as drawLayerGrid,
+} from "../js/panels/map/MapMarkers.js";
+import { getGameWindow } from "../js/runtime/FeatureRuntime.js";
+import { getMapCharacters } from "../js/panels/map/MapCharacters.js";
+import MinimapPanel from "./MinimapPanel.js";
 
 export default {
   name: "MapEventPanel",
+  components: { MapLayers, MinimapPanel },
 
   template: `
 <v-card flat class="ma-0 pa-0" color="transparent">
@@ -30,11 +47,11 @@ export default {
     <v-row class="ma-0 pa-1">
         <v-col cols="12">
             <div class="d-flex flex-wrap">
-                <v-chip x-small color="grey" class="ma-1">Grey: Walkable</v-chip>
-                <v-chip x-small color="grey darken-3" class="ma-1">Dark: Blocked</v-chip>
+                <v-chip v-if="renderMode === 'radar'" x-small color="grey" class="ma-1">Grey: Walkable</v-chip>
+                <v-chip v-if="renderMode === 'radar'" x-small color="grey darken-3" class="ma-1">Dark: Blocked</v-chip>
                 <v-chip x-small color="red" class="ma-1">Red: Player</v-chip>
-                <v-chip x-small color="yellow" text-color="black" class="ma-1">EV: Event</v-chip>
-                <v-chip x-small color="white" text-color="black" class="ma-1">White: Border</v-chip>
+                <v-chip x-small color="yellow" text-color="black" class="ma-1">Yellow: NPC / Event</v-chip>
+                <v-chip v-if="renderMode === 'radar'" x-small color="white" text-color="black" class="ma-1">White: Border</v-chip>
                 <v-chip x-small color="orange" class="ma-1">Orange: Enemy</v-chip>
                 <v-chip x-small color="blue" class="ma-1">Blue: Treasure</v-chip>
             </div>
@@ -45,6 +62,14 @@ export default {
     </v-row>
 
     <v-divider></v-divider>
+    <map-layers @change="renderMap"/>
+    <v-expansion-panels v-model="minimapSection" flat class="my-2"><v-expansion-panel data-feature="floating-minimap"><v-expansion-panel-header>Floating minimap settings</v-expansion-panel-header><v-expansion-panel-content><minimap-panel embedded/></v-expansion-panel-content></v-expansion-panel></v-expansion-panels>
+
+    <v-row class="ma-0 pa-2" align="center">
+        <v-col cols="8" class="py-1"><v-select v-model="renderMode" :items="[{text: 'Realistic (live tiles)', value: 'realistic'}, {text: 'Radar (passability)', value: 'radar'}]" label="Map display" dense outlined hide-details/></v-col>
+        <v-col cols="4" class="py-1"><v-btn x-small text @click="refreshArtwork">Refresh artwork</v-btn></v-col>
+        <v-col v-if="renderMode === 'realistic'" cols="12" class="py-0 caption grey--text" role="status">{{ renderStatus }}</v-col>
+    </v-row>
 
     <v-row class="ma-0 pa-2" align="center">
         <v-col cols="12" sm="6" class="py-1">
@@ -108,6 +133,12 @@ export default {
 
   data() {
     return {
+      minimapSection: null,
+      renderMode:
+        this.loadSetting("mapEventPanel_renderMode", "realistic") === "radar"
+          ? "radar"
+          : "realistic",
+      renderStatus: "Loading map artwork...",
       limitedView: this.loadSetting("mapEventPanel_limitedView", true), // 25x25 view when true, full map when false
       clickToTeleportEnabled: this.loadSetting(
         "mapEventPanel_clickToTeleport",
@@ -147,18 +178,6 @@ export default {
   },
 
   created() {
-    // Pre-compiled regex patterns for better performance (non-reactive)
-    this.treasureNamePattern =
-      /treasure|chest|box|gold|coin|money|gem|jewel|diamond|ruby|emerald|loot|reward|prize|vault|safe|宝箱|宝物|金币|金钱|珠宝|财宝|奖励|宝石|钻石|红宝石|绿宝石|たからばこ|たからもの|きんか|きんせん|ほうせき|しゅほう|おうごん|ゴールド|コイン|マネー|ジェム|ジュエル|ダイヤモンド|ルビー|エメラルド|トレジャー|チェスト|ボックス|リワード|プライズ/i;
-    this.treasureImageNamePattern =
-      /chest|box|treasure|gold|coin|gem|jewel|crystal|orb|artifact|vault|safe|money|diamond|ruby|emerald|宝箱|宝物|金币|金钱|珠宝|财宝|钻石|红宝石|绿宝石|宝石|たからばこ|たからもの|きんか|きんせん|ほうせき|ダイヤモンド|ルビー|エメラルド|ゴールド|コイン|ジェム|ジュエル|クリスタル|トレジャー|チェスト|ボックス/i;
-    this.treasureTextPattern =
-      /found|obtained|received|gained|treasure|gold|coin|item|reward|loot|prize|discovered|acquired|collected|发现|获得|得到|找到|宝物|金币|收集|获取|奖励|战利品|發見|入手|取得|みつけた|てにいれた|えた|かくとく|ほうしゅう|あいてむ|たからもの|きんか|ゴールド|アイテム|リワード|トレジャー|コイン|しゅうしゅう|はっけん/i;
-    this.enemyCommentPattern =
-      /enemy|敌人|monster|hostile|boss|guard|soldier|bandit|thief|assassin|villain|criminal|mercenary|outlaw|warrior|knight|敵|モンスター|敵対|ボス|ガード|兵士|盗賊|暗殺者|悪|魔物|魔獣|デーモン|鬼|妖怪|悪役|犯罪者|傭兵|戦士|騎士|アウトロー/i;
-    this.enemyImageNamePattern =
-      /enemy|monster|evil|demon|beast|soldier|guard|bandit|thief|assassin|mercenary|outlaw|criminal|villain|boss|captain|samurai|ninja|ronin|hunter|archer|swordsman|mage|wizard|witch|sorcerer|priest|cleric|warrior|knight|man|woman|person|human|people|npc|char|character|sprite|敌人|敵|怪物|魔物|士兵|守卫|强盗|小偷|刺客|雇佣兵|罪犯|恶棍|老板|队长|武士|忍者|猎人|弓箭手|剑士|法师|巫师|祭司|战士|骑士|人|角色|モンスター|悪|デーモン|魔獣|兵士|ガード|盗賊|暗殺者|傭兵|犯罪者|悪役|ボス|キャプテン|サムライ|ニンジャ|浪人|ハンター|アーチャー|ソードマン|メイジ|ウィザード|魔女|ソーサラー|プリースト|クレリック|戦士|騎士|人間|キャラクター|スプライト/i;
-
     this.initializeMapDisplay();
   },
 
@@ -181,6 +200,10 @@ export default {
   },
 
   watch: {
+    renderMode(value) {
+      this.saveSetting("mapEventPanel_renderMode", value);
+      this.$nextTick(() => this.renderMap());
+    },
     limitedView(newValue) {
       // Save setting to localStorage
       this.saveSetting("mapEventPanel_limitedView", newValue);
@@ -284,6 +307,20 @@ export default {
   },
 
   methods: {
+    focusFeature(anchor) {
+      if (anchor === "floating-minimap") this.minimapSection = 0;
+    },
+    drawCharacter(ctx, marker, startX, startY) {
+      return !!(
+        this._characters &&
+        this._characters.draw(ctx, marker, {
+          unit: this.cellSize,
+          ox: -startX * this.cellSize,
+          oy: -startY * this.cellSize,
+          scale: this._layers.markerScale,
+        })
+      );
+    },
     // localStorage helper methods
     loadSetting(key, defaultValue) {
       try {
@@ -326,7 +363,11 @@ export default {
     updateCurrentMapData() {
       try {
         this.currentMapId = $gameMap.mapId();
-        this.mapData = $dataMap;
+        // Vue must never observe the game's live map/event command objects.
+        this._sourceMap = $dataMap;
+        this.mapData = $dataMap
+          ? { width: $dataMap.width, height: $dataMap.height }
+          : null;
 
         if (this.mapData) {
           this.updateCanvasSize();
@@ -344,10 +385,11 @@ export default {
 
       if (this.limitedView) {
         // For limited view, use base cellSize and calculate canvas size
-        this.cellSize = this.baseCellSize;
-        const maxSize = this.maxViewSize;
-        this.canvasWidth = Math.min(600, maxSize * this.cellSize);
-        this.canvasHeight = Math.min(600, maxSize * this.cellSize);
+        this.cellSize = Math.min(this.baseCellSize, 600 / this.maxViewSize);
+        this.canvasWidth =
+          Math.min(this.mapData.width, this.maxViewSize) * this.cellSize;
+        this.canvasHeight =
+          Math.min(this.mapData.height, this.maxViewSize) * this.cellSize;
       } else {
         // For full view, dynamically adjust cellSize to fit the map within 600px
         const maxCanvasSize = 600;
@@ -383,41 +425,13 @@ export default {
 
     onCanvasMouseMove(event) {
       if (!this.mapData || !this.$refs.mapCanvas) return;
-
-      const canvas = this.$refs.mapCanvas;
-      const rect = canvas.getBoundingClientRect();
-      const x = (event.clientX - rect.left) * (canvas.width / rect.width);
-      const y = (event.clientY - rect.top) * (canvas.height / rect.height);
-
-      const cellX = Math.floor(x / this.cellSize);
-      const cellY = Math.floor(y / this.cellSize);
-
-      let mapX, mapY;
-      if (this.limitedView) {
-        const startX = Math.max(
-          0,
-          this.playerPosition.x - Math.floor(this.maxViewSize / 2),
-        );
-        const startY = Math.max(
-          0,
-          this.playerPosition.y - Math.floor(this.maxViewSize / 2),
-        );
-        const endX = Math.min(this.mapData.width, startX + this.maxViewSize);
-        const endY = Math.min(this.mapData.height, startY + this.maxViewSize);
-        const realStartX =
-          endX - startX < this.maxViewSize
-            ? Math.max(0, endX - this.maxViewSize)
-            : startX;
-        const realStartY =
-          endY - startY < this.maxViewSize
-            ? Math.max(0, endY - this.maxViewSize)
-            : startY;
-        mapX = realStartX + cellX;
-        mapY = realStartY + cellY;
-      } else {
-        mapX = cellX;
-        mapY = cellY;
+      const tile = tileAtPointer(event, this.$refs.mapCanvas, this.viewport());
+      if (!tile) {
+        this.hoverInfo = "";
+        return;
       }
+      const mapX = tile.x,
+        mapY = tile.y;
 
       if (
         mapX < 0 ||
@@ -431,25 +445,38 @@ export default {
 
       // Check for events at this position
       let info = `Pos: (${mapX}, ${mapY})`;
+      const layers = readMapLayers();
 
       // Passability info
       const isWalkable = this.isTilePassable(mapX, mapY);
       info += isWalkable ? " | Walkable" : " | Blocked";
 
       // Check player
-      if (mapX === this.playerPosition.x && mapY === this.playerPosition.y) {
+      if (
+        layers.player &&
+        mapX === Math.round(this.playerPosition.x) &&
+        mapY === Math.round(this.playerPosition.y)
+      ) {
         info += ` | Player`;
       }
 
       // Check enemies
-      const enemy = this.enemies.find((e) => e.x === mapX && e.y === mapY);
+      const enemy = this.enemies.find(
+        (e) =>
+          markerVisible(e, layers) &&
+          Math.round(e.x) === mapX &&
+          Math.round(e.y) === mapY,
+      );
       if (enemy) {
         info += ` | Enemy: ${enemy.characterName || "Unknown"} (ID: ${enemy.id})`;
       }
 
       // Check treasures
       const treasure = this.treasureBoxes.find(
-        (t) => t.x === mapX && t.y === mapY,
+        (t) =>
+          markerVisible(t, layers) &&
+          Math.round(t.x) === mapX &&
+          Math.round(t.y) === mapY,
       );
       if (treasure) {
         info += ` | Treasure: ${treasure.name || "Unknown"} (ID: ${treasure.id})`;
@@ -457,7 +484,10 @@ export default {
 
       // Check regular events
       const regEvent = this.regularEvents.find(
-        (e) => e.x === mapX && e.y === mapY,
+        (e) =>
+          markerVisible(e, layers) &&
+          Math.round(e.x) === mapX &&
+          Math.round(e.y) === mapY,
       );
       if (regEvent) {
         const name = regEvent.name || "Event";
@@ -556,8 +586,12 @@ export default {
       try {
         if ($gamePlayer) {
           this.playerPosition = {
-            x: $gamePlayer.x,
-            y: $gamePlayer.y,
+            x: Number.isFinite($gamePlayer._realX)
+              ? $gamePlayer._realX
+              : $gamePlayer.x,
+            y: Number.isFinite($gamePlayer._realY)
+              ? $gamePlayer._realY
+              : $gamePlayer.y,
           };
         }
       } catch (error) {
@@ -567,186 +601,21 @@ export default {
 
     updateMapEvents() {
       try {
-        // Clear all event arrays
-        this.mapEvents = [];
-        this.enemies = [];
-        this.treasureBoxes = [];
-        this.regularEvents = [];
-
-        if (!$dataMap || !$dataMap.events) return;
-
-        // Single pass through events - classify each one
-        for (let i = 1; i < $dataMap.events.length; i++) {
-          const event = $dataMap.events[i];
-          if (!event || event.x === undefined || event.y === undefined)
-            continue;
-
-          // Add to main events list
-          this.mapEvents.push(event);
-
-          // Get corresponding game event for dynamic data
-          const gameEvent = $gameMap._events[i];
-
-          // Check if it's an enemy first
-          if (gameEvent && this.isEnemyEvent(gameEvent)) {
-            this.enemies.push({
-              id: gameEvent._eventId || i,
-              x: gameEvent._x !== undefined ? gameEvent._x : event.x,
-              y: gameEvent._y !== undefined ? gameEvent._y : event.y,
-              direction: gameEvent._direction || 2,
-              moving: gameEvent._moveType > 0,
-              characterName: gameEvent._characterName || "",
-              characterIndex: gameEvent._characterIndex || 0,
-            });
-          }
-          // If not enemy, check if it's a treasure
-          else if (this.isTreasureEvent(event)) {
-            this.treasureBoxes.push({
-              x: event.x,
-              y: event.y,
-              id: event.id,
-              name: event.name,
-            });
-          }
-          // If neither enemy nor treasure, add to regular events
-          else {
-            this.regularEvents.push(event);
-          }
-        }
-
-        console.log(
-          `Events processed: ${this.enemies.length} enemies, ${this.treasureBoxes.length} treasures, ${this.regularEvents.length} regular events`,
+        const rows = readMapMarkers(getGameWindow());
+        this.mapEvents = rows;
+        this.enemies = rows.filter((row) => row.kind === "enemy");
+        this.treasureBoxes = rows.filter((row) => row.kind === "treasure");
+        this.regularEvents = rows.filter(
+          (row) => row.kind === "npc" || row.kind === "event",
         );
       } catch (error) {
         console.warn("Could not get map events:", error);
       }
     },
 
-    isEnemyEvent(event) {
-      try {
-        const hasMovement = event._moveType > 0; // 1=random, 2=approach, 3=custom
-        const hasCharacterGraphic =
-          event._characterName && event._characterName !== "";
-        const notPlayer = event._eventId !== $gamePlayer._eventId;
-
-        // Moving characters are likely enemies
-        if (hasMovement && notPlayer) {
-          return true;
-        }
-
-        if (!hasCharacterGraphic) {
-          return false;
-        }
-
-        // Look for enemy-related patterns in event pages
-        if (event._pages) {
-          for (const page of event._pages) {
-            if (page && page.list) {
-              for (const command of page.list) {
-                // Check for battle processing command (code 301)
-                if (command.code === 301) return true;
-                // Check for common enemy event patterns
-                if (command.code === 108 || command.code === 408) {
-                  const comment = command.parameters[0] || "";
-
-                  // Use pre-compiled regex for efficient multi-language enemy pattern matching
-                  if (this.enemyCommentPattern.test(comment)) {
-                    return true;
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        // Check character filename patterns using pre-compiled regex
-        if (this.enemyImageNamePattern.test(event._characterName)) {
-          return true;
-        }
-
-        return false;
-      } catch (error) {
-        return false;
-      }
-    },
-
-    isTreasureEvent(event) {
-      try {
-        // Check if event name contains treasure-related keywords using pre-compiled regex
-        if (event.name && this.treasureNamePattern.test(event.name)) {
-          return true;
-        }
-
-        // Check if event has treasure-like graphics using pre-compiled regex
-        if (
-          event._characterName &&
-          this.treasureImageNamePattern.test(event._characterName)
-        ) {
-          return true;
-        }
-
-        // Check event pages for treasure-related commands
-        if (event.pages) {
-          for (const page of event.pages) {
-            if (!page) continue;
-            if (
-              page.image &&
-              page.image.characterName &&
-              this.treasureImageNamePattern.test(page.image.characterName)
-            ) {
-              return true;
-            }
-            if (page && page.list) {
-              for (const command of page.list) {
-                if (command && command.parameters) {
-                  // Check for item/gold gain commands
-                  if (
-                    command.code === 125 || // Change Gold
-                    command.code === 126 || // Change Items
-                    command.code === 127 || // Change Weapons
-                    command.code === 128
-                  ) {
-                    // Change Armors
-                    return true;
-                  }
-
-                  // Check for treasure-related text in messages using pre-compiled regex
-                  if (command.code === 101 || command.code === 401) {
-                    // Show Text
-                    const text = command.parameters[0] || "";
-
-                    // Use pre-compiled regex for efficient multi-language treasure pattern matching
-                    if (this.treasureTextPattern.test(text)) {
-                      return true;
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        return false;
-      } catch (error) {
-        return false;
-      }
-    },
-
     updateEnemyPositions() {
-      try {
-        // Only update positions of existing enemies, don't reclassify
-        this.enemies.forEach((enemy) => {
-          const gameEvent = $gameMap._events[enemy.id];
-          if (gameEvent) {
-            enemy.x = gameEvent._x;
-            enemy.y = gameEvent._y;
-            enemy.direction = gameEvent._direction || 2;
-            enemy.moving = gameEvent._moveType > 0;
-          }
-        });
-      } catch (error) {
-        console.warn("Could not update enemy positions:", error);
-      }
+      // Refresh active pages too: looted chests and changing NPCs must not stay stale.
+      this.updateMapEvents();
     },
 
     checkForMapChange() {
@@ -754,7 +623,10 @@ export default {
         const currentMapId = $gameMap.mapId();
 
         // If map has changed, update all map-related data
-        if (currentMapId !== this.lastKnownMapId) {
+        if (
+          currentMapId !== this.lastKnownMapId ||
+          this._sourceMap !== $dataMap
+        ) {
           console.log(
             `Map changed from ${this.lastKnownMapId} to ${currentMapId}`,
           );
@@ -772,57 +644,125 @@ export default {
       }
     },
 
+    viewport() {
+      return mapViewport(
+        this.mapData.width,
+        this.mapData.height,
+        this.playerPosition.x,
+        this.playerPosition.y,
+        this.limitedView,
+        this.maxViewSize,
+      );
+    },
+
+    refreshArtwork() {
+      clearMinimapCache();
+      this.renderMap();
+    },
+
     renderMap() {
       if (!this.mapData || !this.$refs.mapCanvas) return;
 
-      // Performance optimization: check if state has changed since last render
-      const currentState = `${this.currentMapId}-${this.playerPosition.x}-${this.playerPosition.y}-${this.cellSize}-${this.limitedView}-${this.enemies.length}-${this.treasureBoxes.length}`;
-      if (this.lastRenderState === currentState) return;
-      this.lastRenderState = currentState;
-
       const canvas = this.$refs.mapCanvas;
       const ctx = canvas.getContext("2d");
+      if (!ctx) return;
 
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const layers = readMapLayers();
+      this._layers = layers;
+      this._characters = layers.sprites ? getMapCharacters() : null;
+      if (this._characters) this._characters.beginFrame();
 
-      // Calculate view bounds
-      let startX = 0,
-        startY = 0,
-        endX = this.mapData.width,
-        endY = this.mapData.height;
-
-      if (this.limitedView) {
-        // Center the view around the player
-        startX = Math.max(
+      const { startX, startY, endX, endY } = this.viewport();
+      const base =
+        layers.background && this.renderMode === "realistic"
+          ? renderBaseMap()
+          : null;
+      if (!layers.background) {
+        ctx.fillStyle = "#0a0a12";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      } else if (base) {
+        const scale = base.width / this.mapData.width;
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(
+          base,
+          startX * scale,
+          startY * scale,
+          (endX - startX) * scale,
+          (endY - startY) * scale,
           0,
-          this.playerPosition.x - Math.floor(this.maxViewSize / 2),
-        );
-        startY = Math.max(
           0,
-          this.playerPosition.y - Math.floor(this.maxViewSize / 2),
+          canvas.width,
+          canvas.height,
         );
-        endX = Math.min(this.mapData.width, startX + this.maxViewSize);
-        endY = Math.min(this.mapData.height, startY + this.maxViewSize);
-
-        // Adjust start positions if we hit the map boundaries
-        if (endX - startX < this.maxViewSize) {
-          startX = Math.max(0, endX - this.maxViewSize);
+      } else {
+        const key = [
+          this.currentMapId,
+          startX,
+          startY,
+          endX,
+          endY,
+          canvas.width,
+          canvas.height,
+        ].join(":");
+        // Cache expensive passability scans; marker redraws remain live.
+        if (
+          !this._radarCache ||
+          this._radarCache.key !== key ||
+          this._radarCache.map !== this._sourceMap ||
+          Date.now() - this._radarCache.time > 1000
+        ) {
+          const grid = document.createElement("canvas");
+          grid.width = canvas.width;
+          grid.height = canvas.height;
+          this.drawMapGrid(grid.getContext("2d"), startX, startY, endX, endY);
+          this._radarCache = {
+            key,
+            map: this._sourceMap,
+            time: Date.now(),
+            canvas: grid,
+          };
         }
-        if (endY - startY < this.maxViewSize) {
-          startY = Math.max(0, endY - this.maxViewSize);
-        }
+        ctx.drawImage(this._radarCache.canvas, 0, 0);
       }
+      if (this.renderMode === "realistic")
+        this.renderStatus = layers.background
+          ? getMinimapStatus().detail
+          : "Map background hidden";
 
-      this.drawMapGrid(ctx, startX, startY, endX, endY);
+      if (layers.grid)
+        drawLayerGrid(ctx, endX - startX, endY - startY, this.cellSize, 0, 0);
 
       this.drawMapEvents(ctx, startX, startY);
 
-      this.drawTreasureBoxes(ctx, startX, startY);
+      if (layers.treasures) this.drawTreasureBoxes(ctx, startX, startY);
 
-      this.drawEnemies(ctx, startX, startY);
+      if (layers.enemies) this.drawEnemies(ctx, startX, startY);
 
-      this.drawPlayer(ctx, startX, startY);
+      if (layers.player) this.drawPlayer(ctx, startX, startY);
+      if (layers.labels) {
+        ctx.font = "11px sans-serif";
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "bottom";
+        this.regularEvents
+          .concat(this.enemies, this.treasureBoxes)
+          .forEach((event) => {
+            if (
+              markerVisible(event, layers) &&
+              event.x >= startX &&
+              event.x < endX &&
+              event.y >= startY &&
+              event.y < endY
+            )
+              ctx.fillText(
+                event.name + " #" + event.id,
+                (event.x - startX + 0.5) * this.cellSize + 4,
+                (event.y - startY) * this.cellSize,
+              );
+          });
+      }
     },
 
     isTooLargeToDrawWalkableBoundaries(width, height) {
@@ -983,28 +923,26 @@ export default {
     drawMapEvents(ctx, startX, startY) {
       // Only draw regular events (excluding enemies and treasure boxes)
       this.regularEvents.forEach((event) => {
+        if (!markerVisible(event, this._layers || readMapLayers())) return;
         if (
           event.x >= startX &&
           event.x < startX + this.displayMapWidth &&
           event.y >= startY &&
           event.y < startY + this.displayMapHeight
         ) {
+          if (this.drawCharacter(ctx, event, startX, startY)) return;
           const canvasX = (event.x - startX) * this.cellSize;
           const canvasY = (event.y - startY) * this.cellSize;
 
           // Draw yellow background for event
           ctx.fillStyle = "#FFD700";
-          ctx.fillRect(canvasX, canvasY, this.cellSize, this.cellSize);
-
-          // Draw "EV" text
-          ctx.fillStyle = "#000000";
-          ctx.font = `${Math.max(8, this.cellSize - 4)}px Arial`;
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillText(
-            "EV",
-            canvasX + this.cellSize / 2,
-            canvasY + this.cellSize / 2,
+          const size =
+            this.cellSize * ((this._layers && this._layers.markerScale) || 1);
+          ctx.fillRect(
+            canvasX + (this.cellSize - size) / 2,
+            canvasY + (this.cellSize - size) / 2,
+            size,
+            size,
           );
         }
       });
@@ -1012,12 +950,14 @@ export default {
 
     drawEnemies(ctx, startX, startY) {
       this.enemies.forEach((enemy) => {
+        if (enemy.erased) return;
         if (
           enemy.x >= startX &&
           enemy.x < startX + this.displayMapWidth &&
           enemy.y >= startY &&
           enemy.y < startY + this.displayMapHeight
         ) {
+          if (this.drawCharacter(ctx, enemy, startX, startY)) return;
           const canvasX = (enemy.x - startX) * this.cellSize;
           const canvasY = (enemy.y - startY) * this.cellSize;
 
@@ -1027,7 +967,8 @@ export default {
           ctx.arc(
             canvasX + this.cellSize / 2,
             canvasY + this.cellSize / 2,
-            Math.max(3, this.cellSize / 3),
+            Math.max(3, this.cellSize / 3) *
+              ((this._layers && this._layers.markerScale) || 1),
             0,
             2 * Math.PI,
           );
@@ -1043,7 +984,9 @@ export default {
             // Draw a small triangle to indicate movement direction
             const centerX = canvasX + this.cellSize / 2;
             const centerY = canvasY + this.cellSize / 2;
-            const size = Math.max(2, this.cellSize / 6);
+            const size =
+              Math.max(2, this.cellSize / 6) *
+              ((this._layers && this._layers.markerScale) || 1);
 
             ctx.fillStyle = "#FFFFFF";
             ctx.beginPath();
@@ -1084,37 +1027,43 @@ export default {
 
     drawTreasureBoxes(ctx, startX, startY) {
       this.treasureBoxes.forEach((treasure) => {
+        if (treasure.erased) return;
         if (
           treasure.x >= startX &&
           treasure.x < startX + this.displayMapWidth &&
           treasure.y >= startY &&
           treasure.y < startY + this.displayMapHeight
         ) {
+          if (this.drawCharacter(ctx, treasure, startX, startY)) return;
           const canvasX = (treasure.x - startX) * this.cellSize;
           const canvasY = (treasure.y - startY) * this.cellSize;
 
           // Draw blue square for treasure box
           ctx.fillStyle = "#0066FF"; // Blue
           // fill the square
-          ctx.fillRect(canvasX, canvasY, this.cellSize, this.cellSize);
+          const size =
+            this.cellSize * ((this._layers && this._layers.markerScale) || 1);
+          const left = canvasX + (this.cellSize - size) / 2,
+            top = canvasY + (this.cellSize - size) / 2;
+          ctx.fillRect(left, top, size, size);
 
           // Add a small black outline for better visibility
           ctx.strokeStyle = "#000000";
           ctx.lineWidth = 1;
           ctx.strokeRect(
-            canvasX + this.cellSize / 8,
-            canvasY + this.cellSize / 8,
-            (this.cellSize * 3) / 4,
-            (this.cellSize * 3) / 4,
+            left + size / 8,
+            top + size / 8,
+            (size * 3) / 4,
+            (size * 3) / 4,
           );
 
           // Optional: Add a small highlight to make it look more like a chest
           ctx.fillStyle = "#66AAFF"; // Lighter blue for highlight
           ctx.fillRect(
-            canvasX + (this.cellSize * 3) / 8,
-            canvasY + this.cellSize / 4,
-            this.cellSize / 4,
-            this.cellSize / 4,
+            left + (size * 3) / 8,
+            top + size / 4,
+            size / 4,
+            size / 4,
           );
         }
       });
@@ -1137,7 +1086,8 @@ export default {
         ctx.arc(
           playerCanvasX + this.cellSize / 2,
           playerCanvasY + this.cellSize / 2,
-          Math.max(3, this.cellSize / 3),
+          Math.max(3, this.cellSize / 3) *
+            ((this._layers && this._layers.markerScale) || 1),
           0,
           2 * Math.PI,
         );
@@ -1153,52 +1103,10 @@ export default {
       )
         return;
 
-      // Get canvas bounds and click position with scaling accounts
-      const canvas = this.$refs.mapCanvas;
-      const rect = canvas.getBoundingClientRect();
-      const clickX = (event.clientX - rect.left) * (canvas.width / rect.width);
-      const clickY = (event.clientY - rect.top) * (canvas.height / rect.height);
-
-      // Calculate which grid cell was clicked
-      const cellX = Math.floor(clickX / this.cellSize);
-      const cellY = Math.floor(clickY / this.cellSize);
-
-      // Calculate actual map coordinates based on current view
-      let mapX, mapY;
-
-      if (this.limitedView) {
-        // For limited view, calculate offset from player position
-        const startX = Math.max(
-          0,
-          this.playerPosition.x - Math.floor(this.maxViewSize / 2),
-        );
-        const startY = Math.max(
-          0,
-          this.playerPosition.y - Math.floor(this.maxViewSize / 2),
-        );
-
-        // Adjust start positions if we hit map boundaries
-        const endX = Math.min(this.mapData.width, startX + this.maxViewSize);
-        const endY = Math.min(this.mapData.height, startY + this.maxViewSize);
-
-        if (endX - startX < this.maxViewSize) {
-          const adjustedStartX = Math.max(0, endX - this.maxViewSize);
-          mapX = adjustedStartX + cellX;
-        } else {
-          mapX = startX + cellX;
-        }
-
-        if (endY - startY < this.maxViewSize) {
-          const adjustedStartY = Math.max(0, endY - this.maxViewSize);
-          mapY = adjustedStartY + cellY;
-        } else {
-          mapY = startY + cellY;
-        }
-      } else {
-        // For full view, direct mapping
-        mapX = cellX;
-        mapY = cellY;
-      }
+      const tile = tileAtPointer(event, this.$refs.mapCanvas, this.viewport());
+      if (!tile) return;
+      const mapX = tile.x,
+        mapY = tile.y;
 
       // Validate coordinates are within map bounds
       if (

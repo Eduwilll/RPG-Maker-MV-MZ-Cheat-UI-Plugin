@@ -2,9 +2,11 @@ import {
   cloneHealthSettingItems,
   HEALTH_SETTING_TABLE_HEADERS,
 } from "../js/panels/health/HealthSettingTabState.js";
+import GameAsset from "../components/GameAsset.js";
 
 export default {
   name: "HealthSettingTab",
+  components: { GameAsset },
 
   template: `
 <div>
@@ -16,7 +18,7 @@ export default {
         :items="editingItems">
         <template
             v-slot:item.name="{ item }">
-            <span class="caption">{{item.name}}</span>
+            <game-asset v-if="item.actorId || item.enemyId" :kind="item.actorId ? 'actor' : 'enemy'" :record-id="item.actorId || item.enemyId" :label="item.name" :size="32"/><span class="caption">{{item.name}}</span>
         </template>
         <template
             v-slot:item.hp="{ item }">

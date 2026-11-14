@@ -10,6 +10,8 @@ import { GeneralCheat } from "../cheats/GeneralCheat.js";
 import { isDesktopRuntime } from "../runtime/RuntimeEnv.js";
 
 export const defaultShortcutSettings = {
+  openFeatureFinder: { shortcut: "ctrl p" },
+  openMessageLog: { shortcut: "ctrl h" },
   toggleCheatModal: {
     shortcut: "ctrl c",
   },
@@ -126,6 +128,20 @@ export function isInValueInRange(value, lowerBound, upperBound) {
 }
 
 export const shortcutConfig = {
+  openFeatureFinder: {
+    name: "Find a feature",
+    desc: "Search panels, settings and shortcuts",
+    enterAction() {
+      GeneralCheat.openFeatureFinder();
+    },
+  },
+  openMessageLog: {
+    name: "Open message log",
+    desc: "Read and search captured dialogue",
+    enterAction() {
+      GeneralCheat.openCheatModal("message-log-panel");
+    },
+  },
   toggleCheatModal: {
     name: "Toggle cheat window",
     desc: "Key mapping required",

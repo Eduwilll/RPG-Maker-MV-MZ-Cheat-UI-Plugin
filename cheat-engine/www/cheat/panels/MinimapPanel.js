@@ -5,6 +5,7 @@ import {
 import {
   readMinimapSettings,
   writeMinimapEnabled,
+  writeMinimapMoveMode,
   writeMinimapPosition,
   writeMinimapCustomX,
   writeMinimapCustomY,
@@ -17,14 +18,19 @@ import {
   MINIMAP_MODES,
 } from "../js/panels/minimap/MinimapPanelState.js";
 import { getMinimapStatus } from "../js/panels/minimap/MinimapRenderer.js";
+import MapLayers from "../components/MapLayers.js";
 
 export default {
   name: "MinimapPanel",
+  props: { embedded: Boolean },
+  components: { MapLayers },
 
   template: `
 <v-card flat class="ma-0 pa-0">
     <v-card-subtitle class="pa-1">Realistic Minimap</v-card-subtitle>
+    <map-layers v-if="!embedded"/>
     <v-row dense class="ma-0">
+        <v-col cols="12"><v-switch v-model="settings.moveMode" label="Move minimap (drag handle or arrow keys)" dense hide-details @change="onMoveModeChange"/><v-btn x-small text @click="resetPosition">Reset position</v-btn><div class="caption">Close the cheat overlay, move the minimap, then press Escape on its handle to finish. Normal mode is click-through.</div></v-col>
         <v-col cols="12">
             <v-switch
                 v-model="settings.enabled"
@@ -35,7 +41,7 @@ export default {
         <v-col cols="12">
             <v-switch
                 v-model="settings.showEvents"
-                label="Show event markers"
+                label="Show characters and event markers"
                 dense hide-details class="my-0"
                 @change="onShowEventsChange"></v-switch>
         </v-col>
@@ -113,7 +119,7 @@ export default {
             </v-slider>
         </v-col>
         <v-col cols="12">
-            <p class="caption grey--text mb-0">Follow centers the map on your character. Full fits the whole map. White dot is you, orange dots are events. Toggle anytime with Alt+N.</p>
+            <p class="caption grey--text mb-0">Follow centers the map on your character. Full fits the whole map. White is you; yellow NPCs/events, orange enemies, blue items/treasure. Toggle anytime with Alt+N.</p>
             <p class="caption mb-0">Status: {{ statusText }}</p>
         </v-col>
     </v-row>
@@ -148,12 +154,23 @@ export default {
   },
 
   methods: {
+    onMoveModeChange() {
+      writeMinimapMoveMode(this.settings.moveMode);
+    },
+    resetPosition() {
+      writeMinimapPosition("top-right");
+      writeMinimapCustomX(8);
+      writeMinimapCustomY(8);
+      writeMinimapMoveMode(false);
+      this.initializeVariables();
+    },
     initializeVariables() {
       this.settings = readMinimapSettings();
       this.refreshStatus();
     },
 
     refreshStatus() {
+      this.settings.moveMode = readMinimapSettings().moveMode;
       try {
         var status = getMinimapStatus();
         this.statusText =

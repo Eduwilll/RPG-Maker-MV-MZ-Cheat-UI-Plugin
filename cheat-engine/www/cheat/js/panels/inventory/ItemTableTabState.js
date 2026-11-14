@@ -17,6 +17,12 @@ export function readItemTableTabState(headers, items, asTableData) {
     text: "Amount",
     value: "amount",
   });
+  tableHeaders.push({
+    text: "",
+    value: "controls",
+    sortable: false,
+    width: 76,
+  });
 
   const tableItems = items
     .filter((item) => !!item)

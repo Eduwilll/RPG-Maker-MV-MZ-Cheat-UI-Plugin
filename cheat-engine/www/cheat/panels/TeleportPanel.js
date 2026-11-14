@@ -1,5 +1,6 @@
 import { TRANSLATE_SETTINGS } from "../js/TranslateHelper.js";
 import { Alert } from "../js/AlertHelper.js";
+import MapPreview from "../components/MapPreview.js";
 import {
   buildMapRows,
   matchesPanelSearch,
@@ -13,6 +14,7 @@ import {
 
 export default {
   name: "TeleportPanel",
+  components: { MapPreview },
 
   template: `
 <v-card flat class="ma-0 pa-0">
@@ -79,6 +81,7 @@ export default {
         <template
             v-slot:item.actions="{ item, index }">
             <div class="d-inline-flex">
+                <v-btn x-small text @click="previewMap = { id: item.id, name: item.name || item.fullPathJoin }">Preview</v-btn>
                 <v-tooltip
                     bottom>
                     <span>Teleport to X/Y</span>
@@ -135,11 +138,13 @@ export default {
             </v-btn>
         </template>
     </v-tooltip>
+    <v-dialog :value="!!previewMap" @input="previewMap = null" max-width="560"><v-card v-if="previewMap"><v-card-title class="subtitle-1">{{ previewMap.name }} #{{ previewMap.id }}</v-card-title><v-card-text><map-preview :map-id="previewMap.id" :x="Number(inputX)" :y="Number(inputY)"/></v-card-text><v-card-actions><v-btn text @click="previewMap = null">Close</v-btn><v-btn text @click="teleportLocation(previewMap.id, Number(inputX), Number(inputY)); previewMap = null">Teleport to X/Y</v-btn><v-btn text @click="teleportMapCenter(previewMap.id); previewMap = null">Teleport to Center</v-btn></v-card-actions></v-card></v-dialog>
 </v-card>
     `,
 
   data() {
     return {
+      previewMap: null,
       inputX: "0",
       inputY: "0",
 

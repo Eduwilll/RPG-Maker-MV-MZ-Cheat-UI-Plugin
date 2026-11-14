@@ -8,13 +8,19 @@ import {
 import {
   readGeneralGold,
   readGeneralPanelState,
+  isGeneralGameReady,
 } from "../js/panels/general/GeneralPanelState.js";
+import LockFavoriteControls from "../components/LockFavoriteControls.js";
 
 export default {
   name: "GeneralPanel",
+  components: { LockFavoriteControls },
 
   template: `
 <v-card class="ma-0 pa-0" flat style="position: relative;">
+    <v-alert v-if="!gameReady" dense text type="info" class="mb-1 mr-8 caption">
+        Start or load a game to use gameplay controls. Other cheat panels remain available.
+    </v-alert>
     <v-btn
         style="top: 8px; right: 8px;"
         color="pink"
@@ -34,7 +40,9 @@ export default {
         <v-row no-gutters align="center" justify="start">
             <v-col cols="auto">
                 <v-checkbox
+                    data-feature="no-clip"
                     v-model="noClip"
+                    :disabled="!gameReady"
                     label="No Clip"
                     hide-details
                     dense
@@ -43,6 +51,7 @@ export default {
             <v-col cols="auto" class="ml-3">
                 <v-checkbox
                     v-model="forceSave"
+                    :disabled="!gameReady"
                     label="Force Save"
                     hide-details
                     dense
@@ -50,7 +59,9 @@ export default {
             </v-col>
             <v-col cols="auto" class="ml-3">
                 <v-checkbox
+                    data-feature="mouse-controls"
                     v-model="mouseMove"
+                    :disabled="!gameReady"
                     label="Enable Mouse Controls"
                     hide-details
                     dense
@@ -58,7 +69,9 @@ export default {
             </v-col>
             <v-col cols="auto" class="ml-3">
                 <v-checkbox
+                    data-feature="mouse-teleport"
                     v-model="mouseTeleport"
+                    :disabled="!gameReady"
                     label="Mouse Tele"
                     hide-details
                     dense
@@ -69,7 +82,9 @@ export default {
 
     <v-card-text class="py-1">
         <v-text-field
+            data-feature="gold"
             v-model="gold"
+            :disabled="!gameReady"
             label="Gold"
             outlined
             dense
@@ -77,12 +92,15 @@ export default {
             @keydown.self.stop
             @change="onGoldChange"
             @focus="$event.target.select()" />
+        <lock-favorite-controls v-if="gameReady" :target="{kind:'gold'}" :value="Number(gold)" @change="initializeVariables"/>
     </v-card-text>
 
     <!-- Speed Section -->
     <v-card-text class="pt-3 pb-1">
         <v-slider
+            data-feature="move-speed"
             v-model="speed"
+            :disabled="!gameReady"
             :min="minSpeed"
             :max="maxSpeed"
             :step="stepSpeed"
@@ -101,6 +119,7 @@ export default {
         </v-slider>
         <v-checkbox
             v-model="fixSpeed"
+            :disabled="!gameReady"
             class="mt-1 pt-0"
             hide-details
             dense
@@ -108,7 +127,9 @@ export default {
             @change="onSpeedChange" />
 
         <v-slider
+            data-feature="game-speed"
             v-model="gameSpeed"
+            :disabled="!gameReady"
             :min="minGameSpeed"
             :max="maxGameSpeed"
             :step="stepGameSpeed"
@@ -132,6 +153,7 @@ export default {
             <v-col cols="auto">
                 <v-checkbox
                     v-model="applyAllForGameSpeed"
+                    :disabled="!gameReady"
                     class="pt-0"
                     hide-details
                     dense
@@ -141,6 +163,7 @@ export default {
             <v-col cols="auto" class="ml-3">
                 <v-checkbox
                     v-model="applyBattleForGameSpeed"
+                    :disabled="!gameReady"
                     class="pt-0"
                     hide-details
                     dense
@@ -168,6 +191,7 @@ export default {
                 small
                 class="ml-1"
                 title="Open RPG Maker Debug Menu (F9)"
+                :disabled="!gameReady"
                 @click="openDebugMenu">
                 Debug Menu
             </v-btn>
@@ -185,7 +209,7 @@ export default {
 
     <v-card-text class="pt-1 pb-3">
         <v-row no-gutters>
-            <v-btn small class="mr-1" @click="toggleSaveScene">Open Save</v-btn>
+            <v-btn small class="mr-1" :disabled="!gameReady" @click="toggleSaveScene">Open Save</v-btn>
             <v-btn small @click="toggleLoadScene">Open Load</v-btn>
         </v-row>
     </v-card-text>
@@ -194,6 +218,7 @@ export default {
 
   data() {
     return {
+      gameReady: false,
       godMode: false,
       noClip: false,
       gold: 0,
@@ -223,6 +248,9 @@ export default {
   },
 
   mounted() {
+    this._sessionCheck = setInterval(() => {
+      if (isGeneralGameReady() !== this.gameReady) this.initializeVariables();
+    }, 500);
     window.addEventListener(
       "cheat-move-speed-change",
       this.initializeVariables,
@@ -234,6 +262,7 @@ export default {
   },
 
   beforeDestroy() {
+    clearInterval(this._sessionCheck);
     window.removeEventListener(
       "cheat-move-speed-change",
       this.initializeVariables,
@@ -248,6 +277,7 @@ export default {
     initializeVariables() {
       const state = readGeneralPanelState();
 
+      this.gameReady = state.gameReady;
       this.noClip = state.noClip;
       this.speed = state.moveSpeed;
       this.fixSpeed = state.fixSpeed;
@@ -262,14 +292,22 @@ export default {
       this.applyBattleForGameSpeed = state.applyBattleForGameSpeed;
     },
 
+    runGameMutation(mutate) {
+      if (!isGeneralGameReady()) {
+        this.initializeVariables();
+        return;
+      }
+      return runPanelMutation(this, mutate);
+    },
+
     onNoClipChange() {
-      runPanelMutation(this, () => {
+      this.runGameMutation(() => {
         GeneralCheat.toggleNoClip();
       });
     },
 
     onSpeedChange() {
-      runPanelMutation(this, () => {
+      this.runGameMutation(() => {
         SpeedCheat.setSpeed(this.speed, this.fixSpeed);
         SpeedCheat.__writeSettings(this.speed, this.fixSpeed);
       });
@@ -284,6 +322,10 @@ export default {
     },
 
     onGoldChange() {
+      if (!isGeneralGameReady()) {
+        this.initializeVariables();
+        return;
+      }
       this.gold = coercePanelNumber(this.gold, {
         fallback: readGeneralGold(),
         integer: true,
@@ -309,7 +351,7 @@ export default {
     },
 
     toggleSaveScene() {
-      SceneCheat.toggleSaveScene();
+      this.runGameMutation(() => SceneCheat.toggleSaveScene());
     },
 
     toggleLoadScene() {
@@ -324,7 +366,7 @@ export default {
         sceneOption = GameSpeedCheat.sceneOptions().battle;
       }
 
-      runPanelMutation(this, () => {
+      this.runGameMutation(() => {
         GameSpeedCheat.setGameSpeed(this.gameSpeed, sceneOption);
         GameSpeedCheat.__writeSettings(this.gameSpeed, sceneOption);
       });
@@ -370,7 +412,7 @@ export default {
     },
 
     onForceSaveChange() {
-      runPanelMutation(this, () => {
+      this.runGameMutation(() => {
         GeneralCheat.forceEnableSave(this.forceSave);
       });
     },
@@ -380,21 +422,21 @@ export default {
     },
 
     onMouseTeleportChange() {
-      runPanelMutation(this, () => {
+      this.runGameMutation(() => {
         GeneralCheat.toggleMouseTeleport(this.mouseTeleport);
         this.mouseMove = GeneralCheat.isMouseMoveEnabled();
       });
     },
 
     onMouseMoveChange() {
-      runPanelMutation(this, () => {
+      this.runGameMutation(() => {
         GeneralCheat.toggleMouseMove(this.mouseMove);
         this.mouseTeleport = GeneralCheat.isMouseTeleportEnabled();
       });
     },
 
     openDebugMenu() {
-      GeneralCheat.openDebugMenu();
+      this.runGameMutation(() => GeneralCheat.openDebugMenu());
     },
 
     openCheatWindow() {

@@ -10,9 +10,12 @@ import {
   getTranslatedPanelText,
 } from "../js/panels/PanelTranslation.js";
 import { addWatcherTarget } from "../js/panels/watcher/WatcherPanelState.js";
+import LockFavoriteControls from "../components/LockFavoriteControls.js";
+import { sortWithFavorites } from "../js/panels/locks/LockPanelState.js";
 
 export default {
   name: "SwitchSettingPanel",
+  components: { LockFavoriteControls },
 
   template: `
 <v-card flat class="ma-0 pa-0">
@@ -23,6 +26,7 @@ export default {
         :items="filteredTableItems"
         :search="search"
         :custom-filter="tableItemFilter"
+        :custom-sort="sortRows"
         :items-per-page="10">
         <template v-slot:top>
             <v-text-field
@@ -71,6 +75,10 @@ export default {
             </v-switch>
         </template>
         <template
+            v-slot:item.controls="{ item }">
+            <lock-favorite-controls :target="{kind:'switch',id:item.id}" :value="item.value" @change="initializeVariables"/>
+        </template>
+        <template
             v-slot:item.watch="{ item }">
             <v-btn
                 x-small
@@ -113,6 +121,7 @@ export default {
       switchNames: [],
 
       tableHeaders: [
+        { text: "", value: "controls", sortable: false, width: 76 },
         {
           text: "Name",
           value: "name",
@@ -171,6 +180,12 @@ export default {
   },
 
   methods: {
+    sortRows(items, sortBy, sortDesc) {
+      return sortWithFavorites(items, sortBy, sortDesc, (row) => ({
+        kind: "switch",
+        id: row.id,
+      }));
+    },
     async initializeVariables() {
       if (
         typeof $dataSystem === "undefined" ||

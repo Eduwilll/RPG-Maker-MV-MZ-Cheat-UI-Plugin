@@ -124,7 +124,15 @@ docker-compose up -d
 - **Translation Idea**: [sieucapoccho3717](https://github.com/sieucapoccho3717/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 - **Maintained & Enhanced by**: [Eduwilll](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 
-Latest Release: v1.7.1
+Latest Release: v1.8.0
+
+### v1.8.0 주요 변경 사항
+- **기능 검색**: `Ctrl+P`로 패널, 설정 및 단축키를 검색합니다.
+- **데이터 편집**: 적, 스킬, 클래스와 파티 멤버를 편집하고 상세 툴팁을 확인합니다.
+- **잠금 및 즐겨찾기**: 지원되는 값을 고정하고 자주 사용하는 행을 상단에 표시합니다.
+- **대화 기록**: `Ctrl+H`로 초상화와 선택한 응답을 확인합니다. 기본 16px 크기, 사용자 지정 크기 및 게임/플러그인 글꼴 선택을 지원합니다.
+- **맵 / 미니맵**: 실제 NPC 스프라이트, 그림자와 레이어 표시 설정, 목적지 미리보기 및 이동 가능한 미니맵을 지원합니다.
+- **개발 미리보기**: 게임 없이 MV/MZ UI를 확인하고 파일 저장 시 자동으로 새로 고칩니다.
 
 ---
 
