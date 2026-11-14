@@ -1,6 +1,7 @@
 .idea/
 .vscode/
 .agents/
+.planning/
 .opencode/
 venv/
 .venv/
