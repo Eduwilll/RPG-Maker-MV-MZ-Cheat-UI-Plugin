@@ -1,6 +1,7 @@
 // @ts-check
 
 import { Alert } from "../AlertHelper.js";
+import { Key } from "./KeyCodes.js";
 import { ShortcutMap } from "./ShortcutHelper.js";
 import { migrateShortcutSettings } from "./ShortcutMigration.js";
 import { ShortcutStorage } from "./ShortcutStorage.js";
@@ -180,6 +181,8 @@ class GlobalShortcut {
   }
 
   setShortcut(shortcutId, newKey) {
+    // Editors in the pop-out create Keys in another JavaScript realm.
+    newKey = Key.fromKey(newKey);
     const prevKey = this.getShortcut(shortcutId);
     if (prevKey.equals(newKey)) {
       return;
@@ -225,4 +228,11 @@ class GlobalShortcut {
   }
 }
 
-export const GLOBAL_SHORTCUT = new GlobalShortcut();
+const shortcutWindow =
+  typeof window !== "undefined" ? /** @type {any} */ (window) : null;
+export const GLOBAL_SHORTCUT =
+  (shortcutWindow &&
+    shortcutWindow.__cheatOpener &&
+    shortcutWindow.__cheatOpener.__cheatShortcutManager) ||
+  new GlobalShortcut();
+if (shortcutWindow) shortcutWindow.__cheatShortcutManager = GLOBAL_SHORTCUT;

@@ -27,6 +27,8 @@ import { Alert } from "../AlertHelper.js";
  */
 
 export class GeneralCheat {
+  static openFeatureFinder() {}
+
   static toggleCheatModal(componentName = null) {}
 
   static openCheatModal(componentName = null) {}

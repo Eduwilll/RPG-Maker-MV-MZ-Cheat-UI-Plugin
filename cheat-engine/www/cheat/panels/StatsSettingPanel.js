@@ -1,4 +1,7 @@
 import { GeneralCheat } from "../js/cheats/GeneralCheat.js";
+import GameAsset from "../components/GameAsset.js";
+import PartyRecruitment from "../components/PartyRecruitment.js";
+import { requestActorNavigation } from "../js/ui/RecordNavigation.js";
 import {
   coercePanelNumber,
   findPartyActorById,
@@ -11,48 +14,53 @@ import {
 
 export default {
   name: "StatsSettingPanel",
+  components: { GameAsset, PartyRecruitment },
 
   template: `
 <v-card flat class="ma-0 pa-0">
-    <v-tabs
-        v-model="selectedTab"
-        dark
-        background-color="grey darken-3"
-        show-arrows>
-        <v-tab
-            v-for="(actor, actorIdx) in actors"
-            :key="actor.id">
-            <div
-                v-if="editingNameActorId !== actor.id"
-                class="d-flex align-center">
-                <span>{{actor.name}}</span>
-                <v-icon
-                    x-small
-                    class="ml-2"
-                    title="Edit name"
-                    @click.stop.prevent="startNameEdit(actor, actorIdx)">
-                    mdi-pencil
-                </v-icon>
-            </div>
-            <v-text-field
-                v-else
-                ref="nameEditField"
-                v-model="nameEditDraft"
-                class="stats-actor-name-field"
-                solo
-                dense
-                flat
-                hide-details
-                single-line
-                @click.stop
-                @mousedown.stop
-                @keydown.stop
-                @keyup.enter.stop="finishNameEdit(actor)"
-                @keyup.esc.stop="cancelNameEdit"
-                @blur="finishNameEdit(actor)">
-            </v-text-field>
-        </v-tab>
-    </v-tabs>
+    <div class="stats-actor-tabs">
+        <v-tabs
+            v-model="selectedTab"
+            class="stats-actor-tabs__strip"
+            dark
+            background-color="grey darken-3"
+            show-arrows>
+            <v-tab
+                v-for="(actor, actorIdx) in actors"
+                :key="actor.id">
+                <div
+                    v-if="editingNameActorId !== actor.id"
+                    class="d-flex align-center">
+                    <game-asset kind="actor" :record-id="actor.id" :label="actor.name" :size="32" class="mr-1"/><span>{{actor.name}}</span>
+                    <v-icon
+                        x-small
+                        class="ml-2"
+                        title="Edit name"
+                        @click.stop.prevent="startNameEdit(actor, actorIdx)">
+                        mdi-pencil
+                    </v-icon>
+                </div>
+                <v-text-field
+                    v-else
+                    ref="nameEditField"
+                    v-model="nameEditDraft"
+                    class="stats-actor-name-field"
+                    solo
+                    dense
+                    flat
+                    hide-details
+                    single-line
+                    @click.stop
+                    @mousedown.stop
+                    @keydown.stop
+                    @keyup.enter.stop="finishNameEdit(actor)"
+                    @keyup.esc.stop="cancelNameEdit"
+                    @blur="finishNameEdit(actor)">
+                </v-text-field>
+            </v-tab>
+        </v-tabs>
+        <party-recruitment @change="onPartyRecruitmentChange"/>
+    </div>
     <v-tabs-items
         dark
         v-model="selectedTab">
@@ -64,6 +72,7 @@ export default {
                 class="ma-0">
                 <v-card-actions
                     class="pa-0">
+                    <v-btn x-small text @click="manageActor(actor.id)">Party / Skills / Status</v-btn>
                     <v-checkbox
                         v-model="actor.godMode"
                         label="God Mode"
@@ -152,6 +161,18 @@ export default {
   },
 
   methods: {
+    onPartyRecruitmentChange(actorId) {
+      this.cancelNameEdit();
+      this.initializeVariables();
+      // Wait for Vuetify to register the refreshed tabs, including the first one.
+      this.$nextTick(() => {
+        const index = this.actors.findIndex((actor) => actor.id === actorId);
+        if (index >= 0) this.selectedTab = index;
+      });
+    },
+    manageActor(id) {
+      requestActorNavigation(id);
+    },
     initializeVariables() {
       const state = readStatsSettingPanelState();
       this.paramNames = state.paramNames;

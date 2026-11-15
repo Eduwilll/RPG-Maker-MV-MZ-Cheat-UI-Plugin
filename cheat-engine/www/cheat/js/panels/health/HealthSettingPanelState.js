@@ -11,6 +11,8 @@ function buildHealthMemberRow(member, id) {
 
   return {
     id,
+    actorId: typeof rawMember.actorId === "function" ? rawMember.actorId() : 0,
+    enemyId: typeof rawMember.enemyId === "function" ? rawMember.enemyId() : 0,
     name: member.name(),
     hp: { hp: rawMember.hp, mhp: rawMember.mhp },
     mp: { mp: rawMember.mp, mmp: rawMember.mmp },

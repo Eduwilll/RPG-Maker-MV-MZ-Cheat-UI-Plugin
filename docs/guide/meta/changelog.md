@@ -1,6 +1,43 @@
 # Changelog
 
-## v1.7.1 - Latest
+## v1.9.0 - Latest
+
+### Interface Refresh
+- [Feat] **Compact Shell**: Grouped navigation, a single top bar with sidebar toggle and Find, consistent panel controls, tighter item filters, compact Teleport X/Y fields and a portrait-based party recruitment menu.
+- [Feat] **Current And Legacy Themes**: Keep the new slate design or choose the older charcoal Material colors. Both support dark/light mode and saved accents; the Default swatch restores the released blue.
+- [Tweak] **Readable Controls**: Overlay opacity defaults to 90%, Game Options toggles use less space, and Feature Finder adds result counts, type labels and keyboard hints.
+
+### Interactive Map
+- [Feat] **One Shared Map**: Full map and floating minimap share drag-to-pan, wheel/button zoom, Follow, Fit, event search and on-map settings for layers, sprites, shadows, labels, placement, size and opacity.
+- [Feat] **Live Markers**: Directional animated player arrow, distinct category pins and live game sprites use frame-based updates with cached settings, artwork and event classification. Reduced-motion preferences stop the arrow pulse.
+- [Fix] **Safe Selection**: Clicking inspects a location; Teleport is explicit. Dragging never teleports, stale search results are rejected after transfers, and compact Follow no longer compounds zoom. Separate-window behavior is preserved.
+
+### Installer And Release Quality
+- [Feat] **Simpler Installer**: Compact guided setup with automatic package detection, optional advanced controls, clear completion/progress, tooltips, maintenance actions and accessible activity logs.
+- [Fix] **Save Editor Layout**: Scrollable structured fields and a roomier editor prevent actor parameters and inventory controls from being clipped; unsupported saves retain Raw JSON editing and backup-before-write behavior.
+- [Dev] **Release Checks**: Runtime/type/MV checks gate package builds; Windows browser and installer tests gate publication. Release notes come from the matching changelog, and tag/package versions must agree.
+
+---
+
+## v1.8.0
+
+### Features
+- [Feat] **Feature Finder**: Find panels, settings and shortcuts with `Ctrl+P`.
+- [Feat] **Database Editors**: Edit enemies, skills and classes with save-specific overrides; manage party members, skills and states directly from the UI.
+- [Feat] **Encounter Roots**: Browse multipart enemies as complete authored encounters, start confirmed battles or matching map events, and summon supported enemies during battle.
+- [Feat] **Locks & Favorites**: Lock supported values and pin frequently used rows; inspect the active locks in one panel.
+- [Feat] **Message Log**: Search captured dialogue with `Ctrl+H`, including speaker portraits and only the chosen player responses. Game fonts remain the default, with readable 16px text, custom sizing and a plugin-font fallback.
+- [Feat] **Map / Minimap**: Combined map controls, live NPC sprites, destination previews, movable minimap, and saved toggles for shadows, upper tiles, marker categories, labels and grid.
+- [Feat] **Game-Native Details**: Item icons, actor portraits, detailed tooltips, resizable overlay, and game-specific options with portable settings.
+
+### Compatibility And Developer Tools
+- [Fix] **MV/MZ Plugin Compatibility**: Keep game data and bitmaps outside Vue observation, preserve game-realm actions in separate windows, and improve Yanfly/FOSSIL-style dialogue and composite artwork handling.
+- [Dev] **Standalone UI Preview**: Updated MV/MZ demo data, scene/panel selectors, live reload and a localhost-only Python launcher; no game required for UI development.
+- [Docs] **Public Documentation**: Updated feature/development guides and moved internal agent plans outside the VitePress website.
+
+---
+
+## v1.7.1
 
 ### FOSSIL Support & Stability Fixes
 - [Feat] **FOSSIL Game Support**: Games using the FOSSIL plugin boot from `FOSSILindex.html` instead of `js/main.js`, which silently bypassed the cheat. The installer now patches `index.html` (inherited automatically when FOSSIL regenerates its file) and any existing `FOSSILindex.html`; manual installs add one `<script>` tag to both files. See the install and troubleshooting guides.

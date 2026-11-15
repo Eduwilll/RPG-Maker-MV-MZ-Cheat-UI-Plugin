@@ -4,6 +4,8 @@
 import { MessageCheat } from "../js/cheats/SpeedCheat.js";
 import { IN_GAME_TRANSLATOR } from "../js/translation/in-game/InGameTranslator.js";
 import { isMvProject } from "../js/runtime/RuntimeEnv.js";
+import { initializeFeatureRuntime } from "../js/runtime/FeatureRuntime.js";
+import { GLOBAL_SHORTCUT } from "../js/shortcuts/GlobalShortcut.js";
 
 /**
  * Apply runtime patches needed for the overlay to coexist with RPG Maker.
@@ -77,4 +79,23 @@ export function customizeRPGMakerFunctions(mainComponent) {
 
   MessageCheat.initialize();
   IN_GAME_TRANSLATOR.initialize();
+  initializeFeatureRuntime(window, {
+    shortcuts: {
+      read() {
+        const bindings = {};
+        for (const id of Object.keys(GLOBAL_SHORTCUT.shortcutSettings)) {
+          bindings[id] = GLOBAL_SHORTCUT.getShortcut(id).asString();
+        }
+        return bindings;
+      },
+      write(bindings) {
+        const raw = GLOBAL_SHORTCUT.readRawShortcutSettings();
+        for (const id of Object.keys(bindings)) {
+          if (raw[id]) raw[id].shortcut = bindings[id];
+        }
+        GLOBAL_SHORTCUT.writeRawShortcutSettings(raw);
+        GLOBAL_SHORTCUT.initialize();
+      },
+    },
+  });
 }

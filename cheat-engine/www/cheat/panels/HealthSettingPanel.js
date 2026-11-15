@@ -23,6 +23,7 @@ export default {
     <v-card-subtitle class="caption pb-0">Battle</v-card-subtitle>
     <v-card-text class="pt-0 pb-0">
         <v-checkbox
+            data-feature="random-encounters"
             v-model="disableRandomEncounter"
             hide-details
             dense
@@ -34,6 +35,7 @@ export default {
             </template>
         </v-checkbox>
         <v-checkbox
+            data-feature="one-hit-kill"
             v-model="oneHitKill"
             hide-details
             dense

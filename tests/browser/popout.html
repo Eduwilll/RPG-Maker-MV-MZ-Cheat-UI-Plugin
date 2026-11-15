@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Pop-out Smoke Fixture</title>
+  </head>
+  <body>
+    <div id="status-overlay">
+      <span id="status-text">Initializing...</span>
+      <div id="error-display"></div>
+    </div>
+    <div id="app" style="display:none;">
+      <v-app
+        ><v-main
+          ><cheat-modal
+            v-model="activeComponentName"
+            is-window
+          ></cheat-modal></v-main
+        ><alert-snackbar></alert-snackbar><confirm-dialog></confirm-dialog
+      ></v-app>
+    </div>
+    <script>
+      window.__cheatOpener=parent;window.__smokeErrors=[];
+    </script>
+    <script src="/cheat-engine/www/cheat/libs/vue.js"></script>
+    <script src="/cheat-engine/www/cheat/libs/vuetify.js"></script>
+    <script>
+      Vue.config.productionTip=false;Vue.config.devtools=false;Vue.config.errorHandler=function(error){window.__smokeErrors.push(error.message);};Vue.config.warnHandler=function(message){window.__smokeErrors.push(message);};
+    </script>
+    <script
+      type="module"
+      src="/cheat-engine/www/cheat/js/window-init.js"
+    ></script>
+  </body>
+</html>

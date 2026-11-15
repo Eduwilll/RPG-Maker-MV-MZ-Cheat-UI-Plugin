@@ -15,9 +15,12 @@ import {
   addWatcherTarget,
   coerceVariableValue,
 } from "../js/panels/watcher/WatcherPanelState.js";
+import LockFavoriteControls from "../components/LockFavoriteControls.js";
+import { sortWithFavorites } from "../js/panels/locks/LockPanelState.js";
 
 export default {
   name: "VariableSettingPanel",
+  components: { LockFavoriteControls },
 
   template: `
 <v-card flat class="ma-0 pa-0">
@@ -28,18 +31,37 @@ export default {
         :items="filteredTableItems"
         :search="search"
         :custom-filter="tableItemFilter"
+        :custom-sort="sortRows"
         :items-per-page="10">
         <template v-slot:top>
-            <v-text-field
-                label="Search..."
-                solo
-                background-color="grey darken-3"
-                v-model="search"
-                dense
-                hide-details
-                @keydown.self.stop
-                @focus="$event.target.select()">
-            </v-text-field>
+            <div class="cheat-table-top">
+                <v-text-field
+                    label="Search..."
+                    solo
+                    background-color="grey darken-3"
+                    v-model="search"
+                    dense
+                    hide-details
+                    @keydown.self.stop
+                    @focus="$event.target.select()">
+                </v-text-field>
+                <v-tooltip bottom>
+                    <span>Reload variables and translations</span>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                            small
+                            text
+                            class="cheat-table-top__action"
+                            aria-label="Reload variables and translations"
+                            v-bind="attrs"
+                            v-on="on"
+                            @click="manualRefresh">
+                            <v-icon small left>mdi-refresh</v-icon>
+                            Reload
+                        </v-btn>
+                    </template>
+                </v-tooltip>
+            </div>
             <v-row
                 class="ma-0 pa-0">
                 <v-col
@@ -85,6 +107,10 @@ export default {
             </v-text-field>
         </template>
         <template
+            v-slot:item.controls="{ item }">
+            <lock-favorite-controls :target="{kind:'variable',id:item.id}" :value="item.value" @change="initializeVariables"/>
+        </template>
+        <template
             v-slot:item.watch="{ item }">
             <v-btn
                 x-small
@@ -95,27 +121,6 @@ export default {
             </v-btn>
         </template>
     </v-data-table>
-    
-    <v-tooltip
-        bottom>
-        <span>Reload variables and translations</span>
-        <template v-slot:activator="{ on, attrs }">
-            <v-btn
-                style="top: 0px; right: 0px;"
-                color="pink"
-                dark
-                small
-                absolute
-                top
-                right
-                fab
-                v-bind="attrs"
-                v-on="on"
-                @click="manualRefresh">
-                <v-icon>mdi-refresh</v-icon>
-            </v-btn>
-        </template>
-    </v-tooltip>
 </v-card>
     `,
 
@@ -138,6 +143,7 @@ export default {
       isInitialized: false,
 
       tableHeaders: [
+        { text: "", value: "controls", sortable: false, width: 76 },
         {
           text: "Name",
           value: "displayName",
@@ -181,6 +187,12 @@ export default {
   },
 
   methods: {
+    sortRows(items, sortBy, sortDesc) {
+      return sortWithFavorites(items, sortBy, sortDesc, (row) => ({
+        kind: "variable",
+        id: row.id,
+      }));
+    },
     async initializeVariables() {
       try {
         console.log("Initializing variables...");

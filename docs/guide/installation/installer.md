@@ -2,6 +2,10 @@
 
 The installer is a helper for users who do not want to manually copy the `cheat/` and `js/` folders into an RPG Maker game.
 
+::: tip Download
+Grab `RPGMakerCheatInstaller-v*-windows.zip` from the [Releases page](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases), extract it, and run the EXE — no repository clone needed. The rest of this page covers running it from source and the command line.
+:::
+
 It can:
 
 - detect RPG Maker MV or MZ automatically
@@ -12,7 +16,7 @@ It can:
 - restore any selected backup
 - uninstall by restoring the original-game backup, or by removing cheat files if no original backup exists
 - optionally remove old `cheat-settings`
-- show install and restore progress in a simple GUI
+- show progress, persistent completion messages and actionable errors in a guided GUI
 
 ::: warning
 Back up the game folder before installing. The installer also creates its own backup, but a full game backup is still the safest fallback.
@@ -24,24 +28,46 @@ Back up the game folder before installing. The installer also creates its own ba
 py -3 tools\installer\gui.py
 ```
 
-The GUI provides:
+### Install in Three Steps
 
-- Browse button for the game folder
-- optional release archive picker
-- optional version override
-- clean settings toggle
-- install button
-- restore old plugin button that reveals the backup list
-- uninstall cheat button
-- status and log panels
+1. **Choose your game.** Use **Browse...**, paste the game folder, or paste the path to `Game.exe`. The installer automatically checks the selection and detects MV or MZ. `Ctrl+O` opens the folder picker; **Check** checks the current selection again.
+2. **Review the result.** Check the game title, engine, installed version and detected release version. The installer finds the matching package beside the EXE. Keep both `.tar.gz` packages from the installer ZIP in that folder.
+3. **Close the game and install.** Choose **Install plugin** or **Update / reinstall**, then confirm. Wait for **You're ready to play.** You can then open the game normally.
 
-The GUI shows a completion popup after install, restore, or uninstall. The log remains available for troubleshooting.
-The backup list is hidden during normal install flow and only appears for manual rollback/uninstall workflows.
+The main action stays at the bottom of the window while the content scrolls. File operations run one at a time, with a progress indicator and current phase. The installer prevents closing through its Close button while an operation is running. Completion and errors remain on screen, not only in a popup or log.
+
+The default view is compact. Extra explanations are behind **Help** buttons: hover, focus, click or press `F1` to read them, and press `Esc` to dismiss them. Errors and important confirmations remain visible without opening help.
+
+### Advanced Options
+
+**Show advanced options** reveals an optional release package picker, displayed-version override and **Reset cheat preferences**.
+
+Reset is **off by default**. It removes `cheat-settings`, including plugin preferences and translation cache, but not game saves. The confirmation explains when reset is enabled. A manually selected invalid package is reported rather than silently replaced with another source.
+
+When run from a repository checkout, local source files remain a developer fallback if no matching archive is found. The packaged EXE needs the release packages; it does not use repository source files.
+
+### Manage an Installation
+
+Choose **Manage** in the sidebar to see original-file recovery information and dated backups. **Restore selected backup** uses the selected backup; **Uninstall plugin...** uses the original-game backup when available, regardless of the dropdown selection. Both require confirmation. Restoring/uninstalling resets cheat preferences, not game saves.
+
+**Save editor** is available after game detection, even without an installation package. Editors are associated with their game, so switching games cannot silently reuse another game's save files.
+
+The save editor has a narrow, resizable file list and separate **Party & actors** and **Inventory** sections. Actor fields wrap into a readable grid, and scrolling keeps every parameter reachable. **Info** shows file details without widening the list. One **Save changes** button remains at the bottom and writes the selected editing mode with a verified backup. Global/Config metadata opens in **Raw JSON**, not in the actor form.
+
+### Troubleshooting
+
+Open **Show activity log** for technical details. **Copy log** copies the current session; **Save log...** exports it to a local file. Check folder paths before sharing logs. Errors keep the current path and explain how to recover. After a file-operation error, use **Check** to refresh game status before retrying.
+
+You can also preselect a game when launching from source:
+
+```powershell
+py -3 tools\installer\gui.py --game-path "C:\Games\MyGame"
+```
 
 There are two backup types:
 
 - `original-game`: created once before the first clean install, used by uninstall.
-- `plugin-version`: created before updating/reinstalling over an existing plugin, used by Restore Old Plugin.
+- `plugin-version`: created before updating/reinstalling over an existing plugin, available under **Restore selected backup**.
 
 ## Check a game
 
@@ -67,7 +93,7 @@ To force a clean plugin settings state:
 
 ## Install from a release archive
 
-Use this when the installer is run beside a packaged release archive.
+Use this when the installer is run beside a packaged release archive downloaded from the [Releases page](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases).
 
 ```powershell
 .venv\Scripts\python.exe tools\installer\cli.py install --game-path "C:\Games\MyGame" --archive "output\rpg-mv-cheat-1.3.1-core.tar.gz"

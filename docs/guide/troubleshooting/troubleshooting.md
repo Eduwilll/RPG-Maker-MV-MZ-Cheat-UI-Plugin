@@ -65,7 +65,4 @@ Some games use obfuscated or heavily modified scripts that override the globals 
 
 ## Still stuck?
 
-Open an issue on the [GitHub repository](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/issues) with:
-- The game name and engine version (MV or MZ)
-- What you did and what happened
-- Any error messages from the developer console
+Open a [bug report](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/issues/new?template=bug_report.yml) — the form asks for the game name, engine version, logs, and everything else needed, so fill in every field. Have an idea instead of a bug? Open a [feature request](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/issues/new?template=feature_request.yml).

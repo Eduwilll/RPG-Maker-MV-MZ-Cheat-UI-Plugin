@@ -9,6 +9,8 @@ Many actions come pre-bound to convenient shortcuts. You can use these immediate
 | Action | Shortcut |
 |--------|---------|
 | **Toggle Cheat Window** | <kbd>Ctrl</kbd> + <kbd>C</kbd> |
+| **Find a Feature** | <kbd>Ctrl</kbd> + <kbd>P</kbd> |
+| **Message Log** | <kbd>Ctrl</kbd> + <kbd>H</kbd> |
 | **Toggle "Save Locations" Tab** | <kbd>Ctrl</kbd> + <kbd>M</kbd> |
 | **Quick Save (Slot 1)** | <kbd>Ctrl</kbd> + <kbd>S</kbd> |
 | **Quick Load (Slot 1)** | <kbd>Ctrl</kbd> + <kbd>Q</kbd> |
@@ -40,4 +42,9 @@ You can change any of these bindings or add new ones in the **Shortcuts** tab:
 
 ## Sharing Shortcuts Across Games
 
-Shortcut bindings are stored in `www/cheat-settings/` (MV) or `cheat-settings/` (MZ) inside the game folder. To reuse your shortcuts in another game, simply copy this folder. See [Sharing Settings](/guide/features/sharing-settings) for more details.
+Shortcut bindings are stored in `www/cheat-settings/` (MV) or `cheat-settings/` (MZ) inside the game folder. Use **Settings > Game Options > Portable Settings Backup** to transfer supported bindings without copying game-specific locks or favorites. See [Sharing Settings](/guide/features/sharing-settings).
+
+Ctrl+P and Ctrl+H work in both window modes and prevent the browser's Print and
+History commands. They do not interrupt the shortcut-recording fields. If an
+existing customized shortcut already uses one of these combinations, migration
+leaves the new action unassigned rather than replacing your binding.

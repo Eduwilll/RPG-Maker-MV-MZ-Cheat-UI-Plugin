@@ -25,16 +25,11 @@ Read these pages first:
 
 ## Reporting bugs
 
-Open an issue on [GitHub](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/issues) and include:
+Open a [bug report](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/issues/new?template=bug_report.yml) — the template asks for everything needed (game, engine, versions, logs), so fill in every field.
 
-- game name
-- engine version: MV or MZ
-- plugin version
-- expected behavior
-- actual behavior
-- reproduction steps
-- screenshots if helpful
-- console output from NW.js developer tools if available
+## Requesting features
+
+Have an idea for a panel, cheat, or improvement? Open a [feature request](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/issues/new?template=feature_request.yml) describing the problem it solves and what it should do. Check the [Roadmap](/guide/technical/roadmap) first to see if it's already planned.
 
 ## Development setup
 

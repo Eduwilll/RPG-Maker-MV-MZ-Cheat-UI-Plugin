@@ -12,9 +12,13 @@ import {
 } from "../js/ui/CheatUiSettings.js";
 
 const HIDE_NAMELESS_ITEMS_SETTING = "itemTable.hideNamelessItems";
+import LockFavoriteControls from "../components/LockFavoriteControls.js";
+import DatabaseTooltip from "../components/DatabaseTooltip.js";
+import { favoriteSort } from "../js/panels/locks/LockPanelState.js";
 
 export default {
   name: "ItemTableTab",
+  components: { LockFavoriteControls, DatabaseTooltip },
 
   template: `
 <v-card flat class="ma-0 pa-0">
@@ -28,83 +32,70 @@ export default {
         :custom-sort="sortTableItems"
         :items-per-page="10">
         <template v-slot:top>
-            <v-text-field
-                label="Search..."
-                solo
-                background-color="grey darken-3"
-                v-model="search"
-                dense
-                hide-details
-                @keydown.self.stop
-                @focus="$event.target.select()">
-            </v-text-field>
-            <v-row
-                class="ma-0 pa-0">
-                <v-col
-                    cols="12"
-                    md="6">
-                    <v-checkbox
-                        v-model="excludeNameless"
-                        dense
-                        hide-details
-                        label="Hide Nameless Items"
-                        @change="onTableFilterChange">
-                    
-                    </v-checkbox>
-                </v-col>
-                <v-col
-                    cols="12"
-                    md="6">
-                    <v-checkbox
-                        v-model="onlyOwnedItems"
-                        dense
-                        hide-details
-                        label="Only Owned Items"
-                        @change="onTableFilterChange">
-                    
-                    </v-checkbox>
-                </v-col>
-                <v-col
+            <div class="cheat-table-top">
+                <v-text-field
+                    label="Search..."
+                    solo
+                    background-color="grey darken-3"
+                    v-model="search"
+                    dense
+                    hide-details
+                    @keydown.self.stop
+                    @focus="$event.target.select()">
+                </v-text-field>
+                <v-tooltip bottom>
+                    <span>Reload from game data</span>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                            small
+                            text
+                            class="cheat-table-top__action"
+                            aria-label="Reload from game data"
+                            v-bind="attrs"
+                            v-on="on"
+                            @click="initializeVariables">
+                            <v-icon small left>mdi-refresh</v-icon>
+                            Reload
+                        </v-btn>
+                    </template>
+                </v-tooltip>
+            </div>
+            <div class="cheat-filter-bar" role="group" aria-label="Table display options">
+                <v-checkbox
+                    v-model="excludeNameless"
+                    dense
+                    hide-details
+                    label="Hide Nameless Items"
+                    @change="onTableFilterChange">
+                </v-checkbox>
+                <v-checkbox
+                    v-model="onlyOwnedItems"
+                    dense
+                    hide-details
+                    label="Only Owned Items"
+                    @change="onTableFilterChange">
+                </v-checkbox>
+                <v-checkbox
                     v-if="hasPriceColumn"
-                    cols="12"
-                    md="6">
-                    <v-checkbox
-                        v-model="showPriceColumn"
-                        dense
-                        hide-details
-                        label="Show Price">
-                    
-                    </v-checkbox>
-                </v-col>
-                <v-col
+                    v-model="showPriceColumn"
+                    dense
+                    hide-details
+                    label="Show Price">
+                </v-checkbox>
+                <v-checkbox
                     v-if="hasDetailColumn"
-                    cols="12"
-                    md="6">
-                    <v-checkbox
-                        v-model="showDetailColumn"
-                        dense
-                        hide-details
-                        :label="detailColumnToggleLabel">
-                    
-                    </v-checkbox>
-                </v-col>
-            </v-row>
+                    v-model="showDetailColumn"
+                    dense
+                    hide-details
+                    :label="detailColumnToggleLabel">
+                </v-checkbox>
+            </div>
         </template>
         <template
             v-slot:item.name="{ item }">
-            <v-tooltip
-                bottom
-                max-width="420">
-                <template v-slot:activator="{ on, attrs }">
-                    <div
-                        style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; max-width: 120px; line-height: 1.2; max-height: 2.4em; word-break: break-word;"
-                        v-bind="attrs"
-                        v-on="on">
-                        {{ item.name }}
-                    </div>
-                </template>
-                <span>{{ item.name }}</span>
-            </v-tooltip>
+            <div style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; max-width: 120px; line-height: 1.2; max-height: 2.4em; word-break: break-word;">
+                <database-tooltip :kind="item._itemKind" :record-id="item._itemId" :label="item.name"/>
+            </div>
         </template>
         <template
             v-slot:item.desc="{ item }">
@@ -155,6 +146,10 @@ export default {
             </v-tooltip>
         </template>
         <template
+            v-slot:item.controls="{ item }">
+            <lock-favorite-controls :target="{kind:item._itemKind,id:item._itemId}" :value="item.amount" @change="initializeVariables"/>
+        </template>
+        <template
             v-slot:item.amount="{ item }">
             <v-text-field
                 background-color="grey darken-3"
@@ -173,27 +168,6 @@ export default {
             </v-text-field>
         </template>
     </v-data-table>
-    
-    <v-tooltip
-        bottom>
-        <span>Reload from game data</span>
-        <template v-slot:activator="{ on, attrs }">
-            <v-btn
-                style="top: 0px; right: 0px;"
-                color="pink"
-                dark
-                small
-                absolute
-                top
-                right
-                fab
-                v-bind="attrs"
-                v-on="on"
-                @click="initializeVariables">
-                <v-icon>mdi-refresh</v-icon>
-            </v-btn>
-        </template>
-    </v-tooltip>
 </v-card>
     `,
 
@@ -338,10 +312,13 @@ export default {
 
     sortTableItems(items, sortBy, sortDesc) {
       if (!Array.isArray(sortBy) || !sortBy.length) {
-        return items;
+        return favoriteSort(items, (row) => ({
+          kind: row._itemKind,
+          id: row._itemId,
+        }));
       }
 
-      return items.slice().sort((leftItem, rightItem) => {
+      const sorted = items.slice().sort((leftItem, rightItem) => {
         for (let index = 0; index < sortBy.length; index += 1) {
           const sortKey = sortBy[index];
           const isDescending = !!sortDesc[index];
@@ -356,6 +333,10 @@ export default {
 
         return 0;
       });
+      return favoriteSort(sorted, (row) => ({
+        kind: row._itemKind,
+        id: row._itemId,
+      }));
     },
 
     getSortableTableValue(item, sortKey) {

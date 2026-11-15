@@ -103,6 +103,14 @@ def run_pyinstaller(project_root, dist_dir, work_dir, spec_dir):
         "core",
         "--hidden-import",
         "save_editor",
+        "--hidden-import",
+        "installer_ui",
+        "--hidden-import",
+        "presentation",
+        "--hidden-import",
+        "ui_theme",
+        "--hidden-import",
+        "save_editor_view",
     ]
 
     if os.path.exists(favicon_path):
@@ -140,13 +148,18 @@ def write_readme(package_dir, version):
             "How to install:\n"
             "1. Run RPGMakerCheatInstaller.exe.\n"
             "2. Select your RPG Maker MV or MZ game folder.\n"
-            "3. Click Install.\n"
+            "3. Review the detected game and package, then close the game.\n"
+            "4. Click Install plugin (or Update / reinstall) and confirm.\n"
+            "5. Wait for the completion message, then open the game normally.\n"
             "\n"
             "Keep the MV/MZ .tar.gz files beside the EXE. The installer auto-selects\n"
             "the correct package based on the selected game engine.\n"
             "\n"
             "Uninstall restores the original-game backup when available. If no original\n"
             "backup exists, it disables the cheat loader while keeping the game bootable.\n"
+            "Backups and uninstall are under Manage installation. Advanced options are\n"
+            "optional; cheat preferences are preserved unless you choose to reset them.\n"
+            "For troubleshooting, open Activity and copy or save the log.\n"
         )
 
 

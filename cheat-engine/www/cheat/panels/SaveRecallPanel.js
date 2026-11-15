@@ -103,16 +103,34 @@ export default {
         :custom-filter="tableItemFilter"
         :items-per-page="10">
         <template v-slot:top>
-            <v-text-field
-                label="Search..."
-                solo
-                background-color="grey darken-3"
-                v-model="search"
-                dense
-                hide-details
-                @keydown.self.stop
-                @focus="$event.target.select()">
-            </v-text-field>
+            <div class="cheat-table-top">
+                <v-text-field
+                    label="Search..."
+                    solo
+                    background-color="grey darken-3"
+                    v-model="search"
+                    dense
+                    hide-details
+                    @keydown.self.stop
+                    @focus="$event.target.select()">
+                </v-text-field>
+                <v-tooltip bottom>
+                    <span>Reload from game data</span>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                            small
+                            text
+                            class="cheat-table-top__action"
+                            aria-label="Reload from game data"
+                            v-bind="attrs"
+                            v-on="on"
+                            @click="initializeVariables">
+                            <v-icon small left>mdi-refresh</v-icon>
+                            Reload
+                        </v-btn>
+                    </template>
+                </v-tooltip>
+            </div>
         </template>
         <template
             v-slot:item.coord="{ item }">
@@ -169,27 +187,6 @@ export default {
             </v-tooltip>
         </template>
     </v-data-table>
-    
-    <v-tooltip
-        bottom>
-        <span>Reload from game data</span>
-        <template v-slot:activator="{ on, attrs }">
-            <v-btn
-                style="top: 0px; right: 0px;"
-                color="pink"
-                dark
-                small
-                absolute
-                top
-                right
-                fab
-                v-bind="attrs"
-                v-on="on"
-                @click="initializeVariables">
-                <v-icon>mdi-refresh</v-icon>
-            </v-btn>
-        </template>
-    </v-tooltip>
 </v-card>
     `,
 

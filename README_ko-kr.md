@@ -2,6 +2,12 @@
 
 RPG Maker MV/MZ 게임을 위한 강력한 GUI 기반 치트 툴이며, **실시간 기계 번역** 기능을 지원합니다.
 
+### 최신 릴리스: v1.9.0
+- **인터랙티브 맵 / 미니맵**: 드래그 이동, 확대/축소, 플레이어 추적, 이벤트 검색과 맵 내부 설정을 제공합니다. 위치를 선택한 뒤 Teleport 버튼으로 이동합니다.
+- **실시간 표시**: 방향이 표시되는 플레이어 화살표, 게임 캐릭터 이미지와 종류별 마커를 프레임 단위로 갱신합니다.
+- **간결한 UI와 테마**: 정리된 탐색 메뉴, 작은 X/Y 입력란, Current / Legacy 색상 테마를 지원합니다.
+- **설치 프로그램과 저장 편집기**: 간단한 설치 화면, 명확한 완료 안내, 유지 관리 기능과 잘리지 않는 스크롤 편집 필드를 제공합니다.
+
 ---
 
 ## 📸 UI 샘플
@@ -124,4 +130,18 @@ docker-compose up -d
 - **Translation Idea**: [sieucapoccho3717](https://github.com/sieucapoccho3717/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 - **Maintained & Enhanced by**: [Eduwilll](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 
-Latest Release: v1.7.1
+Latest Release: v1.8.0
+
+### v1.8.0 주요 변경 사항
+- **기능 검색**: `Ctrl+P`로 패널, 설정 및 단축키를 검색합니다.
+- **데이터 편집**: 적, 스킬, 클래스와 파티 멤버를 편집하고 상세 툴팁을 확인합니다.
+- **잠금 및 즐겨찾기**: 지원되는 값을 고정하고 자주 사용하는 행을 상단에 표시합니다.
+- **대화 기록**: `Ctrl+H`로 초상화와 선택한 응답을 확인합니다. 기본 16px 크기, 사용자 지정 크기 및 게임/플러그인 글꼴 선택을 지원합니다.
+- **맵 / 미니맵**: 실제 NPC 스프라이트, 그림자와 레이어 표시 설정, 목적지 미리보기 및 이동 가능한 미니맵을 지원합니다.
+- **개발 미리보기**: 게임 없이 MV/MZ UI를 확인하고 파일 저장 시 자동으로 새로 고칩니다.
+
+---
+
+## 💡 문제 신고 및 기능 요청
+- **버그?** [버그 리포트](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/issues/new?template=bug_report.yml)를 열어주세요 — 게임, 엔진, 버전, 로그를 묻습니다.
+- **아이디어?** [기능 요청](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/issues/new?template=feature_request.yml)을 열어주세요.

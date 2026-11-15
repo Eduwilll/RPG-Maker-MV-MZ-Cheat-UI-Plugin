@@ -16,62 +16,33 @@
       rel="stylesheet"
     />
     <link
-      href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css"
+      href="https://cdn.jsdelivr.net/npm/vuetify@2.6.3/dist/vuetify.min.css"
       rel="stylesheet"
     />
 
-    <style>
-      body {
-          background-color: #121212;
-          margin: 0;
-          padding: 20px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          min-height: 100vh;
-      }
-
-      #app-container {
-          border: 2px solid #333;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      }
-
-      /* Hide scrollbars for a cleaner "app" feel */
-      .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-      }
-
-      .hide-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-      }
-    </style>
+    <link rel="stylesheet" href="../cheat-engine/www/cheat/css/main.css" />
+    <link rel="stylesheet" href="./preview.css" />
+    <script>
+      window.__previewErrors = [];
+      window.addEventListener("error", function (event) { if (event.message) window.__previewErrors.push(event.message); });
+      window.addEventListener("unhandledrejection", function (event) { window.__previewErrors.push(String(event.reason)); });
+    </script>
   </head>
 
   <body>
     <div id="app">
-      <v-app dark>
-        <v-main>
-          <div id="app-container" class="mx-auto" style="width: 700px;">
-            <!-- The Cheat Modal will be rendered here -->
-            <cheat-modal v-model="activeComponentName"></cheat-modal>
-          </div>
-
-          <div class="mt-4 text-center grey--text text--darken-1">
-            Current Panel: <v-chip small>{{ activeComponentName }}</v-chip>
-          </div>
-        </v-main>
-      </v-app>
+      <p class="preview-loading">Loading the UI preview...</p>
     </div>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script src="../cheat-engine/www/cheat/libs/vue.js"></script>
+    <script src="../cheat-engine/www/cheat/libs/vuetify.js"></script>
+    <script src="../cheat-engine/www/cheat/libs/axios.min.js"></script>
 
     <!-- 1. Load RGP Maker Mocks first so CheatHelper can find them -->
-    <script src="./rpg-mocks.js?v=6"></script>
+    <script src="./rpg-mocks.js"></script>
 
     <!-- 2. Bootstrap the Vue app as a module -->
-    <script type="module" src="./preview.js?v=6"></script>
+    <script type="module" src="./preview.js"></script>
   </body>
 </html>

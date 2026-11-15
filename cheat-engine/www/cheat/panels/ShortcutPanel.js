@@ -77,9 +77,11 @@ export default {
         :items="filteredShortcuts"
         :search="search"
         :custom-filter="tableItemFilter"
+        :page.sync="tablePage"
         :items-per-page="10">
         <template
             v-slot:item.shortcut="{ item }">
+            <div :data-feature="'shortcut-' + item.id">
             <key-input-field
                 style="width: 170px;"
                 v-model="item.shortcut"
@@ -92,6 +94,7 @@ export default {
                 hide-details
                 @change="onShortcutChange($event, item)">
             </key-input-field>
+            </div>
         </template>
         <template
             v-slot:item.param="{ item, index }">
@@ -154,6 +157,7 @@ export default {
   data() {
     return {
       shortcuts: [],
+      tablePage: 1,
 
       tableExpanded: [],
 
@@ -204,6 +208,15 @@ export default {
   },
 
   methods: {
+    focusFeature(anchor) {
+      const id = anchor.indexOf("shortcut-") === 0 ? anchor.slice(9) : "";
+      const config = GLOBAL_SHORTCUT.getConfig(id);
+      if (config) {
+        this.search = config.name;
+        this.shortcutSearch = Key.createEmpty();
+        this.tablePage = 1;
+      }
+    },
     restoreToDefault() {
       GLOBAL_SHORTCUT.restoreDefaultSettings();
       this.initializeVariables();
@@ -232,7 +245,7 @@ export default {
         Alert.error(err.message);
       }
 
-      item.shortcut = GLOBAL_SHORTCUT.getShortcut(item.id);
+      item.shortcut = Key.fromKey(GLOBAL_SHORTCUT.getShortcut(item.id));
     },
 
     onParameterChange(value, item, paramId) {
