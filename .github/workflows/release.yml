@@ -8,140 +8,131 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 11.0.8
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - name: Validate version and release notes
+        id: version
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          python tools/release_notes.py --tag "$RELEASE_TAG" --output release-notes.md
+          printf 'version=%s\n' "${RELEASE_TAG#v}" >> "$GITHUB_OUTPUT"
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Runtime, type, MV and documentation checks
+        run: pnpm run check:repo
+      - name: Browser regression checks
+        run: |
+          pnpm run test:browser
+          pnpm run test:preview
+      - name: Release metadata tests
+        run: python -B -m unittest discover -s tests -p test_release_notes.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-notes
+          path: release-notes.md
+          if-no-files-found: error
+
   build-packages:
     runs-on: ubuntu-latest
-
+    needs: validate
+    timeout-minutes: 10
+    env:
+      RELEASE_VERSION: ${{ needs.validate.outputs.version }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Extract version from tag
-        id: version
-        shell: bash
-        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
-
+          python-version: '3.14'
       - name: Build release packages
-        run: python deploy/main.py --version ${{ steps.version.outputs.VERSION }}
-
-      - name: Upload release packages
-        uses: actions/upload-artifact@v4
+        run: python deploy/main.py --version "$RELEASE_VERSION"
+      - uses: actions/upload-artifact@v4
         with:
           name: release-packages
+          if-no-files-found: error
           path: |
-            output/rpg-mv-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz
-            output/rpg-mz-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz
+            output/rpg-mv-cheat-${{ env.RELEASE_VERSION }}-core.tar.gz
+            output/rpg-mz-cheat-${{ env.RELEASE_VERSION }}-core.tar.gz
 
   build-windows-installer:
     runs-on: windows-latest
-    needs: build-packages
-
+    needs: [validate, build-packages]
+    timeout-minutes: 20
+    env:
+      RELEASE_VERSION: ${{ needs.validate.outputs.version }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Extract version from tag
-        id: version
-        shell: bash
-        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
-
-      - name: Download release packages
-        uses: actions/download-artifact@v4
+          python-version: '3.14'
+      - uses: actions/download-artifact@v4
         with:
           name: release-packages
           path: output
-
-      - name: Install PyInstaller
-        run: python -m pip install pyinstaller pillow
-
+      - name: Install tested packaging tools
+        run: python -m pip install pyinstaller==6.20.0 pillow==12.2.0
+      - name: Installer, save-editor and preview-launcher tests
+        run: python -B -m unittest discover -s tests -p "test_*.py"
       - name: Build Windows installer ZIP
-        run: python tools/installer/build_windows.py --version ${{ steps.version.outputs.VERSION }}
-
-      - name: Upload Windows installer
-        uses: actions/upload-artifact@v4
+        run: python tools/installer/build_windows.py --version "$env:RELEASE_VERSION"
+      - uses: actions/upload-artifact@v4
         with:
           name: windows-installer
-          path: output/RPGMakerCheatInstaller-v${{ steps.version.outputs.VERSION }}-windows.zip
+          if-no-files-found: error
+          path: output/RPGMakerCheatInstaller-v${{ env.RELEASE_VERSION }}-windows.zip
 
   release:
     runs-on: ubuntu-latest
-    needs:
-      - build-packages
-      - build-windows-installer
+    needs: [validate, build-packages, build-windows-installer]
+    timeout-minutes: 10
     permissions:
       contents: write
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
+      RELEASE_VERSION: ${{ needs.validate.outputs.version }}
     steps:
-      - name: Extract version from tag
-        id: version
-        shell: bash
-        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
-
-      - name: Download release packages
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-notes
+          path: output
+      - uses: actions/download-artifact@v4
         with:
           name: release-packages
           path: output
-
-      - name: Download Windows installer
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: windows-installer
           path: output
-
       - name: Create GitHub Release (Draft)
         uses: softprops/action-gh-release@v2
         with:
-          name: "v${{ steps.version.outputs.VERSION }}"
+          name: v${{ env.RELEASE_VERSION }}
           draft: true
-          generate_release_notes: true
-          body: |
-            ## What's New in v${{ steps.version.outputs.VERSION }}
-
-            > **Edit this section** with your features, fixes, and changes before publishing.
-
-            ### Features
-            -
-
-            ### Bug Fixes
-            -
-
-            ### Performance
-            -
-
-            ---
-
-            ### Installation
-            Recommended for most users:
-            1. Download `RPGMakerCheatInstaller-v${{ steps.version.outputs.VERSION }}-windows.zip`
-            2. Extract the ZIP
-            3. Run `RPGMakerCheatInstaller.exe`
-            4. Select your RPG Maker MV/MZ game folder and click **Install**
-
-            Manual packages are also available:
-
-            | File | For |
-            |---|---|
-            | `RPGMakerCheatInstaller-v${{ steps.version.outputs.VERSION }}-windows.zip` | Windows installer for **MV/MZ** |
-            | `rpg-mv-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz` | Manual RPG Maker **MV** install |
-            | `rpg-mz-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz` | Manual RPG Maker **MZ** install |
+          body_path: output/release-notes.md
+          fail_on_unmatched_files: true
           files: |
-            output/rpg-mv-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz
-            output/rpg-mz-cheat-${{ steps.version.outputs.VERSION }}-core.tar.gz
-            output/RPGMakerCheatInstaller-v${{ steps.version.outputs.VERSION }}-windows.zip
+            output/rpg-mv-cheat-${{ env.RELEASE_VERSION }}-core.tar.gz
+            output/rpg-mz-cheat-${{ env.RELEASE_VERSION }}-core.tar.gz
+            output/RPGMakerCheatInstaller-v${{ env.RELEASE_VERSION }}-windows.zip
