@@ -1,6 +1,25 @@
 # Changelog
 
-## v1.8.0 - Latest
+## v1.9.0 - Latest
+
+### Interface Refresh
+- [Feat] **Compact Shell**: Grouped navigation, a single top bar with sidebar toggle and Find, consistent panel controls, tighter item filters, compact Teleport X/Y fields and a portrait-based party recruitment menu.
+- [Feat] **Current And Legacy Themes**: Keep the new slate design or choose the older charcoal Material colors. Both support dark/light mode and saved accents; the Default swatch restores the released blue.
+- [Tweak] **Readable Controls**: Overlay opacity defaults to 90%, Game Options toggles use less space, and Feature Finder adds result counts, type labels and keyboard hints.
+
+### Interactive Map
+- [Feat] **One Shared Map**: Full map and floating minimap share drag-to-pan, wheel/button zoom, Follow, Fit, event search and on-map settings for layers, sprites, shadows, labels, placement, size and opacity.
+- [Feat] **Live Markers**: Directional animated player arrow, distinct category pins and live game sprites use frame-based updates with cached settings, artwork and event classification. Reduced-motion preferences stop the arrow pulse.
+- [Fix] **Safe Selection**: Clicking inspects a location; Teleport is explicit. Dragging never teleports, stale search results are rejected after transfers, and compact Follow no longer compounds zoom. Separate-window behavior is preserved.
+
+### Installer And Release Quality
+- [Feat] **Simpler Installer**: Compact guided setup with automatic package detection, optional advanced controls, clear completion/progress, tooltips, maintenance actions and accessible activity logs.
+- [Fix] **Save Editor Layout**: Scrollable structured fields and a roomier editor prevent actor parameters and inventory controls from being clipped; unsupported saves retain Raw JSON editing and backup-before-write behavior.
+- [Dev] **Release Checks**: Automated runtime/browser tests gate package builds; Windows installer tests run before packaging. Release notes come from the matching changelog, and tag/package versions must agree.
+
+---
+
+## v1.8.0
 
 ### Features
 - [Feat] **Feature Finder**: Find panels, settings and shortcuts with `Ctrl+P`.
