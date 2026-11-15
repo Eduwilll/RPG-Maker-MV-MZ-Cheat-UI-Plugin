@@ -7,7 +7,7 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "typecheck": "tsc -p tsconfig.json",
-    "test:unit": "node --experimental-default-type=module --experimental-test-isolation=none --test tests/unit/*.test.mjs",
+    "test:unit": "node tools/test-unit.mjs",
     "test:browser": "node tools/test-browser.mjs",
     "test:preview": "node tools/test-browser.mjs --preview",
     "check:mv-compat": "node tools/check-mv-compat.mjs",
