@@ -25,7 +25,7 @@ class PreviewHTTPTests(unittest.TestCase):
                         "launcher must expose import-safe create_server")
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name) / "repo"
+        self.root = (Path(self.temp.name) / "repo").resolve()
         self.root.mkdir()
         for name, content in {
             "preview/index.html": "<h1>Standalone UI</h1>",
