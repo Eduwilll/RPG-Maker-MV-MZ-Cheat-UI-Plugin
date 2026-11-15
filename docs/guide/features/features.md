@@ -133,24 +133,36 @@ Toggle boolean game switches in real time. Search helps when games have hundreds
 
 ### Map / Minimap
 
-The **Map / Minimap** sidebar page combines the full map with expandable
-**Floating minimap settings**. Search for Floating Minimap to jump to those
-settings. The older `minimap-panel` route still works for existing links.
+The **Map / Minimap** page and floating minimap use the same interactive map.
+Controls sit on the artwork: drag to pan, scroll or use **+ / -** to zoom,
+**Follow player** to track your character, and **Fit whole map** for an overview.
+The canvas also accepts arrow keys for panning, **F** to follow and **0** to fit.
+Search locates NPCs, enemies, treasure and events by name or ID.
 
 The full map defaults to **Realistic (live tiles)**, sharing the minimap's rendered
 tile artwork. It preserves ground layers, autotile shapes, shadows and table edges,
 with live player/event markers and character sprites. Choose **Radar (passability)** for the original
 walkable/blocked grid. The display choice persists when reopening the panel.
 
-Both modes support the 25x25/full-map view, hover details and click-to-teleport,
-including in the separate cheat window. **Refresh artwork** rebuilds the cached
+Clicking inspects a location or marker; the selected card's explicit **Teleport**
+button moves you there. Dragging never teleports. The player uses an animated
+directional arrow (reduced-motion preferences disable its pulse). NPCs, enemies,
+treasure and events have distinct labeled pins when game sprites are unavailable
+or turned off. Live positions update with animation frames rather than a slow
+polling interval, with settings, classification and artwork cached separately.
+These interactions also work in the separate cheat window.
+
+**Map settings** includes display options and **Floating minimap settings** for
+size, opacity, placement and mode. Search for Floating Minimap to jump there.
+The older `minimap-panel` route still works for existing links.
+**Refresh artwork** rebuilds the cached
 map if a game plugin changes tiles in place. Missing/loading tileset images fall
 back to radar with a status message. Plugin-specific lighting, weather, pictures
 and screen effects are not reproduced in the full-map artwork.
 
 ### Map Layers
 
-Expand **Map layers** on the combined map page to customize both views. These
+Use the on-map **Map layers** button to customize both views. These
 preferences are saved for the game and shared with the separate cheat window.
 
 - **Tile shadows / dimming** removes engine tile shadows from the cheat artwork.
@@ -159,7 +171,7 @@ preferences are saved for the game and shared with the separate cheat window.
   control marker visibility. **Event names / IDs** enables labels.
 - **Show actual NPC / event sprites** uses the game's loaded character images and
   current frame, facing and opacity. It is enabled by default. Turning it off
-  restores lightweight colored markers. Missing images fall back to markers.
+  restores lightweight category pins. Missing images fall back to pins.
 - **Map background**, **Grid** and **Marker size** customize readability.
 - **Reset map layers** restores the defaults without resetting other cheat settings.
 
@@ -267,14 +279,21 @@ remain display-only. Missing artwork uses a neutral placeholder.
 The Actors editor includes confirmed **Add to Party** / **Remove from Party**
 actions alongside stats, skills and status effects. Recruitment can bypass story
 progression; it does not override custom battle-party limits. Removing the last
-party member is blocked. Stats/Level also offers searchable, confirmed **Add party
-member** directly above its actor tabs and selects the recruited actor when they
-are in the visible battle roster. **Party / Skills / Status** opens the same
-actor's detailed editor.
+party member is blocked. Stats/Level also offers a **+ Add party member** menu
+beside its actor tabs, listing each recruitable actor with a portrait and a
+confirmation prompt; the recruited actor is selected when they are in the visible
+battle roster. **Party / Skills / Status** opens the same actor's detailed editor.
 
 Under Appearance, **Use game font in cheat UI** optionally uses the game's fonts
 without changing the game itself. It is off by default and retains a readable
-fallback. These features also work through the separate cheat window.
+fallback. The same panel holds the window opacity slider (90% by default, fully
+opaque while hovered), the dark/light switch and the accent color swatches used
+for selections and primary actions. **Color theme** offers **Current** (the slate
+design) and **Legacy** (the older charcoal-gray Material colors shown in the
+screenshots), keeping the compact layout in both. Dark/light mode and accent
+color remain independent; the labeled **Default** swatch restores the released
+blue. Saved colors are honored. The color-theme choice persists, is included in
+settings export/import, and synchronizes with the separate cheat window.
 
 ## Destination Previews And Layout
 
@@ -291,7 +310,9 @@ window remains resizable and remembers its size.
 In Minimap, enable **Move minimap**, close the cheat overlay and drag its handle.
 Arrow keys also move it; Escape on the handle ends Move mode. Position is saved
 when dragging finishes. Existing custom X/Y fields and **Reset position** provide
-non-drag alternatives. Outside Move mode the minimap is click-through.
+non-drag alternatives. The minimap's cursor button enables panning and selection;
+turn it off to keep gameplay click-through. Its tool buttons remain usable, and
+opening settings temporarily enlarges the map without changing its saved size.
 
 ## Speed and encounter controls
 

@@ -6,27 +6,20 @@ import {
   writeMinimapCustomY,
 } from "../js/panels/minimap/MinimapPanelState.js";
 import { boundedPosition, startPointerDrag } from "../js/ui/LayoutGeometry.js";
-import {
-  renderBaseMap,
-  drawMinimap,
-  readMinimapFrame,
-  getMinimapStatus,
-} from "../js/panels/minimap/MinimapRenderer.js";
+import { getMinimapStatus } from "../js/panels/minimap/MinimapRenderer.js";
 import { CHEAT_DIAGNOSTICS } from "../js/runtime/CheatDiagnostics.js";
-import { readMapLayers } from "../js/panels/map/MapLayersState.js";
+import { getGameWindow } from "../js/runtime/FeatureRuntime.js";
+import { startMapFrames } from "../js/panels/map/MapFrames.js";
+import InteractiveMap from "./InteractiveMap.js";
 
 export default {
   name: "MinimapOverlay",
+  components: { InteractiveMap },
 
   template: `
 <div v-show="visible" :style="canvasStyle" @pointerdown.stop.prevent @mousedown.stop.prevent @mouseup.stop.prevent @touchstart.stop.prevent @touchend.stop.prevent @click.stop @contextmenu.stop.prevent>
-<canvas
-    ref="mapCanvas"
-    :width="canvasSize"
-    :height="canvasSize"
-    style="width:100%;height:100%;display:block;">
-</canvas>
-<button v-if="moveMode" type="button" aria-label="Move minimap; arrow keys move, Escape finishes" title="Drag to move. Arrow keys move, Escape finishes." style="position:absolute;top:0;left:0;width:100%;height:28px;background:#222d;color:white;cursor:move;touch-action:none;" @pointerdown="startMove" @mousedown.stop.prevent @touchstart.stop @click.stop @keydown="moveKey">Move minimap</button>
+<interactive-map ref="view" compact :active="visible" @tools-open="configuring = $event; tick()"/>
+<button v-if="moveMode" type="button" class="minimap-move-handle" aria-label="Move minimap; arrow keys move, Escape finishes" title="Drag to move. Arrow keys move, Escape finishes." @pointerdown="startMove" @mousedown.stop.prevent @touchstart.stop @click.stop @keydown="moveKey">Move minimap · Esc to finish</button>
 </div>
     `,
 
@@ -34,27 +27,21 @@ export default {
     return {
       visible: false,
       moveMode: false,
+      configuring: false,
       canvasSize: 176,
       canvasStyle: "",
-      refreshIntervalId: null,
-      refreshMs: 300,
       lastLoggedStage: "",
     };
   },
 
   mounted() {
     this.tick();
-    this.refreshIntervalId = setInterval(() => {
-      this.tick();
-    }, this.refreshMs);
+    this._stopFrames = startMapFrames(window, () => this.tick());
   },
 
   beforeDestroy() {
     if (this._stopDrag) this._stopDrag();
-    if (this.refreshIntervalId) {
-      clearInterval(this.refreshIntervalId);
-      this.refreshIntervalId = null;
-    }
+    if (this._stopFrames) this._stopFrames();
   },
 
   methods: {
@@ -88,6 +75,7 @@ export default {
       this.tick();
     },
     moveKey(event) {
+      event.stopPropagation();
       if (event.key === "Escape") {
         event.preventDefault();
         event.stopPropagation();
@@ -119,6 +107,7 @@ export default {
       );
     },
     positionStyle(settings) {
+      const displaySize = this.canvasSize;
       var base =
         "position: fixed; z-index: 8; pointer-events: " +
         (this.moveMode ? "auto" : "none") +
@@ -127,27 +116,26 @@ export default {
         "opacity: " +
         settings.opacity +
         ";";
-      var size =
-        "width: " + settings.size + "px; height: " + settings.size + "px;";
+      var size = "width: " + displaySize + "px; height: " + displaySize + "px;";
       var pos = settings.position || "top-right";
       const x =
         pos === "custom"
           ? settings.customX
           : pos.indexOf("left") >= 0
             ? 8
-            : window.innerWidth - settings.size - 8;
+            : window.innerWidth - displaySize - 8;
       const y =
         pos === "custom"
           ? settings.customY
           : pos.indexOf("bottom") >= 0
-            ? window.innerHeight - settings.size - 8
+            ? window.innerHeight - displaySize - 8
             : 8;
       const point =
         this._dragPosition ||
         boundedPosition(
           x,
           y,
-          settings.size,
+          displaySize,
           window.innerWidth,
           window.innerHeight,
         );
@@ -168,48 +156,30 @@ export default {
       }
       this.moveMode = settings.moveMode;
 
-      var frame = readMinimapFrame();
-      if (!frame.onMap) {
-        this.reportStatus();
+      const game = getGameWindow();
+      if (
+        !game ||
+        !game.Scene_Map ||
+        !(
+          game.SceneManager &&
+          game.SceneManager._scene instanceof game.Scene_Map
+        )
+      ) {
         this.visible = false;
         return;
       }
-
-      var base = null;
-      const layers = readMapLayers();
-      try {
-        base = layers.background ? renderBaseMap() : null;
-      } catch (e) {
-        base = null;
-      }
-      if (!base && layers.background) {
-        // Tileset graphics still loading - retry next tick.
-        this.reportStatus();
-        this.visible = false;
-        return;
-      }
-
-      var canvas = this.$refs.mapCanvas;
-      if (!canvas) {
-        return;
-      }
-
-      try {
-        drawMinimap(canvas, base, {
-          size: settings.size,
-          mode: settings.mode,
-          zoom: settings.zoom,
-          playerX: frame.playerX,
-          playerY: frame.playerY,
-          events: settings.showEvents ? frame.events : [],
-          layers,
+      const nextSize = this.configuring
+        ? Math.max(
+            96,
+            Math.min(360, window.innerWidth - 16, window.innerHeight - 16),
+          )
+        : settings.size;
+      if (nextSize !== this.canvasSize) {
+        this.canvasSize = nextSize;
+        this.$nextTick(() => {
+          if (this.$refs.view) this.$refs.view.measure();
         });
-      } catch (e) {
-        this.visible = false;
-        return;
       }
-
-      this.canvasSize = settings.size;
       this.canvasStyle = this.positionStyle(settings);
       this.visible = true;
       this.reportStatus();

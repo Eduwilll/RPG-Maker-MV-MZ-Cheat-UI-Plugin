@@ -2,7 +2,7 @@ import { startPointerDrag } from "../js/ui/LayoutGeometry.js";
 export default {
   name: "OverlayResize",
   props: { width: Number, height: Number },
-  template: `<button type="button" aria-label="Resize cheat overlay; arrow keys also resize" title="Drag to resize; use arrow keys for small adjustments" style="position:absolute;right:0;bottom:0;width:28px;height:28px;z-index:4;cursor:nwse-resize;background:#555c;color:white;touch-action:none;" @pointerdown="start" @mousedown.stop.prevent @touchstart.stop @click.stop @keydown="key">&#9698;</button>`,
+  template: `<button type="button" class="cheat-resize-handle" aria-label="Resize cheat overlay; arrow keys also resize" title="Drag to resize; use arrow keys for small adjustments" @pointerdown="start" @mousedown.stop.prevent @touchstart.stop @click.stop @keydown="key">&#9698;</button>`,
   beforeDestroy() {
     if (this._stop) this._stop();
   },

@@ -17,86 +17,98 @@ export default {
   components: { LockFavoriteControls },
 
   template: `
-<v-card class="ma-0 pa-0" flat style="position: relative;">
-    <v-alert v-if="!gameReady" dense text type="info" class="mb-1 mr-8 caption">
+<v-card flat class="cheat-panel">
+    <div class="cheat-panel__head">
+        <div>
+            <div class="cheat-panel__title">Gameplay</div>
+            <div class="cheat-panel__meta">{{ gameReady ? 'Changes apply to the running game immediately' : 'Waiting for a game session' }}</div>
+        </div>
+        <v-btn
+            small
+            text
+            title="Reload values from game data"
+            aria-label="Reload values from game data"
+            @click="initializeVariables">
+            <v-icon left small>mdi-refresh</v-icon>
+            Refresh
+        </v-btn>
+    </div>
+
+    <v-alert v-if="!gameReady" dense text type="info" class="mb-3">
         Start or load a game to use gameplay controls. Other cheat panels remain available.
     </v-alert>
-    <v-btn
-        style="top: 8px; right: 8px;"
-        color="pink"
-        dark
-        x-small
-        absolute
-        fab
-        title="Reload from game data"
-        @click="initializeVariables">
-        <v-icon small>mdi-refresh</v-icon>
-    </v-btn>
 
-    <!-- Edit Section -->
-    <v-card-subtitle class="pb-0 font-weight-bold">Edit</v-card-subtitle>
+    <section class="cheat-section">
+        <div class="cheat-section__title">Toggles</div>
+        <div class="cheat-grid cheat-grid--toggles">
+            <v-checkbox
+                data-feature="no-clip"
+                v-model="noClip"
+                :disabled="!gameReady"
+                label="No clip"
+                hide-details
+                dense
+                @change="onNoClipChange" />
+            <v-checkbox
+                v-model="forceSave"
+                :disabled="!gameReady"
+                label="Force save"
+                hide-details
+                dense
+                @change="onForceSaveChange" />
+            <v-checkbox
+                data-feature="mouse-controls"
+                v-model="mouseMove"
+                :disabled="!gameReady"
+                label="Mouse controls"
+                hide-details
+                dense
+                @change="onMouseMoveChange" />
+            <v-checkbox
+                data-feature="mouse-teleport"
+                v-model="mouseTeleport"
+                :disabled="!gameReady"
+                label="Click to teleport"
+                hide-details
+                dense
+                @change="onMouseTeleportChange" />
+        </div>
+    </section>
 
-    <v-card-text class="py-1">
-        <v-row no-gutters align="center" justify="start">
-            <v-col cols="auto">
-                <v-checkbox
-                    data-feature="no-clip"
-                    v-model="noClip"
-                    :disabled="!gameReady"
-                    label="No Clip"
-                    hide-details
-                    dense
-                    @change="onNoClipChange" />
-            </v-col>
-            <v-col cols="auto" class="ml-3">
-                <v-checkbox
-                    v-model="forceSave"
-                    :disabled="!gameReady"
-                    label="Force Save"
-                    hide-details
-                    dense
-                    @change="onForceSaveChange" />
-            </v-col>
-            <v-col cols="auto" class="ml-3">
-                <v-checkbox
-                    data-feature="mouse-controls"
-                    v-model="mouseMove"
-                    :disabled="!gameReady"
-                    label="Enable Mouse Controls"
-                    hide-details
-                    dense
-                    @change="onMouseMoveChange" />
-            </v-col>
-            <v-col cols="auto" class="ml-3">
-                <v-checkbox
-                    data-feature="mouse-teleport"
-                    v-model="mouseTeleport"
-                    :disabled="!gameReady"
-                    label="Mouse Tele"
-                    hide-details
-                    dense
-                    @change="onMouseTeleportChange" />
-            </v-col>
-        </v-row>
-    </v-card-text>
+    <section class="cheat-section">
+        <div class="cheat-section__title">Gold</div>
+        <div class="cheat-inline">
+            <v-text-field
+                data-feature="gold"
+                v-model="gold"
+                :disabled="!gameReady"
+                label="Party gold"
+                outlined
+                dense
+                hide-details
+                class="cheat-field-gold"
+                @keydown.self.stop
+                @change="onGoldChange"
+                @focus="$event.target.select()" />
+            <lock-favorite-controls v-if="gameReady" :target="{kind:'gold'}" :value="Number(gold)" @change="initializeVariables"/>
+        </div>
+    </section>
 
-    <v-card-text class="py-1">
-        <v-text-field
-            data-feature="gold"
-            v-model="gold"
-            :disabled="!gameReady"
-            label="Gold"
-            outlined
-            dense
-            hide-details
-            @keydown.self.stop
-            @change="onGoldChange"
-            @focus="$event.target.select()" />
-        <lock-favorite-controls v-if="gameReady" :target="{kind:'gold'}" :value="Number(gold)" @change="initializeVariables"/>
-    </v-card-text>
+    <section class="cheat-section">
+        <div class="cheat-section__title">Speeds</div>
 
-    <!-- Speed Section -->
-    <v-card-text class="pt-3 pb-1">
+        <div class="cheat-slider__head">
+            <span class="cheat-slider__label">Move speed</span>
+            <span class="cheat-stepper-group">
+                <button type="button" class="cheat-stepper" aria-label="Decrease move speed" @click="addSpeed(-stepSpeed)">
+                    <v-icon small>mdi-minus</v-icon>
+                </button>
+                <span class="cheat-value cheat-value--centre">{{ speed.toFixed(1) }}</span>
+                <button type="button" class="cheat-stepper" aria-label="Increase move speed" @click="addSpeed(stepSpeed)">
+                    <v-icon small>mdi-plus</v-icon>
+                </button>
+            </span>
+        </div>
         <v-slider
             data-feature="move-speed"
             v-model="speed"
@@ -104,28 +116,34 @@ export default {
             :min="minSpeed"
             :max="maxSpeed"
             :step="stepSpeed"
-            thumb-label
-            thumb-color="red"
+            color="primary"
             hide-details
-            @change="onSpeedChange">
-            <template v-slot:prepend>
-                <span class="grey--text text--lighten-1 align-self-center mr-1 body-2" style="white-space: nowrap;">Move Speed</span>
-                <v-icon color="grey lighten-3" @click="addSpeed(-stepSpeed)">mdi-chevron-left</v-icon>
-            </template>
-            <template v-slot:append>
-                <v-icon color="grey lighten-3" @click="addSpeed(stepSpeed)">mdi-chevron-right</v-icon>
-                <span class="grey--text text--lighten-1 align-self-center ml-2">{{ speed.toFixed(1) }}</span>
-            </template>
-        </v-slider>
+            class="cheat-slider"
+            @change="onSpeedChange" />
         <v-checkbox
             v-model="fixSpeed"
             :disabled="!gameReady"
-            class="mt-1 pt-0"
+            class="cheat-checkbox"
             hide-details
             dense
-            label="Fixed"
+            label="Keep move speed fixed"
             @change="onSpeedChange" />
 
+        <div class="cheat-slider__head cheat-slider__head--spaced">
+            <span class="cheat-slider__label">Game speed</span>
+            <span class="cheat-stepper-group">
+                <button type="button" class="cheat-stepper" aria-label="Decrease game speed" @click="addGameSpeed(-stepGameSpeed)">
+                    <v-icon small>mdi-minus</v-icon>
+                </button>
+                <span class="cheat-value cheat-value--centre">x{{ gameSpeed.toFixed(1) }}</span>
+                <button type="button" class="cheat-stepper" aria-label="Increase game speed" @click="addGameSpeed(stepGameSpeed)">
+                    <v-icon small>mdi-plus</v-icon>
+                </button>
+                <button type="button" class="cheat-stepper cheat-stepper--reset" aria-label="Reset game speed to normal" title="Reset to normal speed" @click="setGameSpeed(1)">
+                    <v-icon small>mdi-restore</v-icon>
+                </button>
+            </span>
+        </div>
         <v-slider
             data-feature="game-speed"
             v-model="gameSpeed"
@@ -133,86 +151,68 @@ export default {
             :min="minGameSpeed"
             :max="maxGameSpeed"
             :step="stepGameSpeed"
-            class="mt-4"
-            thumb-label
-            thumb-color="red"
+            color="primary"
             hide-details
-            @change="onGameSpeedChange">
-            <template v-slot:prepend>
-                <span class="grey--text text--lighten-1 align-self-center mr-1 body-2" style="white-space: nowrap;">Game Speed</span>
-                <v-icon color="grey lighten-3" @click="addGameSpeed(-stepGameSpeed)">mdi-chevron-left</v-icon>
-            </template>
-            <template v-slot:append>
-                <v-icon color="grey lighten-3" @click="addGameSpeed(stepGameSpeed)">mdi-chevron-right</v-icon>
-                <span class="grey--text text--lighten-1 align-self-center ml-2">x{{ gameSpeed.toFixed(1) }}</span>
-                <v-icon size="16" color="grey lighten-3" class="ml-2" @click="setGameSpeed(1)">mdi-restore</v-icon>
-            </template>
-        </v-slider>
-
-        <v-row no-gutters align="center" class="mt-1">
-            <v-col cols="auto">
-                <v-checkbox
-                    v-model="applyAllForGameSpeed"
-                    :disabled="!gameReady"
-                    class="pt-0"
-                    hide-details
-                    dense
-                    label="All"
-                    @change="onApplyAllForGameSpeedChange" />
-            </v-col>
-            <v-col cols="auto" class="ml-3">
-                <v-checkbox
-                    v-model="applyBattleForGameSpeed"
-                    :disabled="!gameReady"
-                    class="pt-0"
-                    hide-details
-                    dense
-                    label="Battle"
-                    @change="onApplyBattleForGameSpeedChange" />
-            </v-col>
-        </v-row>
-    </v-card-text>
-
-    <!-- Quick Actions Section -->
-    <v-card-subtitle class="mt-1 pb-1 font-weight-bold">Quick Actions</v-card-subtitle>
-
-    <v-card-text class="py-1">
-        <v-row no-gutters>
-            <v-btn small @click="gotoTitle">To Title</v-btn>
-            <v-btn
-                v-if="canOpenConsole"
-                small
-                class="ml-1"
-                title="Open NW.js Developer Console"
-                @click="openConsole">
-                Open Console
-            </v-btn>
-            <v-btn
-                small
-                class="ml-1"
-                title="Open RPG Maker Debug Menu (F9)"
+            class="cheat-slider"
+            @change="onGameSpeedChange" />
+        <div class="cheat-grid cheat-grid--toggles">
+            <v-checkbox
+                v-model="applyAllForGameSpeed"
                 :disabled="!gameReady"
+                class="cheat-checkbox"
+                hide-details
+                dense
+                label="All scenes"
+                @change="onApplyAllForGameSpeedChange" />
+            <v-checkbox
+                v-model="applyBattleForGameSpeed"
+                :disabled="!gameReady"
+                class="cheat-checkbox"
+                hide-details
+                dense
+                label="Battle scenes"
+                @change="onApplyBattleForGameSpeedChange" />
+        </div>
+    </section>
+
+    <section class="cheat-section">
+        <div class="cheat-section__title">Screens</div>
+        <div class="cheat-actions">
+            <v-btn small outlined :disabled="!gameReady" @click="toggleSaveScene">Open Save</v-btn>
+            <v-btn small outlined @click="toggleLoadScene">Open Load</v-btn>
+            <v-btn small outlined @click="gotoTitle">To Title</v-btn>
+        </div>
+    </section>
+
+    <section class="cheat-section">
+        <div class="cheat-section__title">Developer</div>
+        <div class="cheat-actions">
+            <v-btn
+                small
+                outlined
+                :disabled="!gameReady"
+                title="Open RPG Maker Debug Menu (F9)"
                 @click="openDebugMenu">
                 Debug Menu
             </v-btn>
             <v-btn
                 v-if="canOpenConsole"
                 small
-                class="ml-1"
+                outlined
+                title="Open NW.js Developer Console"
+                @click="openConsole">
+                Open Console
+            </v-btn>
+            <v-btn
+                v-if="canOpenConsole"
+                small
                 color="primary"
                 title="Pop out Cheat Engine to a separate window"
                 @click="openCheatWindow">
                 Pop Out
             </v-btn>
-        </v-row>
-    </v-card-text>
-
-    <v-card-text class="pt-1 pb-3">
-        <v-row no-gutters>
-            <v-btn small class="mr-1" :disabled="!gameReady" @click="toggleSaveScene">Open Save</v-btn>
-            <v-btn small @click="toggleLoadScene">Open Load</v-btn>
-        </v-row>
-    </v-card-text>
+        </div>
+    </section>
 </v-card>
     `,
 

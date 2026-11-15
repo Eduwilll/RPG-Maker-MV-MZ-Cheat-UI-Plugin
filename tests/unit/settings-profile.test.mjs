@@ -93,6 +93,30 @@ test("enforces 1 MiB UTF-8 limit before parsing, including multi-byte labels", a
   );
 });
 
+test("color theme roundtrips through portable preferences and rejects unknown styles", async () => {
+  const { createGameOptions } = await runtime();
+  const { game, storage, data } = setup();
+  const options = createGameOptions(game, storage);
+  const profile = '{"version":1,"appearance":{"themeStyle":"legacy"}}';
+  assert.equal(options.importProfile(profile).applied.length, 1);
+  assert.equal(data.get("cheatModal.themeStyle"), "legacy");
+  assert.equal(
+    JSON.parse(options.exportProfile()).appearance.themeStyle,
+    "legacy",
+  );
+  const { parseSettingsProfile } = await load();
+  for (const value of ["unknown", "", null, false, {}, 1]) {
+    assert.throws(() =>
+      parseSettingsProfile(
+        JSON.stringify({
+          version: 1,
+          appearance: { themeStyle: value },
+        }),
+      ),
+    );
+  }
+});
+
 test("exports only explicit valid appearance preferences and imports through existing storage keys", async () => {
   const { createGameOptions } = await runtime();
   const { game, storage, data } = setup();

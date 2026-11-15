@@ -32,6 +32,7 @@ body {
   border-bottom: 1px solid #617f71;
   flex: 0 0 auto;
   z-index: 20;
+  color: #e1e8e5;
   font:
     13px Consolas,
     monospace;

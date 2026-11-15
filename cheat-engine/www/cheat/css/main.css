@@ -1,9 +1,1807 @@
-/* hide body scrollbar */
+/* ==========================================================================
+   Cheat UI design tokens
+   "Slate console": deep slate surfaces, one accent, dense 8px rhythm.
+   ========================================================================== */
+
+:root {
+  --cheat-font-ui:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  --cheat-font-mono:
+    "Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+
+  --cheat-bg: #0b1220;
+  --cheat-surface-1: #0f1828;
+  --cheat-surface-2: #16233a;
+  --cheat-surface-3: #1d2c46;
+  --cheat-border: rgba(148, 163, 184, 0.18);
+  --cheat-border-strong: rgba(148, 163, 184, 0.34);
+  --cheat-text: #e8eef9;
+  --cheat-text-muted: #9fb0c7;
+  --cheat-text-faint: #7c8ea6;
+  --cheat-focus: #8ab4ff;
+  --cheat-focus-soft: rgba(138, 180, 255, 0.16);
+  --cheat-primary: #1976d2;
+  --cheat-primary-soft: rgba(25, 118, 210, 0.16);
+  --cheat-success: #34d399;
+  --cheat-warning: #fbbf24;
+  --cheat-danger: #f87171;
+
+  --cheat-radius-sm: 6px;
+  --cheat-radius: 10px;
+  --cheat-radius-lg: 14px;
+  --cheat-shadow-1: 0 1px 2px rgba(2, 6, 15, 0.55);
+  --cheat-shadow-2: 0 18px 44px rgba(2, 6, 15, 0.55);
+  --cheat-speed: 140ms;
+  --cheat-ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.v-application.theme--light {
+  --cheat-bg: #f3f6fb;
+  --cheat-surface-1: #ffffff;
+  --cheat-surface-2: #f7f9fd;
+  --cheat-surface-3: #eaf0f8;
+  --cheat-border: rgba(15, 23, 42, 0.12);
+  --cheat-border-strong: rgba(15, 23, 42, 0.26);
+  --cheat-text: #0f172a;
+  --cheat-text-muted: #52627a;
+  --cheat-text-faint: #6b7c94;
+  --cheat-focus: #2563eb;
+  --cheat-focus-soft: rgba(37, 99, 235, 0.14);
+  --cheat-primary-soft: rgba(37, 99, 235, 0.1);
+  --cheat-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.08);
+  --cheat-shadow-2: 0 18px 44px rgba(15, 23, 42, 0.18);
+}
+
+/* Original Material colors, with the current compact layout kept intact. */
+.v-application[data-cheat-theme="legacy"] {
+  --cheat-bg: #1e1e1e;
+  --cheat-surface-1: #1e1e1e;
+  --cheat-surface-2: #272727;
+  --cheat-surface-3: #424242;
+  --cheat-border: rgba(255, 255, 255, 0.12);
+  --cheat-border-strong: rgba(255, 255, 255, 0.24);
+  --cheat-text: #ffffff;
+  --cheat-text-muted: rgba(255, 255, 255, 0.7);
+  --cheat-text-faint: rgba(255, 255, 255, 0.6);
+  --cheat-focus: #90caf9;
+  --cheat-focus-soft: rgba(144, 202, 249, 0.16);
+  --cheat-success: #4caf50;
+  --cheat-warning: #fb8c00;
+  --cheat-danger: #ff5252;
+}
+
+.v-application.theme--light[data-cheat-theme="legacy"] {
+  --cheat-bg: #fafafa;
+  --cheat-surface-1: #ffffff;
+  --cheat-surface-2: #f5f5f5;
+  --cheat-surface-3: #eeeeee;
+  --cheat-border: rgba(0, 0, 0, 0.12);
+  --cheat-border-strong: rgba(0, 0, 0, 0.24);
+  --cheat-text: rgba(0, 0, 0, 0.87);
+  --cheat-text-muted: rgba(0, 0, 0, 0.6);
+  --cheat-text-faint: rgba(0, 0, 0, 0.6);
+  --cheat-focus: #1976d2;
+  --cheat-focus-soft: rgba(25, 118, 210, 0.16);
+}
+
+.v-application[data-cheat-theme="legacy"] .cheat-shell__bar,
+.v-application.theme--light[data-cheat-theme="legacy"] .cheat-shell__bar,
+.v-application[data-cheat-theme="legacy"] .v-tooltip__content {
+  background: var(--cheat-surface-2);
+}
+
+.v-application[data-cheat-theme="legacy"] .cheat-nav__item.is-active {
+  color: var(--cheat-primary);
+}
+
+/* --------------------------------------------------------------------------
+   Base typography and surfaces
+   -------------------------------------------------------------------------- */
+
+.v-application {
+  font-family: var(--cheat-font-ui);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--cheat-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.v-application.theme--dark {
+  background: var(--cheat-bg);
+}
+
+.v-application.theme--light {
+  background: var(--cheat-bg);
+  color: var(--cheat-text);
+}
+
+.v-application .subtitle-1 {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.v-application .subtitle-2 {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.v-application .body-2 {
+  font-size: 12.5px;
+  letter-spacing: 0;
+}
+
+.v-application .caption {
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: var(--cheat-text-muted);
+}
+
+.v-application .text-h6 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.v-application .v-divider {
+  border-color: var(--cheat-border);
+}
+
+.v-application .v-card {
+  background-color: var(--cheat-surface-1);
+  border-radius: var(--cheat-radius);
+}
+
+/* --------------------------------------------------------------------------
+   Scrollbars
+   -------------------------------------------------------------------------- */
+
+.v-application ::-webkit-scrollbar,
+.v-application::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+.v-application ::-webkit-scrollbar-track,
+.v-application::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.v-application ::-webkit-scrollbar-thumb,
+.v-application::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.28);
+  background-clip: content-box;
+  border: 2px solid transparent;
+  border-radius: 9px;
+}
+
+.v-application ::-webkit-scrollbar-thumb:hover,
+.v-application::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.45);
+  background-clip: content-box;
+}
+
+/* --------------------------------------------------------------------------
+   Buttons
+   -------------------------------------------------------------------------- */
+
+.v-application .v-btn {
+  border-radius: var(--cheat-radius-sm);
+  font-family: var(--cheat-font-ui);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  transition:
+    background-color var(--cheat-speed) var(--cheat-ease),
+    box-shadow var(--cheat-speed) var(--cheat-ease),
+    color var(--cheat-speed) var(--cheat-ease);
+}
+
+.v-application .v-btn.v-size--small {
+  height: 30px;
+  min-width: 52px;
+  padding: 0 12px;
+  font-size: 12.5px;
+}
+
+.v-application .v-btn.v-size--x-small {
+  height: 26px;
+  min-width: 26px;
+  padding: 0 9px;
+  font-size: 11.5px;
+}
+
+.v-application .v-btn--fab.v-size--x-small {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+}
+
+.v-application .v-btn--fab.v-size--small {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+}
+
+.v-application .v-btn--icon.v-size--small {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  padding: 0;
+}
+
+.v-application .v-btn--text {
+  padding: 0 8px;
+}
+
+.v-application .v-btn--outlined {
+  border-color: var(--cheat-border-strong);
+}
+
+/* Flatten Vuetify's stock elevation. The panels sit on a flat surface, so
+   only hover lifts a button; floating action buttons keep their own shadow. */
+.v-application .v-btn.v-btn--is-elevated {
+  box-shadow: none;
+}
+
+.v-application .v-btn.v-btn--is-elevated:hover {
+  box-shadow: var(--cheat-shadow-1);
+}
+
+/* Colorless buttons inherit Vuetify's #272727 fill, which reads as a warm grey
+   slab next to the slate surfaces. Give them the shared subtle surface; themed
+   buttons keep their semantic color. */
+.v-application
+  .v-btn.v-btn--has-bg:not(.v-btn--outlined):not(.v-btn--text):not(
+    .v-btn--fab
+  ):not(.v-btn--icon):not(.primary):not(.secondary):not(.accent):not(
+    .error
+  ):not(.info):not(.success):not(.warning) {
+  border: 1px solid var(--cheat-border);
+  background: rgba(148, 163, 184, 0.1) !important;
+  color: var(--cheat-text);
+}
+
+.v-application
+  .v-btn.v-btn--has-bg:not(.v-btn--outlined):not(.v-btn--text):not(
+    .v-btn--fab
+  ):not(.v-btn--icon):not(.primary):not(.secondary):not(.accent):not(
+    .error
+  ):not(.info):not(.success):not(.warning):hover {
+  background: rgba(148, 163, 184, 0.16) !important;
+}
+
+/* Segmented toggles read as one control rather than a row of raised grey
+   buttons. Used by the database editor's encounter/record switch. */
+.v-application .v-btn-toggle {
+  border: 1px solid var(--cheat-border);
+  border-radius: 8px;
+  background: rgba(148, 163, 184, 0.06);
+  overflow: hidden;
+}
+
+.v-application .v-btn-toggle .v-btn {
+  height: 28px;
+  min-width: 0;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--cheat-text-muted);
+}
+
+.v-application .v-btn-toggle .v-btn + .v-btn {
+  border-left: 1px solid var(--cheat-border);
+}
+
+.v-application .v-btn-toggle .v-btn.v-btn--active {
+  background: var(--cheat-primary-soft) !important;
+  color: var(--cheat-primary) !important;
+}
+
+.v-application .v-btn-toggle .v-btn.v-btn--active::before {
+  opacity: 0;
+}
+
+.v-application .v-btn:focus {
+  outline: 2px solid var(--cheat-focus);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Inputs
+   -------------------------------------------------------------------------- */
+
+.v-application .v-input {
+  font-size: 12.5px;
+}
+
+.v-application .v-input__slot {
+  min-height: 34px;
+}
+
+.v-application .v-label {
+  font-size: 12.5px;
+  color: var(--cheat-text-muted);
+}
+
+.v-application .v-text-field--outlined fieldset,
+.v-application .v-text-field--outlined.v-input--dense fieldset {
+  border-color: var(--cheat-border);
+  border-radius: 8px;
+}
+
+/* A few legacy panels pass background-color="grey darken-3" to outlined
+   fields; an outlined field should only show its border on the shell surface. */
+.v-application .v-text-field--outlined .v-input__slot {
+  background: transparent !important;
+}
+
+.v-application
+  .v-text-field--outlined:not(.v-input--is-focused)
+  .v-input__slot:hover
+  fieldset {
+  border-color: var(--cheat-border-strong);
+}
+
+.v-application .v-text-field--outlined.v-input--is-focused fieldset {
+  border-color: var(--cheat-focus) !important;
+  border-width: 2px;
+}
+
+.v-application .v-text-field--outlined.v-input--is-focused .v-input__slot {
+  box-shadow: 0 0 0 3px var(--cheat-focus-soft);
+  border-radius: 8px;
+}
+
+.v-application .v-text-field--filled .v-input__slot {
+  background: rgba(148, 163, 184, 0.07);
+  border-radius: 8px 8px 0 0;
+}
+
+/* Solo fields are used for panel search boxes and inline table values. The
+   legacy panels pass `background-color="grey darken-3"`; flatten that to the
+   shared surface so every panel reads the same. */
+.v-application .v-text-field--solo .v-input__slot {
+  min-height: 34px !important;
+  border: 1px solid var(--cheat-border);
+  border-radius: 8px;
+  background: rgba(148, 163, 184, 0.06) !important;
+  box-shadow: none !important;
+}
+
+.v-application .v-text-field--solo.v-input--is-focused .v-input__slot {
+  border-color: var(--cheat-focus);
+  box-shadow: 0 0 0 3px var(--cheat-focus-soft) !important;
+}
+
+.v-application .v-text-field--solo .v-label {
+  color: var(--cheat-text-faint);
+}
+
+.v-application .v-data-table .v-text-field--solo .v-input__slot {
+  min-height: 28px !important;
+  border-radius: 6px;
+}
+
+.v-application .v-data-table .v-text-field__slot input {
+  font-size: 12.5px;
+}
+
+/* Floating refresh/reset buttons in legacy panels: keep the affordance, drop
+   the saturated pink/green fills. */
+.cheat-content .v-btn--fab {
+  background: var(--cheat-surface-2) !important;
+  box-shadow: var(--cheat-shadow-1) !important;
+  color: var(--cheat-text-muted) !important;
+}
+
+.cheat-content .v-btn--fab:hover {
+  background: var(--cheat-surface-3) !important;
+  color: var(--cheat-text) !important;
+}
+
+.cheat-content .v-btn--fab.v-btn--small {
+  width: 30px;
+  height: 30px;
+}
+
+.v-application .v-input--is-disabled {
+  opacity: 0.55;
+}
+
+.v-application .v-input--is-disabled .v-label {
+  color: var(--cheat-text-faint);
+}
+
+.v-application input:focus,
+.v-application textarea:focus {
+  outline: none;
+}
+
+.v-application .v-input__icon .v-icon {
+  font-size: 18px;
+}
+
+/* Selection controls: keep Vuetify's hit areas, just tighten the chrome.
+   Sizing the shared input box smaller breaks switches, so only the icon and
+   the vertical rhythm change here. */
+.v-application .v-input--selection-controls {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.v-application .v-input--selection-controls__input .v-icon {
+  font-size: 18px;
+}
+
+.v-application .v-input--selection-controls .v-messages {
+  font-size: 10.5px;
+}
+
+.v-application .v-input--switch .v-input--selection-controls__input {
+  width: 36px;
+  min-width: 36px;
+  margin-right: 10px;
+}
+
+/* Sliders */
+.v-application .v-slider__thumb {
+  width: 14px;
+  height: 14px;
+}
+
+.v-application .v-slider__track-container {
+  border-radius: 3px;
+}
+
+.v-application .v-slider__thumb-label {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.v-application .v-slider .v-icon {
+  font-size: 18px;
+}
+
+/* --------------------------------------------------------------------------
+   Chips, alerts, badges
+   -------------------------------------------------------------------------- */
+
+.v-application .v-chip {
+  height: 24px;
+  border-radius: var(--cheat-radius-sm);
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+.v-application .v-chip.v-size--small {
+  height: 21px;
+  font-size: 11px;
+}
+
+.v-application .v-chip .v-chip__content {
+  padding: 0 8px;
+}
+
+.v-application .v-alert {
+  border: 1px solid var(--cheat-border);
+  border-radius: var(--cheat-radius);
+  font-size: 12.5px;
+  padding: 9px 12px;
+}
+
+.v-application .v-alert--text {
+  background: rgba(96, 165, 250, 0.08);
+  border-left: 3px solid currentColor;
+}
+
+/* --------------------------------------------------------------------------
+   Tables
+   -------------------------------------------------------------------------- */
+
+.v-application .v-data-table {
+  background: transparent;
+}
+
+.v-application .v-data-table > .v-data-table__wrapper > table {
+  background: transparent;
+}
+
+.v-application
+  .v-data-table
+  > .v-data-table__wrapper
+  > table
+  > thead
+  > tr
+  > th {
+  height: 30px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--cheat-border);
+  color: var(--cheat-text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.v-application
+  .v-data-table
+  > .v-data-table__wrapper
+  > table
+  > tbody
+  > tr
+  > td {
+  height: 34px;
+  padding: 0 8px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.09);
+  font-size: 12.5px;
+}
+
+.v-application
+  .v-data-table
+  > .v-data-table__wrapper
+  > table
+  > tbody
+  > tr:hover {
+  background: rgba(148, 163, 184, 0.06);
+}
+
+.v-application .v-data-footer {
+  border-top: 1px solid var(--cheat-border);
+  font-size: 11.5px;
+}
+
+.v-application .v-data-footer .v-btn {
+  min-width: 26px;
+}
+
+/* The rows-per-page select is the only bare select left in the panels; give it
+   the same compact surface as the solo search fields. */
+.v-application .v-data-footer__select .v-input__slot {
+  min-height: 28px;
+  padding: 0 6px;
+  border: 1px solid var(--cheat-border);
+  border-radius: 6px;
+  background: rgba(148, 163, 184, 0.06);
+}
+
+.v-application .v-data-footer__select .v-input__slot::before,
+.v-application .v-data-footer__select .v-input__slot::after {
+  display: none;
+}
+
+.v-application .v-data-footer__select .v-select__selection {
+  margin: 0 4px 0 0;
+}
+
+.v-application .v-simple-table th {
+  height: 30px;
+  padding: 0 8px;
+  color: var(--cheat-text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.v-application .v-simple-table td {
+  height: 32px;
+  padding: 0 8px;
+  border-color: rgba(148, 163, 184, 0.09);
+  font-size: 12.5px;
+}
+
+/* --------------------------------------------------------------------------
+   Tabs, expansion panels, lists
+   -------------------------------------------------------------------------- */
+
+.v-application .cheat-content .v-tabs-bar {
+  /* Legacy panels pass background-color="grey darken-3" on v-tabs; the shell
+     is already a surface, so the tab strip must stay flush with it. The
+     three-class selector beats Vuetify's injected .grey.darken-3 rule. */
+  background: transparent !important;
+}
+
+.v-application .v-tab {
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.v-application .v-tabs-slider {
+  height: 2px;
+  border-radius: 2px;
+}
+
+.v-application .v-expansion-panel {
+  background: var(--cheat-surface-1);
+}
+
+.v-application .v-expansion-panel-header {
+  min-height: 40px;
+  padding: 0 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.v-application .v-expansion-panel-content__wrap {
+  padding: 0 12px 12px;
+}
+
+.v-application .v-list {
+  background: transparent;
+}
+
+.v-application .v-list-item {
+  min-height: 34px;
+}
+
+.v-application .v-list-item__title {
+  font-size: 12.5px;
+}
+
+.v-application .v-list-item__subtitle {
+  color: var(--cheat-text-muted);
+  font-size: 11px;
+}
+
+/* --------------------------------------------------------------------------
+   Overlays: dialogs, menus, tooltips, snackbars
+   -------------------------------------------------------------------------- */
+
+.v-application .v-dialog .v-card {
+  background-color: var(--cheat-surface-1);
+  border: 1px solid var(--cheat-border);
+  border-radius: var(--cheat-radius-lg);
+  box-shadow: var(--cheat-shadow-2);
+}
+
+.v-application .v-dialog .v-card__title {
+  padding: 14px 16px 6px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.v-application .v-dialog .v-card__text {
+  font-size: 12.5px;
+}
+
+.v-application .v-dialog .v-card__actions {
+  padding: 8px 12px 12px;
+}
+
+.v-application .v-menu__content {
+  background: var(--cheat-surface-1);
+  border: 1px solid var(--cheat-border);
+  border-radius: var(--cheat-radius);
+  box-shadow: var(--cheat-shadow-2);
+}
+
+.v-application .v-menu__content .v-list {
+  padding: 4px;
+}
+
+.v-application .v-menu__content .v-list-item {
+  min-height: 32px;
+  border-radius: var(--cheat-radius-sm);
+}
+
+.v-application .v-tooltip__content {
+  background: #16233a;
+  border: 1px solid var(--cheat-border);
+  border-radius: 8px;
+  box-shadow: var(--cheat-shadow-2);
+  color: var(--cheat-text);
+  font-size: 11.5px;
+  padding: 6px 9px;
+}
+
+.v-application .v-snack__wrapper {
+  background: var(--cheat-surface-1);
+  border: 1px solid var(--cheat-border);
+  border-radius: var(--cheat-radius);
+  box-shadow: var(--cheat-shadow-2);
+}
+
+.v-application .v-snack__content {
+  font-size: 12.5px;
+}
+
+/* --------------------------------------------------------------------------
+   Feature finder
+   -------------------------------------------------------------------------- */
+
+.cheat-finder {
+  overflow: hidden;
+}
+
+.cheat-finder__head {
+  display: flex;
+  align-items: center;
+  padding: 12px 10px 8px 14px;
+  border-bottom: 1px solid var(--cheat-border);
+}
+
+.cheat-finder__icon {
+  margin-right: 8px;
+  color: var(--cheat-text-muted);
+}
+
+.cheat-finder__title {
+  color: var(--cheat-text);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.cheat-finder__count {
+  margin-left: 8px;
+  color: var(--cheat-text-faint);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cheat-finder__close {
+  margin-left: auto;
+}
+
+.cheat-finder__search {
+  padding: 10px 12px 6px;
+}
+
+.cheat-finder__results {
+  max-height: 300px;
+  padding: 4px 6px 6px;
+  overflow-y: auto;
+}
+
+.cheat-finder__item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--cheat-text);
+  cursor: pointer;
+  font-family: var(--cheat-font-ui);
+  text-align: left;
+}
+
+.cheat-finder__item.is-active {
+  background: var(--cheat-primary-soft);
+  box-shadow: inset 2px 0 0 var(--cheat-primary);
+}
+
+.cheat-finder__label {
+  font-size: 12.5px;
+}
+
+.cheat-finder__type {
+  margin-left: 8px;
+  color: var(--cheat-text-faint);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cheat-finder__item kbd {
+  margin-left: auto;
+}
+
+.cheat-finder__empty {
+  padding: 18px 10px;
+  color: var(--cheat-text-muted);
+  font-size: 12.5px;
+  text-align: center;
+}
+
+.cheat-finder__foot {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 8px 14px 10px;
+  border-top: 1px solid var(--cheat-border);
+  color: var(--cheat-text-faint);
+  font-size: 10.5px;
+}
+
+.cheat-finder__foot > span {
+  margin-right: 14px;
+}
+
+.cheat-finder__foot kbd {
+  margin-right: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   Shell: bar, navigation, content
+   -------------------------------------------------------------------------- */
+
+.cheat-shell {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--cheat-bg) !important;
+  border: 1px solid var(--cheat-border-strong);
+  border-radius: var(--cheat-radius-lg);
+  box-shadow: var(--cheat-shadow-2) !important;
+}
+
+.cheat-shell--window {
+  border: 0;
+  border-radius: 0;
+}
+
+.cheat-shell__bar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 8px;
+  background: linear-gradient(180deg, #121e33 0%, #0c1524 100%);
+  border-bottom: 1px solid var(--cheat-border);
+}
+
+.v-application.theme--light .cheat-shell__bar {
+  background: linear-gradient(180deg, #ffffff 0%, #f2f6fc 100%);
+}
+
+.cheat-shell__titles {
+  min-width: 0;
+  margin-left: 6px;
+}
+
+.cheat-shell__title {
+  overflow: hidden;
+  color: var(--cheat-text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cheat-shell__subtitle {
+  margin-top: 1px;
+  color: var(--cheat-text-faint);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.cheat-shell__spacer {
+  flex: 1 1 auto;
+}
+
+.cheat-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--cheat-text-muted);
+  cursor: pointer;
+  transition:
+    background-color var(--cheat-speed) var(--cheat-ease),
+    color var(--cheat-speed) var(--cheat-ease);
+}
+
+.cheat-icon-button:hover {
+  background: rgba(148, 163, 184, 0.14);
+  color: var(--cheat-text);
+}
+
+.cheat-icon-button:active {
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.cheat-icon-button:focus {
+  outline: 2px solid var(--cheat-focus);
+  outline-offset: 1px;
+}
+
+.cheat-bar__action {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--cheat-border);
+  border-radius: 8px;
+  background: rgba(148, 163, 184, 0.06);
+  color: var(--cheat-text-muted);
+  cursor: pointer;
+  font-family: var(--cheat-font-ui);
+  font-size: 11.5px;
+  transition:
+    background-color var(--cheat-speed) var(--cheat-ease),
+    border-color var(--cheat-speed) var(--cheat-ease),
+    color var(--cheat-speed) var(--cheat-ease);
+}
+
+.cheat-bar__action:hover {
+  border-color: var(--cheat-border-strong);
+  background: rgba(148, 163, 184, 0.12);
+  color: var(--cheat-text);
+}
+
+.cheat-bar__action:focus {
+  outline: 2px solid var(--cheat-focus);
+  outline-offset: 2px;
+}
+
+.cheat-bar__action .v-icon {
+  margin-right: 6px;
+}
+
+.cheat-body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.cheat-nav {
+  flex: 0 0 auto;
+  width: max-content;
+  min-width: 156px;
+  max-width: 180px;
+  padding: 10px 8px 16px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--cheat-surface-1);
+  border-right: 1px solid var(--cheat-border);
+}
+
+.cheat-nav__heading {
+  padding: 12px 8px 4px;
+  color: var(--cheat-text-faint);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.cheat-nav__item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 30px;
+  padding: 3px 8px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--cheat-text-muted);
+  cursor: pointer;
+  font-family: var(--cheat-font-ui);
+  font-size: 12.5px;
+  line-height: 1.3;
+  text-align: left;
+  transition:
+    background-color 120ms var(--cheat-ease),
+    color 120ms var(--cheat-ease);
+}
+
+.cheat-nav__item > span {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.cheat-nav__item .v-icon {
+  flex: 0 0 auto;
+  margin-right: 7px;
+  font-size: 16px;
+  opacity: 0.85;
+}
+
+.cheat-nav__item:hover {
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--cheat-text);
+}
+
+.cheat-nav__item:focus {
+  outline: 2px solid var(--cheat-focus);
+  outline-offset: -2px;
+}
+
+.cheat-nav__item.is-active {
+  background: var(--cheat-primary-soft);
+  box-shadow: inset 2px 0 0 var(--cheat-primary);
+  color: var(--cheat-text);
+  font-weight: 500;
+}
+
+.cheat-nav__item.is-active .v-icon {
+  color: var(--cheat-primary);
+  opacity: 1;
+}
+
+.cheat-nav__parent {
+  font-weight: 500;
+}
+
+.cheat-nav__chevron {
+  margin-right: 0 !important;
+  margin-left: auto;
+  opacity: 0.6 !important;
+  transition: transform var(--cheat-speed) var(--cheat-ease);
+}
+
+.cheat-nav__parent[aria-expanded="true"] .cheat-nav__chevron {
+  transform: rotate(180deg);
+}
+
+.cheat-nav__children {
+  padding-left: 18px;
+}
+
+.cheat-nav__children .cheat-nav__item {
+  min-height: 28px;
+  font-size: 12px;
+}
+
+.cheat-nav__children .v-icon {
+  font-size: 14px;
+}
+
+.cheat-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 14px 16px 22px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.cheat-content > .v-card {
+  background: transparent;
+  border-radius: 0;
+}
+
+.cheat-shell--window .cheat-content {
+  padding: 18px 20px 26px;
+}
+
+.cheat-resize-handle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-bottom-right-radius: 13px;
+  background: transparent;
+  color: var(--cheat-text-faint);
+  cursor: nwse-resize;
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0.65;
+  touch-action: none;
+  transition:
+    background-color var(--cheat-speed) var(--cheat-ease),
+    color var(--cheat-speed) var(--cheat-ease),
+    opacity var(--cheat-speed) var(--cheat-ease);
+}
+
+.cheat-resize-handle:hover {
+  background: rgba(148, 163, 184, 0.14);
+  color: var(--cheat-text);
+  opacity: 1;
+}
+
+.cheat-resize-handle:focus {
+  outline: 2px solid var(--cheat-focus);
+  outline-offset: -2px;
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Panel building blocks
+   -------------------------------------------------------------------------- */
+
+.cheat-panel__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+/* Vuetify rows carry a -12px gutter. Inside a flush card that pushes the first
+   row above the scroll area and clips floating labels, so keep the top flush
+   while leaving the horizontal gutters alone. */
+.cheat-content .v-card > .row:first-child {
+  margin-top: 0;
+}
+
+.cheat-panel__title {
+  color: var(--cheat-text);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.cheat-panel__meta {
+  margin-top: 2px;
+  color: var(--cheat-text-muted);
+  font-size: 11px;
+}
+
+.cheat-section {
+  margin-top: 12px;
+}
+
+.cheat-section:first-child {
+  margin-top: 0;
+}
+
+.cheat-section__title {
+  margin-bottom: 6px;
+  color: var(--cheat-text-muted);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.cheat-grid {
+  display: grid;
+  grid-column-gap: 12px;
+  grid-row-gap: 4px;
+}
+
+.cheat-grid--toggles {
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+}
+
+/* Shared interactive map: tools float above artwork instead of consuming rows. */
+.interactive-map {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--cheat-border-strong);
+  border-radius: 10px;
+  background: #101923;
+  color: var(--cheat-text);
+  isolation: isolate;
+}
+
+.interactive-map__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+#app .interactive-map__canvas {
+  cursor: grab !important;
+}
+#app .interactive-map__canvas:active {
+  cursor: grabbing !important;
+}
+.interactive-map__canvas:focus {
+  outline: 2px solid var(--cheat-focus);
+  outline-offset: -3px;
+}
+
+.interactive-map__heading,
+.interactive-map__tools,
+.interactive-map__navigation,
+.interactive-map__status,
+.interactive-map__selection,
+.interactive-map__drawer,
+.interactive-map__legend {
+  position: absolute;
+  z-index: 1;
+  background: var(--cheat-surface-1);
+  color: var(--cheat-text);
+  border: 1px solid var(--cheat-border-strong);
+  border-radius: 8px;
+  box-shadow: var(--cheat-shadow-1);
+}
+
+.interactive-map__heading {
+  top: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  max-width: calc(100% - 152px);
+  height: 32px;
+  padding: 0 9px;
+  font-size: 12px;
+  font-weight: 600;
+  pointer-events: none;
+}
+.interactive-map__heading > span:first-of-type {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.interactive-map__heading .v-icon {
+  margin-right: 6px;
+}
+.interactive-map__live {
+  margin-left: 8px;
+  color: var(--cheat-success);
+  font: 9px var(--cheat-font-mono);
+  letter-spacing: 0.1em;
+}
+.interactive-map__tools {
+  top: 10px;
+  right: 10px;
+  display: flex;
+  padding: 2px;
+  pointer-events: auto;
+}
+.interactive-map__navigation {
+  bottom: 38px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  padding: 2px;
+  pointer-events: auto;
+}
+
+.map-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  color: var(--cheat-text);
+  background: transparent;
+}
+.map-tool:hover,
+.map-tool.is-active {
+  background: var(--cheat-primary-soft);
+  color: var(--cheat-primary);
+}
+.map-tool:focus,
+.map-result:focus,
+.map-settings__link:focus,
+.map-teleport:focus {
+  outline: 2px solid var(--cheat-focus);
+  outline-offset: -2px;
+}
+.map-tool .v-icon {
+  color: inherit;
+  font-size: 18px;
+}
+.map-tool__divider {
+  height: 1px;
+  margin: 3px 4px;
+  background: var(--cheat-border);
+}
+
+.interactive-map__status {
+  left: 8px;
+  bottom: 7px;
+  right: 8px;
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 7px;
+  font: 10px var(--cheat-font-mono);
+  pointer-events: none;
+  opacity: 0.92;
+}
+.interactive-map__drawer {
+  top: 50px;
+  right: 10px;
+  bottom: 38px;
+  width: 300px;
+  max-width: calc(100% - 20px);
+  overflow: auto;
+  pointer-events: auto;
+}
+.interactive-map__drawer > header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--cheat-surface-1);
+  border-bottom: 1px solid var(--cheat-border);
+  padding: 4px 8px 4px 12px;
+  font-size: 12px;
+}
+.map-settings {
+  padding: 10px 12px;
+}
+.map-layer-settings__toggles > * + * {
+  margin-top: 5px !important;
+}
+.map-settings .caption {
+  margin-top: 10px;
+}
+.map-settings__link {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 0;
+  color: var(--cheat-text);
+  border-bottom: 1px solid var(--cheat-border);
+  text-align: left;
+  font-size: 12px;
+}
+.map-settings__link > .v-icon {
+  margin-right: 7px;
+}
+.interactive-map__drawer > .v-card {
+  padding: 8px !important;
+}
+.interactive-map__legend {
+  top: 50px;
+  left: 10px;
+  padding: 6px 9px;
+  pointer-events: none;
+}
+.interactive-map__legend > span {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  line-height: 22px;
+}
+.interactive-map__legend i {
+  width: 7px;
+  height: 10px;
+  border-radius: 4px 4px 1px 1px;
+  margin-right: 7px;
+}
+
+.map-result {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 9px 2px;
+  border-bottom: 1px solid var(--cheat-border);
+  color: var(--cheat-text);
+}
+.map-result strong,
+.interactive-map__selection strong {
+  display: block;
+  font-size: 12px;
+  overflow-wrap: break-word;
+}
+.map-result small,
+.interactive-map__selection small {
+  display: block;
+  font: 10px var(--cheat-font-mono);
+  color: var(--cheat-text-muted);
+}
+.map-result__kind {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.interactive-map__selection {
+  left: 10px;
+  bottom: 38px;
+  display: flex;
+  align-items: center;
+  width: 330px;
+  max-width: calc(100% - 64px);
+  padding: 9px;
+  pointer-events: auto;
+}
+.interactive-map__selection > div {
+  flex: 1;
+  min-width: 0;
+}
+.map-teleport {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--cheat-text);
+  background: var(--cheat-primary-soft);
+}
+.map-teleport .v-icon {
+  margin-right: 3px;
+}
+.interactive-map__message {
+  position: absolute;
+  z-index: 3;
+  top: 50px;
+  left: 10px;
+  max-width: calc(100% - 20px);
+  padding: 8px;
+  font-size: 12px;
+  border-radius: 6px;
+  background: var(--cheat-surface-1);
+  color: var(--cheat-text);
+}
+
+.interactive-map--compact .interactive-map__heading {
+  display: none;
+}
+.interactive-map--compact .interactive-map__tools {
+  top: 4px;
+  right: 4px;
+}
+.interactive-map--compact .map-tool {
+  width: 25px;
+  height: 25px;
+}
+.interactive-map--compact .interactive-map__navigation {
+  bottom: 26px;
+  right: 4px;
+}
+.interactive-map--compact .interactive-map__status {
+  left: 3px;
+  right: 3px;
+  bottom: 3px;
+  padding: 2px 4px;
+  font-size: 9px;
+}
+.interactive-map--compact .interactive-map__drawer {
+  top: 35px;
+  right: 3px;
+  bottom: 25px;
+  max-width: calc(100% - 6px);
+}
+.interactive-map--compact .interactive-map__selection {
+  left: 3px;
+  bottom: 26px;
+  max-width: calc(100% - 35px);
+  padding: 5px;
+  flex-wrap: wrap;
+}
+.interactive-map--compact .map-teleport {
+  margin: 4px 0 0;
+}
+.interactive-map--compact .interactive-map__selection > .map-tool {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.interactive-map--compact .interactive-map__selection > div {
+  flex-basis: 100%;
+  padding-right: 20px;
+}
+.minimap-move-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  height: 25px;
+  background: var(--cheat-surface-1);
+  color: var(--cheat-text);
+  font-size: 10px;
+  cursor: move;
+  touch-action: none;
+}
+
+.cheat-grid--two {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.cheat-inline--top {
+  margin-top: 8px;
+}
+
+.cheat-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 2px;
+}
+
+.cheat-swatch {
+  width: 24px;
+  height: 24px;
+  margin: 2px 7px 4px 2px;
+  padding: 0;
+  border: 1px solid rgba(15, 23, 42, 0.35);
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    box-shadow var(--cheat-speed) var(--cheat-ease),
+    transform var(--cheat-speed) var(--cheat-ease);
+}
+
+.cheat-swatch:hover {
+  transform: translateY(-1px);
+}
+
+.cheat-swatch--default {
+  width: auto;
+  padding: 0 9px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cheat-swatch:focus {
+  outline: 2px solid var(--cheat-focus);
+  outline-offset: 2px;
+}
+
+.cheat-swatch.is-selected {
+  box-shadow:
+    0 0 0 2px var(--cheat-bg),
+    0 0 0 4px var(--cheat-focus);
+}
+
+.cheat-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.cheat-inline > * + * {
+  margin-left: 8px;
+}
+
+.cheat-inline--end {
+  margin-left: auto;
+}
+
+.cheat-value {
+  color: var(--cheat-text);
+  font-family: var(--cheat-font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cheat-muted {
+  color: var(--cheat-text-muted);
+}
+
+.cheat-field-narrow {
+  max-width: 180px;
+}
+
+.cheat-kbd,
+.v-application kbd,
+.v-application .cheat-shell kbd,
+.v-application .cheat-finder kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  border: 1px solid var(--cheat-border-strong);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--cheat-text-muted);
+  font-family: var(--cheat-font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.cheat-slider__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 22px;
+}
+
+.cheat-slider__head--spaced {
+  margin-top: 12px;
+}
+
+.cheat-slider__label {
+  color: var(--cheat-text-muted);
+  font-size: 12px;
+}
+
+.cheat-slider .v-slider {
+  margin-top: 2px;
+}
+
+.cheat-slider .v-input__slot {
+  min-height: 22px;
+}
+
+.cheat-checkbox {
+  margin-top: 2px;
+  margin-bottom: 0;
+}
+
+.cheat-game-option {
+  padding: 4px 0;
+}
+
+.cheat-game-option--boolean {
+  padding: 1px 0;
+}
+
+.v-application .cheat-game-option--boolean .v-input__slot {
+  min-height: 26px;
+  margin-bottom: 0;
+}
+
+.cheat-stepper-group {
+  display: inline-flex;
+  align-items: center;
+}
+
+.cheat-stepper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--cheat-border);
+  border-radius: 5px;
+  background: rgba(148, 163, 184, 0.07);
+  color: var(--cheat-text-muted);
+  cursor: pointer;
+  transition:
+    background-color var(--cheat-speed) var(--cheat-ease),
+    border-color var(--cheat-speed) var(--cheat-ease),
+    color var(--cheat-speed) var(--cheat-ease);
+}
+
+.cheat-stepper:hover {
+  border-color: var(--cheat-border-strong);
+  background: rgba(148, 163, 184, 0.16);
+  color: var(--cheat-text);
+}
+
+.cheat-stepper:active {
+  background: rgba(148, 163, 184, 0.22);
+}
+
+.cheat-stepper:focus {
+  outline: 2px solid var(--cheat-focus);
+  outline-offset: 1px;
+}
+
+.cheat-stepper .v-icon {
+  font-size: 14px;
+}
+
+.cheat-stepper--reset {
+  margin-left: 6px;
+  opacity: 0.75;
+}
+
+.cheat-stepper--reset:hover {
+  opacity: 1;
+}
+
+.cheat-value--centre {
+  min-width: 38px;
+  text-align: center;
+}
+
+.cheat-field-gold {
+  max-width: 200px;
+}
+
+/* Search + panel actions share one line above tables, so the reload action no
+   longer floats over the search field. */
+.cheat-table-top {
+  display: flex;
+  align-items: center;
+}
+
+.cheat-table-top > .v-input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cheat-table-top__action {
+  flex: 0 0 auto;
+  margin-left: 8px;
+}
+
+.cheat-reload {
+  white-space: nowrap;
+}
+
+/* Table display toggles used to be a 2x2 grid of padded v-cols. Keep the same
+   checkboxes on one compact, wrapping line so the table stays above the fold. */
+.cheat-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 2px 0;
+}
+
+.cheat-filter-bar .v-input--checkbox {
+  flex: 0 0 auto;
+  margin: 0 16px 0 0;
+}
+
+.cheat-filter-bar .v-input--selection-controls__input {
+  margin-right: 4px;
+}
+
+.cheat-filter-bar .v-label {
+  font-size: 11.5px;
+}
+
+/* Party tabs and the recruitment button share one row; the button stays
+   pinned to the right even when the tabs overflow into arrows. */
+.stats-actor-tabs {
+  display: flex;
+  align-items: center;
+}
+
+.stats-actor-tabs__strip {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.stats-party-recruitment {
+  flex: 0 0 auto;
+  margin: 0 8px;
+}
+
+.stats-party-recruitment__add {
+  border: 1px solid var(--cheat-border);
+  background: rgba(148, 163, 184, 0.08);
+  color: var(--cheat-text-muted);
+}
+
+.stats-party-recruitment__add:hover {
+  border-color: var(--cheat-border-strong);
+  background: rgba(148, 163, 184, 0.16);
+  color: var(--cheat-text);
+}
+
+.stats-party-recruitment__menu {
+  min-width: 220px;
+  background: var(--cheat-surface-2);
+  border: 1px solid var(--cheat-border);
+}
+
+.cheat-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  grid-column-gap: 6px;
+  grid-row-gap: 6px;
+}
+
+.cheat-actions .v-btn {
+  margin: 0;
+  min-width: 0;
+}
+
+.cheat-panel__head .v-btn.v-btn--text {
+  flex: 0 0 auto;
+  margin-top: -2px;
+  margin-left: 8px;
+}
+
 .cheat-feature-highlight {
   outline: 2px solid #ffb74d !important;
   outline-offset: 2px;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .cheat-shell *,
+  .cheat-shell *::before,
+  .cheat-shell *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* hide body scrollbar */
 .database-detail-label {
   display: inline-block;
   max-width: 100%;
@@ -92,6 +1890,11 @@ body {
   cursor: crosshair !important;
 }
 
+/* Resize grip keeps its diagonal cursor despite the global #app reset. */
+#app .cheat-resize-handle {
+  cursor: nwse-resize !important;
+}
+
 /* z-index */
 .z-index-cheat-0 {
   z-index: 1001 !important;
@@ -165,31 +1968,24 @@ body {
   max-width: 280px;
 }
 
-/*.x-small-field .v-input__control {*/
-/*    height: 35px;*/
-/*    width: 1px;*/
-/*    margin: 0;*/
-/*}*/
-/*.x-small-field .v-input__slot {*/
-/*    min-height: 12px !important;*/
-/*}*/
-/*.x-small-field .v-label,*/
-/*.x-small-field .v-select__selections,*/
-/*.x-small-field .v-list-item__title {*/
-/*    font-size: 12px;*/
-/*}*/
-/*.x-small-field .v-input__prepend-inner {*/
-/*    top: 1px !important;*/
-/*    margin-top: 8px !important;*/
-/*    text-align: center !important;*/
-/*    align-content: center !important;*/
-/*}*/
-/*.x-small-field .v-text-field__slot .v-label {*/
-/*    top: 6px;*/
-/*}*/
-/*.x-small-field .v-text-field__slot .v-label--active {*/
-/*    top: 16px;*/
-/*}*/
+/* Section headers across every panel. Kept last so panels that add spacing
+   utilities still get the shared hierarchy without new markup. */
+.v-application .v-card__subtitle,
+.v-application .v-card-subtitle {
+  min-height: 0;
+  padding: 12px 0 5px;
+  color: var(--cheat-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+}
+
+.v-application .v-card__subtitle:first-child,
+.v-application .v-card-subtitle:first-child {
+  padding-top: 0;
+}
+
 .cheat-game-font,
 .cheat-game-font input,
 .cheat-game-font textarea,

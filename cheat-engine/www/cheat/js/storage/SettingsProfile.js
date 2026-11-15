@@ -4,6 +4,7 @@ const APPEARANCE = [
   "windowOpacity",
   "isDarkMode",
   "primaryColor",
+  "themeStyle",
   "sidebarVisible",
 ];
 const SHORTCUTS = [
@@ -112,6 +113,8 @@ function validate(value) {
           (typeof item !== "string" || !/^#[0-9a-f]{6}$/i.test(item))
         )
           throw new Error("Invalid accent color");
+        if (key === "themeStyle" && !["current", "legacy"].includes(item))
+          throw new Error("Invalid color theme");
       } else {
         if (!SHORTCUTS.includes(key)) throw new Error("Unsupported shortcut");
         result.shortcuts[key] = normalizeProfileShortcut(item);

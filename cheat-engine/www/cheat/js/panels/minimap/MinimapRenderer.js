@@ -135,7 +135,13 @@ export function drawMinimap(canvas, base, options) {
 }
 
 export function readMinimapFrame() {
-  const frame = { onMap: false, playerX: 0, playerY: 0, events: [] };
+  const frame = {
+    onMap: false,
+    playerX: 0,
+    playerY: 0,
+    direction: 2,
+    events: [],
+  };
   const game = /** @type {any} */ (getGameWindow());
   try {
     if (
@@ -147,6 +153,10 @@ export function readMinimapFrame() {
     const player = game.$gamePlayer;
     frame.playerX = Number.isFinite(player._realX) ? player._realX : player.x;
     frame.playerY = Number.isFinite(player._realY) ? player._realY : player.y;
+    frame.direction =
+      typeof player.direction === "function"
+        ? player.direction()
+        : player._direction || 2;
     frame.events = readMapMarkers(game);
   } catch (error) {
     /* No active map yet. */

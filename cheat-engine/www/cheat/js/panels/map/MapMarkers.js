@@ -5,6 +5,43 @@ const COLORS = {
   event: "#ffd700",
 };
 
+const classificationCaches = new WeakMap();
+
+function classificationCache(game, map) {
+  const dataMap = game.$dataMap,
+    commonEvents = game.$dataCommonEvents,
+    scene = game.SceneManager && game.SceneManager._scene,
+    mapId = map._mapId;
+  let cache = classificationCaches.get(game);
+  if (
+    !cache ||
+    cache.map !== map ||
+    cache.mapId !== mapId ||
+    cache.dataMap !== dataMap ||
+    cache.commonEvents !== commonEvents ||
+    cache.scene !== scene
+  ) {
+    cache = { map, mapId, dataMap, commonEvents, scene, pages: new WeakMap() };
+    classificationCaches.set(game, cache);
+  }
+  return cache.pages;
+}
+
+function cachedKind(game, pages, page, characterName) {
+  if (!page || typeof page !== "object") return kind(game, page, characterName);
+  const cached = pages.get(page);
+  if (
+    cached &&
+    cached.list === page.list &&
+    cached.characterName === characterName
+  )
+    return cached.category;
+  const category = kind(game, page, characterName);
+  // One entry per weak page, not an ever-growing history of graphics or event IDs.
+  pages.set(page, { list: page.list, characterName, category });
+  return category;
+}
+
 function kind(game, page, characterName) {
   const lists = [(page && page.list) || []],
     visited = new Set();
@@ -37,7 +74,11 @@ function kind(game, page, characterName) {
 /** Active-page hints only; do not guess that every moving person is an enemy. */
 export function readMapMarkers(game) {
   const map = game && game.$gameMap;
-  if (!map) return [];
+  if (!map) {
+    if (game && typeof game === "object") classificationCaches.delete(game);
+    return [];
+  }
+  const pages = classificationCache(game, map);
   const source =
     typeof map.events === "function" ? map.events() : map._events || [];
   return source.reduce((rows, event) => {
@@ -60,7 +101,7 @@ export function readMapMarkers(game) {
             ? event._characterName
             : (image && image.characterName) || "",
       );
-      const category = kind(game, page, characterName);
+      const category = cachedKind(game, pages, page, characterName);
       const x = Number.isFinite(event._realX)
         ? event._realX
         : event.x !== undefined

@@ -9,10 +9,18 @@ export default {
     results() {
       return searchFeatures(this.search, this.catalog);
     },
+    resultSummary() {
+      const count = this.results.length;
+      if (!this.search) return count + " features";
+      return count === 1 ? "1 match" : count + " matches";
+    },
   },
   watch: {
     search() {
       this.selectedIndex = 0;
+    },
+    selectedIndex() {
+      this.ensureVisible();
     },
     value(open) {
       if (open) {
@@ -24,21 +32,68 @@ export default {
       }
     },
   },
-  template: `<v-dialog :value="value" @input="$emit('input', $event)" max-width="600" @keydown.native.stop="onKeyDown">
-    <v-card><v-card-title class="py-2 subtitle-1">Find a Feature <v-spacer/><span class="caption">Ctrl+P</span></v-card-title>
-    <v-card-text class="pb-1"><v-text-field ref="search" v-model="search" autofocus dense outlined hide-details label="Panels, settings, shortcuts..." @keydown.stop="onKeyDown"/></v-card-text>
-    <v-list dense style="max-height: 320px; overflow-y: auto;">
-      <v-list-item v-for="(entry, i) in results" :key="entry.id" :input-value="i === selectedIndex" @click="choose(entry)">
-        <v-list-item-content><v-list-item-title>{{ entry.label }}</v-list-item-title><v-list-item-subtitle>{{ entry.description || entry.type }}</v-list-item-subtitle></v-list-item-content>
-        <v-list-item-action v-if="entry.shortcut"><kbd>{{ entry.shortcut }}</kbd></v-list-item-action>
-      </v-list-item><v-list-item v-if="!results.length">No matching features.</v-list-item>
-    </v-list><div class="caption px-4 pb-2">Up/Down to select, Enter to open, Esc to close.</div></v-card>
+  template: `<v-dialog :value="value" @input="$emit('input', $event)" max-width="560" @keydown.native.stop="onKeyDown">
+    <v-card class="cheat-finder">
+      <div class="cheat-finder__head">
+        <v-icon small class="cheat-finder__icon">mdi-magnify</v-icon>
+        <span class="cheat-finder__title">Find a feature</span>
+        <span class="cheat-finder__count">{{ resultSummary }}</span>
+        <button type="button" class="cheat-icon-button cheat-finder__close" aria-label="Close feature finder" title="Close" @click="$emit('input', false)">
+          <v-icon small>mdi-close</v-icon>
+        </button>
+      </div>
+      <div class="cheat-finder__search">
+        <v-text-field
+          ref="search"
+          v-model="search"
+          autofocus
+          dense
+          outlined
+          hide-details
+          label="Search panels, settings, shortcuts"
+          @keydown.stop="onKeyDown" />
+      </div>
+      <div class="cheat-finder__results" role="listbox" aria-label="Matching features">
+        <button
+          v-for="(entry, i) in results"
+          :key="entry.id"
+          type="button"
+          role="option"
+          class="cheat-finder__item"
+          :class="{ 'is-active': i === selectedIndex }"
+          :aria-selected="i === selectedIndex ? 'true' : 'false'"
+          @click="choose(entry)"
+          @mouseenter="selectedIndex = i">
+          <span class="cheat-finder__label">{{ entry.label }}</span>
+          <span class="cheat-finder__type">{{ entry.type }}</span>
+          <kbd v-if="entry.shortcut">{{ entry.shortcut }}</kbd>
+        </button>
+        <div v-if="!results.length" class="cheat-finder__empty">
+          No matching features. Try a shorter word.
+        </div>
+      </div>
+      <div class="cheat-finder__foot">
+        <span><kbd>Up</kbd> <kbd>Down</kbd> to move</span>
+        <span><kbd>Enter</kbd> to open</span>
+        <span><kbd>Esc</kbd> to close</span>
+      </div>
+    </v-card>
   </v-dialog>`,
   methods: {
     choose(entry) {
       if (!entry) return;
       this.$emit("navigate", entry);
       this.$emit("input", false);
+    },
+    ensureVisible() {
+      this.$nextTick(() => {
+        const active =
+          this.$el && this.$el.querySelector
+            ? this.$el.querySelector(".cheat-finder__item.is-active")
+            : null;
+        if (active && active.scrollIntoView)
+          active.scrollIntoView({ block: "nearest" });
+      });
     },
     onKeyDown(event) {
       if (!["ArrowUp", "ArrowDown", "Enter", "Escape"].includes(event.key))

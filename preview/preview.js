@@ -6,6 +6,7 @@ import { initializeFeatureRuntime } from "../cheat-engine/www/cheat/js/runtime/F
 import { createFeatureCatalog } from "../cheat-engine/www/cheat/js/ui/FeatureCatalog.js";
 import { handleFeatureShortcut } from "../cheat-engine/www/cheat/js/ui/FeatureShortcuts.js";
 import { GLOBAL_SHORTCUT } from "../cheat-engine/www/cheat/js/shortcuts/GlobalShortcut.js";
+import { createVuetifyTheme } from "../cheat-engine/www/cheat/js/ui/CheatTheme.js";
 import { KEY_VALUE_STORAGE } from "../cheat-engine/www/cheat/js/storage/KeyValueStorage.js";
 import {
   drawMinimap,
@@ -63,7 +64,7 @@ if (window.axios)
 
 const app = new Vue({
   el: "#app",
-  vuetify: new Vuetify({ theme: { dark: true } }),
+  vuetify: new Vuetify({ theme: createVuetifyTheme() }),
   components: { CheatModal, MinimapOverlay },
   data: {
     activeComponentName:

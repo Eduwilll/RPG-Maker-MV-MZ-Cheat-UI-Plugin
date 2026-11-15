@@ -136,15 +136,14 @@ async function init() {
       .default;
     const { GLOBAL_SHORTCUT } = await import("./shortcuts/GlobalShortcut.js");
     const { handleFeatureShortcut } = await import("./ui/FeatureShortcuts.js");
+    const { createVuetifyTheme } = await import("./ui/CheatTheme.js");
 
     status.textContent = "Mounting UI...";
 
     // --- 3. Setup Vue App ---
     new Vue({
       el: "#app",
-      vuetify: new Vuetify({
-        theme: { dark: true },
-      }),
+      vuetify: new Vuetify({ theme: createVuetifyTheme() }),
       components: {
         CheatModal,
         AlertSnackbar,

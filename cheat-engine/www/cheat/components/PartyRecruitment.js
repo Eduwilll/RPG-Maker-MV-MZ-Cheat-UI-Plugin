@@ -8,39 +8,50 @@ export default {
   name: "PartyRecruitment",
   components: { GameAsset },
   template: `
-<div class="stats-party-recruitment mb-3" data-testid="stats-party-recruitment">
-    <v-row dense align="center" class="ma-0">
-        <v-col cols="12" sm="8" class="pa-1">
-            <v-autocomplete
-                v-model="selectedActorId"
-                :items="candidates"
-                item-text="name"
-                item-value="id"
-                label="Add party member"
-                placeholder="Search actors by name"
-                no-data-text="No actors available to recruit"
-                outlined dense hide-details clearable
-                data-testid="stats-recruitment-select"
-                @focus="refreshCandidates"
-                @keydown.stop>
-                <template v-slot:item="{ item }">
-                    <game-asset kind="actor" :record-id="item.id" :label="item.name" :size="40" :navigate="false" class="mr-2"/>
-                    <v-list-item-content>
-                        <v-list-item-title>{{ item.name }}</v-list-item-title>
-                        <v-list-item-subtitle>Actor #{{ item.id }}</v-list-item-subtitle>
-                    </v-list-item-content>
-                </template>
-                <template v-slot:selection="{ item }">
-                    <game-asset kind="actor" :record-id="item.id" :label="item.name" :size="24" :navigate="false" class="mr-2"/>
-                    <span>{{ item.name }}</span>
-                </template>
-            </v-autocomplete>
-        </v-col>
-        <v-col cols="12" sm="4" class="pa-1">
-            <v-btn small block color="primary" :disabled="!selectedActorId" data-testid="stats-recruitment-add" @click="requestRecruitment">Add party member</v-btn>
-        </v-col>
-    </v-row>
-    <v-alert v-if="partyError" type="error" dense class="mt-2 mb-0" role="alert">{{ partyError }}</v-alert>
+<div class="stats-party-recruitment" data-testid="stats-party-recruitment">
+    <v-menu
+        v-model="menuOpen"
+        offset-y
+        left
+        nudge-bottom="4"
+        max-height="320"
+        :close-on-content-click="false">
+        <template v-slot:activator="{ on, attrs }">
+            <v-btn
+                icon
+                small
+                class="stats-party-recruitment__add"
+                aria-label="Add party member"
+                title="Add party member"
+                data-testid="stats-recruitment-add"
+                v-bind="attrs"
+                v-on="on"
+                @click="refreshCandidates">
+                <v-icon small>mdi-plus</v-icon>
+            </v-btn>
+        </template>
+        <v-list dense class="stats-party-recruitment__menu">
+            <v-list-item
+                v-for="candidate in candidates"
+                :key="candidate.id"
+                :data-testid="'stats-recruitment-option-' + candidate.id"
+                @click="selectCandidate(candidate.id)">
+                <game-asset kind="actor" :record-id="candidate.id" :label="candidate.name" :size="28" :navigate="false" class="mr-2"/>
+                <v-list-item-content>
+                    <v-list-item-title>{{ candidate.name }}</v-list-item-title>
+                    <v-list-item-subtitle>Actor #{{ candidate.id }}</v-list-item-subtitle>
+                </v-list-item-content>
+            </v-list-item>
+            <v-list-item v-if="!candidates.length" disabled>
+                <v-list-item-content>
+                    <v-list-item-title>All actors are already in the party</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
+        </v-list>
+    </v-menu>
+    <v-snackbar v-model="errorVisible" :timeout="6000" color="error">
+        {{ partyError }}
+    </v-snackbar>
     <v-dialog v-model="partyConfirmation" max-width="440">
         <v-card>
             <v-card-title>Confirm recruitment</v-card-title>
@@ -62,6 +73,8 @@ export default {
       pendingActorName: "",
       partyConfirmation: false,
       partyError: "",
+      menuOpen: false,
+      errorVisible: false,
     };
   },
 
@@ -90,13 +103,21 @@ export default {
       }
     },
 
+    selectCandidate(id) {
+      this.selectedActorId = id;
+      this.menuOpen = false;
+      this.requestRecruitment();
+    },
+
     requestRecruitment() {
       this.partyError = "";
+      this.errorVisible = false;
       this.refreshCandidates();
       const actor = this.candidates.find(
         (row) => row.id === this.selectedActorId,
       );
       if (!actor) return;
+      this.menuOpen = false;
       this.pendingActorId = actor.id;
       this.pendingActorName = actor.name;
       this.partyConfirmation = true;
@@ -120,6 +141,7 @@ export default {
         runtime.actors.setPartyMember(id, true);
       } catch (error) {
         this.partyError = error.message || "Unable to recruit this actor.";
+        this.errorVisible = true;
         this.refreshCandidates();
         return;
       }

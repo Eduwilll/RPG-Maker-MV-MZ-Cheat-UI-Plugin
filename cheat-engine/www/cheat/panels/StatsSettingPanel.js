@@ -18,46 +18,49 @@ export default {
 
   template: `
 <v-card flat class="ma-0 pa-0">
-    <party-recruitment @change="onPartyRecruitmentChange"/>
-    <v-tabs
-        v-model="selectedTab"
-        dark
-        background-color="grey darken-3"
-        show-arrows>
-        <v-tab
-            v-for="(actor, actorIdx) in actors"
-            :key="actor.id">
-            <div
-                v-if="editingNameActorId !== actor.id"
-                class="d-flex align-center">
-                <game-asset kind="actor" :record-id="actor.id" :label="actor.name" :size="32" class="mr-1"/><span>{{actor.name}}</span>
-                <v-icon
-                    x-small
-                    class="ml-2"
-                    title="Edit name"
-                    @click.stop.prevent="startNameEdit(actor, actorIdx)">
-                    mdi-pencil
-                </v-icon>
-            </div>
-            <v-text-field
-                v-else
-                ref="nameEditField"
-                v-model="nameEditDraft"
-                class="stats-actor-name-field"
-                solo
-                dense
-                flat
-                hide-details
-                single-line
-                @click.stop
-                @mousedown.stop
-                @keydown.stop
-                @keyup.enter.stop="finishNameEdit(actor)"
-                @keyup.esc.stop="cancelNameEdit"
-                @blur="finishNameEdit(actor)">
-            </v-text-field>
-        </v-tab>
-    </v-tabs>
+    <div class="stats-actor-tabs">
+        <v-tabs
+            v-model="selectedTab"
+            class="stats-actor-tabs__strip"
+            dark
+            background-color="grey darken-3"
+            show-arrows>
+            <v-tab
+                v-for="(actor, actorIdx) in actors"
+                :key="actor.id">
+                <div
+                    v-if="editingNameActorId !== actor.id"
+                    class="d-flex align-center">
+                    <game-asset kind="actor" :record-id="actor.id" :label="actor.name" :size="32" class="mr-1"/><span>{{actor.name}}</span>
+                    <v-icon
+                        x-small
+                        class="ml-2"
+                        title="Edit name"
+                        @click.stop.prevent="startNameEdit(actor, actorIdx)">
+                        mdi-pencil
+                    </v-icon>
+                </div>
+                <v-text-field
+                    v-else
+                    ref="nameEditField"
+                    v-model="nameEditDraft"
+                    class="stats-actor-name-field"
+                    solo
+                    dense
+                    flat
+                    hide-details
+                    single-line
+                    @click.stop
+                    @mousedown.stop
+                    @keydown.stop
+                    @keyup.enter.stop="finishNameEdit(actor)"
+                    @keyup.esc.stop="cancelNameEdit"
+                    @blur="finishNameEdit(actor)">
+                </v-text-field>
+            </v-tab>
+        </v-tabs>
+        <party-recruitment @change="onPartyRecruitmentChange"/>
+    </div>
     <v-tabs-items
         dark
         v-model="selectedTab">

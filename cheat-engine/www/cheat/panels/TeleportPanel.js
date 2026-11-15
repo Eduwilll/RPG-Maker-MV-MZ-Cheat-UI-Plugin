@@ -18,36 +18,51 @@ export default {
 
   template: `
 <v-card flat class="ma-0 pa-0">
-    <v-row>
-        <v-col
-            cols="12"
-            md="6">
-            <v-text-field
-                v-model="inputX"
-                label="X"
-                dense
-                background-color="grey darken-3"
-                hide-details
-                outlined
-                @keydown.self.stop
-                @focus="$event.target.select()">
-            </v-text-field>
-        </v-col>
-        <v-col
-            cols="12"
-            md="6">
-            <v-text-field
-                v-model="inputY"
-                label="Y"
-                dense
-                background-color="grey darken-3"
-                hide-details
-                outlined
-                @keydown.self.stop
-                @focus="$event.target.select()">
-            </v-text-field>
-        </v-col>
-    </v-row>
+    <div class="teleport-coordinates" style="display: flex; flex-wrap: wrap; align-items: center;">
+        <v-text-field
+            v-model="inputX"
+            label="X"
+            type="number"
+            class="mr-2 mb-2"
+            style="flex: 0 0 80px; width: 80px; min-width: 0; max-width: 80px;"
+            dense
+            background-color="grey darken-3"
+            hide-details
+            outlined
+            @keydown.self.stop
+            @focus="$event.target.select()">
+        </v-text-field>
+        <v-text-field
+            v-model="inputY"
+            label="Y"
+            type="number"
+            class="mr-2 mb-2"
+            style="flex: 0 0 80px; width: 80px; min-width: 0; max-width: 80px;"
+            dense
+            background-color="grey darken-3"
+            hide-details
+            outlined
+            @keydown.self.stop
+            @focus="$event.target.select()">
+        </v-text-field>
+        <v-tooltip bottom>
+            <span>Reload maps and translations</span>
+            <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                    small
+                    text
+                    class="cheat-reload ml-auto mb-2"
+                    style="flex: 0 0 auto;"
+                    aria-label="Reload maps and translations"
+                    v-bind="attrs"
+                    v-on="on"
+                    @click="manualRefresh">
+                    <v-icon small left>mdi-refresh</v-icon>
+                    Reload
+                </v-btn>
+            </template>
+        </v-tooltip>
+    </div>
 
     <v-data-table
         v-if="tableHeaders"
@@ -118,26 +133,6 @@ export default {
         </template>
     </v-data-table>
 
-    <v-tooltip
-        bottom>
-        <span>Reload maps and translations</span>
-        <template v-slot:activator="{ on, attrs }">
-            <v-btn
-                style="top: 0px; right: 0px;"
-                color="pink"
-                dark
-                small
-                absolute
-                top
-                right
-                fab
-                v-bind="attrs"
-                v-on="on"
-                @click="manualRefresh">
-                <v-icon>mdi-refresh</v-icon>
-            </v-btn>
-        </template>
-    </v-tooltip>
     <v-dialog :value="!!previewMap" @input="previewMap = null" max-width="560"><v-card v-if="previewMap"><v-card-title class="subtitle-1">{{ previewMap.name }} #{{ previewMap.id }}</v-card-title><v-card-text><map-preview :map-id="previewMap.id" :x="Number(inputX)" :y="Number(inputY)"/></v-card-text><v-card-actions><v-btn text @click="previewMap = null">Close</v-btn><v-btn text @click="teleportLocation(previewMap.id, Number(inputX), Number(inputY)); previewMap = null">Teleport to X/Y</v-btn><v-btn text @click="teleportMapCenter(previewMap.id); previewMap = null">Teleport to Center</v-btn></v-card-actions></v-card></v-dialog>
 </v-card>
     `,

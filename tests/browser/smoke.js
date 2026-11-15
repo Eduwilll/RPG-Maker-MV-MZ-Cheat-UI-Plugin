@@ -321,9 +321,9 @@ async function run() {
   );
   await route("stats-setting-panel");
   const recruit = descendants(app, "PartyRecruitment");
-  recruit.selectedActorId = 3;
-  await tick();
   document.querySelector('[data-testid="stats-recruitment-add"]').click();
+  await new Promise((resolve) => setTimeout(resolve, 350));
+  document.querySelector('[data-testid="stats-recruitment-option-3"]').click();
   await tick();
   assert(
     recruit.partyConfirmation && !$gameParty._actors.includes(3),
@@ -408,23 +408,48 @@ async function run() {
     JSON.parse(runtime.options.exportProfile()).options.alwaysDash === true,
     "Changed option enters portable profile",
   );
+  // --dump-dom advances timers but can suspend native animation frames. Keep
+  // the map's real frame loop running on a deterministic clock for this section.
+  const nativeRequestFrame = window.requestAnimationFrame;
+  const nativeCancelFrame = window.cancelAnimationFrame;
+  window.requestAnimationFrame = (callback) =>
+    window.setTimeout(() => callback(performance.now()), 16);
+  window.cancelAnimationFrame = (id) => window.clearTimeout(id);
   await route("map-event-panel");
-  const mapPanel = descendants(app, "MapEventPanel");
+  const mapWrapper = descendants(app, "MapEventPanel");
+  const mapPanel = mapWrapper.$refs.view;
   assert(
-    document.body.textContent.includes("Floating minimap settings"),
-    "Map page includes floating minimap controls instead of a second sidebar page",
+    mapPanel === descendants(mapWrapper, "InteractiveMap") &&
+      !descendants(mapPanel, "MapLayers") &&
+      !descendants(mapPanel, "MinimapPanel"),
+    "Map page mounts the shared InteractiveMap with settings drawers initially closed",
   );
-  mapPanel.focusFeature("floating-minimap");
+  mapWrapper.focusFeature("floating-minimap");
   await tick();
   assert(
-    descendants(mapPanel, "MinimapPanel").embedded &&
+    mapPanel.drawer === "floating" &&
+      mapPanel.$el.textContent.includes("Floating minimap settings") &&
+      descendants(mapPanel, "MinimapPanel").embedded &&
       !descendants(descendants(mapPanel, "MinimapPanel"), "MapLayers"),
     "Combined map settings reuse the existing minimap component without duplicating layer controls",
   );
-  mapPanel.renderMap();
+  mapPanel.drawer = "";
+  mapPanel.fitMap();
   await tick();
   const mapCanvas = mapPanel.$refs.mapCanvas;
-  const tilePixel = mapCanvas.getContext("2d").getImageData(2, 2, 1, 1).data;
+  const mapPoint = (panel, x, y) => ({
+    x: panel._camera.ox + x * panel._camera.unit,
+    y: panel._camera.oy + y * panel._camera.unit,
+  });
+  const mapPixel = (panel, x, y) => {
+    const point = mapPoint(panel, x, y);
+    return Array.from(
+      panel.$refs.mapCanvas
+        .getContext("2d")
+        .getImageData(point.x, point.y, 1, 1).data,
+    );
+  };
+  const tilePixel = mapPixel(mapPanel, 0.5, 0.5);
   assert(
     mapPanel.renderMode === "realistic" && tilePixel[1] === 153,
     "Map Events defaults to actual tileset artwork",
@@ -460,48 +485,32 @@ async function run() {
     !$dataMap.__ob__ && !$dataMap.events[1].__ob__,
     "Map and event data stay outside Vue observation",
   );
-  const beforeMarker = mapCanvas
-    .getContext("2d")
-    .getImageData(
-      5 * mapPanel.cellSize + mapPanel.cellSize / 2,
-      4 * mapPanel.cellSize + mapPanel.cellSize / 2,
-      1,
-      1,
-    ).data;
-  $gameMap._events[1]._realX = 8;
+  const beforeMarker = mapPixel(mapPanel, 5.5, 4.5);
+  const stationaryPlayer = { x: $gamePlayer.x, y: $gamePlayer.y };
+  $gameMap._events[1]._realX = 8.25;
+  $gameMap._events[1]._realY = 4.25;
   $gameMap._events[1].x = 8;
-  mapPanel.updateEnemyPositions();
-  mapPanel.renderMap();
-  const afterMarker = mapCanvas
-    .getContext("2d")
-    .getImageData(
-      5 * mapPanel.cellSize + mapPanel.cellSize / 2,
-      4 * mapPanel.cellSize + mapPanel.cellSize / 2,
-      1,
-      1,
-    ).data;
+  for (let i = 0; i < 20 && mapPanel._frame.events[0].x !== 8.25; i++)
+    await tick();
+  const afterMarker = mapPixel(mapPanel, 5.5, 4.5);
   assert(
-    beforeMarker[0] === 255 &&
+    beforeMarker.some((value, index) => value !== afterMarker[index]) &&
       afterMarker[0] === 34 &&
-      mapPanel.enemies[0].x === 8,
-    "Active-page battle markers redraw while the player is stationary",
+      mapPanel._frame.events[0].kind === "enemy" &&
+      mapPanel._frame.events[0].x === 8.25 &&
+      mapPanel._frame.events[0].y === 4.25 &&
+      $gamePlayer.x === stationaryPlayer.x &&
+      $gamePlayer.y === stationaryPlayer.y,
+    "Animation frames redraw fractional battle-marker positions while the player is stationary, without manual rendering",
   );
+  mapPanel.drawer = "layers";
+  await tick();
   const layerControl = descendants(mapPanel, "MapLayers");
   $dataMap.data[4 * 300 + 1] = 15;
   $dataMap.data[2 * 300 + 2] = 2;
   $dataTilesets[1].flags[2] = 0x10;
   mapPanel.refreshArtwork();
-  const sample = (x, y) =>
-    Array.from(
-      mapCanvas
-        .getContext("2d")
-        .getImageData(
-          x * mapPanel.cellSize + 1,
-          y * mapPanel.cellSize + 1,
-          1,
-          1,
-        ).data,
-    );
+  const sample = (x, y) => mapPixel(mapPanel, x + 0.5, y + 0.5);
   const shadowed = sample(1, 0),
     roof = sample(2, 0);
   layerControl.change("shadows", false);
@@ -550,11 +559,8 @@ async function run() {
   SceneManager._scene._spriteset = {
     _characterSprites: [makeNpcSprite($gameMap._events[2])],
   };
-  mapPanel.updateMapEvents();
   mapPanel.renderMap();
-  const npcPixel = mapCanvas
-    .getContext("2d")
-    .getImageData(10.5 * mapPanel.cellSize, 2.5 * mapPanel.cellSize, 1, 1).data;
+  const npcPixel = mapPixel(mapPanel, 10.5, 2.5);
   assert(
     npcPixel[0] === 208 && npcPixel[2] === 221,
     "Full map draws the NPC's real character artwork instead of a yellow event square",
@@ -579,16 +585,14 @@ async function run() {
   layerControl.change("sprites", false);
   mapPanel.renderMap();
   assert(
-    mapCanvas
-      .getContext("2d")
-      .getImageData(10.5 * mapPanel.cellSize, 2.5 * mapPanel.cellSize, 1, 1)
-      .data[2] !== 221,
+    mapPixel(mapPanel, 10.5, 2.5)[2] !== 221,
     "Sprites can be switched back to lightweight markers",
   );
   layerControl.change("sprites", true);
   assert(
-    mapPanel.regularEvents.some((ev) => ev.kind === "npc") &&
-      mapPanel.treasureBoxes.length === 1,
+    mapPanel._frame.events.some((ev) => ev.kind === "npc") &&
+      mapPanel._frame.events.filter((ev) => ev.kind === "treasure").length ===
+        1,
     "Walking NPCs and active item rewards are classified separately from battles",
   );
   layerControl.change("npcs", false);
@@ -626,6 +630,12 @@ async function run() {
   layerControl.change("background", false);
   layerControl.change("grid", true);
   mapPanel.renderMap();
+  for (
+    let i = 0;
+    i < 20 && mapPanel.renderStatus !== "Map background hidden";
+    i++
+  )
+    await tick();
   assert(
     mapPanel.renderStatus === "Map background hidden",
     "Map background and grid can be controlled independently of tile artwork",
@@ -634,38 +644,108 @@ async function run() {
   layerControl.change("shadows", false);
   $gameMap._events.length = 2;
   SceneManager._scene._spriteset = previousSpriteset;
-  mapPanel.updateMapEvents();
   mapPanel.renderMap();
-  const clickMap = (panel) => {
+  mapPanel.drawer = "";
+  const mapMouse = (panel, x, y) => {
     const rect = panel.$refs.mapCanvas.getBoundingClientRect();
-    const event = {
-      clientX: rect.left + rect.width * 0.9,
-      clientY: rect.top + rect.height * 0.9,
+    const point = mapPoint(panel, x, y);
+    return {
+      clientX: rect.left + (point.x * rect.width) / panel.width,
+      clientY: rect.top + (point.y * rect.height) / panel.height,
     };
-    panel.onCanvasMouseMove(event);
-    panel.onCanvasClick(event);
+  };
+  const clickMap = (panel, x = 22.5, y = 9.5) => {
+    const canvas = panel.$refs.mapCanvas;
+    const Mouse = canvas.ownerDocument.defaultView.MouseEvent;
+    const point = mapMouse(panel, x, y);
+    canvas.dispatchEvent(new Mouse("mousemove", { ...point, bubbles: true }));
+    canvas.dispatchEvent(new Mouse("click", { ...point, bubbles: true }));
     return panel.hoverInfo;
   };
+  const beforeSelection = { x: $gamePlayer.x, y: $gamePlayer.y };
+  const clickHover = clickMap(mapPanel);
   assert(
-    clickMap(mapPanel).includes("(22, 9)") &&
+    clickHover === "X 22 · Y 9" &&
+      mapPanel.selection.x === 22 &&
+      mapPanel.selection.y === 9 &&
+      mapPanel.selection.mapId === mapPanel.currentMapId &&
+      $gamePlayer.x === beforeSelection.x &&
+      $gamePlayer.y === beforeSelection.y,
+    "Click selects the hovered world tile without moving the player",
+  );
+  await tick();
+  mapPanel.$el
+    .querySelector('[aria-label="Teleport to selected location"]')
+    .click();
+  assert(
+    $gamePlayer.x === 22 && $gamePlayer.y === 9,
+    "Explicit Teleport moves the player to the selected and hovered tile",
+  );
+  mapPanel.selection = null;
+  mapPanel.zoomBy(2);
+  await tick();
+  const dragStart = mapMouse(mapPanel, 15, 5);
+  const beforePan = mapPanel._camera.ox;
+  mapCanvas.dispatchEvent(
+    new PointerEvent("pointerdown", {
+      ...dragStart,
+      pointerId: 19,
+      button: 0,
+      buttons: 1,
+      bubbles: true,
+      cancelable: true,
+    }),
+  );
+  document.dispatchEvent(
+    new PointerEvent("pointermove", {
+      clientX: dragStart.clientX + 40,
+      clientY: dragStart.clientY,
+      pointerId: 19,
+      buttons: 1,
+      bubbles: true,
+      cancelable: true,
+    }),
+  );
+  document.dispatchEvent(
+    new PointerEvent("pointerup", {
+      pointerId: 19,
+      bubbles: true,
+      cancelable: true,
+    }),
+  );
+  mapCanvas.dispatchEvent(
+    new MouseEvent("click", {
+      clientX: dragStart.clientX + 40,
+      clientY: dragStart.clientY,
+      bubbles: true,
+    }),
+  );
+  assert(
+    mapPanel._camera.ox !== beforePan &&
+      mapPanel.selection === null &&
       $gamePlayer.x === 22 &&
       $gamePlayer.y === 9,
-    "Realistic map hover and click-to-teleport share scaled coordinates",
+    "Dragging pans the map and suppresses selection and teleport from the trailing click",
   );
+  mapPanel.fitMap();
   mapPanel.renderMode = "radar";
+  mapPanel.saveView();
   await tick();
   await route("general-panel");
   await route("map-event-panel");
   assert(
-    descendants(app, "MapEventPanel").renderMode === "radar",
+    descendants(app, "InteractiveMap").renderMode === "radar",
     "Radar choice persists when reopening Map Events",
   );
+  const reopenedMap = descendants(app, "InteractiveMap");
+  reopenedMap.drawer = "layers";
+  await tick();
   assert(
-    descendants(descendants(app, "MapEventPanel"), "MapLayers").layers
-      .shadows === false,
+    descendants(reopenedMap, "MapLayers").layers.shadows === false,
     "Map layer settings survive closing and reopening the panel",
   );
-  descendants(app, "MapEventPanel").renderMode = "realistic";
+  reopenedMap.renderMode = "realistic";
+  reopenedMap.saveView();
   await tick();
   await route("minimap-panel");
   assert(
@@ -675,6 +755,8 @@ async function run() {
     "Legacy minimap route remains usable and selects the combined Map sidebar entry",
   );
   await route("teleport-panel");
+  window.requestAnimationFrame = nativeRequestFrame;
+  window.cancelAnimationFrame = nativeCancelFrame;
   const teleport = descendants(app, "TeleportPanel");
   const liveMap = $dataMap;
   teleport.previewMap = { id: 2, name: "Preview destination" };
@@ -739,14 +821,40 @@ async function run() {
   const miniView = mini.$children[0];
   miniView.tick();
   await tick();
+  const miniMap = miniView.$refs.view;
+  assert(
+    miniMap === descendants(miniView, "InteractiveMap") && miniMap.compact,
+    "Floating minimap mounts the same shared InteractiveMap in compact mode",
+  );
+  const savedMinimapSize = readMinimapSettings().size;
+  miniMap.$el.querySelector('[aria-label="Map settings"]').click();
+  await tick();
+  assert(
+    miniMap.drawer === "display" &&
+      miniView.configuring &&
+      miniView.canvasSize === 360 &&
+      miniView.$el.style.width === "360px" &&
+      readMinimapSettings().size === savedMinimapSize,
+    "Opening floating map settings expands the host to 360px without overwriting the saved minimap size",
+  );
+  miniMap.$el.querySelector('[aria-label="Close map settings"]').click();
+  await tick();
+  assert(
+    miniMap.drawer === "" &&
+      !miniView.configuring &&
+      miniView.canvasSize === savedMinimapSize &&
+      miniView.$el.style.width === savedMinimapSize + "px" &&
+      readMinimapSettings().size === savedMinimapSize,
+    "Closing floating map settings restores the saved minimap size",
+  );
   let leakedInput = 0;
   const onGameInput = () => leakedInput++;
   document.addEventListener("mousedown", onGameInput);
   document.addEventListener("touchstart", onGameInput);
-  miniView.$refs.mapCanvas.dispatchEvent(
+  miniMap.$refs.mapCanvas.dispatchEvent(
     new MouseEvent("mousedown", { bubbles: true, cancelable: true }),
   );
-  miniView.$refs.mapCanvas.dispatchEvent(
+  miniMap.$refs.mapCanvas.dispatchEvent(
     new Event("touchstart", { bubbles: true, cancelable: true }),
   );
   document.removeEventListener("mousedown", onGameInput);
@@ -755,7 +863,7 @@ async function run() {
     leakedInput === 0,
     "The full minimap surface isolates game input in Move mode",
   );
-  const handle = miniView.$el.querySelector("button");
+  const handle = miniView.$el.querySelector(".minimap-move-handle");
   const rect = miniView.$el.getBoundingClientRect();
   handle.dispatchEvent(
     new PointerEvent("pointerdown", {
@@ -1000,6 +1108,8 @@ async function run() {
       $dataClasses[1].params[0][1] === 11,
     "New game restores enemy, skill and class originals",
   );
+  KEY_VALUE_STORAGE.setItem("cheatModal.themeStyle", "legacy");
+  window.dispatchEvent(new CustomEvent("cheat-profile-change"));
   const frame = document.createElement("iframe");
   frame.style.width = "800px";
   frame.style.height = "500px";
@@ -1018,6 +1128,27 @@ async function run() {
     }
   }
   assert(!!popupRoot, "Actual window-init mounts in a separate browser realm");
+  const popupApp = frame.contentDocument.querySelector(".v-application");
+  assert(
+    popupApp.getAttribute("data-cheat-theme") === "legacy" &&
+      popupRoot.$vuetify.theme.themes.dark.accent === "#FF4081",
+    "Pop-out boots with the saved Legacy color theme",
+  );
+  popupRoot.activeComponentName = "appearance-panel";
+  await tick();
+  const popupAppearance = descendants(popupRoot, "AppearancePanel");
+  popupAppearance.themeStyle = "current";
+  popupAppearance.onStyleChange();
+  await tick();
+  assert(
+    popupApp.getAttribute("data-cheat-theme") === "current" &&
+      document
+        .querySelector(".v-application")
+        .getAttribute("data-cheat-theme") === "current" &&
+      app.$vuetify.theme.themes.dark.accent === "#38bdf8" &&
+      popupRoot.$vuetify.theme.themes.dark.accent === "#38bdf8",
+    "Changing color theme in the pop-out synchronizes both cheat surfaces",
+  );
   assert(
     descendants(popupRoot, "CheatModal").$el.classList.contains(
       "cheat-game-font",
@@ -1161,34 +1292,36 @@ async function run() {
   );
   popupRoot.activeComponentName = "map-event-panel";
   await tick();
-  const popupMap = descendants(popupRoot, "MapEventPanel");
+  const popupMapWrapper = descendants(popupRoot, "MapEventPanel");
+  const popupMap = popupMapWrapper.$refs.view;
+  popupMap.focusFeature("floating-minimap");
+  await tick();
   assert(
-    popupMap.$el.textContent.includes("Floating minimap settings"),
+    popupMap === descendants(popupMapWrapper, "InteractiveMap") &&
+      popupMap.drawer === "floating" &&
+      popupMap.$el.textContent.includes("Floating minimap settings") &&
+      descendants(popupMap, "MinimapPanel").embedded &&
+      !descendants(popupMap, "MapLayers"),
     "Separate-window Map page also includes the combined minimap controls",
   );
+  popupMap.drawer = "";
+  popupMap.fitMap();
+  await tick();
   const popupSpriteset = SceneManager._scene._spriteset;
   $gameMap._events[2] = newEvent(2, 10, "People", []);
   SceneManager._scene._spriteset = {
     _characterSprites: [makeNpcSprite($gameMap._events[2])],
   };
-  popupMap.updateMapEvents();
   popupMap.renderMap();
-  const popupNpcView = popupMap.viewport();
-  const popupNpcPixel = popupMap.$refs.mapCanvas
-    .getContext("2d")
-    .getImageData(
-      (10.5 - popupNpcView.startX) * popupMap.cellSize,
-      (2.5 - popupNpcView.startY) * popupMap.cellSize,
-      1,
-      1,
-    ).data;
+  const popupNpcPixel = mapPixel(popupMap, 10.5, 2.5);
   assert(
     popupNpcPixel[0] === 208 && popupNpcPixel[2] === 221,
     "Separate-window map paints NPC artwork from the game realm",
   );
   $gameMap._events.length = 2;
   SceneManager._scene._spriteset = popupSpriteset;
-  popupMap.updateMapEvents();
+  popupMap.drawer = "layers";
+  await tick();
   const popupLayers = descendants(popupMap, "MapLayers");
   assert(
     popupLayers.layers.shadows === false,
@@ -1201,32 +1334,45 @@ async function run() {
   );
   popupLayers.reset();
   popupMap.renderMap();
+  const popupTilePixel = mapPixel(popupMap, 0.5, 0.5);
   assert(
-    popupMap.renderStatus === "Live map artwork" &&
-      popupMap.$refs.mapCanvas.getContext("2d").getImageData(2, 2, 1, 1)
-        .data[1] === 153,
+    popupMap.renderStatus === "Live map artwork" && popupTilePixel[1] === 153,
     "Separate-window map shares the game's realistic artwork renderer (" +
       popupMap.renderMode +
       ", " +
       popupMap.renderStatus +
       ", pixel=" +
-      popupMap.$refs.mapCanvas
-        .getContext("2d")
-        .getImageData(2, 2, 1, 1)
-        .data.join() +
+      popupTilePixel.join() +
       ")",
   );
+  popupMap.drawer = "";
+  const popupBeforeSelection = { x: $gamePlayer.x, y: $gamePlayer.y };
   assert(
-    clickMap(popupMap).includes("Pos:") && !$dataMap.__ob__,
-    "Pop-out map hover and teleport preserve unobserved game data",
+    clickMap(popupMap, 21.5, 8.5) === "X 21 · Y 8" &&
+      popupMap.selection.x === 21 &&
+      popupMap.selection.y === 8 &&
+      popupMap.selection.mapId === popupMap.currentMapId &&
+      $gamePlayer.x === popupBeforeSelection.x &&
+      $gamePlayer.y === popupBeforeSelection.y &&
+      !$dataMap.__ob__,
+    "Pop-out map selects the hovered tile without teleporting or observing game data",
+  );
+  await tick();
+  popupMap.$el
+    .querySelector('[aria-label="Teleport to selected location"]')
+    .click();
+  assert(
+    $gamePlayer.x === 21 && $gamePlayer.y === 8 && !$dataMap.__ob__,
+    "Pop-out explicit Teleport moves the game player to the selected tile",
   );
   popupRoot.activeComponentName = "stats-setting-panel";
   await tick();
-  const popupRecruitment = descendants(popupRoot, "PartyRecruitment");
-  popupRecruitment.selectedActorId = 3;
-  await tick();
   frame.contentDocument
     .querySelector('[data-testid="stats-recruitment-add"]')
+    .click();
+  await new Promise((resolve) => setTimeout(resolve, 350));
+  frame.contentDocument
+    .querySelector('[data-testid="stats-recruitment-option-3"]')
     .click();
   await tick();
   frame.contentDocument

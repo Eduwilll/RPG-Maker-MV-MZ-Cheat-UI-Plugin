@@ -29,6 +29,7 @@ import { createFeatureCatalog } from "./js/ui/FeatureCatalog.js";
 import { GLOBAL_SHORTCUT } from "./js/shortcuts/GlobalShortcut.js";
 import { KEY_VALUE_STORAGE } from "./js/storage/KeyValueStorage.js";
 import { getGameWindow } from "./js/runtime/FeatureRuntime.js";
+import { applyThemeStyle, readThemeStyle } from "./js/ui/CheatTheme.js";
 import {
   readBooleanSetting,
   writeBooleanSetting,
@@ -37,6 +38,162 @@ import {
 
 const SIDEBAR_VISIBLE_SETTING = "cheatModal.sidebarVisible";
 const WINDOW_OPACITY_SETTING = "cheatModal.windowOpacity";
+const THEME_PRIMARY_COLOR = "cheatModal.themePrimaryColor";
+
+const NAV_GROUPS = [
+  {
+    label: "Play",
+    items: [
+      {
+        name: "General",
+        icon: "mdi-hammer-screwdriver",
+        component: "general-panel",
+      },
+      {
+        name: "HP/MP/Battle",
+        icon: "mdi-battery-70",
+        component: "health-setting-panel",
+      },
+      {
+        name: "Actors",
+        icon: "mdi-account-group",
+        component: "actor-setting-panel",
+      },
+      {
+        name: "Stats/Level",
+        icon: "mdi-sword-cross",
+        component: "stats-setting-panel",
+      },
+      {
+        name: "Items",
+        icon: "mdi-bag-personal-outline",
+        children: [
+          {
+            name: "Item",
+            icon: "mdi-flask-empty-plus",
+            component: "item-setting-panel",
+          },
+          {
+            name: "Weapon",
+            icon: "mdi-sword",
+            component: "weapon-setting-panel",
+          },
+          {
+            name: "Armor",
+            icon: "mdi-shield-plus",
+            component: "armor-setting-panel",
+          },
+        ],
+      },
+      {
+        name: "Variables",
+        icon: "mdi-variable",
+        component: "variable-setting-panel",
+      },
+      {
+        name: "Switches",
+        icon: "mdi-toggle-switch",
+        component: "switch-setting-panel",
+      },
+      {
+        name: "Enemies",
+        icon: "mdi-skull-outline",
+        component: "enemy-editor-panel",
+      },
+      {
+        name: "Skills",
+        icon: "mdi-auto-fix",
+        component: "skill-editor-panel",
+      },
+      {
+        name: "Classes",
+        icon: "mdi-school",
+        component: "class-editor-panel",
+      },
+    ],
+  },
+  {
+    label: "World",
+    items: [
+      {
+        name: "Map / Minimap",
+        icon: "mdi-map",
+        component: "map-event-panel",
+      },
+      {
+        name: "Teleport",
+        icon: "mdi-run-fast",
+        component: "teleport-panel",
+      },
+      {
+        name: "Save Locations",
+        icon: "mdi-map-marker-plus",
+        component: "save-recall-panel",
+      },
+      {
+        name: "Message Log",
+        icon: "mdi-message-text-outline",
+        component: "message-log-panel",
+      },
+      {
+        name: "Event Analyzer",
+        icon: "mdi-transit-connection-variant",
+        component: "event-analyzer-panel",
+      },
+      {
+        name: "Watch",
+        icon: "mdi-eye-outline",
+        component: "watcher-panel",
+      },
+    ],
+  },
+  {
+    label: "Tools",
+    items: [
+      {
+        name: "Shortcuts",
+        icon: "mdi-keyboard-outline",
+        component: "shortcut-panel",
+      },
+      {
+        name: "Locks & Favorites",
+        icon: "mdi-lock-star",
+        component: "locks-panel",
+      },
+    ],
+  },
+  {
+    label: "System",
+    items: [
+      {
+        name: "Settings",
+        icon: "mdi-cog",
+        children: [
+          {
+            name: "Game Options",
+            icon: "mdi-tune",
+            component: "game-options-panel",
+          },
+          {
+            name: "Appearance",
+            icon: "mdi-palette",
+            component: "appearance-panel",
+          },
+          {
+            name: "Translate",
+            icon: "mdi-google-translate",
+            component: "translate-settings-panel",
+          },
+          {
+            name: "About",
+            icon: "mdi-information-outline",
+            component: "about-panel",
+          },
+        ],
+      },
+    ],
+  },
+];
 
 export default {
   name: "CheatModal",
@@ -70,57 +227,91 @@ export default {
   },
 
   template: `
-<v-card 
+<v-card
     :dark="$vuetify.theme.dark"
-    :color="$vuetify.theme.dark ? '#212121' : '#FFFFFF'"
-    class="z-index-cheat-0 elevation-12"
+    class="cheat-shell z-index-cheat-0"
+    :class="{ 'cheat-shell--window': isWindow }"
     :style="{ position: 'fixed', top: 0, left: 0, opacity: effectiveOpacity, transition: 'opacity 0.2s' }"
     :width="isWindow ? '100vw' : overlaySize.width"
     :height="isWindow ? '100vh' : overlaySize.height"
+    role="dialog"
+    aria-label="Cheat engine"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
 >
-    <v-btn
-        style="top: 4px; left: 4px; z-index: 3;"
-        color="grey darken-2"
-        dark
-        x-small
-        absolute
-        fab
-        :title="isSidebarVisible ? 'Hide sidebar' : 'Show sidebar'"
-        @click="toggleSidebar">
-        <v-icon small>{{ isSidebarVisible ? 'mdi-menu-open' : 'mdi-menu' }}</v-icon>
-    </v-btn>
-    <v-row 
-        class="fill-height ma-0 pa-0">
-        <div
-            v-if="isSidebarVisible"
-            :style="'width: ' + navWidth + 'px;'"
-            class="fill-height d-inline pa-2 overflow-y-auto hide-scrollbar">
-            <v-treeview
-                :active.sync="navTreeModel"
-                transition
-                return-object
-                open-all
-                dense
-                :items="navTreeItems"
-                activatable
-                item-key="name"
-                open-on-click
-                @update:active="onNavTreeUpdate">
-                <template v-slot:label="{item}">
-                    <v-icon v-text="item.icon" small class="mx-0 px-0 align-self-center"></v-icon>
-                    <span class="subtitle-2">{{item.name}}</span>
+    <header class="cheat-shell__bar">
+        <button
+            type="button"
+            class="cheat-icon-button"
+            :title="isSidebarVisible ? 'Hide sidebar' : 'Show sidebar'"
+            :aria-label="isSidebarVisible ? 'Hide sidebar' : 'Show sidebar'"
+            :aria-expanded="isSidebarVisible ? 'true' : 'false'"
+            @click="toggleSidebar">
+            <v-icon small>{{ isSidebarVisible ? 'mdi-menu-open' : 'mdi-menu' }}</v-icon>
+        </button>
+        <div class="cheat-shell__titles">
+            <div class="cheat-shell__title">{{ activePanelLabel }}</div>
+            <div class="cheat-shell__subtitle">{{ activePanelGroupLabel || 'Cheat engine' }}</div>
+        </div>
+        <span class="cheat-shell__spacer"></span>
+        <button
+            type="button"
+            class="cheat-bar__action"
+            title="Find a feature"
+            aria-label="Find a feature"
+            @click="openFinder">
+            <v-icon small>mdi-magnify</v-icon>
+            <span>Find</span>
+            <kbd v-if="finderShortcut" class="ml-2">{{ finderShortcut }}</kbd>
+        </button>
+    </header>
+    <div class="cheat-body">
+        <nav v-if="isSidebarVisible" class="cheat-nav" aria-label="Cheat panels">
+            <div v-for="group in navGroups" :key="group.label" class="cheat-nav__group">
+                <div class="cheat-nav__heading">{{ group.label }}</div>
+                <template v-for="item in group.items">
+                    <button
+                        v-if="!item.children"
+                        :key="item.component"
+                        type="button"
+                        class="cheat-nav__item"
+                        :class="{ 'is-active': isNavItemActive(item) }"
+                        :aria-current="isNavItemActive(item) ? 'page' : null"
+                        @click="selectNavItem(item)">
+                        <v-icon small>{{ item.icon }}</v-icon>
+                        <span>{{ item.name }}</span>
+                    </button>
+                    <div v-else :key="item.name" class="cheat-nav__subgroup">
+                        <button
+                            type="button"
+                            class="cheat-nav__item cheat-nav__parent"
+                            :aria-expanded="isGroupOpen(item) ? 'true' : 'false'"
+                            @click="toggleGroup(item)">
+                            <v-icon small>{{ item.icon }}</v-icon>
+                            <span>{{ item.name }}</span>
+                            <v-icon small class="cheat-nav__chevron">mdi-chevron-down</v-icon>
+                        </button>
+                        <div v-show="isGroupOpen(item)" class="cheat-nav__children">
+                            <button
+                                v-for="child in item.children"
+                                :key="child.component"
+                                type="button"
+                                class="cheat-nav__item"
+                                :class="{ 'is-active': isNavItemActive(child) }"
+                                :aria-current="isNavItemActive(child) ? 'page' : null"
+                                @click="selectNavItem(child)">
+                                <v-icon small>{{ child.icon }}</v-icon>
+                                <span>{{ child.name }}</span>
+                            </button>
+                        </div>
+                    </div>
                 </template>
-            </v-treeview>
-        </div>
-        <v-divider v-if="isSidebarVisible" vertical></v-divider>
-        <div
-            :style="'width: ' + contentWidth + ';'"
-            class="fill-height d-inline pa-2 overflow-y-auto hide-scrollbar">
+            </div>
+        </nav>
+        <main class="cheat-content">
             <component ref="panel" :is="activePanelComponent" :key="currentComponentName" v-bind="activePanelProps"></component>
-        </div>
-    </v-row>
+        </main>
+    </div>
     <feature-finder v-model="finderOpen" :catalog="featureCatalog" @navigate="navigateFeature"></feature-finder>
     <overlay-resize v-if="!isWindow" :width="overlaySize.width" :height="overlaySize.height" @resize="resizeOverlay"/>
 </v-card>
@@ -143,7 +334,8 @@ export default {
 
   data() {
     return {
-      navWidth: 200,
+      navGroups: NAV_GROUPS,
+      openGroups: ["Items", "Settings"],
       overlayWidth: readNumberSetting("cheatModal.width", 750),
       overlayHeight: readNumberSetting("cheatModal.height", 450),
       viewportWidth: window.innerWidth,
@@ -151,157 +343,16 @@ export default {
       finderOpen: false,
       featureCatalog: [],
       isSidebarVisible: readBooleanSetting(SIDEBAR_VISIBLE_SETTING, true),
-      windowOpacity: readNumberSetting(WINDOW_OPACITY_SETTING, 0.3),
+      windowOpacity: readNumberSetting(WINDOW_OPACITY_SETTING, 0.9),
       isHovered: false,
 
       navTreeModel: undefined,
-
-      navTreeItems: [
-        {
-          name: "Find a Feature",
-          icon: "mdi-magnify",
-          component: "feature-finder",
-        },
-        {
-          name: "General",
-          icon: "mdi-hammer-screwdriver",
-          component: "general-panel",
-        },
-        {
-          name: "Shortcuts",
-          icon: "mdi-keyboard-outline",
-          component: "shortcut-panel",
-        },
-        {
-          name: "HP/MP/Battle",
-          icon: "mdi-battery-70",
-          component: "health-setting-panel",
-        },
-        {
-          name: "Actors",
-          icon: "mdi-account-group",
-          component: "actor-setting-panel",
-        },
-        {
-          name: "Stats/Level",
-          icon: "mdi-sword-cross",
-          component: "stats-setting-panel",
-        },
-        {
-          name: "Items",
-          icon: "mdi-bag-personal-outline",
-          children: [
-            {
-              name: "Item",
-              icon: "mdi-flask-empty-plus",
-              component: "item-setting-panel",
-            },
-            {
-              name: "Weapon",
-              icon: "mdi-sword",
-              component: "weapon-setting-panel",
-            },
-            {
-              name: "Armor",
-              icon: "mdi-shield-plus",
-              component: "armor-setting-panel",
-            },
-          ],
-        },
-        {
-          name: "Variables",
-          icon: "mdi-variable",
-          component: "variable-setting-panel",
-        },
-        {
-          name: "Enemies",
-          icon: "mdi-skull-outline",
-          component: "enemy-editor-panel",
-        },
-        {
-          name: "Skills",
-          icon: "mdi-auto-fix",
-          component: "skill-editor-panel",
-        },
-        {
-          name: "Classes",
-          icon: "mdi-school",
-          component: "class-editor-panel",
-        },
-        {
-          name: "Locks & Favorites",
-          icon: "mdi-lock-star",
-          component: "locks-panel",
-        },
-        {
-          name: "Message Log",
-          icon: "mdi-message-text-outline",
-          component: "message-log-panel",
-        },
-        {
-          name: "Switches",
-          icon: "mdi-toggle-switch",
-          component: "switch-setting-panel",
-        },
-        {
-          name: "Watch",
-          icon: "mdi-eye-outline",
-          component: "watcher-panel",
-        },
-        {
-          name: "Save Locations",
-          icon: "mdi-map-marker-plus",
-          component: "save-recall-panel",
-        },
-        {
-          name: "Map / Minimap",
-          icon: "mdi-map",
-          component: "map-event-panel",
-        },
-        {
-          name: "Event Analyzer",
-          icon: "mdi-transit-connection-variant",
-          component: "event-analyzer-panel",
-        },
-        {
-          name: "Teleport",
-          icon: "mdi-run-fast",
-          component: "teleport-panel",
-        },
-        {
-          name: "Settings",
-          icon: "mdi-cog",
-          children: [
-            {
-              name: "Game Options",
-              icon: "mdi-tune",
-              component: "game-options-panel",
-            },
-            {
-              name: "Appearance",
-              icon: "mdi-palette",
-              component: "appearance-panel",
-            },
-            {
-              name: "Translate",
-              icon: "mdi-google-translate",
-              component: "translate-settings-panel",
-            },
-            {
-              name: "About",
-              icon: "mdi-information-outline",
-              component: "about-panel",
-            },
-          ],
-        },
-      ],
     };
   },
 
   watch: {
     currentComponentName(name) {
-      const item = this.componentNameToNavItem[name];
-      if (item) this.navTreeModel = [item];
+      this.syncNavSelection(name);
     },
   },
 
@@ -315,13 +366,17 @@ export default {
       );
     },
     activePanelComponent() {
-      return [
-        "enemy-editor-panel",
-        "skill-editor-panel",
-        "class-editor-panel",
-      ].includes(this.currentComponentName)
-        ? "database-editor-panel"
-        : this.currentComponentName;
+      if (
+        [
+          "enemy-editor-panel",
+          "skill-editor-panel",
+          "class-editor-panel",
+        ].includes(this.currentComponentName)
+      )
+        return "database-editor-panel";
+      // Never render an undefined dynamic component on the first tick; the
+      // mounted hook emits the resolved panel immediately afterwards.
+      return this.currentComponentName || "general-panel";
     },
     activePanelProps() {
       const kinds = {
@@ -342,18 +397,34 @@ export default {
       return this.isHovered ? 1.0 : this.windowOpacity;
     },
 
-    contentWidth() {
-      if (!this.isSidebarVisible) {
-        return "100%";
-      }
+    activeNavItem() {
+      return this.navTreeModel && this.navTreeModel.length
+        ? this.navTreeModel[0]
+        : null;
+    },
 
-      return `calc(100% - ${this.navWidth}px - 1px)`;
+    activePanelLabel() {
+      return (this.activeNavItem && this.activeNavItem.name) || "Cheat Engine";
+    },
+
+    activePanelGroupLabel() {
+      const group = this.navGroupForItem(this.activeNavItem);
+      return group ? group.label : "";
+    },
+
+    finderShortcut() {
+      try {
+        const key = GLOBAL_SHORTCUT.getShortcut("openFeatureFinder");
+        return key && !key.isEmpty() ? key.asDisplayString() : "";
+      } catch (error) {
+        return "";
+      }
     },
 
     componentNameToNavItem() {
       const ret = {};
-      this.iterateLeaf(this.navTreeItems, (item) => {
-        if (item.component !== "feature-finder") ret[item.component] = item;
+      this.iterateLeaf(this.navGroups, (item) => {
+        ret[item.component] = item;
       });
       ret["minimap-panel"] = ret["map-event-panel"];
       return ret;
@@ -377,14 +448,10 @@ export default {
     window.addEventListener("cheat-layout-change", this._layoutChanged);
     window.addEventListener("resize", this._viewportChanged);
     this._layoutChanged();
-    this._openFinder = () => {
-      this.featureCatalog = createFeatureCatalog(
-        GLOBAL_SHORTCUT.shortcutSettings,
-        GLOBAL_SHORTCUT.shortcutConfig,
-      );
-      this.finderOpen = true;
-    };
+
+    this._openFinder = () => this.openFinder();
     window.addEventListener("cheat-open-finder", this._openFinder);
+
     this._navigateActor = (event) => {
       const id = Number(event.detail);
       if (!Number.isInteger(id) || id < 1) return;
@@ -395,32 +462,44 @@ export default {
       });
     };
     window.addEventListener("cheat-navigate-actor", this._navigateActor);
+
     this._profileChanged = () => {
-      this.windowOpacity = readNumberSetting(WINDOW_OPACITY_SETTING, 0.3);
+      applyThemeStyle(
+        this.$vuetify,
+        this.$el.closest(".v-application") || this.$el,
+        readThemeStyle(),
+      );
+      this.windowOpacity = readNumberSetting(WINDOW_OPACITY_SETTING, 0.9);
       this.isSidebarVisible = readBooleanSetting(SIDEBAR_VISIBLE_SETTING, true);
       this.$vuetify.theme.dark = readBooleanSetting(
         "cheatModal.themeDarkMode",
         true,
       );
-      const color = KEY_VALUE_STORAGE.getItem("cheatModal.themePrimaryColor");
+      const color = KEY_VALUE_STORAGE.getItem(THEME_PRIMARY_COLOR);
       if (typeof color === "string" && /^#[0-9a-f]{6}$/i.test(color)) {
         this.$vuetify.theme.themes.dark.primary = color;
         this.$vuetify.theme.themes.light.primary = color;
+        this.applyAccent(color);
       }
     };
     window.addEventListener("cheat-profile-change", this._profileChanged);
+
     const gameWindow = getGameWindow();
     if (gameWindow && gameWindow !== window)
       gameWindow.addEventListener("cheat-layout-change", this._layoutChanged);
     if (gameWindow && gameWindow !== window)
       gameWindow.addEventListener("cheat-profile-change", this._profileChanged);
+
+    // Keep a pop-out window's colors in sync with the saved profile.
+    this._profileChanged();
+
     let navItem = this.componentNameToNavItem[this.currentComponentName];
 
     if (!navItem) {
-      navItem = Object.values(this.componentNameToNavItem)[0];
+      navItem = this.navGroups[0].items[0];
       this.$emit("change", navItem.component);
     }
-    this.navTreeModel = [navItem];
+    this.setNavSelection(navItem);
 
     this._onAppearanceChange = (e) => {
       this.windowOpacity = e.detail.windowOpacity;
@@ -471,20 +550,95 @@ export default {
         KEY_VALUE_STORAGE.setItem("cheatModal.height", value.height);
       }
     },
-    onNavTreeUpdate(data) {
-      if (data && data.length === 1) {
-        if (data[0].component === "feature-finder") {
-          this._openFinder();
-          return;
+
+    openFinder() {
+      this.featureCatalog = createFeatureCatalog(
+        GLOBAL_SHORTCUT.shortcutSettings,
+        GLOBAL_SHORTCUT.shortcutConfig,
+      );
+      this.finderOpen = true;
+    },
+
+    selectNavItem(item) {
+      if (!item || !item.component) return;
+      this.setNavSelection(item);
+      this.$emit("change", item.component);
+    },
+
+    setNavSelection(item) {
+      if (!item) return;
+      this.navTreeModel = [item];
+      const group = this.navGroupForItem(item);
+      if (group) this.openGroup(group);
+    },
+
+    syncNavSelection(name) {
+      const item = this.componentNameToNavItem[name];
+      if (item) this.setNavSelection(item);
+    },
+
+    isNavItemActive(item) {
+      return (
+        !!this.activeNavItem && this.activeNavItem.component === item.component
+      );
+    },
+
+    navGroupForItem(item) {
+      if (!item) return null;
+      for (const group of this.navGroups) {
+        for (const entry of group.items) {
+          if (entry === item) return group;
+          if (entry.children && entry.children.indexOf(item) !== -1)
+            return group;
         }
-        this.$emit("change", data[0].component);
       }
+      return null;
+    },
+
+    navParentForItem(item) {
+      if (!item) return null;
+      for (const group of this.navGroups) {
+        for (const entry of group.items) {
+          if (entry.children && entry.children.indexOf(item) !== -1)
+            return entry;
+        }
+      }
+      return null;
+    },
+
+    isGroupOpen(item) {
+      return this.openGroups.indexOf(item.name) !== -1;
+    },
+
+    openGroup(item) {
+      if (item && !this.isGroupOpen(item)) this.openGroups.push(item.name);
+    },
+
+    toggleGroup(item) {
+      const index = this.openGroups.indexOf(item.name);
+      if (index === -1) this.openGroups.push(item.name);
+      else this.openGroups.splice(index, 1);
+    },
+
+    applyAccent(color) {
+      if (!this.$el || !this.$el.style) return;
+      const match = /^#([0-9a-f]{6})$/i.exec(color);
+      if (!match) return;
+      const value = parseInt(match[1], 16);
+      const red = (value >> 16) & 255;
+      const green = (value >> 8) & 255;
+      const blue = value & 255;
+      this.$el.style.setProperty("--cheat-primary", color);
+      this.$el.style.setProperty(
+        "--cheat-primary-soft",
+        "rgba(" + red + "," + green + "," + blue + ",0.16)",
+      );
     },
 
     navigateFeature(entry) {
       this.$emit("change", entry.panel);
       const nav = this.componentNameToNavItem[entry.panel];
-      if (nav) this.navTreeModel = [nav];
+      if (nav) this.setNavSelection(nav);
       if (entry.anchor)
         this.$nextTick(() => {
           const panel = this.$refs.panel;
@@ -520,9 +674,11 @@ export default {
         for (const item of node) {
           this.iterateLeaf(item, leafFunc);
         }
-      } else if (Object.hasOwnProperty.call(node, "children")) {
+      } else if (node && Object.hasOwnProperty.call(node, "items")) {
+        this.iterateLeaf(node.items, leafFunc);
+      } else if (node && Object.hasOwnProperty.call(node, "children")) {
         this.iterateLeaf(node.children, leafFunc);
-      } else {
+      } else if (node) {
         leafFunc(node);
       }
     },

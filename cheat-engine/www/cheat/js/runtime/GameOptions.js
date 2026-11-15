@@ -24,6 +24,7 @@ const PREFERENCES = {
   windowOpacity: "cheatModal.windowOpacity",
   isDarkMode: "cheatModal.themeDarkMode",
   primaryColor: "cheatModal.themePrimaryColor",
+  themeStyle: "cheatModal.themeStyle",
   sidebarVisible: "cheatModal.sidebarVisible",
 };
 const CHANGED_KEY = "game-options-changed-v1";

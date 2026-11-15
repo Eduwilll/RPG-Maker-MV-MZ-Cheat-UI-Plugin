@@ -31,7 +31,6 @@ export default {
     <v-fade-transition leave-absolute>
         <cheat-modal
             id="cheat-modal"
-            class="opaque-on-mouseover"
             v-model="currentComponentName"
             v-if="show"
             >
