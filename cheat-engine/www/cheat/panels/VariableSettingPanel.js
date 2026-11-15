@@ -62,32 +62,25 @@ export default {
                     </template>
                 </v-tooltip>
             </div>
-            <v-row
-                class="ma-0 pa-0">
-                <v-col
-                    cols="12"
-                    md="6">
-                    <v-checkbox
-                        v-model="excludeNameless"
-                        dense
-                        hide-details
-                        label="Hide Nameless Variables">
-                    </v-checkbox>
-                </v-col>
-                <v-col
-                    cols="12"
-                    md="6">
-                    <v-select
-                        v-model="valueFilter"
-                        :items="valueFilterOptions"
-                        dense
-                        hide-details
-                        solo
-                        background-color="grey darken-3"
-                        label="Value Filter">
-                    </v-select>
-                </v-col>
-            </v-row>
+              <div class="d-flex px-3 pt-3 pb-3">
+                  <v-checkbox
+                      v-model="excludeNameless"
+                      dense
+                      hide-details
+                      label="Hide Nameless Variables">
+                  </v-checkbox>
+                  <v-spacer></v-spacer>
+                  <v-select
+                      v-model="valueFilter"
+                      :items="valueFilterOptions"
+                      dense
+                      hide-details
+                      solo
+                      background-color="grey darken-3"
+                      style="flex: 0 0 140px; max-width: 240px;"
+                      label="Value Filter">
+                  </v-select>
+                </div>
         </template>
         <template
             v-slot:item.value="{ item }">

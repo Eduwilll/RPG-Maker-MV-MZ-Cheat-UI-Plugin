@@ -46,9 +46,16 @@ export default {
             </v-tooltip>
         </template>
     </v-text-field>
-
+    <v-expansion-panels>
+    <v-expansion-panel
+        v-for="(item,i) in 1"
+        :key="i"
+      >
+    <v-expansion-panel-header>
+        Flags (optional)
+      </v-expansion-panel-header>
+      <v-expansion-panel-content>
     <div class="mt-2">
-        <div class="caption grey--text mb-1">Flags (optional)</div>
         <div class="d-flex flex-wrap" style="gap: 4px;">
             <v-chip
                 v-for="preset in presetFlags"
@@ -89,8 +96,10 @@ export default {
                 @click:close="removeSelectedFlag(flag)">
                 {{ getFlagIcon(flag) }} {{ flag }}
             </v-chip>
-        </div>
     </div>
+</v-expansion-panel-content>
+    </v-expansion-panel>
+  </v-expansion-panels>
 
     <v-card-subtitle class="ma-0 pa-0 mt-5">Recall Location</v-card-subtitle>
     <v-data-table

@@ -55,14 +55,14 @@ const NAV_GROUPS = [
         component: "health-setting-panel",
       },
       {
-        name: "Actors",
-        icon: "mdi-account-group",
-        component: "actor-setting-panel",
-      },
-      {
         name: "Stats/Level",
         icon: "mdi-sword-cross",
         component: "stats-setting-panel",
+      },
+      {
+        name: "Actors",
+        icon: "mdi-account-group",
+        component: "actor-setting-panel",
       },
       {
         name: "Items",

@@ -22,6 +22,7 @@ export default {
     flat>
     <v-card-subtitle class="caption pb-0">Battle</v-card-subtitle>
     <v-card-text class="pt-0 pb-0">
+    <div class="cheat-filter-bar">
         <v-checkbox
             data-feature="random-encounters"
             v-model="disableRandomEncounter"
@@ -46,6 +47,7 @@ export default {
                 <span class="caption">One-Hit Kill</span>
             </template>
         </v-checkbox>
+        </div>
         <v-btn small @click.prevent="encounterBattle">Encounter</v-btn>
         <v-btn small @click.prevent="victory">Victory</v-btn>
         <v-btn small @click.prevent="defeat">Defeat</v-btn>

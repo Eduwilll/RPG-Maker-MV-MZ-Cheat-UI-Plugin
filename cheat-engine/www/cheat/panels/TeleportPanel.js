@@ -19,32 +19,7 @@ export default {
   template: `
 <v-card flat class="ma-0 pa-0">
     <div class="teleport-coordinates" style="display: flex; flex-wrap: wrap; align-items: center;">
-        <v-text-field
-            v-model="inputX"
-            label="X"
-            type="number"
-            class="mr-2 mb-2"
-            style="flex: 0 0 80px; width: 80px; min-width: 0; max-width: 80px;"
-            dense
-            background-color="grey darken-3"
-            hide-details
-            outlined
-            @keydown.self.stop
-            @focus="$event.target.select()">
-        </v-text-field>
-        <v-text-field
-            v-model="inputY"
-            label="Y"
-            type="number"
-            class="mr-2 mb-2"
-            style="flex: 0 0 80px; width: 80px; min-width: 0; max-width: 80px;"
-            dense
-            background-color="grey darken-3"
-            hide-details
-            outlined
-            @keydown.self.stop
-            @focus="$event.target.select()">
-        </v-text-field>
+        
         <v-tooltip bottom>
             <span>Reload maps and translations</span>
             <template v-slot:activator="{ on, attrs }">
@@ -84,10 +59,38 @@ export default {
                 @keydown.self.stop
                 @focus="$event.target.select()">
             </v-text-field>
+            <div class="cheat-filter-bar" style="display: flex; flex-wrap: wrap; align-items: center;">
             <v-checkbox
                 v-model="excludeFullPath"
                 label="Hide Full Path Field">
-            </v-checkbox>
+          </v-checkbox>
+          <v-text-field
+            v-model="inputX"
+            label="X"
+            type="number"
+            class="mr-2 mb-2"
+            style="flex: 0 0 80px; width: 80px; min-width: 0; max-width: 80px;"
+            dense
+            background-color="grey darken-3"
+            hide-details
+            outlined
+            @keydown.self.stop
+            @focus="$event.target.select()">
+          </v-text-field>
+          <v-text-field
+            v-model="inputY"
+            label="Y"
+            type="number"
+            class="mr-2 mb-2"
+            style="flex: 0 0 80px; width: 80px; min-width: 0; max-width: 80px;"
+            dense
+            background-color="grey darken-3"
+            hide-details
+            outlined
+            @keydown.self.stop
+            @focus="$event.target.select()">
+        </v-text-field>
+        </div>
         </template>
         <template
             v-slot:item.fullPath="{ item }">

@@ -71,13 +71,9 @@ export default {
                 flat
                 class="ma-0">
                 <v-card-actions
-                    class="pa-0">
+                    class="pa-0 ">
                     <v-btn x-small text @click="manageActor(actor.id)">Party / Skills / Status</v-btn>
-                    <v-checkbox
-                        v-model="actor.godMode"
-                        label="God Mode"
-                        @change="onGodModeChange(actor)">
-                    </v-checkbox>
+                    
                     <v-spacer></v-spacer>
                     <v-tooltip
                         bottom>
@@ -96,6 +92,15 @@ export default {
                         </template>
                     </v-tooltip>
                 </v-card-actions>
+
+                <div class="cheat-filter-bar">
+                      <v-checkbox
+                          v-model="actor.godMode"
+                          label="God Mode"
+                          @change="onGodModeChange(actor)">
+                      </v-checkbox>
+                    </div>    
+                    
                 <v-card-subtitle class="pa-0">Level / EXP</v-card-subtitle>
                 <v-row class="mt-0">
                     <v-col>
@@ -127,7 +132,7 @@ export default {
                     <v-col
                         v-for="(_, paramIdx) in actor.param.length"
                         :key="paramIdx"
-                        cols="12"
+                        cols="6"
                         md="6">
                         <v-text-field
                             :label="paramNames[paramIdx]"

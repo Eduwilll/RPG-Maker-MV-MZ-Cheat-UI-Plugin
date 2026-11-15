@@ -96,7 +96,9 @@ export default {
 
     <section class="cheat-section">
         <div class="cheat-section__title">Theme</div>
-        <v-select
+        
+        <div class="cheat-grid cheat-grid--toggles">
+            <v-select
             v-model="themeStyle"
             :items="themeStyles"
             label="Color theme"
@@ -105,22 +107,23 @@ export default {
             outlined
             hide-details
             @change="onStyleChange" />
-        <div class="cheat-grid cheat-grid--toggles">
-            <v-switch
-                v-model="isDarkMode"
-                label="Dark mode"
-                class="cheat-checkbox"
-                hide-details
-                dense
-                @change="onThemeChange" />
-            <v-checkbox
-                v-model="useGameFont"
-                label="Game font"
-                class="cheat-checkbox"
-                hide-details
-                dense
-                @change="onLayoutChange" />
+            <v-btn
+                icon
+                danse
+                outlined
+                :title="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'"
+                :aria-label="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'"
+                @click="toggleTheme">
+                <v-icon>{{ isDarkMode ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
+            </v-btn>
         </div>
+          <v-checkbox
+                  v-model="useGameFont"
+                  label="Game font"
+                  class="cheat-checkbox"
+                  hide-details
+                  dense
+                  @change="onLayoutChange" />
         <div class="caption">The game font falls back to a readable system font when unavailable.</div>
     </section>
 </v-card>
@@ -182,6 +185,10 @@ export default {
           },
         }),
       );
+    },
+    toggleTheme() {
+      this.isDarkMode = !this.isDarkMode;
+      this.onThemeChange();
     },
     onThemeChange() {
       writeBooleanSetting(THEME_DARK_MODE_SETTING, this.isDarkMode);

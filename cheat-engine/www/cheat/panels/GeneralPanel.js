@@ -40,7 +40,7 @@ export default {
 
     <section class="cheat-section">
         <div class="cheat-section__title">Toggles</div>
-        <div class="cheat-grid cheat-grid--toggles">
+        <div class="cheat-filter-bar">
             <v-checkbox
                 data-feature="no-clip"
                 v-model="noClip"
