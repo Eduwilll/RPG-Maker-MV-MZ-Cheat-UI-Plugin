@@ -15,7 +15,7 @@
 ### Installer And Release Quality
 - [Feat] **Simpler Installer**: Compact guided setup with automatic package detection, optional advanced controls, clear completion/progress, tooltips, maintenance actions and accessible activity logs.
 - [Fix] **Save Editor Layout**: Scrollable structured fields and a roomier editor prevent actor parameters and inventory controls from being clipped; unsupported saves retain Raw JSON editing and backup-before-write behavior.
-- [Dev] **Release Checks**: Automated runtime/browser tests gate package builds; Windows installer tests run before packaging. Release notes come from the matching changelog, and tag/package versions must agree.
+- [Dev] **Release Checks**: Runtime/type/MV checks gate package builds; Windows browser and installer tests gate publication. Release notes come from the matching changelog, and tag/package versions must agree.
 
 ---
 
