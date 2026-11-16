@@ -29,7 +29,12 @@ import { createFeatureCatalog } from "./js/ui/FeatureCatalog.js";
 import { GLOBAL_SHORTCUT } from "./js/shortcuts/GlobalShortcut.js";
 import { KEY_VALUE_STORAGE } from "./js/storage/KeyValueStorage.js";
 import { getGameWindow } from "./js/runtime/FeatureRuntime.js";
-import { applyThemeStyle, readThemeStyle } from "./js/ui/CheatTheme.js";
+import {
+  DEFAULT_PRIMARY_COLOR,
+  accentFocusColor,
+  applyThemeStyle,
+  readThemeStyle,
+} from "./js/ui/CheatTheme.js";
 import {
   readBooleanSetting,
   writeBooleanSetting,
@@ -475,12 +480,14 @@ export default {
         "cheatModal.themeDarkMode",
         true,
       );
-      const color = KEY_VALUE_STORAGE.getItem(THEME_PRIMARY_COLOR);
-      if (typeof color === "string" && /^#[0-9a-f]{6}$/i.test(color)) {
-        this.$vuetify.theme.themes.dark.primary = color;
-        this.$vuetify.theme.themes.light.primary = color;
-        this.applyAccent(color);
-      }
+      const storedColor = KEY_VALUE_STORAGE.getItem(THEME_PRIMARY_COLOR);
+      const color =
+        typeof storedColor === "string" && /^#[0-9a-f]{6}$/i.test(storedColor)
+          ? storedColor
+          : DEFAULT_PRIMARY_COLOR;
+      this.$vuetify.theme.themes.dark.primary = color;
+      this.$vuetify.theme.themes.light.primary = color;
+      this.applyAccent(color);
     };
     window.addEventListener("cheat-profile-change", this._profileChanged);
 
@@ -622,17 +629,22 @@ export default {
 
     applyAccent(color) {
       if (!this.$el || !this.$el.style) return;
-      const match = /^#([0-9a-f]{6})$/i.exec(color);
-      if (!match) return;
-      const value = parseInt(match[1], 16);
-      const red = (value >> 16) & 255;
-      const green = (value >> 8) & 255;
-      const blue = value & 255;
-      this.$el.style.setProperty("--cheat-primary", color);
-      this.$el.style.setProperty(
-        "--cheat-primary-soft",
-        "rgba(" + red + "," + green + "," + blue + ",0.16)",
-      );
+      const dark = !!(this.$vuetify && this.$vuetify.theme.dark);
+      const accent = accentFocusColor(color, dark);
+      if (!accent) return;
+      const targets = [this.$el];
+      if (this.$el.closest) {
+        const app = this.$el.closest(".v-application");
+        if (app && targets.indexOf(app) === -1) targets.push(app);
+      }
+      for (let i = 0; i < targets.length; i++) {
+        const target = targets[i];
+        if (!target || !target.style) continue;
+        target.style.setProperty("--cheat-primary", accent.primary);
+        target.style.setProperty("--cheat-primary-soft", accent.primarySoft);
+        target.style.setProperty("--cheat-focus", accent.focus);
+        target.style.setProperty("--cheat-focus-soft", accent.focusSoft);
+      }
     },
 
     navigateFeature(entry) {

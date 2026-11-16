@@ -18,27 +18,6 @@ export default {
 
   template: `
 <v-card flat class="ma-0 pa-0">
-    <div class="teleport-coordinates" style="display: flex; flex-wrap: wrap; align-items: center;">
-        
-        <v-tooltip bottom>
-            <span>Reload maps and translations</span>
-            <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                    small
-                    text
-                    class="cheat-reload ml-auto mb-2"
-                    style="flex: 0 0 auto;"
-                    aria-label="Reload maps and translations"
-                    v-bind="attrs"
-                    v-on="on"
-                    @click="manualRefresh">
-                    <v-icon small left>mdi-refresh</v-icon>
-                    Reload
-                </v-btn>
-            </template>
-        </v-tooltip>
-    </div>
-
     <v-data-table
         v-if="tableHeaders"
         class="mt-2"
@@ -52,14 +31,13 @@ export default {
             <v-text-field
                 label="Search..."
                 solo
-                background-color="grey darken-3"
                 v-model="search"
                 dense
                 hide-details
                 @keydown.self.stop
                 @focus="$event.target.select()">
             </v-text-field>
-            <div class="cheat-filter-bar" style="display: flex; flex-wrap: wrap; align-items: center;">
+            <div class="teleport-coordinates">
             <v-checkbox
                 v-model="excludeFullPath"
                 label="Hide Full Path Field">
@@ -68,10 +46,8 @@ export default {
             v-model="inputX"
             label="X"
             type="number"
-            class="mr-2 mb-2"
-            style="flex: 0 0 80px; width: 80px; min-width: 0; max-width: 80px;"
+            class="mr-2 mb-2 cheat-field-w80"
             dense
-            background-color="grey darken-3"
             hide-details
             outlined
             @keydown.self.stop
@@ -81,15 +57,29 @@ export default {
             v-model="inputY"
             label="Y"
             type="number"
-            class="mr-2 mb-2"
-            style="flex: 0 0 80px; width: 80px; min-width: 0; max-width: 80px;"
+            class="mr-2 mb-2 cheat-field-w80"
             dense
-            background-color="grey darken-3"
             hide-details
             outlined
             @keydown.self.stop
             @focus="$event.target.select()">
         </v-text-field>
+        <v-tooltip bottom>
+            <span>Reload maps and translations</span>
+            <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                    small
+                    text
+                    class="cheat-reload teleport-coordinates__field ml-auto mb-2"
+                    aria-label="Reload maps and translations"
+                    v-bind="attrs"
+                    v-on="on"
+                    @click="manualRefresh">
+                    <v-icon small left>mdi-refresh</v-icon>
+                    Reload
+                </v-btn>
+            </template>
+        </v-tooltip>
         </div>
         </template>
         <template
@@ -106,7 +96,7 @@ export default {
                     <template v-slot:activator="{ on, attrs }">
                     
                         <v-btn
-                            color="green"
+                            color="success"
                             x-small
                             fab
                             v-bind="attrs"
@@ -121,7 +111,7 @@ export default {
                     <span>Teleport to Map Center</span>
                     <template v-slot:activator="{ on, attrs }">
                         <v-btn
-                            color="blue"
+                            color="info"
                             x-small
                             fab
                             class="ml-1"

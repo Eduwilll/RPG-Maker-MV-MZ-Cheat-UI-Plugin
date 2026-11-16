@@ -1,9 +1,12 @@
 function rootRank(part) {
   if (part.missing) return 100;
   const excluded = part.encyclopediaHidden || part.doesntCount ? 10 : 0;
-  if (/\b(torso|body)\b/i.test(part.name)) return excluded;
-  if (/\b(head|arms?|legs?|hands?|feet|appendage)\b/i.test(part.name))
-    return excluded + 2;
+  // Prefer a head as the representative: torso artwork often stops at the
+  // neck, which makes the encounter list look headless.
+  if (/\bhead\b/i.test(part.name)) return excluded;
+  if (/\b(torso|body)\b/i.test(part.name)) return excluded + 2;
+  if (/\b(arms?|legs?|hands?|feet|appendage)\b/i.test(part.name))
+    return excluded + 3;
   return excluded + 1;
 }
 

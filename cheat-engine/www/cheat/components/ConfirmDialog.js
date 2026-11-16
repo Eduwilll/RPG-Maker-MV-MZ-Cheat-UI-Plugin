@@ -5,7 +5,6 @@ export default {
   template: `
   <v-dialog v-model="showDialog" v-if="options" :width="options.width">
     <v-card
-        dark 
         class="pt-4">
       <v-card-text
         class="subtitle-1">

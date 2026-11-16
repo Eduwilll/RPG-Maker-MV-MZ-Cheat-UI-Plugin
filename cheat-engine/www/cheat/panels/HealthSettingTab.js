@@ -23,9 +23,7 @@ export default {
         <template
             v-slot:item.hp="{ item }">
             <v-text-field
-                background-color="grey darken-3"
-                class="d-inline-flex x-small-field caption"
-                style="width: 50px;"
+                class="d-inline-flex x-small-field caption cheat-field-w50"
                 hide-details
                 solo
                 v-model="item.hp.hp"
@@ -40,9 +38,7 @@ export default {
         <template
             v-slot:item.mp="{ item }">
             <v-text-field
-                background-color="grey darken-3"
-                class="d-inline-flex x-small-field caption"
-                style="width: 50px;"
+                class="d-inline-flex x-small-field caption cheat-field-w50"
                 hide-details
                 solo
                 v-model="item.mp.mp"

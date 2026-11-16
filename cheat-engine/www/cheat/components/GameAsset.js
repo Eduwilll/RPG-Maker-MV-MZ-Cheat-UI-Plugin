@@ -25,8 +25,8 @@ export default {
       return (this.navigate && this.asset && this.asset.actorId) || 0;
     },
   },
-  template: `<span class="game-asset" :role="actorId ? 'button' : 'img'" :tabindex="actorId ? 0 : null" :aria-label="actorId ? 'Open stats for ' + (label || 'actor ' + actorId) : (label || kind || 'Game artwork')" :title="actorId ? 'Open actor stats' : label" :style="{width:size+'px',height:size+'px',display:'inline-flex',flex:'0 0 '+size+'px',verticalAlign:'middle',alignItems:'center',justifyContent:'center',cursor:actorId?'pointer':'default'}" @click="openActor" @keydown.enter.stop.prevent="openActor" @keydown.space.stop.prevent="openActor">
-    <canvas ref="image" v-show="ready" :width="size" :height="size" :style="{width:size+'px',height:size+'px'}"/>
+  template: `<span class="game-asset" :role="actorId ? 'button' : 'img'" :tabindex="actorId ? 0 : null" :aria-label="actorId ? 'Open stats for ' + (label || 'actor ' + actorId) : (label || kind || 'Game artwork')" :title="actorId ? 'Open actor stats' : label" :style="{ '--game-asset-size': size + 'px' }" @click="openActor" @keydown.enter.stop.prevent="openActor" @keydown.space.stop.prevent="openActor">
+    <canvas ref="image" v-show="ready" :width="size" :height="size"/>
     <v-icon v-if="!ready" :size="Math.min(size,24)" aria-hidden="true">{{ kind === 'actor' || (asset && asset.actorId) ? 'mdi-account' : 'mdi-image-outline' }}</v-icon>
   </span>`,
   watch: {

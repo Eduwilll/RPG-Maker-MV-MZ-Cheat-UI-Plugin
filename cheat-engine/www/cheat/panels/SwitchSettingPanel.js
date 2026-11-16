@@ -33,7 +33,6 @@ export default {
                 <v-text-field
                     label="Search..."
                     solo
-                    background-color="grey darken-3"
                     v-model="search"
                     dense
                     hide-details
@@ -70,7 +69,7 @@ export default {
                     <span>{{ allSwitchOn ? 'Turn off all filtered switches' : 'Turn on all filtered switches' }}</span>
                     <template v-slot:activator="{ on, attrs }">
                         <v-btn
-                            color="teal"
+                            color="primary"
                             v-bind="attrs"
                             v-on="on"
                             fab

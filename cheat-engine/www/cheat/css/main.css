@@ -26,6 +26,8 @@
   --cheat-success: #34d399;
   --cheat-warning: #fbbf24;
   --cheat-danger: #f87171;
+  --cheat-info: #60a5fa;
+  --cheat-accent: #38bdf8;
 
   --cheat-radius-sm: 6px;
   --cheat-radius: 10px;
@@ -49,6 +51,8 @@
   --cheat-focus: #2563eb;
   --cheat-focus-soft: rgba(37, 99, 235, 0.14);
   --cheat-primary-soft: rgba(37, 99, 235, 0.1);
+  --cheat-info: #2563eb;
+  --cheat-accent: #0284c7;
   --cheat-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.08);
   --cheat-shadow-2: 0 18px 44px rgba(15, 23, 42, 0.18);
 }
@@ -69,6 +73,8 @@
   --cheat-success: #4caf50;
   --cheat-warning: #fb8c00;
   --cheat-danger: #ff5252;
+  --cheat-info: #2196f3;
+  --cheat-accent: #ff4081;
 }
 
 .v-application.theme--light[data-cheat-theme="legacy"] {
@@ -83,6 +89,8 @@
   --cheat-text-faint: rgba(0, 0, 0, 0.6);
   --cheat-focus: #1976d2;
   --cheat-focus-soft: rgba(25, 118, 210, 0.16);
+  --cheat-info: #1976d2;
+  --cheat-accent: #82b1ff;
 }
 
 .v-application[data-cheat-theme="legacy"] .cheat-shell__bar,
@@ -1568,6 +1576,472 @@
   color: var(--cheat-text-muted);
 }
 
+/* Status text. Legacy panels used Material color utility classes, which bypass
+   the Current/Legacy palettes; these map the same intent to theme tokens. */
+.v-application .cheat-text-success {
+  color: var(--cheat-success);
+}
+
+.v-application .cheat-text-warning {
+  color: var(--cheat-warning);
+}
+
+.v-application .cheat-text-error {
+  color: var(--cheat-danger);
+}
+
+.v-application .cheat-text-info {
+  color: var(--cheat-info);
+}
+
+.v-application .cheat-text-primary {
+  color: var(--cheat-primary);
+}
+
+.v-application .cheat-text-accent {
+  color: var(--cheat-accent);
+}
+
+/* Snackbars keep a neutral surface so the same message stays readable on both
+   palettes; the status accent is a left edge instead of a fill. */
+/* Vuetify forces `.v-snack__wrapper` borders to currentColor with
+   !important, so the status edge needs the same weight to survive. */
+.cheat-snackbar .v-snack__wrapper {
+  background: var(--cheat-surface-3) !important;
+  border: 1px solid var(--cheat-border-strong);
+  border-color: var(--cheat-border-strong) !important;
+  border-left: 4px solid
+    var(--cheat-snackbar-accent, var(--cheat-border-strong)) !important;
+  color: var(--cheat-text);
+}
+
+.cheat-snackbar .v-snack__content {
+  color: var(--cheat-text);
+}
+
+.cheat-snackbar .cheat-snackbar__close {
+  margin: 0;
+  color: var(--cheat-text-muted);
+}
+
+.cheat-snackbar--success {
+  --cheat-snackbar-accent: var(--cheat-success);
+}
+
+.cheat-snackbar--info {
+  --cheat-snackbar-accent: var(--cheat-info);
+}
+
+.cheat-snackbar--warning {
+  --cheat-snackbar-accent: var(--cheat-warning);
+}
+
+.cheat-snackbar--error {
+  --cheat-snackbar-accent: var(--cheat-danger);
+}
+
+/* Shared row and column helpers. Legacy panels repeated the same inline
+   border/flex rules; keeping them here means dividers follow the theme. */
+.cheat-row {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--cheat-border);
+}
+
+.cheat-row:last-child {
+  border-bottom: 0;
+}
+
+.cheat-row__main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cheat-text-wrap {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.cheat-break-word {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.cheat-cell-clamp {
+  display: -webkit-box;
+  overflow: hidden;
+  max-height: 2.4em;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.cheat-cell-clamp--sm {
+  max-width: 120px;
+}
+
+.cheat-cell-clamp--md {
+  max-width: 180px;
+}
+
+.cheat-cell-clamp--lg {
+  max-width: 240px;
+}
+
+.cheat-list-scroll {
+  overflow-y: auto;
+}
+
+.cheat-list-scroll--actors {
+  max-height: 380px;
+}
+
+.cheat-list-scroll--records {
+  max-height: 330px;
+}
+
+.cheat-list-scroll--encounters {
+  max-height: 360px;
+}
+
+.cheat-dialog-scroll {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Margin-based chip rows replace flex `gap`, which Chromium 65 does not
+   support. The vertical margins collapse to the same visual rhythm. */
+.cheat-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -2px 0;
+}
+
+.cheat-chip-row > * {
+  margin: 2px 4px 2px 0;
+}
+
+.cheat-chip-row--tight > * {
+  margin: 1px 2px 1px 0;
+}
+
+.cheat-chip-row--loose > * {
+  margin: 3px 6px 3px 0;
+}
+
+/* Matches a 36px action button when a status chip sits beside it. */
+.cheat-chip--tall {
+  height: 36px;
+}
+
+.cheat-field-w50 {
+  width: 50px;
+}
+
+.cheat-field-w60 {
+  width: 60px;
+}
+
+.cheat-field-w80 {
+  flex: 0 0 80px;
+  width: 80px;
+  min-width: 0;
+  max-width: 80px;
+}
+
+.cheat-field-watcher {
+  max-width: 92px;
+}
+
+.cheat-field-max130 {
+  max-width: 130px;
+}
+
+.cheat-field-w170 {
+  width: 170px;
+}
+
+.cheat-field-filter {
+  flex: 0 0 140px;
+  max-width: 240px;
+}
+
+.cheat-record-row {
+  padding: 4px;
+  margin-bottom: 4px;
+  border: 1px solid var(--cheat-border);
+  border-radius: 3px;
+}
+
+/* Artwork. The canvas owns the hover/focus ring so the inline JS style no
+   longer has to track pointer state. */
+.game-asset {
+  display: inline-flex;
+  flex: 0 0 var(--game-asset-size, 32px);
+  align-items: center;
+  justify-content: center;
+  width: var(--game-asset-size, 32px);
+  height: var(--game-asset-size, 32px);
+  vertical-align: middle;
+}
+
+.game-asset canvas {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+}
+
+.game-asset[role="button"]:hover canvas,
+.game-asset[role="button"]:focus canvas {
+  box-shadow: 0 0 0 2px var(--cheat-focus);
+}
+
+.game-asset[role="button"]:focus {
+  outline: none;
+}
+
+.message-portrait {
+  flex: 0 0 56px;
+  width: 56px;
+  height: 56px;
+  margin-right: 10px;
+  background: rgba(148, 163, 184, 0.13);
+}
+
+.message-portrait canvas {
+  width: 56px;
+  height: 56px;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.message-portrait[role="button"]:hover canvas,
+.message-portrait[role="button"]:focus canvas {
+  box-shadow: 0 0 0 2px var(--cheat-focus);
+}
+
+.message-portrait[role="button"]:focus {
+  outline: none;
+}
+
+.message-portrait__fallback {
+  height: 100%;
+}
+
+.cheat-message-text {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.database-tooltip {
+  width: 360px;
+  max-width: 90vw;
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-wrap: break-word;
+}
+
+.database-tooltip__description {
+  white-space: pre-wrap;
+}
+
+/* The watch overlay floats over the game, so it keeps a fixed dark surface
+   regardless of the panel theme and never intercepts game clicks. */
+.watcher-overlay {
+  position: fixed;
+  right: 8px;
+  bottom: 8px;
+  z-index: 8;
+  width: 280px;
+  max-height: 220px;
+  overflow: hidden;
+  pointer-events: none;
+  background: rgba(11, 18, 32, 0.82) !important;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  color: #e8eef9 !important;
+}
+
+.watcher-overlay .v-card__text,
+.watcher-overlay .caption {
+  color: inherit;
+}
+
+.map-preview__canvas {
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: contain;
+  background: var(--cheat-surface-2);
+}
+
+/* Encounter browser */
+.encounter-browser__summary {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.encounter-browser__summary-body {
+  min-width: 0;
+}
+
+.encounter-browser__name {
+  display: block;
+  overflow-wrap: break-word;
+}
+
+.encounter-browser__item-title,
+.encounter-browser__item-subtitle {
+  white-space: normal;
+}
+
+.encounter-browser__part {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--cheat-border);
+}
+
+.encounter-browser__part:last-child {
+  border-bottom: 0;
+}
+
+/* Message log: controls stay compact so the history owns the panel height. */
+.message-log {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.message-log__head {
+  margin-bottom: 8px;
+}
+
+.message-log__actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  margin-left: 8px;
+}
+
+.message-log__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0 -4px 8px;
+}
+
+.message-log__toolbar > * {
+  margin: 2px 4px;
+}
+
+.message-log__search {
+  flex: 1 1 190px;
+  min-width: 140px;
+}
+
+.message-log__select {
+  flex: 0 1 150px;
+  min-width: 120px;
+}
+
+.message-log__size {
+  flex: 0 0 92px;
+}
+
+.message-log__reset {
+  flex: 0 0 auto;
+}
+
+.message-log__history {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  border-top: 1px solid var(--cheat-border);
+}
+
+.message-log__row {
+  display: flex;
+  padding: 8px;
+  border-bottom: 1px solid var(--cheat-border);
+}
+
+.message-log__row:last-child {
+  border-bottom: 0;
+}
+
+.message-log__body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.message-log__copy {
+  line-height: 1.45;
+}
+
+.message-log__speaker {
+  font-size: 0.85em;
+}
+
+/* About panel */
+.about-panel {
+  position: relative;
+}
+
+.about-panel__refresh {
+  top: 8px;
+  right: 8px;
+}
+
+.about-panel__cell-label {
+  width: 180px;
+}
+
+.about-panel__cell-value {
+  word-break: break-word;
+}
+
+/* Watcher panel */
+.v-application .v-expansion-panel-header.watcher-panel__header {
+  min-height: 34px;
+}
+
+/* Event analyzer */
+.event-analyzer__root {
+  margin: 4px;
+  padding: 8px;
+  border-radius: 4px;
+  background: var(--cheat-surface-2);
+}
+
+.event-analyzer__run {
+  min-width: 0;
+  height: 16px;
+}
+
+.event-analyzer__reload {
+  top: 0;
+  right: 0;
+}
+
+.event-analyzer__stat-row {
+  margin: 0 8px 4px;
+}
+
+/* Teleport coordinates */
+.teleport-coordinates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.teleport-coordinates__field {
+  flex: 0 0 auto;
+}
+
 .cheat-field-narrow {
   max-width: 180px;
 }
@@ -1710,6 +2184,11 @@
 
 .cheat-reload {
   white-space: nowrap;
+}
+
+.cheat-refresh-fab {
+  top: 0;
+  right: 0;
 }
 
 /* Table display toggles used to be a 2x2 grid of padded v-cols. Keep the same

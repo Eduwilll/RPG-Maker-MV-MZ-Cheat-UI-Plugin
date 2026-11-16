@@ -26,7 +26,7 @@ export default {
     <v-row class="ma-0" dense>
         <v-col cols="12" sm="4" class="pa-1">
             <v-card-subtitle class="pa-1">Actors ({{ actors.length }})</v-card-subtitle>
-            <v-list dense class="overflow-y-auto" style="max-height: 380px;">
+            <v-list dense class="cheat-list-scroll cheat-list-scroll--actors">
                 <template v-for="group in groupedActors">
                     <v-subheader :key="'h-' + group.key" class="pa-1">{{ group.label }}</v-subheader>
                     <v-list-item
@@ -36,17 +36,17 @@ export default {
                         @click="selectActor(actor.id)">
                         <game-asset kind="actor" :record-id="actor.id" :label="actor.name" :size="40" :navigate="false" class="mr-2"/>
                         <v-list-item-content>
-                            <v-list-item-title>{{ actor.name }} <span class="caption grey--text">Lv{{ actor.level }}</span></v-list-item-title>
+                            <v-list-item-title>{{ actor.name }} <span class="caption cheat-muted">Lv{{ actor.level }}</span></v-list-item-title>
                             <v-list-item-subtitle>{{ actor.className }}<span v-if="actor.nickname"> · {{ actor.nickname }}</span></v-list-item-subtitle>
                         </v-list-item-content>
                         <v-list-item-action v-if="actor.isLeader">
-                            <v-icon x-small color="amber">mdi-crown</v-icon>
+                            <v-icon x-small color="warning">mdi-crown</v-icon>
                         </v-list-item-action>
                         <v-list-item-action v-else-if="actor.isBattleMember">
-                            <v-icon x-small color="green">mdi-sword-cross</v-icon>
+                            <v-icon x-small color="success">mdi-sword-cross</v-icon>
                         </v-list-item-action>
                         <v-list-item-action v-else-if="actor.isInParty">
-                            <v-icon x-small color="blue">mdi-account</v-icon>
+                            <v-icon x-small color="info">mdi-account</v-icon>
                         </v-list-item-action>
                     </v-list-item>
                 </template>
@@ -57,7 +57,7 @@ export default {
         </v-col>
         <v-col cols="12" sm="8" class="pa-1" v-if="detail">
             <v-card-subtitle class="pa-1">Identity — {{ detail.name }}</v-card-subtitle>
-            <div class="pa-1"><v-btn x-small :color="selectedInParty ? 'warning' : 'primary'" @click="partyConfirmation = true">{{ selectedInParty ? 'Remove from Party' : 'Add to Party' }}</v-btn><span class="caption ml-2">{{ selectedInParty ? 'Current party member' : 'Not in party' }}</span></div>
+            <div class="pa-1"><v-btn x-small :color="selectedInParty ? 'warning' : 'primary'" @click="partyConfirmation = true">{{ selectedInParty ? 'Remove from Party' : 'Add to Party' }}</v-btn><span class="caption cheat-muted ml-2">{{ selectedInParty ? 'Current party member' : 'Not in party' }}</span></div>
             <v-row dense class="ma-0">
                 <v-col cols="12" md="6">
                     <v-text-field
@@ -81,7 +81,7 @@ export default {
                     <v-text-field
                         label="Lv"
                         v-model="detail.level"
-                        outlined dense hide-details
+                        type="number" outlined dense hide-details
                         @keydown.self.stop
                         @change="onLevelChange"
                         @focus="$event.target.select()"></v-text-field>
@@ -157,7 +157,7 @@ export default {
                     <v-text-field
                         :label="paramNames[paramIdx] || ('Param ' + paramIdx)"
                         v-model="detail.param[paramIdx]"
-                        outlined dense hide-details
+                        type="number" outlined dense hide-details
                         @keydown.self.stop
                         @change="onParamChange(paramIdx)"
                         @focus="$event.target.select()"></v-text-field>
@@ -165,7 +165,7 @@ export default {
             </v-row>
 
             <v-card-subtitle class="pa-1 mt-2">Skills ({{ detail.learnedSkills.length }})</v-card-subtitle>
-            <div class="d-flex flex-wrap" style="gap: 4px;">
+            <div class="cheat-chip-row">
                 <v-chip
                     v-for="skill in detail.learnedSkills"
                     :key="skill.id"
@@ -173,7 +173,7 @@ export default {
                     @click:close="onForgetSkill(skill.id)">
                     <database-tooltip kind="skill" :record-id="skill.id" :label="skill.name"/>
                 </v-chip>
-                <span v-if="detail.learnedSkills.length === 0" class="caption grey--text">No skills learned</span>
+                <span v-if="detail.learnedSkills.length === 0" class="caption cheat-muted">No skills learned</span>
             </div>
             <v-row dense class="ma-0 mt-1">
                 <v-col cols="12">
@@ -198,16 +198,16 @@ export default {
             </v-row>
 
             <v-card-subtitle class="pa-1 mt-2">Status Effects ({{ detail.activeStates.length }})</v-card-subtitle>
-            <div class="d-flex flex-wrap" style="gap: 4px;">
+            <div class="cheat-chip-row">
                 <v-chip
                     v-for="st in favoriteStates"
                     :key="st.id"
-                    x-small label close color="orange darken-2"
+                    x-small label close color="warning"
                     @click:close="onRemoveState(st.id)">
                     <database-tooltip kind="state" :record-id="st.id" :label="st.name"/>
                     <lock-favorite-controls :target="{kind:'state',actorId:detail.id,id:st.id}" :value="true" @change="initializeVariables"/>
                 </v-chip>
-                <span v-if="detail.activeStates.length === 0" class="caption grey--text">No active states</span>
+                <span v-if="detail.activeStates.length === 0" class="caption cheat-muted">No active states</span>
             </div>
             <v-row dense class="ma-0 mt-1">
                 <v-col cols="12">
@@ -226,7 +226,7 @@ export default {
             </v-row>
         </v-col>
         <v-col cols="12" sm="8" class="pa-1" v-else>
-            <p class="caption grey--text pa-2">No actor selected. Open a game with a party first.</p>
+            <p class="caption cheat-muted pa-2">No actor selected. Open a game with a party first.</p>
         </v-col>
     </v-row>
     <v-alert v-if="partyError" type="error" dense>{{ partyError }}</v-alert>

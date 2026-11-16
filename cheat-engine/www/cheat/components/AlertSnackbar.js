@@ -1,17 +1,16 @@
 import { Alert } from "../js/AlertHelper.js";
 
 export default {
-  name: "ShortcutPanel",
+  name: "AlertSnackbar",
 
   template: `
 <v-snackbar
     app
     top
     left
-    :color="color"
     v-model="showSnackbar"
     :timeout="timeout"
-    class="z-index-cheat-1">
+    :class="['z-index-cheat-1', 'cheat-snackbar', 'cheat-snackbar--' + level]">
     <span 
         v-for="(line, idx) in text"
         :key="idx"
@@ -21,8 +20,7 @@ export default {
     <template v-slot:action="{ attrs }">
     <v-btn
         x-small
-        style="margin:0"
-        color="white"
+        class="cheat-snackbar__close"
         icon
         v-bind="attrs"
         @click="showSnackbar = false">
@@ -37,33 +35,33 @@ export default {
       showSnackbar: false,
       text: "",
       timeout: 1000,
-      color: "black",
+      level: "info",
     };
   },
 
   mounted() {
     Alert.alertInternal = (level, msg, err = null, timeout = 1500) => {
-      let color = null;
+      let tone = "info";
       switch (level) {
         case "success":
-          color = "green";
+          tone = "success";
           break;
         case "info":
-          color = "blue";
+          tone = "info";
           break;
         case "warn":
-          color = "orange";
+          tone = "warning";
           break;
         case "error":
-          color = "red";
+          tone = "error";
           break;
         default:
-          color = "blue-grey";
+          tone = "info";
       }
 
       this.show({
         text: msg,
-        color: color,
+        level: tone,
         timeout: timeout,
       });
     };
@@ -77,8 +75,8 @@ export default {
 
       this.text = options.text.split("\n");
       this.timeout = options.timeout;
-      if (options.color) {
-        this.color = options.color;
+      if (options.level) {
+        this.level = options.level;
       }
 
       this.showSnackbar = true;

@@ -43,7 +43,7 @@ export default {
             Custom translation server must be running before translation.
         </span>
     </v-card-text>
-    <v-card-text class="py-0" :class="translatorStatusColor + '--text'">
+    <v-card-text class="py-0" :class="translatorStatusColor">
         {{translatorStatusMessage}}
     </v-card-text>
     <v-card-subtitle class="pb-0 mt-4 font-weight-bold">Translate</v-card-subtitle>
@@ -94,7 +94,6 @@ export default {
                     :items="restApiMethods"
                     item-value="value"
                     item-text="name"
-                    background-color="grey darken-3"
                     label="Method"
                     solo
                     :disabled="!enabled"
@@ -113,7 +112,6 @@ export default {
                     dense
                     hide-details
                     label="URL Pattern"
-                    background-color="grey darken-3"
                     solo
                     :disabled="!enabled"
                     @keydown.self.stop
@@ -130,7 +128,6 @@ export default {
             hide-details
             row-height="1"
             auto-grow
-            background-color="grey darken-3"
             label="Body"
             :disabled="!enabled"
             @keydown.self.stop
@@ -152,7 +149,6 @@ export default {
             label="Model Name"
             hint="e.g. qwen3:8b, gemma3:12b, gpt-4o-mini, gemini-2.0-flash, deepseek-chat"
             persistent-hint
-            background-color="grey darken-3"
             solo
             :disabled="!enabled"
             @keydown.self.stop
@@ -167,7 +163,6 @@ export default {
             hide-details
             label="API Key"
             type="password"
-            background-color="grey darken-3"
             solo
             :disabled="!enabled"
             @keydown.self.stop
@@ -183,14 +178,13 @@ export default {
             label="API URL (OpenAI-compatible endpoint)"
             hint="e.g. http://localhost:11434/v1/chat/completions"
             persistent-hint
-            background-color="grey darken-3"
             solo
             :disabled="!enabled"
             @keydown.self.stop
             @change="onChangeLLMConfig">
         </v-text-field>
 
-        <v-card-text class="pa-0 mt-1 caption grey--text">
+        <v-card-text class="pa-0 mt-1 caption cheat-muted">
             <strong>Recommended models:</strong> qwen3:8b, gemma3:12b (Ollama) · gpt-4o-mini (OpenAI) · gemini-2.0-flash (Google) · deepseek-chat (DeepSeek)
         </v-card-text>
     </v-card-text>
@@ -204,15 +198,14 @@ export default {
             dense
             hide-details
             label="Chunk size"
-            background-color="grey darken-3"
             solo
             :disabled="!enabled"
             @keydown.self.stop
             @change="onChnageBulkTranslateChunkSize">
         </v-text-field>
-        <span class="caption grey--text">Number of items to combine into single API requests using delimiters.</span><br/>
-        <span class="caption grey--text">Higher values = fewer API calls but longer requests.</span><br/>
-        <span v-if="recommendChunkSizeDesc" class="caption font-weight-bold teal--text">{{recommendChunkSizeDesc}}</span><br/>
+        <span class="caption cheat-muted">Number of items to combine into single API requests using delimiters.</span><br/>
+        <span class="caption cheat-muted">Higher values = fewer API calls but longer requests.</span><br/>
+        <span v-if="recommendChunkSizeDesc" class="caption font-weight-bold cheat-text-success">{{recommendChunkSizeDesc}}</span><br/>
         <span v-if="chunkSizeWarning.message" :class="chunkSizeWarning.class">{{chunkSizeWarning.message}}</span>
 
         <v-switch
@@ -224,10 +217,10 @@ export default {
             class="mt-3"
             @change="onChangeBatchTranslation">
         </v-switch>
-        <span class="caption grey--text">
+        <span class="caption cheat-muted">
             Batch mode combines multiple texts with delimiters, dramatically reducing API calls.<br/>
             Example: 200 variables → 4-8 API calls instead of 200 individual calls.<br/>
-            <span v-if="isJpToKrEndpoint" class="orange--text font-weight-bold">
+            <span v-if="isJpToKrEndpoint" class="cheat-text-warning font-weight-bold">
                 ⚠️ JP→KR endpoints use original method (batch mode disabled for compatibility)
             </span>
         </span>
@@ -349,7 +342,7 @@ export default {
         </v-switch>
 
         <v-divider class="my-2"></v-divider>
-        <span class="caption font-weight-bold teal--text">🌐 Full Game Translation</span>
+        <span class="caption font-weight-bold cheat-text-primary">🌐 Full Game Translation</span>
 
         <v-switch
             v-model="targets.actors"
@@ -383,7 +376,7 @@ export default {
             @click.self.stop
             @change="onChangeTargetsValue">
         </v-switch>
-        <span class="caption grey--text">
+        <span class="caption cheat-muted">
             Scans ALL map files and extracts every dialogue, choice, scroll text,<br/>
             battle event text, and common event text for translation.
         </span>
@@ -393,11 +386,11 @@ export default {
     <v-card-text class="py-0">
         <v-row class="mt-1">
             <v-col cols="12">
-                <v-chip small :color="isDataPatched ? 'green' : 'grey'" text-color="white" class="mr-2">
+                <v-chip small outlined :color="isDataPatched ? 'success' : 'secondary'" class="mr-2">
                     <v-icon small left>{{isDataPatched ? 'mdi-check-circle' : 'mdi-close-circle'}}</v-icon>
                     Game Data: {{isDataPatched ? 'Translated' : 'Original'}}
                 </v-chip>
-                <v-chip small color="blue" text-color="white">
+                <v-chip small outlined color="info">
                     <v-icon small left>mdi-translate</v-icon>
                     {{inGamePatchCount}} strings patched
                 </v-chip>
@@ -405,7 +398,7 @@ export default {
         </v-row>
         <v-btn
             small
-            color="teal"
+            color="success"
             class="mt-2"
             @click="reapplyInGameTranslation"
             :disabled="!enabled || bankStats.totalEntries === 0">
@@ -414,7 +407,7 @@ export default {
         </v-btn>
         <v-btn
             small
-            color="orange"
+            color="warning"
             class="mt-2 ml-2"
             @click="revertInGameTranslation"
             :disabled="!isDataPatched">
@@ -422,7 +415,7 @@ export default {
             Revert to Original
         </v-btn>
         <br/>
-        <span class="caption grey--text">
+        <span class="caption cheat-muted">
             After running "Start Translation", the plugin automatically applies<br/>
             translations to ALL in-game text (menus, dialogues, battles, shops).<br/>
             Use "Re-apply" if the game reloads data. Use "Revert" to restore Japanese.
@@ -433,11 +426,11 @@ export default {
     <v-card-text class="py-0">
         <v-row>
             <v-col cols="12" md="6">
-                <v-chip small color="green" text-color="white" class="mr-2">
+                <v-chip small outlined color="success" class="mr-2">
                     <v-icon small left>mdi-database</v-icon>
                     {{bankStats.totalEntries}} cached
                 </v-chip>
-                <v-chip small color="blue" text-color="white">
+                <v-chip small outlined color="info">
                     <v-icon small left>mdi-clock</v-icon>
                     {{bankStats.ageText}}
                 </v-chip>
@@ -445,7 +438,7 @@ export default {
             <v-col cols="12" md="6">
                 <v-btn
                     small
-                    color="orange"
+                    color="warning"
                     @click="clearTranslationBank"
                     :disabled="!enabled">
                     <v-icon small left>mdi-delete</v-icon>
@@ -453,7 +446,7 @@ export default {
                 </v-btn>
                 <v-btn
                     small
-                    color="blue"
+                    color="info"
                     class="ml-2"
                     @click="exportTranslationBank"
                     :disabled="!enabled">
@@ -462,7 +455,7 @@ export default {
                 </v-btn>
             </v-col>
         </v-row>
-        <span class="caption grey--text">
+        <span class="caption cheat-muted">
             Translation bank stores successful translations for instant reuse.<br/>
             Cached translations load instantly without API calls.
         </span>
@@ -470,7 +463,7 @@ export default {
         <v-divider class="my-4"></v-divider>
         <div class="d-flex align-center mt-2">
             <v-btn
-                color="green"
+                color="success"
                 class="flex-grow-1"
                 @click="startGlobalTranslation"
                 :disabled="!enabled || isTranslatingGlobals">
@@ -481,10 +474,9 @@ export default {
             <v-chip
                 v-if="isTranslatingGlobals"
                 small
-                color="orange"
-                text-color="white"
-                class="ml-3 px-3 py-4 font-weight-bold"
-                style="height: 36px">
+                outlined
+                color="warning"
+                class="ml-3 px-3 py-4 font-weight-bold cheat-chip--tall">
                 <v-icon small left>mdi-translate</v-icon>
                 {{globalTranslationText}}... {{Math.round(globalTranslationProgress)}}%
             </v-chip>
@@ -602,14 +594,14 @@ export default {
 
     translatorStatusColor() {
       if (this.translatorChecking) {
-        return "orange";
+        return "cheat-text-warning";
       }
 
       if (this.translatorRunning) {
-        return "green";
+        return "cheat-text-success";
       }
 
-      return "red";
+      return "cheat-text-error";
     },
 
     endPointList() {
@@ -709,33 +701,6 @@ export default {
         this.bulkTranslateChunkSize,
         this.endPointSelection,
       );
-      return;
-
-      const chunkSize = Number(this.bulkTranslateChunkSize);
-      const endPointId = this.endPointSelection;
-      const maxSafe = MAX_CHUNK_SIZE[endPointId] || 50;
-
-      if (chunkSize <= 0) {
-        this.chunkSizeWarning = {
-          message: "Chunk size must be greater than 0",
-          class: "caption font-weight-bold red--text",
-        };
-      } else if (chunkSize > maxSafe) {
-        this.chunkSizeWarning = {
-          message: `⚠️ Large chunk size (${chunkSize}) may cause issues with ${endPointId}. Recommended max: ${maxSafe}`,
-          class: "caption font-weight-bold orange--text",
-        };
-      } else if (chunkSize > 100) {
-        this.chunkSizeWarning = {
-          message: `⚠️ Large chunk size may be slower due to rate limiting`,
-          class: "caption font-weight-bold amber--text",
-        };
-      } else {
-        this.chunkSizeWarning = {
-          message: "✅ Good chunk size for reliable translation",
-          class: "caption font-weight-bold green--text",
-        };
-      }
     },
 
     onChnageBulkTranslateChunkSize() {

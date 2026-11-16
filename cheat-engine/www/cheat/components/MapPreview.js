@@ -5,7 +5,7 @@ export default {
   data() {
     return { status: "Loading destination...", width: 0, height: 0 };
   },
-  template: `<div><div class="caption" role="status">{{ status }} <span v-if="width">{{ width }} x {{ height }} tiles. Red dot: requested destination.</span></div><canvas ref="preview" width="480" height="300" style="width:100%;height:auto;max-height:300px;object-fit:contain;background:#101018;"/><p class="caption mt-1">Preview only. Dynamic events, lighting and screen effects are not executed.</p></div>`,
+  template: `<div><div class="caption" role="status">{{ status }} <span v-if="width">{{ width }} x {{ height }} tiles. Red dot: requested destination.</span></div><canvas ref="preview" class="map-preview__canvas" width="480" height="300"/><p class="caption mt-1">Preview only. Dynamic events, lighting and screen effects are not executed.</p></div>`,
   mounted() {
     this.load();
     this._timer = setInterval(this.paint, 300);

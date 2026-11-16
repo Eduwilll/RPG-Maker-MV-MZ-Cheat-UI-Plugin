@@ -16,12 +16,11 @@ export default {
   template: `
 <v-card flat class="ma-0 pa-0">
     <v-card-subtitle class="ma-0 pa-0">Save Location</v-card-subtitle>
-    <span class="body-2 green--text text--darken-1">Map : {{currentMapName}}</span>
+    <span class="body-2 cheat-text-success">Map : {{currentMapName}}</span>
     <v-text-field
         ref="locationAliasField"
         label="Location Alias"
         solo
-        background-color="grey darken-3"
         v-model="locationAliasInput"
         dense
         hide-details
@@ -34,7 +33,7 @@ export default {
                 <template v-slot:activator="{ on, attrs }">
                     <v-btn
                         class="mt-n1"
-                        color="teal"
+                        color="primary"
                         x-small
                         fab
                         v-on="on"
@@ -56,11 +55,11 @@ export default {
       </v-expansion-panel-header>
       <v-expansion-panel-content>
     <div class="mt-2">
-        <div class="d-flex flex-wrap" style="gap: 4px;">
+        <div class="cheat-chip-row">
             <v-chip
                 v-for="preset in presetFlags"
                 :key="preset.value"
-                :color="selectedFlags.includes(preset.value) ? preset.color : 'grey darken-2'"
+                :color="selectedFlags.includes(preset.value) ? preset.color : undefined"
                 :outlined="!selectedFlags.includes(preset.value)"
                 x-small
                 label
@@ -73,7 +72,6 @@ export default {
             v-model="customFlagInput"
             label="Custom flag (press Enter)"
             solo
-            background-color="grey darken-3"
             dense
             hide-details
             class="mt-2"
@@ -85,7 +83,7 @@ export default {
                 </v-btn>
             </template>
         </v-text-field>
-        <div v-if="selectedFlags.length > 0" class="d-flex flex-wrap mt-1" style="gap: 4px;">
+        <div v-if="selectedFlags.length > 0" class="cheat-chip-row mt-1">
             <v-chip
                 v-for="flag in selectedFlags"
                 :key="flag"
@@ -96,6 +94,7 @@ export default {
                 @click:close="removeSelectedFlag(flag)">
                 {{ getFlagIcon(flag) }} {{ flag }}
             </v-chip>
+        </div>
     </div>
 </v-expansion-panel-content>
     </v-expansion-panel>
@@ -116,7 +115,6 @@ export default {
                 <v-text-field
                     label="Search..."
                     solo
-                    background-color="grey darken-3"
                     v-model="search"
                     dense
                     hide-details
@@ -146,7 +144,7 @@ export default {
             {{ item.coord.x }}, {{ item.coord.y }}
         </template>
         <template v-slot:item.flags="{ item }">
-            <div class="d-flex flex-wrap" style="gap: 2px;">
+            <div class="cheat-chip-row cheat-chip-row--tight">
                 <v-chip
                     v-for="flag in (item.flags || [])"
                     :key="flag"
@@ -155,7 +153,7 @@ export default {
                     label>
                     {{ getFlagIcon(flag) }} {{ flag }}
                 </v-chip>
-                <span v-if="!item.flags || item.flags.length === 0" class="grey--text caption">—</span>
+                <span v-if="!item.flags || item.flags.length === 0" class="cheat-muted caption">—</span>
             </div>
         </template>
         <template
@@ -166,7 +164,7 @@ export default {
                 <span>Teleport</span>
                 <template v-slot:activator="{ on, attrs }">
                     <v-btn
-                        color="green"
+                        color="success"
                         x-small
                         fab
                         v-bind="attrs"
@@ -183,7 +181,7 @@ export default {
                 <span>Delete location</span>
                 <template v-slot:activator="{ on, attrs }">
                     <v-btn
-                        color="red"
+                        color="error"
                         class="ml-2"
                         x-small
                         fab
@@ -218,27 +216,27 @@ export default {
           value: "Boss Area",
           label: "Boss Area",
           icon: "🔴",
-          color: "red darken-2",
+          color: "error",
         },
-        { value: "Shop", label: "Shop", icon: "🛒", color: "blue darken-1" },
+        { value: "Shop", label: "Shop", icon: "🛒", color: "info" },
         {
           value: "Checkpoint",
           label: "Checkpoint",
           icon: "🚩",
-          color: "green darken-1",
+          color: "success",
         },
-        { value: "NPC", label: "NPC", icon: "💬", color: "purple darken-1" },
+        { value: "NPC", label: "NPC", icon: "💬", color: "accent" },
         {
           value: "Farm Spot",
           label: "Farm Spot",
           icon: "⚡",
-          color: "amber darken-2",
+          color: "warning",
         },
         {
           value: "Danger Zone",
           label: "Danger Zone",
           icon: "☠️",
-          color: "orange darken-3",
+          color: "error",
         },
       ],
 
@@ -412,7 +410,7 @@ export default {
 
     getFlagColor(flag) {
       const preset = this.presetFlags.find((p) => p.value === flag);
-      return preset ? preset.color : "teal darken-1";
+      return preset ? preset.color : "secondary";
     },
 
     getFlagIcon(flag) {

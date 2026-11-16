@@ -16,10 +16,8 @@ export default {
   template: `
 <v-card
     v-if="visible"
-    dark
     dense
-    class="pa-2"
-    style="position: fixed; right: 8px; bottom: 8px; z-index: 8; width: 280px; max-height: 220px; overflow: hidden; pointer-events: none; background: rgba(20, 20, 20, 0.78); border: 1px solid rgba(255,255,255,0.12);">
+    class="pa-2 watcher-overlay">
     <div class="caption font-weight-bold mb-1">
         Watch List
     </div>

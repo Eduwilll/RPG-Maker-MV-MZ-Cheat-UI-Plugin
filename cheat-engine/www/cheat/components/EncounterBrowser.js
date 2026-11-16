@@ -56,33 +56,33 @@ export default {
     clearInterval(this._timer);
   },
   template: `<div class="encounter-browser">
-    <div class="d-flex align-center mb-2"><strong>Encounters</strong><v-spacer/><v-btn x-small text @click="reload">Reload</v-btn></div>
+    <div class="d-flex align-center mb-2"><strong>Troops</strong><v-spacer/><v-btn x-small text @click="reload">Reload</v-btn></div>
     <div class="caption mb-2">Authored troop variants include every part and initially hidden member. The root artwork is a representative, not a replacement for the troop.</div>
     <v-alert v-if="error" type="error" dense dismissible @input="error = ''">{{ error }}</v-alert>
     <v-row dense><v-col cols="12" sm="4">
-      <v-text-field v-model="search" label="Search encounter, root, part or troop ID" dense outlined hide-details @keydown.stop/>
-      <v-list dense style="max-height: 360px; overflow-y: auto;">
+      <v-text-field v-model="search" label="Search troop, enemy or ID" dense outlined hide-details @keydown.stop/>
+      <v-list dense class="cheat-list-scroll cheat-list-scroll--encounters">
         <v-list-item v-for="row in rows" :key="row.troopId" :input-value="selectedTroopId === row.troopId" @click="choose(row.troopId)">
           <game-asset kind="enemy" :record-id="row.primaryId" :label="row.rootName" :size="40" :navigate="false" class="mr-2"/>
-          <v-list-item-content><v-list-item-title style="white-space: normal;">{{ row.rootName }}</v-list-item-title><v-list-item-subtitle style="white-space: normal;">#{{ row.troopId }} {{ row.displayName }} / {{ row.parts.length }} members</v-list-item-subtitle></v-list-item-content>
+          <v-list-item-content><v-list-item-title class="encounter-browser__item-title">{{ row.rootName }}</v-list-item-title><v-list-item-subtitle class="encounter-browser__item-subtitle">#{{ row.troopId }} {{ row.displayName }} / {{ row.parts.length }} members</v-list-item-subtitle></v-list-item-content>
         </v-list-item>
       </v-list>
-      <div v-if="!rows.length" class="caption pa-2">No matching authored encounters.</div>
+      <div v-if="!rows.length" class="caption pa-2">No matching troops.</div>
     </v-col><v-col cols="12" sm="8" v-if="selected">
-      <div class="d-flex align-center mb-2"><game-asset kind="enemy" :record-id="selected.primaryId" :label="selected.rootName" :size="128" :navigate="false" class="mr-2"/><div><strong>{{ selected.rootName }}</strong><div class="caption" style="white-space: pre-wrap; overflow-wrap: break-word;">{{ selected.displayName }}</div><div class="caption">Troop #{{ selected.troopId }} / {{ selected.pageCount }} battle event pages</div><v-btn x-small text @click="editPart(selected.primaryId)">Edit root enemy</v-btn></div></div>
-      <div class="subtitle-2">All Authored Members</div>
-      <div v-for="part in selected.parts" :key="part.index" class="d-flex align-center py-1" style="border-bottom: 1px solid #8884;">
-        <div style="flex: 1; min-width: 0; overflow-wrap: break-word;"><database-tooltip kind="enemy" :record-id="part.enemyId" :label="part.name"/><span class="caption"> #{{ part.enemyId }}</span><div class="caption">{{ part.enemyId === selected.primaryId ? 'Root representative. ' : '' }}{{ part.hidden ? 'Initially hidden. ' : '' }}{{ part.encyclopediaHidden ? 'Hidden from encyclopedia. ' : '' }}{{ part.doesntCount ? 'Does not count. ' : '' }}{{ part.missing ? 'Missing enemy definition. ' : '' }}Position: {{ part.x == null ? '?' : part.x }}, {{ part.y == null ? '?' : part.y }}</div></div>
-        <v-btn x-small text :disabled="part.missing" @click="editPart(part.enemyId)">Edit part</v-btn>
+      <div class="encounter-browser__summary"><game-asset kind="enemy" :record-id="selected.primaryId" :label="selected.rootName" :size="128" :navigate="false" class="mr-2"/><div class="encounter-browser__summary-body"><strong class="encounter-browser__name">{{ selected.rootName }}</strong><div class="caption cheat-text-wrap">{{ selected.displayName }}</div><div class="caption">Troop #{{ selected.troopId }} / {{ selected.pageCount }} battle event pages</div><v-btn x-small text @click="editPart(selected.primaryId)">Edit root enemy</v-btn></div></div>
+      <div class="subtitle-2">Enemies in this troop</div>
+      <div v-for="part in selected.parts" :key="part.index" class="encounter-browser__part">
+        <div class="cheat-row__main cheat-break-word"><database-tooltip kind="enemy" :record-id="part.enemyId" :label="part.name"/><span class="caption"> #{{ part.enemyId }}</span><div class="caption">{{ part.enemyId === selected.primaryId ? 'Root representative. ' : '' }}{{ part.hidden ? 'Initially hidden. ' : '' }}{{ part.encyclopediaHidden ? 'Hidden from encyclopedia. ' : '' }}{{ part.doesntCount ? 'Does not count. ' : '' }}{{ part.missing ? 'Missing enemy definition. ' : '' }}Position: {{ part.x == null ? '?' : part.x }}, {{ part.y == null ? '?' : part.y }}</div></div>
+        <v-btn x-small text :disabled="part.missing" @click="editPart(part.enemyId)">Edit enemy</v-btn>
       </div>
-      <v-btn small color="primary" class="mt-3" :disabled="!availability.allowed" @click="confirmEncounter">Start Encounter</v-btn>
+      <v-btn small color="primary" class="mt-3" :disabled="!availability.allowed" @click="confirmEncounter">Start Troop</v-btn>
       <div class="caption mt-1">{{ availability.reason }} Uses the authored troop's positions, hidden members and battle event pages. Troop battle events may affect the story even though the map event does not run. Normal rewards and defeat still apply. Save first.</div>
       <v-btn x-small text class="mt-2" @click="refreshMapEvents">Refresh map events</v-btn>
       <v-select v-model="selectedEvent" :items="mapEvents" item-text="label" item-value="eventId" label="Matching Original Map Event (exact troop)" dense outlined hide-details/>
       <div v-if="!mapEvents.length" class="caption mt-1">No active map event references this exact troop.</div>
       <v-btn small class="mt-2" :disabled="!selectedEvent || !availability.allowed" @click="confirmMapEvent">Run Map Event</v-btn>
       <div class="caption mt-1">Runs the original event, which may affect story flags, quests, items or location. Conditional branches may skip combat. Script-only battles cannot be matched automatically.</div>
-    </v-col><v-col v-else cols="12" sm="8" class="caption pa-3">Select an encounter.</v-col></v-row>
+    </v-col><v-col v-else cols="12" sm="8" class="caption pa-3">Select a troop.</v-col></v-row>
     <v-dialog :value="!!confirmation" @input="!$event && cancel()" max-width="440"><v-card><v-card-text class="pt-4">{{ confirmation }}</v-card-text><v-card-actions><v-btn text @click="cancel">Cancel</v-btn><v-btn text color="primary" @click="proceed">Continue</v-btn></v-card-actions></v-card></v-dialog>
   </div>`,
   methods: {

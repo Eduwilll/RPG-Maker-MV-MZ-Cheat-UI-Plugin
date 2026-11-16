@@ -16,15 +16,14 @@ export default {
     </v-card-subtitle>
 
     <v-expansion-panels
-        dark
         accordion
         multiple
         class="mb-2"
         v-model="openContextPanels">
         <v-expansion-panel>
-            <v-expansion-panel-header class="py-1 px-3" style="min-height: 34px;">
+            <v-expansion-panel-header class="py-1 px-3 watcher-panel__header">
                 Facing Event
-                <span class="caption grey--text text--lighten-1 ml-2">
+                <span class="caption cheat-muted ml-2">
                     {{ facingEvent ? facingEvent.label : 'No event in front' }}
                 </span>
             </v-expansion-panel-header>
@@ -57,8 +56,7 @@ export default {
                             dense
                             solo
                             hide-details
-                            background-color="grey darken-3"
-                            style="max-width: 92px;"
+                            class="cheat-field-watcher"
                             @keydown.self.stop
                             @change="onContextValueChange(item)"
                             @focus="$event.target.select()">
@@ -77,9 +75,9 @@ export default {
         </v-expansion-panel>
 
         <v-expansion-panel>
-            <v-expansion-panel-header class="py-1 px-3" style="min-height: 34px;">
+            <v-expansion-panel-header class="py-1 px-3 watcher-panel__header">
                 Nearby Map References
-                <span class="caption grey--text text--lighten-1 ml-2">
+                <span class="caption cheat-muted ml-2">
                     Map {{ currentMapId }} - {{ mapEventCount }} events - {{ mapRows.length }} refs
                 </span>
             </v-expansion-panel-header>
@@ -112,8 +110,7 @@ export default {
                             dense
                             solo
                             hide-details
-                            background-color="grey darken-3"
-                            style="max-width: 92px;"
+                            class="cheat-field-watcher"
                             @keydown.self.stop
                             @change="onContextValueChange(item)"
                             @focus="$event.target.select()">
@@ -162,8 +159,6 @@ export default {
             <v-btn
                 x-small
                 fab
-                color="pink"
-                dark
                 title="Refresh watched values"
                 @click="refreshWatchedRows">
                 <v-icon small>mdi-refresh</v-icon>
@@ -191,8 +186,7 @@ export default {
                 dense
                 solo
                 hide-details
-                background-color="grey darken-3"
-                style="max-width: 130px;"
+                class="cheat-field-max130"
                 @keydown.self.stop
                 @change="onWatchedValueChange(item)"
                 @focus="$event.target.select()">

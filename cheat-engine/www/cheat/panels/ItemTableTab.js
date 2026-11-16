@@ -36,7 +36,6 @@ export default {
                 <v-text-field
                     label="Search..."
                     solo
-                    background-color="grey darken-3"
                     v-model="search"
                     dense
                     hide-details
@@ -93,7 +92,7 @@ export default {
         </template>
         <template
             v-slot:item.name="{ item }">
-            <div style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; max-width: 120px; line-height: 1.2; max-height: 2.4em; word-break: break-word;">
+            <div class="cheat-cell-clamp cheat-cell-clamp--sm">
                 <database-tooltip :kind="item._itemKind" :record-id="item._itemId" :label="item.name"/>
             </div>
         </template>
@@ -104,7 +103,7 @@ export default {
                 max-width="420">
                 <template v-slot:activator="{ on, attrs }">
                     <div
-                        style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; max-width: 240px; line-height: 1.2; max-height: 2.4em; word-break: break-word;"
+                        class="cheat-cell-clamp cheat-cell-clamp--lg"
                         v-bind="attrs"
                         v-on="on">
                         {{ item.desc }}
@@ -120,7 +119,7 @@ export default {
                 max-width="420">
                 <template v-slot:activator="{ on, attrs }">
                     <div
-                        style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; max-width: 180px; line-height: 1.2; max-height: 2.4em; word-break: break-word;"
+                        class="cheat-cell-clamp cheat-cell-clamp--md"
                         v-bind="attrs"
                         v-on="on">
                         {{ item.effects }}
@@ -136,7 +135,7 @@ export default {
                 max-width="420">
                 <template v-slot:activator="{ on, attrs }">
                     <div
-                        style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; max-width: 180px; line-height: 1.2; max-height: 2.4em; word-break: break-word;"
+                        class="cheat-cell-clamp cheat-cell-clamp--md"
                         v-bind="attrs"
                         v-on="on">
                         {{ item.params }}
@@ -152,10 +151,8 @@ export default {
         <template
             v-slot:item.amount="{ item }">
             <v-text-field
-                background-color="grey darken-3"
-                class="d-inline-flex"
+                class="d-inline-flex cheat-field-w60"
                 height="10"
-                style="width: 60px;"
                 hide-details
                 solo
                 :value="item.amount"

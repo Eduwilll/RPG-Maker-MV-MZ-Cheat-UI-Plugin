@@ -21,7 +21,6 @@ export default {
             <v-text-field
                 label="Search..."
                 solo
-                background-color="grey darken-3"
                 v-model="search"
                 dense
                 hide-details
@@ -38,7 +37,6 @@ export default {
                 label="Shortcut"
                 solo
                 dense
-                background-color="grey darken-3"
                 hide-details
                 combining-key-alone
                 @change="onShortcutSearchChange">
@@ -57,7 +55,7 @@ export default {
             <span>Restore to default settings</span>
             <template v-slot:activator="{ on, attrs }">
                 <v-btn
-                    color="green"
+                    color="success"
                     v-bind="attrs"
                     v-on="on"
                     x-small
@@ -83,13 +81,12 @@ export default {
             v-slot:item.shortcut="{ item }">
             <div :data-feature="'shortcut-' + item.id">
             <key-input-field
-                style="width: 170px;"
+                class="cheat-field-w170"
                 v-model="item.shortcut"
                 :deletable="!item.necessary"
                 label="No Shortcut"
                 solo
                 dense
-                background-color="grey darken-3"
                 :combining-key-alone="item.combiningKeyAlone"
                 hide-details
                 @change="onShortcutChange($event, item)">
@@ -100,8 +97,7 @@ export default {
             v-slot:item.param="{ item, index }">
             <v-btn
                 v-if="Object.keys(item.paramDesc).length > 0"
-                color="blue-grey"
-                dark
+                color="secondary"
                 x-small
                 fab
                 @click="changeExpanded(item)">

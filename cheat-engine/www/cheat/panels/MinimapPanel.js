@@ -119,7 +119,7 @@ export default {
             </v-slider>
         </v-col>
         <v-col cols="12">
-            <p class="caption grey--text mb-0">Follow centers on the directional player arrow. Full fits the map. Use the minimap's cursor button to pan and inspect; normal mode lets clicks reach the game. Toggle anytime with Alt+N.</p>
+            <p class="caption cheat-muted mb-0">Follow centers on the directional player arrow. Full fits the map. Use the minimap's cursor button to pan and inspect; normal mode lets clicks reach the game. Toggle anytime with Alt+N.</p>
             <p class="caption mb-0">Status: {{ statusText }}</p>
         </v-col>
     </v-row>

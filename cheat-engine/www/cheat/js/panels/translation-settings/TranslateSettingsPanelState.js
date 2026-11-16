@@ -37,27 +37,27 @@ export function buildChunkSizeWarning(chunkSize, endPointSelection) {
   if (numericChunkSize <= 0) {
     return {
       message: "Chunk size must be greater than 0",
-      class: "caption font-weight-bold red--text",
+      class: "caption font-weight-bold cheat-text-error",
     };
   }
 
   if (numericChunkSize > maxSafe) {
     return {
       message: `Large chunk size (${numericChunkSize}) may cause issues with ${endPointSelection}. Recommended max: ${maxSafe}`,
-      class: "caption font-weight-bold orange--text",
+      class: "caption font-weight-bold cheat-text-warning",
     };
   }
 
   if (numericChunkSize > 100) {
     return {
       message: "Large chunk size may be slower due to rate limiting",
-      class: "caption font-weight-bold amber--text",
+      class: "caption font-weight-bold cheat-text-warning",
     };
   }
 
   return {
     message: "Good chunk size for reliable translation",
-    class: "caption font-weight-bold green--text",
+    class: "caption font-weight-bold cheat-text-success",
   };
 }
 

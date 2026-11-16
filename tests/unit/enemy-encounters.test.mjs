@@ -30,7 +30,7 @@ test("encounters expose the authored root and retain all limbs, hidden members a
   assert.equal(rows[0].name, "Woodsman1");
   assert.equal(rows[0].parts.length, 3);
   assert.equal(rows[0].parts[2].hidden, true);
-  assert.equal(rows[0].primaryId, 1);
+  assert.equal(rows[0].primaryId, 2);
   assert.equal(rows[0].troopId, 1);
   game.$dataEnemies = [
     null,
@@ -68,7 +68,7 @@ test("encounter snapshots preserve member order, coordinates and plugin data wit
   const row = readEnemyEncounters(game)[0];
   assert.equal(row.name, "  Exact variant  ");
   assert.equal(row.rootName, "Root");
-  assert.equal(row.primaryId, 1);
+  assert.equal(row.primaryId, 2);
   assert.equal(row.pageCount, 2);
   assert.deepEqual(
     row.parts.map((part) => [part.enemyId, part.x, part.y, part.hidden]),
@@ -249,7 +249,7 @@ test("pop-out encounters use the opener's runtime and keep database records deta
       $dataTroops: [],
     };
     vm.reload();
-    assert.equal(vm.selected.primaryId, 1);
+    assert.equal(vm.selected.primaryId, 2);
     vm.selected.parts[0].name = "Detached";
     assert.equal(game.$dataEnemies[1].name, "Woodsman [torso]");
     vm.confirmEncounter();

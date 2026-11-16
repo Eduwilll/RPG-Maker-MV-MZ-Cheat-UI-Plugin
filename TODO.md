@@ -17,29 +17,23 @@ This document tracks planned features and enhancements for the RPG Maker MV/MZ C
 ### 📦 3. "Safe Patch" Export
 - **Description**: Generate a standalone `data/` patch from translations that can be used without the full cheat engine installed.
 - **Priority**: Medium
-- **Status**: Tagged for v1.6.0
+- **Status**: Shipped for v1.6.0
 
 ### 🗺️ 4. Interactive Mini-Map & Entity Radar
 - **Description**: A top-down view of the current map highlighting NPCs, treasure chests, and active events.
 - **Priority**: Medium
-- **Status**: Tagged for v1.7.0
+- **Status**: Shipped for v1.7.0
 
 ### ⚡ 5. Global Database Search
 - **Description**: A universal search bar to instantly find any Item, Weapon, Enemy, or Skill across all database tabs.
 - **Priority**: High
-- **Status**: Tagged for v1.8.0
+- **Status**: Tagged for v1.10.0
 
 ### 6. Add Create Item, Weapon, Armor, Skill, Enemy, Map, Event, etc.
 - **Description**: Add a feature to create items, weapons, armor, skills, enemies, maps, events, etc.
 - **Priority**: High
-- **Status**: Tagged for v1.9.0
+- **Status**: Tagged for v1.11.0
 
-### 7. Create a realistc mini-map
-- **Description**: Add a feature to add a mini-map realistic that can put in any place of the screen.
-- **Priority**: High
-- **Status**: Tagged for v1.10.0
----
-*Note: These features were selected based on user feedback to prioritize development efficiency and player experience.*
 
 TODAY:
 - Be able to read all plugin in mz/mv games from the file plugins.js and edit the plugin is enable or disable
@@ -50,17 +44,6 @@ Discussion backlog:
 - Expand the cheat UI with an About panel that shows runtime and game diagnostics.
 - Add exportable troubleshooting logs users can send to developers.
 
-Maintainability planning:
-- Phase 4 is effectively complete: diagnostics, validation, compatibility scanning, and smoke-testing are in place.
-- Phase 5: Type and domain alignment.
-- Audit remaining root-level files under `cheat-engine/www/cheat/js` and decide which belong in clearer domains.
-- Split `CheatBattle.js` into scene-action and battle-action modules.
-- Strengthen typed JavaScript checking incrementally instead of trying to enforce it everywhere at once.
-- Add local type augmentations for intentional MV/MZ internals instead of relying on scattered `any`.
-- Make the two panel layers explicit:
-  - `cheat-engine/www/cheat/panels` = Vue component/view layer
-  - `cheat-engine/www/cheat/js/panels` = shared panel state/helper layer
-- Migrate remaining panels that still only partially follow the shared helper conventions.
 
  New Features & Enhancements
 # 🌍 Advanced Translation System
@@ -111,16 +94,36 @@ Maintainability planning:
 
 
 # Others modifications
-- toggle to hide side bar (x)
-- option to teleport in the center of the map (X)
 - pre-load items
-- hide nameless item default and persist that mode even when the user change tabs (x)
 - save location give the user give flags to his saves locations like boss area, shop, checkpoint etc.
-- in variables possible to user filter them by value like positive, nagative, non-values etc.(x)
-- the toggle bar in items more compacts (x)
 - make an tab with only actors in a list and when click show besides all the var we can chage in him, if possible show what skills he can learn, all possible modifies in general you can do with actor
-- make the ui more compact in general
-- Add game speed and with the ctrl keyboard butom holding foward the game speed 2x, with the possibility to chenge the speed value
-- other cheats, one-hit kill, no random encounters. Check if i already have them (X)
-- List all communEv. And possibility to run;
-- let user change the opacity of the window.
+- Add game speed and with the ctrl keyboard butom holding foward the game speed 2x, with the possibility to chenge the speed val
+
+# new modifications
+
+Find a feature  Ctrl + P
+Not sure where something is? Type a few letters and it finds panels, settings and shortcuts, then takes you right there.
+
+Edit and summon enemies
+Change an enemy’s stats and actions. Fight any troop or the enemies you pick, or call in more enemies mid-battle. Saving the game keeps your changes.
+
+Skills and classes
+Edit skill values like cost, success rate and damage formula. For classes, change the stat curves, EXP curve, level-up skills and traits. Saving the game keeps your changes.
+
+Detailed tooltips
+Hover over items, equipment, skills, classes, status effects or enemies to see their stats, traits, effects and price on a card.
+
+Locks and favorites
+Lock item and equipment amounts, gold, variables, switches, status effects or the timer, and they stay put even when the game changes them. Star the rows you use most to keep them at the top. Both are kept per game and left out of settings backups.
+
+Message log  Ctrl + H
+Missed a line? Read and search past dialogue.
+
+Game options
+Change Always dash, Remember commands and volume from the cheat window. Only what you change here goes into the settings backup, so restoring it in a new game means no setting up the options again.
+If possible, each game they have they own game settigs will be great if we can show the games ones top
+
+
+#new stuff
+Element selector, if in map select object/npc/id to redirect to respective info
+Element selector select ui to be redirect of the especifique var/switch etc.

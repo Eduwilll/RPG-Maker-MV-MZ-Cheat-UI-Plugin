@@ -38,7 +38,6 @@ export default {
                 <v-text-field
                     label="Search..."
                     solo
-                    background-color="grey darken-3"
                     v-model="search"
                     dense
                     hide-details
@@ -76,8 +75,7 @@ export default {
                       dense
                       hide-details
                       solo
-                      background-color="grey darken-3"
-                      style="flex: 0 0 140px; max-width: 240px;"
+                      class="cheat-field-filter"
                       label="Value Filter">
                   </v-select>
                 </div>
@@ -85,10 +83,8 @@ export default {
         <template
             v-slot:item.value="{ item }">
             <v-text-field
-                background-color="grey darken-3"
-                class="d-inline-flex"
+                class="d-inline-flex cheat-field-w60"
                 height="10"
-                style="width: 60px;"
                 hide-details
                 solo
                 v-model="item.value"

@@ -15,7 +15,7 @@ export default {
     type: { type: String, default: "traits" },
     references: { type: Object, default: () => ({}) },
   },
-  template: `<div><div v-for="(row, i) in value" :key="i" class="pa-1 mb-1" style="border: 1px solid #8885; border-radius: 3px;">
+  template: `<div><div v-for="(row, i) in value" :key="i" class="cheat-record-row">
     <v-row dense class="ma-0"><v-col v-for="field in fields(row)" :key="field.key" cols="6" sm="4">
       <v-select v-if="field.items" :value="row[field.key]" :items="field.items" item-text="text" item-value="value" :label="field.label" dense outlined hide-details @change="change(i, field.key, $event)"/>
       <v-text-field v-else :value="row[field.key]" :label="field.label" dense outlined hide-details type="number" @keydown.stop @input="change(i, field.key, $event)"/>

@@ -98,9 +98,7 @@ export default {
         <span>Reload from game data</span>
         <template v-slot:activator="{ on, attrs }">
             <v-btn
-                style="top: 0px; right: 0px;"
-                color="pink"
-                dark
+                class="cheat-refresh-fab"
                 small
                 absolute
                 top

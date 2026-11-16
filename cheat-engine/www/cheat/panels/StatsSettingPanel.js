@@ -22,8 +22,6 @@ export default {
         <v-tabs
             v-model="selectedTab"
             class="stats-actor-tabs__strip"
-            dark
-            background-color="grey darken-3"
             show-arrows>
             <v-tab
                 v-for="(actor, actorIdx) in actors"
@@ -62,7 +60,6 @@ export default {
         <party-recruitment @change="onPartyRecruitmentChange"/>
     </div>
     <v-tabs-items
-        dark
         v-model="selectedTab">
         <v-tab-item
             v-for="actor in actors"
@@ -80,8 +77,6 @@ export default {
                         <span>Reload from game data</span>
                         <template v-slot:activator="{ on, attrs }">
                             <v-btn
-                                color="pink"
-                                dark
                                 small
                                 fab
                                 v-bind="attrs"
@@ -107,6 +102,7 @@ export default {
                         <v-text-field
                             label="Lv"
                             v-model="actor.level"
+                            type="number"
                             outlined
                             dense
                             hide-details
@@ -137,6 +133,7 @@ export default {
                         <v-text-field
                             :label="paramNames[paramIdx]"
                             v-model="actor.param[paramIdx]"
+                            type="number"
                             outlined
                             dense
                             hide-details

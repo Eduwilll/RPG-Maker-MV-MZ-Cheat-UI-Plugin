@@ -6,6 +6,8 @@
 - [Feat] **Compact Shell**: Grouped navigation, a single top bar with sidebar toggle and Find, consistent panel controls, tighter item filters, compact Teleport X/Y fields and a portrait-based party recruitment menu.
 - [Feat] **Current And Legacy Themes**: Keep the new slate design or choose the older charcoal Material colors. Both support dark/light mode and saved accents; the Default swatch restores the released blue.
 - [Tweak] **Readable Controls**: Overlay opacity defaults to 90%, Game Options toggles use less space, and Feature Finder adds result counts, type labels and keyboard hints.
+- [Tweak] **Theme-Aware Panels**: Buttons, chips, status text, snackbars and focus rings follow Current/Legacy, dark/light and the chosen accent instead of fixed Material colors. Focus rings brighten or darken the accent to stay visible on both palettes.
+- [Tweak] **Dialogue And Enemies Layout**: Message Log puts non-history controls on one compact toolbar and lets history fill the panel; enemy browsing is labeled **Troops** / **Enemies**, with head-first representative artwork.
 
 ### Interactive Map
 - [Feat] **One Shared Map**: Full map and floating minimap share drag-to-pan, wheel/button zoom, Follow, Fit, event search and on-map settings for layers, sprites, shadows, labels, placement, size and opacity.

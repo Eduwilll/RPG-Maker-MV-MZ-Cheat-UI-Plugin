@@ -9,16 +9,16 @@ import {
 // Vuetify v-treeview icon/colour helpers
 // ─────────────────────────────────────────────────────────────────────────────
 const KIND_META = {
-  "event-ref": { icon: "mdi-link-variant", color: "light-blue lighten-1" },
-  "cycle-ref": { icon: "mdi-sync-alert", color: "amber darken-1" },
-  "battle-ref": { icon: "mdi-sword-cross", color: "purple lighten-1" },
-  branch: { icon: "mdi-source-branch", color: "orange" },
-  "branch-true": { icon: "mdi-check-circle", color: "green" },
-  "branch-false": { icon: "mdi-close-circle", color: "red lighten-1" },
-  choices: { icon: "mdi-format-list-bulleted", color: "teal lighten-1" },
-  "choice-branch": { icon: "mdi-menu-right", color: "teal lighten-2" },
-  loop: { icon: "mdi-repeat", color: "blue lighten-1" },
-  command: { icon: null /* per-code */, color: "grey lighten-1" },
+  "event-ref": { icon: "mdi-link-variant", color: "info" },
+  "cycle-ref": { icon: "mdi-sync-alert", color: "warning" },
+  "battle-ref": { icon: "mdi-sword-cross", color: "primary" },
+  branch: { icon: "mdi-source-branch", color: "warning" },
+  "branch-true": { icon: "mdi-check-circle", color: "success" },
+  "branch-false": { icon: "mdi-close-circle", color: "error" },
+  choices: { icon: "mdi-format-list-bulleted", color: "accent" },
+  "choice-branch": { icon: "mdi-menu-right", color: "accent" },
+  loop: { icon: "mdi-repeat", color: "info" },
+  command: { icon: null /* per-code */, color: "secondary" },
 };
 
 const CE_TRIGGER_LABELS = ["None", "Autorun", "Parallel"];
@@ -38,9 +38,9 @@ export default {
 
     <!-- Type picker -->
     <v-radio-group v-model="rootType" row dense hide-details class="ma-1 mt-0">
-        <v-radio label="Common Event" value="common" color="teal" />
-        <v-radio label="Map Event"    value="map"    color="blue" />
-        <v-radio label="Battle Event" value="battle" color="red" />
+        <v-radio label="Common Event" value="common" color="accent" />
+        <v-radio label="Map Event"    value="map"    color="info" />
+        <v-radio label="Battle Event" value="battle" color="error" />
     </v-radio-group>
 
     <!-- ── Common Event selectors ── -->
@@ -102,25 +102,25 @@ export default {
         </v-row>
 
         <!-- Map loading controls -->
-        <div class="d-flex align-center flex-wrap ma-1" style="gap: 6px;">
+        <div class="cheat-chip-row cheat-chip-row--loose ma-1 align-center">
             <v-btn
-                x-small color="blue darken-2"
+                x-small color="primary"
                 :disabled="!selectedMapId || mapIsLoaded || loadingMaps"
                 @click="loadCurrentMap">
                 Load This Map
             </v-btn>
             <v-btn
-                x-small color="blue darken-3"
+                x-small color="primary"
                 :loading="loadingMaps"
                 :disabled="loadingMaps"
                 @click="loadAllMaps">
                 Load All Maps
             </v-btn>
-            <span v-if="loadingMaps" class="caption grey--text">
+            <span v-if="loadingMaps" class="caption cheat-muted">
                 {{ loadProgress.loaded }}/{{ loadProgress.total }}
                 <template v-if="loadProgress.current"> — {{ loadProgress.current }}</template>
             </span>
-            <span v-else-if="dbVersion > 0" class="caption grey--text">
+            <span v-else-if="dbVersion > 0" class="caption cheat-muted">
                 {{ availableMaps.length }} map(s) loaded
             </span>
         </div>
@@ -157,7 +157,7 @@ export default {
     <!-- Trace button -->
     <div class="ma-1">
         <v-btn
-            color="teal" small
+            color="accent" small
             :disabled="!canTrace || tracing"
             :loading="tracing"
             @click="trace">
@@ -191,11 +191,11 @@ export default {
     <template v-if="traceTree">
 
         <!-- Root header -->
-        <div class="ma-1 pa-2 grey darken-3" style="border-radius:4px;">
-            <div class="subtitle-2 white--text">{{ traceTree.name }}</div>
+        <div class="event-analyzer__root">
+            <div class="subtitle-2">{{ traceTree.name }}</div>
 
             <!-- Common Event trigger -->
-            <div v-if="traceTree.eventKind === 'common'" class="caption grey--text mt-1">
+            <div v-if="traceTree.eventKind === 'common'" class="caption cheat-muted mt-1">
                 Trigger: {{ formatTrigger(traceTree.trigger) }}
                 <template v-if="traceTree.trigger > 0 && traceTree.switchId">
                     &nbsp;|&nbsp; Switch: [{{ traceTree.switchId }}: {{ getSwitchName(traceTree.switchId) }}]
@@ -204,7 +204,7 @@ export default {
 
             <!-- Page conditions -->
             <template v-if="pageConditionLines.length > 0">
-                <div class="caption green--text font-weight-bold mt-1">Page Conditions:</div>
+                <div class="caption cheat-text-success font-weight-bold mt-1">Page Conditions:</div>
                 <div
                     v-for="(line, i) in pageConditionLines"
                     :key="'cond-' + i"
@@ -212,16 +212,16 @@ export default {
                     ▸ {{ line }}
                 </div>
             </template>
-            <div v-else-if="traceTree.eventKind !== 'common'" class="caption grey--text mt-1">
+            <div v-else-if="traceTree.eventKind !== 'common'" class="caption cheat-muted mt-1">
                 No page conditions.
             </div>
         </div>
 
         <!-- Stats -->
-        <div class="caption grey--text mx-2 mb-1">
+        <div class="caption cheat-muted event-analyzer__stat-row">
             {{ nodeCount }} node(s)
             <template v-if="ceRefCount > 0"> · {{ ceRefCount }} CE reference(s)</template>
-            <template v-if="cycleCount > 0"> · <span class="amber--text font-weight-bold">{{ cycleCount }} cycle(s)</span></template>
+            <template v-if="cycleCount > 0"> · <span class="cheat-text-warning font-weight-bold">{{ cycleCount }} cycle(s)</span></template>
         </div>
 
         <!-- Tree -->
@@ -248,15 +248,15 @@ export default {
                     <span
                         :class="[
                             'caption',
-                            item.kind === 'cycle-ref'    ? 'amber--text font-weight-bold' :
-                            item.kind === 'event-ref'    ? 'light-blue--text text--lighten-1' :
-                            item.kind === 'event-end'    ? 'grey--text font-italic' :
-                            item.kind === 'battle-ref'   ? 'purple--text text--lighten-1' :
-                            item.kind === 'branch'       ? 'orange--text' :
-                            item.kind === 'branch-true'  ? 'green--text' :
-                            item.kind === 'branch-false' ? 'red--text text--lighten-1' :
-                            item.kind === 'choices'      ? 'teal--text text--lighten-1' :
-                            item.kind === 'loop'         ? 'blue--text text--lighten-1' :
+                            item.kind === 'cycle-ref'    ? 'cheat-text-warning font-weight-bold' :
+                            item.kind === 'event-ref'    ? 'cheat-text-info' :
+                            item.kind === 'event-end'    ? 'cheat-muted font-italic' :
+                            item.kind === 'battle-ref'   ? 'cheat-text-primary' :
+                            item.kind === 'branch'       ? 'cheat-text-warning' :
+                            item.kind === 'branch-true'  ? 'cheat-text-success' :
+                            item.kind === 'branch-false' ? 'cheat-text-error' :
+                            item.kind === 'choices'      ? 'cheat-text-accent' :
+                            item.kind === 'loop'         ? 'cheat-text-info' :
                             ''
                         ]">
                         {{ item.name }}
@@ -265,18 +265,16 @@ export default {
                     <!-- Run button -->
                     <v-btn
                         v-if="item.eventKey && item.commandIndex !== undefined"
-                        x-small text class="ml-2 pa-0 green--text"
-                        style="min-width:0;height:16px;"
+                        x-small text class="ml-2 pa-0 cheat-text-success event-analyzer__run"
                         @click.stop="executeFromNode(item)">
-                        <v-icon x-small color="green" left>mdi-play</v-icon>
+                        <v-icon x-small color="success" left>mdi-play</v-icon>
                         <span class="caption">Run</span>
                     </v-btn>
 
                     <!-- Jump-to button for battle refs -->
                     <v-btn
                         v-if="item.kind === 'battle-ref' && item.troopId"
-                        x-small text class="ml-1 pa-0"
-                        style="min-width:0;height:16px;"
+                        x-small text class="ml-1 pa-0 event-analyzer__run"
                         @click.stop="jumpToBattleEvent(item.troopId)">
                         <v-icon x-small>mdi-arrow-right-circle-outline</v-icon>
                         <span class="caption">Jump →</span>
@@ -286,7 +284,7 @@ export default {
 
         </v-treeview>
 
-        <div v-if="treeItems.length === 0" class="caption grey--text ma-2">
+        <div v-if="treeItems.length === 0" class="caption cheat-muted ma-2">
             No commands to display in this page.
         </div>
     </template>
@@ -296,8 +294,8 @@ export default {
         <span>Reload game data</span>
         <template v-slot:activator="{ on, attrs }">
             <v-btn
-                style="top:0;right:0;"
-                color="pink" dark small absolute top right fab
+                class="event-analyzer__reload"
+                small absolute top right fab
                 v-bind="attrs" v-on="on"
                 @click="reload">
                 <v-icon>mdi-refresh</v-icon>

@@ -60,10 +60,13 @@ settings profiles. Missing targets are disabled with diagnostics and remain remo
 ## Message log
 
 Press **Ctrl+H** to read and search the latest 1,000 captured dialogue entries,
-including speaker/map metadata where available. Export plain text or clear the
-history without dismissing the game's current message. New game/load clears the
-history. Text shown before the cheat initialized and arbitrary plugin-drawn text
-cannot be recovered.
+including speaker/map metadata where available. Refresh, Export and Clear sit in
+the panel header; search, log font, text size and reset share one compact toolbar.
+History fills the remaining panel height and scrolls on its own, so long sessions
+stay readable at small overlay sizes. Export plain text or clear the history
+without dismissing the game's current message. New game/load clears the history.
+Text shown before the cheat initialized and arbitrary plugin-drawn text cannot be
+recovered.
 
 ## Game options
 
@@ -232,12 +235,13 @@ original dialogue windows, and applies to newly captured messages in the session
 
 ### Enemy Browser And Fight Actions
 
-Enemies opens in **Encounters / Roots** mode. It groups heads, limbs and other
-members under their authored database troop, including initially hidden members.
-Troop variants stay separate. The representative artwork/name is a display aid,
-not an invented parent pointer. **Start Encounter** launches the original troop
-with its placements and battle-event pages; confirm the story-side-effect warning
-first. **Individual Enemies / Parts** retains the per-record editor.
+Enemies opens with **Troops** and **Enemies** tabs. **Troops** groups heads,
+limbs and other members under their authored database troop, including initially
+hidden members. Troop variants stay separate. The representative artwork prefers
+the enemy's head over torso and limbs, so cards stay recognizable; the name is a
+display aid, not an invented parent pointer. **Start Troop** launches the original
+troop with its placements and battle-event pages; confirm the story-side-effect
+warning first. **Enemies** retains the per-record editor.
 
 The Enemies editor uses game battler artwork and available descriptions. Hover or
 focus an enemy label to see parameters, actions, traits, base EXP/gold and base drop
@@ -292,8 +296,11 @@ for selections and primary actions. **Color theme** offers **Current** (the slat
 design) and **Legacy** (the older charcoal-gray Material colors shown in the
 screenshots), keeping the compact layout in both. Dark/light mode and accent
 color remain independent; the labeled **Default** swatch restores the released
-blue. Saved colors are honored. The color-theme choice persists, is included in
-settings export/import, and synchronizes with the separate cheat window.
+blue. Saved colors are honored. Panel actions, status text, chips, snackbars and
+focus rings follow the active theme, and focus rings brighten or darken the chosen
+accent so they stay visible on both palettes. The color-theme choice persists, is
+included in settings export/import, and synchronizes with the separate cheat
+window.
 
 ## Destination Previews And Layout
 

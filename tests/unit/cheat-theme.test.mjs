@@ -5,6 +5,7 @@ import {
   ACCENT_COLOR_OPTIONS,
   DEFAULT_PRIMARY_COLOR,
   THEME_PRIMARY_COLOR,
+  accentFocusColor,
   createVuetifyTheme,
   readThemeSelection,
   readThemeStyle,
@@ -104,4 +105,22 @@ test("switching Legacy on and off updates the app root and both palettes", (t) =
   assert.equal(attributes["data-cheat-theme"], "current");
   assert.equal(vuetify.theme.themes.dark.success, "#34d399");
   assert.equal(vuetify.theme.themes.dark.primary, "#14B8A6");
+});
+
+test("the focus ring lifts dark accents on dark surfaces and deepens pale accents on light surfaces", () => {
+  assert.equal(accentFocusColor("nope", true), null);
+  assert.deepEqual(accentFocusColor("#1976D2", true), {
+    primary: "#1976D2",
+    primarySoft: "rgba(25,118,210,0.16)",
+    focus: "#81b4e6",
+    focusSoft: "rgba(129,180,230,0.2)",
+  });
+  assert.deepEqual(accentFocusColor("#F59E0B", false), {
+    primary: "#F59E0B",
+    primarySoft: "rgba(245,158,11,0.16)",
+    focus: "#ac6f08",
+    focusSoft: "rgba(172,111,8,0.2)",
+  });
+  assert.equal(accentFocusColor("#94A3B8", true).focus, "#94A3B8");
+  assert.equal(accentFocusColor("#1976D2", false).focus, "#1976D2");
 });

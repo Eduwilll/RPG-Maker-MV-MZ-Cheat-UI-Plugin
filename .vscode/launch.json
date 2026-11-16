@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Edge",
+            "name": "Launch Edge UI Preview",
             "request": "launch",
             "type": "msedge",
-            "url": "http://localhost:5173/RPG-Maker-MV-MZ-Cheat-UI-Plugin/",
+            "url": "http://localhost:8080/preview/index.html",
             "webRoot": "${workspaceFolder}"
         },
         {

@@ -30,6 +30,81 @@ function isHexColor(value) {
   return typeof value === "string" && /^#[0-9a-f]{6}$/i.test(value);
 }
 
+function parseHexColor(value) {
+  if (!isHexColor(value)) return null;
+  const numeric = parseInt(value.slice(1), 16);
+  return {
+    r: (numeric >> 16) & 255,
+    g: (numeric >> 8) & 255,
+    b: numeric & 255,
+  };
+}
+
+function channelLuminance(channel) {
+  const value = channel / 255;
+  return value <= 0.03928
+    ? value / 12.92
+    : Math.pow((value + 0.055) / 1.055, 2.4);
+}
+
+function relativeLuminance(rgb) {
+  return (
+    0.2126 * channelLuminance(rgb.r) +
+    0.7152 * channelLuminance(rgb.g) +
+    0.0722 * channelLuminance(rgb.b)
+  );
+}
+
+function mixChannel(channel, target, amount) {
+  return Math.round(channel + (target - channel) * amount);
+}
+
+function mixColor(rgb, target, amount) {
+  return {
+    r: mixChannel(rgb.r, target.r, amount),
+    g: mixChannel(rgb.g, target.g, amount),
+    b: mixChannel(rgb.b, target.b, amount),
+  };
+}
+
+function rgba(rgb, alpha) {
+  return `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha})`;
+}
+
+/**
+ * Derive the focus ring variables from the user's accent. The accent itself is
+ * tuned for filled buttons, so dark accents are lightened on dark surfaces and
+ * pale accents are darkened on light surfaces to keep focus visible.
+ */
+export function accentFocusColor(color, dark) {
+  const rgb = parseHexColor(color);
+  if (!rgb) return null;
+  const luminance = relativeLuminance(rgb);
+  let focus = color;
+  if (dark && luminance < 0.3) {
+    const lifted = mixColor(rgb, { r: 255, g: 255, b: 255 }, 0.45);
+    focus =
+      "#" +
+      lifted.r.toString(16).padStart(2, "0") +
+      lifted.g.toString(16).padStart(2, "0") +
+      lifted.b.toString(16).padStart(2, "0");
+  } else if (!dark && luminance > 0.32) {
+    const deepened = mixColor(rgb, { r: 0, g: 0, b: 0 }, 0.3);
+    focus =
+      "#" +
+      deepened.r.toString(16).padStart(2, "0") +
+      deepened.g.toString(16).padStart(2, "0") +
+      deepened.b.toString(16).padStart(2, "0");
+  }
+  const focusRgb = parseHexColor(focus) || rgb;
+  return {
+    primary: color,
+    primarySoft: rgba(rgb, 0.16),
+    focus: focus,
+    focusSoft: rgba(focusRgb, 0.2),
+  };
+}
+
 /**
  * Semantic colors tuned for the slate surfaces in `css/main.css`. Vuetify uses
  * these for chips, alerts, switches and validation states, so they need enough

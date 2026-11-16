@@ -8,34 +8,33 @@ export default {
   name: "AboutPanel",
 
   template: `
-<v-card flat class="ma-0 pa-0" style="position: relative;">
+<v-card flat class="about-panel ma-0 pa-0">
     <v-btn
-        style="top: 8px; right: 8px;"
-        color="pink"
-        dark
+        class="about-panel__refresh"
         x-small
         absolute
         fab
         title="Refresh environment info"
+        aria-label="Refresh environment info"
         @click="initializeVariables">
         <v-icon small>mdi-refresh</v-icon>
     </v-btn>
 
     <v-card-subtitle class="pb-0 font-weight-bold">Overview</v-card-subtitle>
     <v-card-text class="pt-0 pb-2">
-        <v-chip small color="teal" text-color="white" class="mr-2 mb-2">
+        <v-chip small outlined color="success" class="mr-2 mb-2">
             <v-icon small left>mdi-information-outline</v-icon>
             Cheat {{ info.cheatVersion }}
         </v-chip>
-        <v-chip small color="blue" text-color="white" class="mr-2 mb-2">
+        <v-chip small outlined color="info" class="mr-2 mb-2">
             <v-icon small left>mdi-controller-classic-outline</v-icon>
             {{ info.engineName }}
         </v-chip>
-        <v-chip small color="indigo" text-color="white" class="mr-2 mb-2">
+        <v-chip small outlined color="primary" class="mr-2 mb-2">
             <v-icon small left>mdi-monitor-dashboard</v-icon>
             {{ info.viewMode }}
         </v-chip>
-        <v-chip small color="green" text-color="white" class="mb-2">
+        <v-chip small outlined color="accent" class="mb-2">
             <v-icon small left>mdi-translate</v-icon>
             {{ info.translationEndpointName }}
         </v-chip>
@@ -57,8 +56,8 @@ export default {
         <v-simple-table dense>
             <tbody>
                 <tr v-for="row in cheatRows" :key="'cheat-' + row.label">
-                    <td class="caption font-weight-bold pr-4" style="width: 180px;">{{row.label}}</td>
-                    <td class="caption" style="word-break: break-word;">{{row.value}}</td>
+                    <td class="caption font-weight-bold pr-4 about-panel__cell-label">{{row.label}}</td>
+                    <td class="caption about-panel__cell-value">{{row.value}}</td>
                 </tr>
             </tbody>
         </v-simple-table>
@@ -69,8 +68,8 @@ export default {
         <v-simple-table dense>
             <tbody>
                 <tr v-for="row in gameRows" :key="'game-' + row.label">
-                    <td class="caption font-weight-bold pr-4" style="width: 180px;">{{row.label}}</td>
-                    <td class="caption" style="word-break: break-word;">{{row.value}}</td>
+                    <td class="caption font-weight-bold pr-4 about-panel__cell-label">{{row.label}}</td>
+                    <td class="caption about-panel__cell-value">{{row.value}}</td>
                 </tr>
             </tbody>
         </v-simple-table>
@@ -81,8 +80,8 @@ export default {
         <v-simple-table dense>
             <tbody>
                 <tr v-for="row in runtimeRows" :key="'runtime-' + row.label">
-                    <td class="caption font-weight-bold pr-4" style="width: 180px;">{{row.label}}</td>
-                    <td class="caption" style="word-break: break-word;">{{row.value}}</td>
+                    <td class="caption font-weight-bold pr-4 about-panel__cell-label">{{row.label}}</td>
+                    <td class="caption about-panel__cell-value">{{row.value}}</td>
                 </tr>
             </tbody>
         </v-simple-table>
@@ -93,8 +92,8 @@ export default {
         <v-simple-table dense>
             <tbody>
                 <tr v-for="row in translationRows" :key="'translation-' + row.label">
-                    <td class="caption font-weight-bold pr-4" style="width: 180px;">{{row.label}}</td>
-                    <td class="caption" style="word-break: break-word;">{{row.value}}</td>
+                    <td class="caption font-weight-bold pr-4 about-panel__cell-label">{{row.label}}</td>
+                    <td class="caption about-panel__cell-value">{{row.value}}</td>
                 </tr>
             </tbody>
         </v-simple-table>
@@ -105,8 +104,8 @@ export default {
         <v-simple-table dense>
             <tbody>
                 <tr v-for="row in diagnosticsRows" :key="'diagnostics-' + row.label">
-                    <td class="caption font-weight-bold pr-4" style="width: 180px;">{{row.label}}</td>
-                    <td class="caption" style="word-break: break-word;">{{row.value}}</td>
+                    <td class="caption font-weight-bold pr-4 about-panel__cell-label">{{row.label}}</td>
+                    <td class="caption about-panel__cell-value">{{row.value}}</td>
                 </tr>
             </tbody>
         </v-simple-table>
@@ -117,8 +116,8 @@ export default {
         <v-simple-table dense>
             <tbody>
                 <tr v-for="row in pathRows" :key="'path-' + row.label">
-                    <td class="caption font-weight-bold pr-4" style="width: 180px;">{{row.label}}</td>
-                    <td class="caption" style="word-break: break-word;">{{row.value}}</td>
+                    <td class="caption font-weight-bold pr-4 about-panel__cell-label">{{row.label}}</td>
+                    <td class="caption about-panel__cell-value">{{row.value}}</td>
                 </tr>
             </tbody>
         </v-simple-table>
@@ -132,8 +131,7 @@ export default {
             auto-grow
             solo
             dense
-            hide-details
-            background-color="grey darken-3">
+            hide-details>
         </v-textarea>
     </v-card-text>
 
@@ -145,8 +143,7 @@ export default {
             auto-grow
             solo
             dense
-            hide-details
-            background-color="grey darken-3">
+            hide-details>
         </v-textarea>
     </v-card-text>
 </v-card>
