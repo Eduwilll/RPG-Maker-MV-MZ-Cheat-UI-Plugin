@@ -17,100 +17,94 @@ export default {
   },
 
   template: `
-<v-card 
-    class="ma-0 pa-0"
-    flat>
-    <v-card-subtitle class="caption pb-0">Battle</v-card-subtitle>
-    <v-card-text class="pt-0 pb-0">
-    <div class="cheat-filter-bar">
-        <v-checkbox
-            data-feature="random-encounters"
-            v-model="disableRandomEncounter"
-            hide-details
-            dense
-            x-small
-            class="my-0 py-0"
-            @change="onDisableRandomEncounterChange">
-            <template v-slot:label>
-                <span class="caption">Disable Random Encounter</span>
-            </template>
-        </v-checkbox>
-        <v-checkbox
-            data-feature="one-hit-kill"
-            v-model="oneHitKill"
-            hide-details
-            dense
-            x-small
-            class="my-0 py-0"
-            @change="onOneHitKillChange">
-            <template v-slot:label>
-                <span class="caption">One-Hit Kill</span>
-            </template>
-        </v-checkbox>
+<v-card flat class="cheat-panel">
+    <div class="cheat-panel__head">
+        <div>
+            <div class="cheat-panel__title">HP / MP / Battle</div>
         </div>
-        <v-btn small @click.prevent="encounterBattle">Encounter</v-btn>
-        <v-btn small @click.prevent="victory">Victory</v-btn>
-        <v-btn small @click.prevent="defeat">Defeat</v-btn>
-        <v-btn small @click.prevent="escape">Escape</v-btn>
-        <v-btn small @click.prevent="abort">Abort</v-btn>
-    </v-card-text>
-    
-    <v-card-subtitle class="caption pb-1">Enemy</v-card-subtitle>
-    <v-card-text class="pt-0 pb-0">
-        <v-btn small @click.prevent="changeAllEnemyHealth(0)">Set 0</v-btn>
-        <v-btn small @click.prevent="changeAllEnemyHealth(1)">Set 1</v-btn>
-        <v-btn small @click.prevent="recoverAllEnemy">Recovery</v-btn>
-        <v-btn small @click.prevent="fillTpAllEnemy">Fill TP</v-btn>
-        <v-btn small @click.prevent="clearStatesAllEnemy">Clear States</v-btn>
-    </v-card-text>
-    
-    <v-card-subtitle class="caption pb-1">Party</v-card-subtitle>
-    <v-card-text class="pt-0 pb-0">
-        <v-btn small @click.prevent="changeAllPartyHealth(0)">Set 0</v-btn>
-        <v-btn small @click.prevent="changeAllPartyHealth(1)">Set 1</v-btn>
-        <v-btn small @click.prevent="recoverAllParty">Recovery</v-btn>
-        <v-btn small @click.prevent="fillTpAllParty">Fill TP</v-btn>
-        <v-btn small @click.prevent="clearStatesAllParty">Clear States</v-btn>
-    </v-card-text>
-    
+        <v-btn small text title="Reload from game data" aria-label="Reload from game data" @click="initializeVariables">
+            <v-icon left small>mdi-refresh</v-icon>Refresh
+        </v-btn>
+    </div>
+
+    <section class="cheat-section">
+        <div class="cheat-section__title">Battle</div>
+        <div class="cheat-filter-bar">
+            <v-checkbox
+                data-feature="random-encounters"
+                v-model="disableRandomEncounter"
+                hide-details
+                dense
+                x-small
+                class="my-0 py-0"
+                @change="onDisableRandomEncounterChange">
+                <template v-slot:label>
+                    <span class="caption">Disable Random Encounter</span>
+                </template>
+            </v-checkbox>
+            <v-checkbox
+                data-feature="one-hit-kill"
+                v-model="oneHitKill"
+                hide-details
+                dense
+                x-small
+                class="my-0 py-0"
+                @change="onOneHitKillChange">
+                <template v-slot:label>
+                    <span class="caption">One-Hit Kill</span>
+                </template>
+            </v-checkbox>
+        </div>
+        <div class="cheat-actions">
+            <v-btn small @click.prevent="encounterBattle">Encounter</v-btn>
+            <v-btn small @click.prevent="victory">Victory</v-btn>
+            <v-btn small @click.prevent="defeat">Defeat</v-btn>
+            <v-btn small @click.prevent="escape">Escape</v-btn>
+            <v-btn small @click.prevent="abort">Abort</v-btn>
+        </div>
+    </section>
+
+    <section class="cheat-section">
+        <div class="cheat-section__title">Enemy</div>
+        <div class="cheat-actions">
+            <v-btn small @click.prevent="changeAllEnemyHealth(0)">Set 0</v-btn>
+            <v-btn small @click.prevent="changeAllEnemyHealth(1)">Set 1</v-btn>
+            <v-btn small @click.prevent="recoverAllEnemy">Recovery</v-btn>
+            <v-btn small @click.prevent="fillTpAllEnemy">Fill TP</v-btn>
+            <v-btn small @click.prevent="clearStatesAllEnemy">Clear States</v-btn>
+        </div>
+    </section>
+
+    <section class="cheat-section">
+        <div class="cheat-section__title">Party</div>
+        <div class="cheat-actions">
+            <v-btn small @click.prevent="changeAllPartyHealth(0)">Set 0</v-btn>
+            <v-btn small @click.prevent="changeAllPartyHealth(1)">Set 1</v-btn>
+            <v-btn small @click.prevent="recoverAllParty">Recovery</v-btn>
+            <v-btn small @click.prevent="fillTpAllParty">Fill TP</v-btn>
+            <v-btn small @click.prevent="clearStatesAllParty">Clear States</v-btn>
+        </div>
+    </section>
+
     <template v-if="enemy && enemy.length > 0">
-        <v-card-subtitle class="caption pb-1">Enemy Details</v-card-subtitle>
-        <v-card-text class="pt-0 pb-0">
+        <section class="cheat-section">
+            <div class="cheat-section__title">Enemy Details</div>
             <health-setting-tab
                 :items="enemy"
                 @change="onDetailChange($event, 'enemy')">
             </health-setting-tab>
-        </v-card-text>
+        </section>
     </template>
-    
+
     <template v-if="party && party.length > 0">
-        <v-card-subtitle class="caption pb-1">Party Details</v-card-subtitle>
-        <v-card-text class="pt-0 pb-0">
+        <section class="cheat-section">
+            <div class="cheat-section__title">Party Details</div>
             <health-setting-tab
                 :items="party"
                 @change="onDetailChange($event, 'party')">
             </health-setting-tab>
-        </v-card-text>
+        </section>
     </template>
-    
-    <v-tooltip
-        bottom>
-        <span>Reload from game data</span>
-        <template v-slot:activator="{ on, attrs }">
-            <v-btn
-                class="cheat-refresh-fab"
-                small
-                absolute
-                top
-                right
-                fab
-                v-bind="attrs"
-                v-on="on"
-                @click="initializeVariables">
-                <v-icon>mdi-refresh</v-icon>
-            </v-btn>
-        </template>
-    </v-tooltip>
 </v-card>
     `,
 

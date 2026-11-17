@@ -45,10 +45,10 @@ const SIDEBAR_VISIBLE_SETTING = "cheatModal.sidebarVisible";
 const WINDOW_OPACITY_SETTING = "cheatModal.windowOpacity";
 const THEME_PRIMARY_COLOR = "cheatModal.themePrimaryColor";
 
-const NAV_GROUPS = [
+const NAV_GROUPS = Object.freeze([
   {
     label: "Play",
-    items: [
+    items: Object.freeze([
       {
         name: "General",
         icon: "mdi-hammer-screwdriver",
@@ -72,7 +72,7 @@ const NAV_GROUPS = [
       {
         name: "Items",
         icon: "mdi-bag-personal-outline",
-        children: [
+        children: Object.freeze([
           {
             name: "Item",
             icon: "mdi-flask-empty-plus",
@@ -88,7 +88,7 @@ const NAV_GROUPS = [
             icon: "mdi-shield-plus",
             component: "armor-setting-panel",
           },
-        ],
+        ]),
       },
       {
         name: "Variables",
@@ -115,11 +115,11 @@ const NAV_GROUPS = [
         icon: "mdi-school",
         component: "class-editor-panel",
       },
-    ],
+    ]),
   },
   {
     label: "World",
-    items: [
+    items: Object.freeze([
       {
         name: "Map / Minimap",
         icon: "mdi-map",
@@ -150,11 +150,11 @@ const NAV_GROUPS = [
         icon: "mdi-eye-outline",
         component: "watcher-panel",
       },
-    ],
+    ]),
   },
   {
     label: "Tools",
-    items: [
+    items: Object.freeze([
       {
         name: "Shortcuts",
         icon: "mdi-keyboard-outline",
@@ -165,15 +165,15 @@ const NAV_GROUPS = [
         icon: "mdi-lock-star",
         component: "locks-panel",
       },
-    ],
+    ]),
   },
   {
     label: "System",
-    items: [
+    items: Object.freeze([
       {
         name: "Settings",
         icon: "mdi-cog",
-        children: [
+        children: Object.freeze([
           {
             name: "Game Options",
             icon: "mdi-tune",
@@ -194,11 +194,11 @@ const NAV_GROUPS = [
             icon: "mdi-information-outline",
             component: "about-panel",
           },
-        ],
+        ]),
       },
-    ],
+    ]),
   },
-];
+]);
 
 export default {
   name: "CheatModal",

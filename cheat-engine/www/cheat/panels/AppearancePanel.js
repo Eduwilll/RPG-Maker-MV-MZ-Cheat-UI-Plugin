@@ -109,7 +109,7 @@ export default {
             @change="onStyleChange" />
             <v-btn
                 icon
-                danse
+                dense
                 outlined
                 :title="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'"
                 :aria-label="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'"

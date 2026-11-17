@@ -32,9 +32,12 @@ export default {
     <!-- ══════════════════════════════════════════════════════
          ROOT SELECTOR
     ══════════════════════════════════════════════════════ -->
-    <v-card-subtitle class="ma-0 pa-1 pb-0 font-weight-bold">
-        Event Sequence Analyzer
-    </v-card-subtitle>
+    <div class="cheat-panel__head">
+        <div class="cheat-panel__title">Event Sequence Analyzer</div>
+        <v-btn small text title="Reload game data" aria-label="Reload game data" @click="reload">
+            <v-icon left small>mdi-refresh</v-icon>Reload
+        </v-btn>
+    </div>
 
     <!-- Type picker -->
     <v-radio-group v-model="rootType" row dense hide-details class="ma-1 mt-0">
@@ -288,20 +291,6 @@ export default {
             No commands to display in this page.
         </div>
     </template>
-
-    <!-- Reload button (top-right) -->
-    <v-tooltip bottom>
-        <span>Reload game data</span>
-        <template v-slot:activator="{ on, attrs }">
-            <v-btn
-                class="event-analyzer__reload"
-                small absolute top right fab
-                v-bind="attrs" v-on="on"
-                @click="reload">
-                <v-icon>mdi-refresh</v-icon>
-            </v-btn>
-        </template>
-    </v-tooltip>
 
 </v-card>
   `,

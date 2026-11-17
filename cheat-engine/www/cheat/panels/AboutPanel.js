@@ -8,17 +8,16 @@ export default {
   name: "AboutPanel",
 
   template: `
-<v-card flat class="about-panel ma-0 pa-0">
-    <v-btn
-        class="about-panel__refresh"
-        x-small
-        absolute
-        fab
-        title="Refresh environment info"
-        aria-label="Refresh environment info"
-        @click="initializeVariables">
-        <v-icon small>mdi-refresh</v-icon>
-    </v-btn>
+<v-card flat class="cheat-panel about-panel">
+    <div class="cheat-panel__head">
+        <div>
+            <div class="cheat-panel__title">About</div>
+            <div class="cheat-panel__meta">Runtime and game diagnostics</div>
+        </div>
+        <v-btn small text title="Refresh environment info" aria-label="Refresh environment info" @click="initializeVariables">
+            <v-icon left small>mdi-refresh</v-icon>Refresh
+        </v-btn>
+    </div>
 
     <v-card-subtitle class="pb-0 font-weight-bold">Overview</v-card-subtitle>
     <v-card-text class="pt-0 pb-2">
