@@ -45,6 +45,24 @@ def main():
         shutil.rmtree(package_dir, ignore_errors=True)
 
 
+def get_tcl_tk_paths():
+    """Find Tcl and Tk library directories for bundling with PyInstaller."""
+    import sysconfig
+
+    stdlib_path = sysconfig.get_path("stdlib")
+    tcl_base = os.path.join(os.path.dirname(stdlib_path), "tcl")
+
+    tcl_path = os.path.join(tcl_base, "tcl8.6")
+    tk_path = os.path.join(tcl_base, "tk8.6")
+
+    if not os.path.isdir(tcl_path):
+        tcl_path = None
+    if not os.path.isdir(tk_path):
+        tk_path = None
+
+    return tcl_path, tk_path
+
+
 def get_project_root():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -81,6 +99,11 @@ def run_pyinstaller(project_root, dist_dir, work_dir, spec_dir):
     favicon_path = os.path.join(project_root, "docs", "public", "favicon.ico")
     add_data_separator = ";" if os.name == "nt" else ":"
 
+    # PyInstaller's tkinter runtime hook looks for these exact directory names.
+    # Bundle them explicitly so --onefile builds still start when automatic
+    # Tcl/Tk collection is unavailable.
+    tcl_path, tk_path = get_tcl_tk_paths()
+
     command = [
         sys.executable,
         "-m",
@@ -113,6 +136,18 @@ def run_pyinstaller(project_root, dist_dir, work_dir, spec_dir):
         "save_editor_view",
     ]
 
+    # PyInstaller 6.x mounts these as _tcl_data/_tk_data in the onefile bundle.
+    if tcl_path:
+        command.extend(["--add-data", f"{tcl_path}{add_data_separator}_tcl_data"])
+    if tk_path:
+        command.extend(["--add-data", f"{tk_path}{add_data_separator}_tk_data"])
+
+    # Add runtime hook to set TCL_LIBRARY and TK_LIBRARY at startup
+    runtime_hook_path = os.path.join(installer_dir, "pyi_rth_tkinter_fix.py")
+    if not os.path.exists(runtime_hook_path):
+        create_runtime_hook(runtime_hook_path)
+    command.extend(["--runtime-hook", runtime_hook_path])
+
     if os.path.exists(favicon_path):
         command.extend(["--icon", favicon_path])
 
@@ -121,6 +156,29 @@ def run_pyinstaller(project_root, dist_dir, work_dir, spec_dir):
 
     command.append(gui_path)
     subprocess.run(command, cwd=project_root, check=True)
+
+
+def create_runtime_hook(runtime_hook_path):
+    """Create a PyInstaller runtime hook to set TCL_LIBRARY and TK_LIBRARY."""
+    hook_content = '''import os
+import sys
+
+# When running in PyInstaller's --onefile mode, the bundled Tcl/Tk data
+# directories are extracted to sys._MEIPASS. Set TCL_LIBRARY and TK_LIBRARY
+# to the names used by PyInstaller's own tkinter runtime hook.
+
+if hasattr(sys, '_MEIPASS'):
+    meipass = sys._MEIPASS
+    tcl_lib = os.path.join(meipass, '_tcl_data')
+    tk_lib = os.path.join(meipass, '_tk_data')
+
+    if os.path.isdir(tcl_lib):
+        os.environ['TCL_LIBRARY'] = tcl_lib
+    if os.path.isdir(tk_lib):
+        os.environ['TK_LIBRARY'] = tk_lib
+'''
+    with open(runtime_hook_path, 'w', encoding='utf-8') as f:
+        f.write(hook_content)
 
 
 def create_package(project_root, output_dir, package_dir, version):
