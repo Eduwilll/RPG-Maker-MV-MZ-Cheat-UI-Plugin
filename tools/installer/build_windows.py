@@ -46,18 +46,26 @@ def main():
 
 
 def get_tcl_tk_paths():
-    """Find Tcl and Tk library directories for bundling with PyInstaller."""
+    """Find Tcl and Tk library directories for bundling with PyInstaller.
+    Detects the actual version (tcl8.6, tcl9.0, etc.) instead of hardcoding.
+    """
     import sysconfig
+    import glob
 
     stdlib_path = sysconfig.get_path("stdlib")
     tcl_base = os.path.join(os.path.dirname(stdlib_path), "tcl")
 
-    tcl_path = os.path.join(tcl_base, "tcl8.6")
-    tk_path = os.path.join(tcl_base, "tk8.6")
+    # Find tcl* and tk* directories (e.g., tcl8.6, tcl9.0, tk8.6, tk9.0)
+    tcl_dirs = glob.glob(os.path.join(tcl_base, "tcl*"))
+    tk_dirs = glob.glob(os.path.join(tcl_base, "tk*"))
 
-    if not os.path.isdir(tcl_path):
+    # Prefer highest version (e.g., tcl9.0 over tcl8.6)
+    tcl_path = max(tcl_dirs, key=os.path.basename) if tcl_dirs else None
+    tk_path = max(tk_dirs, key=os.path.basename) if tk_dirs else None
+
+    if tcl_path and not os.path.isdir(tcl_path):
         tcl_path = None
-    if not os.path.isdir(tk_path):
+    if tk_path and not os.path.isdir(tk_path):
         tk_path = None
 
     return tcl_path, tk_path
