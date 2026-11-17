@@ -9,6 +9,7 @@ import queue
 import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
+import webbrowser
 
 if __package__:
     from .core import install_from_archive, install_from_source, uninstall
@@ -23,6 +24,18 @@ else:
 
 
 _AUTO = object()
+
+PROJECT_URL = "https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin"
+DOCUMENTATION_URL = "https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/"
+LICENSE_URL = f"{PROJECT_URL}/blob/main/LICENSE"
+ISSUES_URL = f"{PROJECT_URL}/issues/new/choose"
+CONTRIBUTORS_URL = f"{PROJECT_URL}/graphs/contributors"
+CREDIT_ROWS = (
+    ("Original plugin", "paramonos", "https://github.com/paramonos/RPG-Maker-MV-MZ-Cheat-UI-Plugin"),
+    ("Translation idea", "sieucapoccho3717", "https://github.com/sieucapoccho3717/RPG-Maker-MV-MZ-Cheat-UI-Plugin"),
+    ("Map Event Panel", "Justype", "https://github.com/Justype/RPG-Maker-MV-MZ-Cheat-UI-Plugin"),
+    ("Maintained and enhanced by", "Eduwilll", PROJECT_URL),
+)
 
 
 class InstallerApp(tk.Tk):
@@ -143,12 +156,15 @@ class InstallerApp(tk.Tk):
         self.manage_button.grid(row=4, column=0, sticky="ew")
         self.save_editor_button = self._track(ttk.Button(sidebar, text="Save editor", style="Nav.TButton", command=self.open_save_editor))
         self.save_editor_button.grid(row=7, column=0, sticky="ew")
+        self.about_button = self._track(ttk.Button(sidebar, text="About", style="Nav.TButton", command=lambda: self.show_view("about")))
+        self.about_button.grid(row=8, column=0, sticky="ew", pady=(8, 0))
         self.scroller = ScrollableContent(self)
         self.scroller.grid(row=0, column=1, sticky="nsew")
         content = self.scroller.body
         header = ttk.Frame(content)
         header.pack(fill="x", pady=(0, 12))
-        help_button(header, "Choose a game folder or paste the path to Game.exe. MV/MZ and the correct package are detected automatically. Close the game before installing. Advanced options are optional.").pack(side="right")
+        self.header_help = help_button(header, "Choose a game folder or paste the path to Game.exe. MV/MZ and the correct package are detected automatically. Close the game before installing. Advanced options are optional.")
+        self.header_help.pack(side="right")
         self.heading = wrapped_label(header, text="Install plugin", style="Heading.TLabel")
         self.heading.pack(side="left", fill="x", expand=True)
         self.subtitle = wrapped_label(content, text="Install the Cheat UI in a few clicks. No manual file copying needed.")
@@ -160,6 +176,8 @@ class InstallerApp(tk.Tk):
         self._create_advanced(self.install_page)
         self.manage_page = ttk.Frame(content)
         self._create_maintenance(self.manage_page)
+        self.about_page = ttk.Frame(content)
+        self._create_about(self.about_page)
         self.details_toggle = ttk.Button(content, text="Show activity log", command=self.toggle_details)
         self.details_toggle.pack(anchor="w", pady=(8, 0))
         self.details_frame = ttk.Frame(content, style="Card.TFrame", padding=12)
@@ -185,6 +203,7 @@ class InstallerApp(tk.Tk):
 
     def _create_game_picker(self, parent):
         card = ttk.Frame(parent, style="Card.TFrame", padding=12)
+        self.game_picker_card = card
         card.pack(fill="x", pady=(0, 8))
         ttk.Label(card, text="Game folder", style="Section.TLabel").pack(anchor="w", pady=(0, 8))
         row = ttk.Frame(card, style="Surface.TFrame")
@@ -259,6 +278,61 @@ class InstallerApp(tk.Tk):
         ttk.Label(header, text="Uninstall", style="Section.TLabel").pack(side="left")
         self.uninstall_button = ttk.Button(card, text="Uninstall plugin...", style="Danger.TButton", command=self.run_uninstall)
         self.uninstall_button.pack(anchor="w")
+
+    def _create_about(self, parent):
+        card = ttk.Frame(parent, style="Card.TFrame", padding=16)
+        card.pack(fill="x", pady=(0, 8))
+        ttk.Label(card, text="RPG Maker MV/MZ Cheat UI Installer", style="Section.TLabel").pack(anchor="w")
+        version = str(self.source_version or "").strip()
+        if version and version.lower() != "unknown":
+            version = version if version.lower().startswith("v") else "v" + version
+            ttk.Label(card, text=f"Version {version}", style="CardMuted.TLabel").pack(anchor="w", pady=(2, 0))
+        wrapped_label(
+            card,
+            text="Guided installer for the RPG Maker MV/MZ Cheat UI plugin. It detects the engine, installs the matching release, keeps backups and can edit local save files.",
+            style="Card.TLabel",
+        ).pack(fill="x", pady=(10, 12))
+        links = ttk.Frame(card, style="Surface.TFrame")
+        links.pack(fill="x")
+        ttk.Button(links, text="GitHub repository", command=lambda: self.open_link(PROJECT_URL, "GitHub repository")).pack(side="left")
+        ttk.Button(links, text="Documentation", command=lambda: self.open_link(DOCUMENTATION_URL, "documentation")).pack(side="left", padx=(8, 0))
+        ttk.Button(links, text="Report an issue", command=lambda: self.open_link(ISSUES_URL, "issue page")).pack(side="left", padx=(8, 0))
+
+        card = ttk.Frame(parent, style="Card.TFrame", padding=16)
+        card.pack(fill="x", pady=(0, 8))
+        ttk.Label(card, text="CREDITS", style="Eyebrow.TLabel").pack(anchor="w")
+        wrapped_label(
+            card,
+            text="This fork builds on the work of the RPG Maker cheat UI community.",
+            style="CardMuted.TLabel",
+        ).pack(fill="x", pady=(2, 10))
+        credits = ttk.Frame(card, style="Surface.TFrame")
+        credits.pack(fill="x")
+        credits.columnconfigure(1, weight=1)
+        for index, (role, name, url) in enumerate(CREDIT_ROWS):
+            ttk.Label(credits, text=role, style="CardMuted.TLabel").grid(row=index, column=0, sticky="w", pady=2)
+            ttk.Label(credits, text=name, style="Card.TLabel").grid(row=index, column=1, sticky="w", padx=(10, 8), pady=2)
+            ttk.Button(credits, text="GitHub", command=lambda target=url: self.open_link(target, name)).grid(row=index, column=2, sticky="e", pady=2)
+        contributors_row = len(CREDIT_ROWS)
+        ttk.Label(credits, text="Contributors", style="CardMuted.TLabel").grid(row=contributors_row, column=0, sticky="w", pady=(8, 0))
+        ttk.Button(credits, text="View all on GitHub", command=lambda: self.open_link(CONTRIBUTORS_URL, "contributors page")).grid(
+            row=contributors_row, column=1, columnspan=2, sticky="w", padx=(10, 0), pady=(8, 0)
+        )
+
+        card = ttk.Frame(parent, style="Card.TFrame", padding=16)
+        card.pack(fill="x")
+        ttk.Label(card, text="LICENSE", style="Eyebrow.TLabel").pack(anchor="w")
+        wrapped_label(
+            card,
+            text="MIT License. Original project copyright (c) 2022 paramonos. The full license text is in the repository.",
+            style="Card.TLabel",
+        ).pack(fill="x", pady=(4, 10))
+        ttk.Button(card, text="Read the license", command=lambda: self.open_link(LICENSE_URL, "license")).pack(anchor="w")
+        wrapped_label(
+            card,
+            text="Built with Python and Tkinter. The in-game UI uses Vue.js and Vuetify. RPG Maker MV/MZ are trademarks of their respective owners.",
+            style="CardMuted.TLabel",
+        ).pack(fill="x", pady=(12, 0))
 
     def _set_notice(self, kind, title, body, *, folder=False):
         self.notice_title.set(title)
@@ -544,20 +618,55 @@ class InstallerApp(tk.Tk):
     def show_view(self, view):
         if self.runner.busy:
             return
+        pages = {"install": self.install_page, "manage": self.manage_page, "about": self.about_page}
+        if view not in pages:
+            view = "install"
         self.current_view = view
-        self.install_page.pack_forget()
-        self.manage_page.pack_forget()
-        page = self.install_page if view == "install" else self.manage_page
-        page.pack(fill="x", before=self.details_toggle)
-        self.setup_button.configure(style="Selected.Nav.TButton" if view == "install" else "Nav.TButton")
-        self.manage_button.configure(style="Selected.Nav.TButton" if view == "manage" else "Nav.TButton")
-        self.heading.configure(text="Install plugin" if view == "install" else "Manage installation")
-        self.subtitle.configure(text="Install the Cheat UI in a few clicks. No manual file copying needed." if view == "install" else "Review backups, roll back a plugin version, or remove the Cheat UI.")
+        for page in pages.values():
+            page.pack_forget()
+        if view == "about":
+            self.game_picker_card.pack_forget()
+            self.notice_frame.pack_forget()
+        else:
+            if not self.game_picker_card.winfo_manager():
+                self.game_picker_card.pack(fill="x", pady=(0, 8), before=self.details_toggle)
+            if not self.notice_frame.winfo_manager():
+                self.notice_frame.pack(fill="x", pady=(0, 8), before=self.details_toggle)
+        pages[view].pack(fill="x", before=self.details_toggle)
+        for name, button in (("install", self.setup_button), ("manage", self.manage_button), ("about", self.about_button)):
+            button.configure(style="Selected.Nav.TButton" if view == name else "Nav.TButton")
+        headings = {"install": "Install plugin", "manage": "Manage installation", "about": "About"}
+        subtitles = {
+            "install": "Install the Cheat UI in a few clicks. No manual file copying needed.",
+            "manage": "Review backups, roll back a plugin version, or remove the Cheat UI.",
+            "about": "Project links, credits and license.",
+        }
+        help_texts = {
+            "install": "Choose a game folder or paste the path to Game.exe. MV/MZ and the correct package are detected automatically. Close the game before installing. Advanced options are optional.",
+            "manage": "Manage shows available backups and the uninstall action. Close the game before restoring or uninstalling so its files are not in use.",
+            "about": "About lists the installer version, project credits and links. GitHub and documentation links open in your default browser.",
+        }
+        self.heading.configure(text=headings[view])
+        self.subtitle.configure(text=subtitles[view])
+        self.header_help.help_tip.text = help_texts[view]
         if view == "install":
             self.install_button.grid()
         else:
             self.install_button.grid_remove()
         self.scroller.canvas.yview_moveto(0)
+
+    def open_link(self, url, label="link"):
+        try:
+            opened = webbrowser.open(url)
+        except (webbrowser.Error, OSError) as error:
+            opened = False
+            self._append_log(f"Could not open {label}: {error}")
+        if opened:
+            self.status_text.set(f"Opened {label} in your browser")
+            return
+        self.status_text.set(f"Couldn't open {label} - the address is in Activity")
+        self._append_log(f"Link: {url}")
+        messagebox.showerror("Couldn't open the link", f"Open this address in your browser:\n\n{url}", parent=self)
 
     def open_save_editor(self):
         if self.runner.busy or self.inspection is None or self.save_editor_factory is None:

@@ -1,6 +1,18 @@
 # Changelog
 
-## v1.9.0 - Latest
+## v1.9.1 - Latest
+
+### Installer
+- [Feat] **About And Credits**: The installer sidebar now opens an About page with the detected version, GitHub and documentation links, an issue-chooser shortcut, credits for paramonos, sieucapoccho3717, Justype and Eduwilll plus all contributors, and the MIT license.
+- [Fix] **Frozen Builds**: Bundle Tcl/Tk data so the packaged installer starts on machines without a separate Python/Tk installation.
+
+### Interface Polish
+- [Tweak] **Theme Consistency**: Buttons, chips, status text, snackbars and focus rings follow Current/Legacy, dark/light and the chosen accent throughout the UI.
+- [Tweak] **Shared Panel Headers**: Panels now use the same header structure and refresh action, so titles and controls stay in predictable places.
+
+---
+
+## v1.9.0
 
 ### Interface Refresh
 - [Feat] **Compact Shell**: Grouped navigation, a single top bar with sidebar toggle and Find, consistent panel controls, tighter item filters, compact Teleport X/Y fields and a portrait-based party recruitment menu.

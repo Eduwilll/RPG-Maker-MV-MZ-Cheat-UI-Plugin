@@ -54,6 +54,10 @@ Choose **Manage** in the sidebar to see original-file recovery information and d
 
 The save editor has a narrow, resizable file list and separate **Party & actors** and **Inventory** sections. Actor fields wrap into a readable grid, and scrolling keeps every parameter reachable. **Info** shows file details without widening the list. One **Save changes** button remains at the bottom and writes the selected editing mode with a verified backup. Global/Config metadata opens in **Raw JSON**, not in the actor form.
 
+### About And Credits
+
+Choose **About** in the sidebar to see the installer version when available, project links and credits. **GitHub repository** and **Documentation** open in your default browser, and **Report an issue** opens the issue chooser. The page credits paramonos for the original plugin, sieucapoccho3717 for the translation idea, Justype for the Map Event Panel, and Eduwilll plus all contributors for maintenance and enhancements. It also links to the MIT license and lists the Python/Tkinter and Vue/Vuetify foundations.
+
 ### Troubleshooting
 
 Open **Show activity log** for technical details. **Copy log** copies the current session; **Save log...** exports it to a local file. Check folder paths before sharing logs. Errors keep the current path and explain how to recover. After a file-operation error, use **Check** to refresh game status before retrying.

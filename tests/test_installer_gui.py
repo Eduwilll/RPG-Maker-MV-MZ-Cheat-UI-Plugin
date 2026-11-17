@@ -12,6 +12,12 @@ from unittest import mock
 from tools.installer import installer_ui
 
 
+def descendants(widget):
+    for child in widget.winfo_children():
+        yield child
+        yield from descendants(child)
+
+
 class InstallerWindowTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -69,6 +75,48 @@ class InstallerWindowTests(unittest.TestCase):
         self.assertFalse(self.app.details_visible)
         self.assertFalse(self.app.clean_settings.get())
         self.assertFalse(self.app.review_card.winfo_manager())
+        self.assertFalse(self.app.about_button.instate(["disabled"]))
+
+    def test_about_view_credits_every_project_and_opens_links(self):
+        self.app.show_view("about")
+        self.assertEqual(self.app.current_view, "about")
+        self.assertEqual(self.app.heading.cget("text"), "About")
+        self.assertEqual(self.app.about_page.winfo_manager(), "pack")
+        self.assertFalse(self.app.install_button.winfo_manager())
+        self.assertFalse(self.app.game_picker_card.winfo_manager())
+        self.assertFalse(self.app.notice_frame.winfo_manager())
+        self.assertIn("credits", self.app.header_help.help_tip.text.lower())
+        page_text = " ".join(
+            str(widget.cget("text"))
+            for widget in descendants(self.app.about_page)
+            if "text" in widget.keys()
+        )
+        self.assertIn("Version v1.8.0", page_text)
+        for name in ["paramonos", "sieucapoccho3717", "Justype", "Eduwilll"]:
+            self.assertIn(name, page_text)
+        for label in ["GitHub repository", "Documentation", "Report an issue", "Contributors", "Read the license"]:
+            self.assertIn(label, page_text)
+        with mock.patch.object(installer_ui.webbrowser, "open", return_value=True) as opened:
+            self.app.open_link(installer_ui.PROJECT_URL, "GitHub repository")
+            self.app.open_link(installer_ui.DOCUMENTATION_URL, "documentation")
+        self.assertEqual(
+            [call.args[0] for call in opened.call_args_list],
+            [installer_ui.PROJECT_URL, installer_ui.DOCUMENTATION_URL],
+        )
+        self.app.show_view("install")
+        self.assertEqual(self.app.about_page.winfo_manager(), "")
+        self.assertEqual(self.app.current_view, "install")
+        self.assertEqual(self.app.game_picker_card.winfo_manager(), "pack")
+        self.assertEqual(self.app.notice_frame.winfo_manager(), "pack")
+
+    def test_about_link_failure_shows_the_address_to_copy(self):
+        with mock.patch.object(installer_ui.webbrowser, "open", return_value=False), mock.patch.object(
+            installer_ui.messagebox, "showerror"
+        ) as error:
+            self.app.open_link(installer_ui.DOCUMENTATION_URL, "documentation")
+        error.assert_called_once()
+        self.assertIn(installer_ui.DOCUMENTATION_URL, error.call_args.args[1])
+        self.assertTrue(any(installer_ui.DOCUMENTATION_URL in line for line in self.app.log_lines))
 
     def test_valid_preflight_enables_install_and_invalidates_immediately_on_edit(self):
         self.inspect()
