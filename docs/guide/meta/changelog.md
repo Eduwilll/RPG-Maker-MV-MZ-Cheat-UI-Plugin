@@ -1,6 +1,13 @@
 # Changelog
 
-## v1.9.1 - Latest
+## v1.9.2 - Latest
+
+### Installer
+- [Fix] **Tcl/Tk 9 Startup**: Detect the Tcl/Tk 9 data archives shipped with Python 3.14+, extract them into the one-file installer, and fail the build if the `_tcl_data` / `_tk_data` scripts are missing. This fixes the startup error in `RPGMakerCheatInstaller.exe`.
+
+---
+
+## v1.9.1
 
 ### Installer
 - [Feat] **About And Credits**: The installer sidebar now opens an About page with the detected version, GitHub and documentation links, an issue-chooser shortcut, credits for paramonos, sieucapoccho3717, Justype and Eduwilll plus all contributors, and the MIT license.

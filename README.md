@@ -39,13 +39,14 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 - **[Full Engine Reference](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/features)**
 - **[Keyboard Shortcuts](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/shortcuts)**
 
-### Latest Release: v1.9.1
+### Latest Release: v1.9.2
 - Windows installer ZIP with `RPGMakerCheatInstaller.exe`
 - **Interactive Map / Minimap**: Pan, zoom, follow, fit, find events and configure layers directly on the map; live sprites, directional player arrow and explicit teleport actions
 - **Compact UI**: Grouped navigation, denser controls, improved Feature Finder and compact Teleport coordinates
 - **Current / Legacy Themes**: Choose slate or the older charcoal colors, with saved accents and dark/light mode
 - **Simpler Installer & Save Editor**: Guided setup, clear results and maintenance; scrollable structured save fields without clipped controls
 - **Installer About & Credits**: Version, GitHub and documentation links, issue chooser, full credits and the MIT license inside the installer
+- **Installer Startup Fix**: Detect the Tcl/Tk 9 data archives used by Python 3.14 and bundle them into the one-file installer, fixing `RPGMakerCheatInstaller.exe` exiting with a `_tcl_data` error on startup
 - **Consistent Panels**: Shared panel headers and refresh actions, with theme-aware controls across both palettes
 - **Find & Edit**: Database editors, party recruitment, detailed tooltips, Locks & Favorites and searchable dialogue history remain available
 - Retains MV/MZ, FOSSIL entry-point support and separate-window compatibility
