@@ -63,6 +63,31 @@ def get_tcl_tk_paths():
     return tcl_path, tk_path
 
 
+def prepare_tcl_tk_for_bundling(tcl_path, tk_path, build_root):
+    """
+    Prepare Tcl/Tk directories for PyInstaller --add-data.
+    PyInstaller's tkinter hook expects the library files directly in _tcl_data/_tk_data,
+    not inside a tcl8.6/tk8.6 subdirectory. Copy contents to staging directories.
+    """
+    import shutil
+
+    staging_tcl = os.path.join(build_root, "_tcl_data")
+    staging_tk = os.path.join(build_root, "_tk_data")
+
+    if tcl_path and os.path.isdir(tcl_path):
+        if os.path.exists(staging_tcl):
+            shutil.rmtree(staging_tcl)
+        shutil.copytree(tcl_path, staging_tcl)
+
+    if tk_path and os.path.isdir(tk_path):
+        if os.path.exists(staging_tk):
+            shutil.rmtree(staging_tk)
+        shutil.copytree(tk_path, staging_tk)
+
+    return staging_tcl if os.path.isdir(staging_tcl) else None, \
+           staging_tk if os.path.isdir(staging_tk) else None
+
+
 def get_project_root():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -104,6 +129,10 @@ def run_pyinstaller(project_root, dist_dir, work_dir, spec_dir):
     # Tcl/Tk collection is unavailable.
     tcl_path, tk_path = get_tcl_tk_paths()
 
+    # Prepare staging directories with library contents (not the tcl8.6/tk8.6 wrapper dirs)
+    build_root = os.path.join(project_root, "build", "installer")
+    staging_tcl, staging_tk = prepare_tcl_tk_for_bundling(tcl_path, tk_path, build_root)
+
     command = [
         sys.executable,
         "-m",
@@ -137,10 +166,11 @@ def run_pyinstaller(project_root, dist_dir, work_dir, spec_dir):
     ]
 
     # PyInstaller 6.x mounts these as _tcl_data/_tk_data in the onefile bundle.
-    if tcl_path:
-        command.extend(["--add-data", f"{tcl_path}{add_data_separator}_tcl_data"])
-    if tk_path:
-        command.extend(["--add-data", f"{tk_path}{add_data_separator}_tk_data"])
+    # The staging directories contain the library files directly (init.tcl, etc.)
+    if staging_tcl:
+        command.extend(["--add-data", f"{staging_tcl}{add_data_separator}_tcl_data"])
+    if staging_tk:
+        command.extend(["--add-data", f"{staging_tk}{add_data_separator}_tk_data"])
 
     # Add runtime hook to set TCL_LIBRARY and TK_LIBRARY at startup
     runtime_hook_path = os.path.join(installer_dir, "pyi_rth_tkinter_fix.py")
