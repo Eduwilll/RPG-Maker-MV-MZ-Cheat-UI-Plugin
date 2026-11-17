@@ -92,7 +92,7 @@ jobs:
           name: release-packages
           path: output
       - name: Install tested packaging tools
-        run: python -m pip install pyinstaller==6.20.0 pillow==12.2.0
+        run: python -m pip install pyinstaller==6.22.3 pillow==12.2.0
       - name: Installer, save-editor and preview-launcher tests
         run: python -B -m unittest discover -s tests -p "test_*.py"
       - name: Browser regression checks (Windows)
