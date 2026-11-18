@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-test("encounters expose the authored root and retain all limbs, hidden members and variants", async () => {
+test("encounters keep authored order and use the first visible member as the representative", async () => {
   const { readEnemyEncounters } =
     await import("../../cheat-engine/www/cheat/js/panels/database/EnemyEncounters.js");
   const game = {
@@ -30,7 +30,9 @@ test("encounters expose the authored root and retain all limbs, hidden members a
   assert.equal(rows[0].name, "Woodsman1");
   assert.equal(rows[0].parts.length, 3);
   assert.equal(rows[0].parts[2].hidden, true);
-  assert.equal(rows[0].primaryId, 2);
+  // First authored member wins; no head/torso/limb ranking.
+  assert.equal(rows[0].primaryId, 1);
+  assert.equal(rows[0].rootName, "Woodsman");
   assert.equal(rows[0].troopId, 1);
   game.$dataEnemies = [
     null,
@@ -249,7 +251,7 @@ test("pop-out encounters use the opener's runtime and keep database records deta
       $dataTroops: [],
     };
     vm.reload();
-    assert.equal(vm.selected.primaryId, 2);
+    assert.equal(vm.selected.primaryId, 1);
     vm.selected.parts[0].name = "Detached";
     assert.equal(game.$dataEnemies[1].name, "Woodsman [torso]");
     vm.confirmEncounter();

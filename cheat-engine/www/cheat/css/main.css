@@ -399,14 +399,21 @@
 }
 
 /* Floating refresh/reset buttons in legacy panels: keep the affordance, drop
-   the saturated pink/green fills. */
-.cheat-content .v-btn--fab {
+   the saturated pink/green fills. Semantic colors stay intact so action
+   buttons keep their own contrast. */
+.cheat-content
+  .v-btn--fab:not(.success):not(.info):not(.warning):not(.error):not(
+    .primary
+  ):not(.secondary):not(.accent) {
   background: var(--cheat-surface-2) !important;
   box-shadow: var(--cheat-shadow-1) !important;
   color: var(--cheat-text-muted) !important;
 }
 
-.cheat-content .v-btn--fab:hover {
+.cheat-content
+  .v-btn--fab:not(.success):not(.info):not(.warning):not(.error):not(
+    .primary
+  ):not(.secondary):not(.accent):hover {
   background: var(--cheat-surface-3) !important;
   color: var(--cheat-text) !important;
 }
@@ -626,8 +633,23 @@
   border-radius: 2px;
 }
 
-.v-application .v-expansion-panel {
-  background: var(--cheat-surface-1);
+/* Vuetify paints dark expansion panels #1e1e1e with a three-class selector.
+   Keep the active theme surface and text colors in both built-in themes. */
+.v-application .v-expansion-panels .v-expansion-panel {
+  background: var(--cheat-surface-1) !important;
+  color: var(--cheat-text) !important;
+}
+
+.v-application .v-expansion-panels .v-expansion-panel:not(:first-child):after {
+  border-color: var(--cheat-border) !important;
+}
+
+.v-application
+  .v-expansion-panels
+  .v-expansion-panel-header
+  .v-expansion-panel-header__icon
+  .v-icon {
+  color: var(--cheat-text-muted);
 }
 
 .v-application .v-expansion-panel-header {
@@ -1879,11 +1901,24 @@
 /* Encounter browser */
 .encounter-browser__summary {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 8px;
 }
 
+.encounter-browser__art {
+  display: flex;
+  flex: 0 1 45%;
+  flex-wrap: wrap;
+  min-width: 0;
+  margin-right: 8px;
+}
+
+.encounter-browser__art .game-asset {
+  margin: 0 4px 4px 0;
+}
+
 .encounter-browser__summary-body {
+  flex: 1 1 auto;
   min-width: 0;
 }
 
@@ -1917,7 +1952,27 @@
 }
 
 .message-log__head {
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
   margin-bottom: 8px;
+}
+
+.message-log__heading {
+  display: flex;
+  flex: 1 1 180px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.message-log__meta {
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0 0 0 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .message-log__actions {
@@ -1927,25 +1982,32 @@
   margin-left: 8px;
 }
 
+.message-log__actions .v-btn {
+  min-width: 26px;
+  padding: 0 6px;
+}
+
 .message-log__toolbar {
   display: flex;
+  flex: 0 0 auto;
   flex-wrap: wrap;
   align-items: center;
   margin: 0 -4px 8px;
 }
 
 .message-log__toolbar > * {
+  max-width: 100%;
   margin: 2px 4px;
 }
 
 .message-log__search {
   flex: 1 1 190px;
-  min-width: 140px;
+  min-width: 0;
 }
 
 .message-log__select {
   flex: 0 1 150px;
-  min-width: 120px;
+  min-width: 0;
 }
 
 .message-log__size {

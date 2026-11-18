@@ -247,16 +247,22 @@ export function buildDatabasePatch(kind, draft, original, references) {
 
 export function createDatabaseEditorState(database, kind, references) {
   if (!fields[kind]) throw new Error("Unsupported database kind.");
+  const skillRows = database ? database.list("skill") : [];
   return {
     kind,
-    rows: database ? copy(database.list(kind)) : [],
+    // Freeze the snapshot arrays before they enter Vue data. The rows are
+    // replaced wholesale after apply/reset, so keeping them unobserved avoids
+    // walking every record in large databases.
+    rows: database ? Object.freeze(database.list(kind)) : [],
     selectedId: null,
     draft: null,
     original: null,
     edited: false,
-    references: Object.assign({}, references || {}, {
-      skills: database ? copy(database.list("skill")) : [],
-    }),
+    references: Object.freeze(
+      Object.assign({}, references || {}, {
+        skills: Object.freeze(skillRows),
+      }),
+    ),
     error: "",
     status: "",
   };
@@ -332,5 +338,6 @@ export function readDatabaseReferences(game) {
       .map((name, id) => ({ id, name: String(name || "#" + id) }))
       .filter((row) => row.id > 0);
   });
-  return copy(refs);
+  // The summaries above are freshly allocated; never return live engine rows.
+  return refs;
 }

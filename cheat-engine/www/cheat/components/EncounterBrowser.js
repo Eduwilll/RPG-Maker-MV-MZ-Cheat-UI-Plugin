@@ -6,6 +6,8 @@ import { readEnemyEncounters } from "../js/panels/database/EnemyEncounters.js";
 import GameAsset from "./GameAsset.js";
 import DatabaseTooltip from "./DatabaseTooltip.js";
 
+const LIST_CHUNK = 60;
+
 export default {
   name: "EncounterBrowser",
   components: { GameAsset, DatabaseTooltip },
@@ -14,6 +16,7 @@ export default {
       encounters: [],
       selectedTroopId: null,
       search: "",
+      listLimit: LIST_CHUNK,
       mapEvents: [],
       selectedEvent: null,
       availability: { allowed: false, reason: "No active game session." },
@@ -39,11 +42,22 @@ export default {
           .includes(term),
       );
     },
+    visibleRows() {
+      return this.rows.slice(0, this.listLimit);
+    },
+    remainingRows() {
+      return Math.max(0, this.rows.length - this.listLimit);
+    },
     selected() {
       return (
         this.encounters.find((row) => row.troopId === this.selectedTroopId) ||
         null
       );
+    },
+  },
+  watch: {
+    search() {
+      this.listLimit = LIST_CHUNK;
     },
   },
   created() {
@@ -57,22 +71,23 @@ export default {
   },
   template: `<div class="encounter-browser">
     <div class="d-flex align-center mb-2"><strong>Troops</strong><v-spacer/><v-btn x-small text @click="reload">Reload</v-btn></div>
-    <div class="caption mb-2">Authored troop variants include every part and initially hidden member. The root artwork is a representative, not a replacement for the troop.</div>
+    <div class="caption mb-2">Each authored troop is listed once with every member, including initially hidden parts. The first visible member supplies the list artwork.</div>
     <v-alert v-if="error" type="error" dense dismissible @input="error = ''">{{ error }}</v-alert>
     <v-row dense><v-col cols="12" sm="4">
       <v-text-field v-model="search" label="Search troop, enemy or ID" dense outlined hide-details @keydown.stop/>
       <v-list dense class="cheat-list-scroll cheat-list-scroll--encounters">
-        <v-list-item v-for="row in rows" :key="row.troopId" :input-value="selectedTroopId === row.troopId" @click="choose(row.troopId)">
-          <game-asset kind="enemy" :record-id="row.primaryId" :label="row.rootName" :size="40" :navigate="false" class="mr-2"/>
-          <v-list-item-content><v-list-item-title class="encounter-browser__item-title">{{ row.rootName }}</v-list-item-title><v-list-item-subtitle class="encounter-browser__item-subtitle">#{{ row.troopId }} {{ row.displayName }} / {{ row.parts.length }} members</v-list-item-subtitle></v-list-item-content>
+        <v-list-item v-for="row in visibleRows" :key="row.troopId" :input-value="selectedTroopId === row.troopId" @click="choose(row.troopId)">
+          <game-asset kind="enemy" :record-id="row.primaryId" :label="row.displayName" :size="40" :navigate="false" class="mr-2"/>
+          <v-list-item-content><v-list-item-title class="encounter-browser__item-title">{{ row.displayName }}</v-list-item-title><v-list-item-subtitle class="encounter-browser__item-subtitle">#{{ row.troopId }} / {{ row.parts.length }} members: {{ memberSummary(row) }}</v-list-item-subtitle></v-list-item-content>
         </v-list-item>
       </v-list>
+      <v-btn v-if="remainingRows" x-small text block class="mt-1" @click="listLimit += 60">Show more ({{ remainingRows }})</v-btn>
       <div v-if="!rows.length" class="caption pa-2">No matching troops.</div>
     </v-col><v-col cols="12" sm="8" v-if="selected">
-      <div class="encounter-browser__summary"><game-asset kind="enemy" :record-id="selected.primaryId" :label="selected.rootName" :size="128" :navigate="false" class="mr-2"/><div class="encounter-browser__summary-body"><strong class="encounter-browser__name">{{ selected.rootName }}</strong><div class="caption cheat-text-wrap">{{ selected.displayName }}</div><div class="caption">Troop #{{ selected.troopId }} / {{ selected.pageCount }} battle event pages</div><v-btn x-small text @click="editPart(selected.primaryId)">Edit root enemy</v-btn></div></div>
+      <div class="encounter-browser__summary"><div class="encounter-browser__art"><game-asset v-for="part in selected.parts" :key="'art' + part.index" kind="enemy" :record-id="part.enemyId" :label="part.name" :size="64" :navigate="false"/></div><div class="encounter-browser__summary-body"><strong class="encounter-browser__name">{{ selected.displayName }}</strong><div class="caption cheat-text-wrap">{{ memberSummary(selected, true) }}</div><div class="caption">Troop #{{ selected.troopId }} / {{ selected.pageCount }} battle event pages</div><v-btn x-small text @click="editPart(selected.primaryId)">Edit first enemy</v-btn></div></div>
       <div class="subtitle-2">Enemies in this troop</div>
       <div v-for="part in selected.parts" :key="part.index" class="encounter-browser__part">
-        <div class="cheat-row__main cheat-break-word"><database-tooltip kind="enemy" :record-id="part.enemyId" :label="part.name"/><span class="caption"> #{{ part.enemyId }}</span><div class="caption">{{ part.enemyId === selected.primaryId ? 'Root representative. ' : '' }}{{ part.hidden ? 'Initially hidden. ' : '' }}{{ part.encyclopediaHidden ? 'Hidden from encyclopedia. ' : '' }}{{ part.doesntCount ? 'Does not count. ' : '' }}{{ part.missing ? 'Missing enemy definition. ' : '' }}Position: {{ part.x == null ? '?' : part.x }}, {{ part.y == null ? '?' : part.y }}</div></div>
+        <div class="cheat-row__main cheat-break-word"><database-tooltip kind="enemy" :record-id="part.enemyId" :label="part.name"/><span class="caption"> #{{ part.enemyId }}</span><div class="caption">{{ part.enemyId === selected.primaryId ? 'First member. ' : '' }}{{ part.hidden ? 'Initially hidden. ' : '' }}{{ part.encyclopediaHidden ? 'Hidden from encyclopedia. ' : '' }}{{ part.doesntCount ? 'Does not count. ' : '' }}{{ part.missing ? 'Missing enemy definition. ' : '' }}Position: {{ part.x == null ? '?' : part.x }}, {{ part.y == null ? '?' : part.y }}</div></div>
         <v-btn x-small text :disabled="part.missing" @click="editPart(part.enemyId)">Edit enemy</v-btn>
       </div>
       <v-btn small color="primary" class="mt-3" :disabled="!availability.allowed" @click="confirmEncounter">Start Troop</v-btn>
@@ -86,11 +101,21 @@ export default {
     <v-dialog :value="!!confirmation" @input="!$event && cancel()" max-width="440"><v-card><v-card-text class="pt-4">{{ confirmation }}</v-card-text><v-card-actions><v-btn text @click="cancel">Cancel</v-btn><v-btn text color="primary" @click="proceed">Continue</v-btn></v-card-actions></v-card></v-dialog>
   </div>`,
   methods: {
+    memberSummary(row, full) {
+      const names = row.parts.map((part) => part.name);
+      if (full || names.length <= 3) return names.join(" / ");
+      return (
+        names.slice(0, 3).join(" / ") + " +" + (names.length - 3) + " more"
+      );
+    },
     reload() {
       this.cancel();
       this.error = "";
+      this.listLimit = LIST_CHUNK;
       try {
-        this.encounters = readEnemyEncounters(getGameWindow());
+        // Freezing the snapshot array keeps Vue 2 from walking hundreds of
+        // troop/member objects while leaving the detached copies mutable.
+        this.encounters = Object.freeze(readEnemyEncounters(getGameWindow()));
         const selected = this.selected || this.encounters[0];
         this.selectedTroopId = selected ? selected.troopId : null;
         this.updateAvailability();
@@ -117,9 +142,13 @@ export default {
     },
     updateAvailability() {
       const runtime = getFeatureRuntime();
-      this.availability = runtime
+      const next = runtime
         ? JSON.parse(JSON.stringify(runtime.battle.availability().start))
         : { allowed: false, reason: "No active game session." };
+      // The timer runs every second; skip the assignment (and the whole panel
+      // re-render) unless the battle readiness actually changed.
+      if (JSON.stringify(next) === JSON.stringify(this.availability)) return;
+      this.availability = next;
     },
     refreshMapEvents() {
       this.selectedEvent = null;

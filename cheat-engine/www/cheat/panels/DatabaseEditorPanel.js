@@ -15,6 +15,8 @@ import DatabaseRowsEditor from "../components/DatabaseRowsEditor.js";
 import DatabaseTooltip from "../components/DatabaseTooltip.js";
 import EncounterBrowser from "../components/EncounterBrowser.js";
 
+const LIST_CHUNK = 60;
+
 export default {
   name: "DatabaseEditorPanel",
   components: { DatabaseRowsEditor, DatabaseTooltip, EncounterBrowser },
@@ -26,6 +28,8 @@ export default {
       mapEvents: [],
       selectedEvent: null,
       search: "",
+      listLimit: LIST_CHUNK,
+      descriptions: {},
       error: "",
       level: 1,
       paramNames: [],
@@ -50,6 +54,12 @@ export default {
             (row.id + " " + row.name).toLowerCase().includes(term),
           )
         : [];
+    },
+    visibleRows() {
+      return this.rows.slice(0, this.listLimit);
+    },
+    remainingRows() {
+      return Math.max(0, this.rows.length - this.listLimit);
     },
     numericFields() {
       if (this.kind === "enemy")
@@ -104,8 +114,17 @@ export default {
         : 99;
     },
   },
+  watch: {
+    search() {
+      this.listLimit = LIST_CHUNK;
+    },
+    enemyView(value) {
+      // Troops is the default view, so the record editor is loaded on demand.
+      if (value === "records" && !this.state) this.initialize();
+    },
+  },
   created() {
-    this.initialize();
+    if (this.kind !== "enemy") this.initialize();
   },
   mounted() {
     this.updateAvailability();
@@ -117,12 +136,13 @@ export default {
   template: `<v-card flat class="pa-1">
     <v-btn-toggle v-if="kind === 'enemy'" v-model="enemyView" mandatory class="mb-2" dense><v-btn small value="encounters">Troops</v-btn><v-btn small value="records">Enemies</v-btn></v-btn-toggle>
     <encounter-browser v-if="kind === 'enemy' && enemyView === 'encounters'" @edit="editEncounterPart"/>
-    <div v-show="kind !== 'enemy' || enemyView === 'records'">
+    <div v-if="kind !== 'enemy' || enemyView === 'records'">
     <div class="d-flex align-center mb-2"><strong>{{ title }}</strong><v-spacer/><v-btn x-small text @click="reload">Reload</v-btn></div>
     <v-alert v-if="error" type="error" dense dismissible @input="error = ''">{{ error }}</v-alert>
     <v-row dense v-if="state"><v-col cols="12" sm="4">
       <v-text-field v-model="search" label="Search name or ID" dense outlined hide-details @keydown.stop/>
-      <v-list dense class="cheat-list-scroll cheat-list-scroll--records"><v-list-item v-for="row in rows" :key="row.id" :input-value="state.selectedId === row.id" @click="choose(row.id)"><v-list-item-content><v-list-item-title><database-tooltip :kind="kind" :record-id="row.id" :label="'#' + row.id + ' ' + row.name"/></v-list-item-title><v-list-item-subtitle v-if="description(row.id)">{{ description(row.id) }}</v-list-item-subtitle><v-list-item-subtitle v-if="row.edited">Save-specific edit</v-list-item-subtitle></v-list-item-content></v-list-item></v-list>
+      <v-list dense class="cheat-list-scroll cheat-list-scroll--records"><v-list-item v-for="row in visibleRows" :key="row.id" :input-value="state.selectedId === row.id" @click="choose(row.id)"><v-list-item-content><v-list-item-title><database-tooltip :kind="kind" :record-id="row.id" :label="'#' + row.id + ' ' + row.name"/></v-list-item-title><v-list-item-subtitle v-if="descriptions[row.id]">{{ descriptions[row.id] }}</v-list-item-subtitle><v-list-item-subtitle v-if="row.edited">Save-specific edit</v-list-item-subtitle></v-list-item-content></v-list-item></v-list>
+      <v-btn v-if="remainingRows" x-small text block class="mt-1" @click="listLimit += 60">Show more ({{ remainingRows }})</v-btn>
     </v-col><v-col cols="12" sm="8" v-if="state.draft">
       <div class="caption mb-2">{{ state.draft.name }} #{{ state.selectedId }}. Apply changes, then save the game. Original game files are never changed.</div>
       <v-alert v-if="state.status" dense type="info" class="caption">{{ state.status }}</v-alert>
@@ -167,14 +187,24 @@ export default {
   methods: {
     editEncounterPart(id) {
       this.enemyView = "records";
-      this.state.rows = getFeatureRuntime().database.list(this.kind);
+      if (!this.state) this.initialize();
+      if (!this.state) return;
+      this.state.rows = Object.freeze(
+        getFeatureRuntime().database.list(this.kind),
+      );
+      this.cacheDescriptions();
       this.choose(id);
     },
-    description(id) {
+    cacheDescriptions() {
+      const descriptions = {};
       const game = getGameWindow();
-      const row =
-        this.kind === "enemy" && game.$dataEnemies && game.$dataEnemies[id];
-      return row ? String(row.description || "").slice(0, 160) : "";
+      if (this.kind === "enemy" && this.state && game && game.$dataEnemies)
+        this.state.rows.forEach((row) => {
+          const record = game.$dataEnemies[row.id];
+          if (record && record.description)
+            descriptions[row.id] = String(record.description).slice(0, 160);
+        });
+      this.descriptions = descriptions;
     },
     refreshMapEvents() {
       try {
@@ -223,6 +253,8 @@ export default {
           readDatabaseReferences(getGameWindow()),
         );
         this.paramNames = databaseParamNames(getGameWindow()).slice();
+        this.listLimit = LIST_CHUNK;
+        this.cacheDescriptions();
         if (this.state.rows.length)
           selectDatabaseRecord(
             this.state,
@@ -266,7 +298,10 @@ export default {
     apply() {
       try {
         applyDatabaseDraft(this.state, getFeatureRuntime().database);
-        this.state.rows = getFeatureRuntime().database.list(this.kind);
+        this.state.rows = Object.freeze(
+          getFeatureRuntime().database.list(this.kind),
+        );
+        this.cacheDescriptions();
         this.error = "";
       } catch (error) {
         this.error = error.message;
@@ -303,7 +338,8 @@ export default {
         const runtime = getFeatureRuntime();
         if (action === "reset") {
           resetDatabaseRecord(this.state, runtime.database);
-          this.state.rows = runtime.database.list(this.kind);
+          this.state.rows = Object.freeze(runtime.database.list(this.kind));
+          this.cacheDescriptions();
         } else if (action === "reload") this.initialize();
         else if (action && action.select) this.select(action.select);
         else if (action && action.mapEvent)
@@ -335,7 +371,12 @@ export default {
     },
     updateAvailability() {
       const runtime = getFeatureRuntime();
-      if (runtime) this.availability = runtime.battle.availability();
+      if (!runtime) return;
+      const next = runtime.battle.availability();
+      // Availability is polled every second. Only assign when it changes so
+      // large record lists are not re-rendered on every tick.
+      if (JSON.stringify(next) === JSON.stringify(this.availability)) return;
+      this.availability = next;
     },
     enemyName(id) {
       const row = this.state.rows.find((entry) => entry.id === id);

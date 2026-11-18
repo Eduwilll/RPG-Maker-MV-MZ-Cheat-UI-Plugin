@@ -1,16 +1,8 @@
-function rootRank(part) {
-  if (part.missing) return 100;
-  const excluded = part.encyclopediaHidden || part.doesntCount ? 10 : 0;
-  // Prefer a head as the representative: torso artwork often stops at the
-  // neck, which makes the encounter list look headless.
-  if (/\bhead\b/i.test(part.name)) return excluded;
-  if (/\b(torso|body)\b/i.test(part.name)) return excluded + 2;
-  if (/\b(arms?|legs?|hands?|feet|appendage)\b/i.test(part.name))
-    return excluded + 3;
-  return excluded + 1;
-}
-
-/** Troops define encounters; root ranking is a display heuristic, not a plugin API. */
+/**
+ * Troops define encounters. The first authored member that counts supplies the
+ * list artwork; never infer body parts or pick a "head" by name, because games
+ * compose enemies however they want and the troop is the real encounter.
+ */
 export function readEnemyEncounters(game) {
   const troops = game && game.$dataTroops;
   const enemies = game && game.$dataEnemies;
@@ -38,17 +30,23 @@ export function readEnemyEncounters(game) {
       return members;
     }, []);
     if (!parts.length || parts.every((part) => part.missing)) return rows;
-    // Keep authored order and duplicate members; only the representative artwork changes.
-    const root = parts.reduce((best, part) =>
-      rootRank(part) < rootRank(best) ? part : best,
-    );
+    // Keep authored order and duplicate members. Prefer the first member that
+    // actually represents the encounter; skip only members explicitly flagged
+    // as hidden or not counting. Never rank by body-part names.
+    const lead =
+      parts.find(
+        (part) =>
+          !part.missing && !part.encyclopediaHidden && !part.doesntCount,
+      ) ||
+      parts.find((part) => !part.missing) ||
+      parts[0];
     const name = String(troop.name || "");
     rows.push({
       troopId,
       name,
-      displayName: name.trim() ? name : root.name + " (Troop #" + troopId + ")",
-      rootName: root.name.replace(/\s*\[[^\]]+\]\s*$/, "").trim() || root.name,
-      primaryId: root.enemyId,
+      displayName: name.trim() ? name : lead.name + " (Troop #" + troopId + ")",
+      rootName: lead.name.replace(/\s*\[[^\]]+\]\s*$/, "").trim() || lead.name,
+      primaryId: lead.enemyId,
       parts,
       pageCount: Array.isArray(troop.pages) ? troop.pages.length : 0,
     });

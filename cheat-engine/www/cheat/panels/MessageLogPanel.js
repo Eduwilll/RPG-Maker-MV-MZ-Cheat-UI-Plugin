@@ -59,14 +59,14 @@ export default {
   },
   template: `<v-card flat class="cheat-panel message-log">
     <div class="cheat-panel__head message-log__head">
-      <div>
+      <div class="message-log__heading">
         <div class="cheat-panel__title">Message Log</div>
-        <div class="cheat-panel__meta">Latest 1,000 entries in this session. Loading or starting a game clears history.</div>
+        <div class="cheat-panel__meta message-log__meta" title="Latest 1,000 entries in this session. Loading or starting a game clears history.">Latest 1,000 entries; a new session clears the log.</div>
       </div>
       <div class="message-log__actions">
-        <v-btn x-small text @click="refresh">Refresh</v-btn>
-        <v-btn x-small text @click="exportLog">Export</v-btn>
-        <v-btn x-small text @click="confirmClear = true">Clear</v-btn>
+        <v-btn x-small text title="Refresh" aria-label="Refresh log" @click="refresh"><v-icon small>mdi-refresh</v-icon></v-btn>
+        <v-btn x-small text title="Export as text" aria-label="Export log" @click="exportLog"><v-icon small>mdi-download</v-icon></v-btn>
+        <v-btn x-small text title="Clear log" aria-label="Clear log" @click="confirmClear = true"><v-icon small>mdi-delete-outline</v-icon></v-btn>
       </div>
     </div>
     <div class="message-log__toolbar">
@@ -121,7 +121,9 @@ export default {
       this.refresh();
     },
     refresh() {
-      this.rows = readMessageLog(this.search);
+      // Snapshot rows are immutable; freezing lets Vue skip observing up to
+      // 1,000 message objects on every poll.
+      this.rows = deepFreeze(readMessageLog(this.search));
       const revision = messageLogPreferenceRevision();
       if (revision !== this._preferenceRevision) {
         this.preferences = readMessageLogPreferences();
