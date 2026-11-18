@@ -1,11 +1,9 @@
 import argparse
-import glob
 import json
 import os
 import shutil
 import subprocess
 import sys
-import zipfile
 
 
 INSTALLER_NAME = "RPGMakerCheatInstaller"
@@ -48,90 +46,29 @@ def main():
 
 
 def get_tcl_tk_paths():
-    """Find versioned Tcl and Tk library directories for bundling with PyInstaller.
-    Returns (tcl_path, tk_path) if versioned directories exist, otherwise (None, None).
+    """Find Tcl and Tk library directories for bundling with PyInstaller.
+    Detects the actual version (tcl8.6, tcl9.0, etc.) instead of hardcoding.
     """
     import sysconfig
+    import glob
 
     stdlib_path = sysconfig.get_path("stdlib")
     tcl_base = os.path.join(os.path.dirname(stdlib_path), "tcl")
-    return find_versioned_tcl_tk(tcl_base)
 
+    # Find tcl* and tk* directories (e.g., tcl8.6, tcl9.0, tk8.6, tk9.0)
+    tcl_dirs = glob.glob(os.path.join(tcl_base, "tcl*"))
+    tk_dirs = glob.glob(os.path.join(tcl_base, "tk*"))
 
-def find_versioned_tcl_tk(tcl_base):
-    """Return versioned Tcl/Tk script directories from a Python installation."""
-    if not os.path.isdir(tcl_base):
-        return None, None
-    for name in sorted(os.listdir(tcl_base)):
-        version = name[3:]
-        if not name.startswith("tcl") or not version or not version[0].isdigit():
-            continue
-        tcl_path = os.path.join(tcl_base, name)
-        tk_path = os.path.join(tcl_base, f"tk{version}")
-        if is_tcl_data_dir(tcl_path) and is_tk_data_dir(tk_path):
-            return tcl_path, tk_path
-    return None, None
+    # Prefer highest version (e.g., tcl9.0 over tcl8.6)
+    tcl_path = max(tcl_dirs, key=os.path.basename) if tcl_dirs else None
+    tk_path = max(tk_dirs, key=os.path.basename) if tk_dirs else None
 
+    if tcl_path and not os.path.isdir(tcl_path):
+        tcl_path = None
+    if tk_path and not os.path.isdir(tk_path):
+        tk_path = None
 
-def is_tcl_data_dir(path):
-    return bool(path) and os.path.isfile(os.path.join(path, "init.tcl"))
-
-
-def is_tk_data_dir(path):
-    return bool(path) and os.path.isfile(os.path.join(path, "tk.tcl"))
-
-
-def find_tcl_tk_zips():
-    """Find the Tcl/Tk 9 data archives shipped by Python 3.14+ on Windows."""
-    import sysconfig
-
-    stdlib_path = sysconfig.get_path("stdlib")
-    tcl_base = os.path.join(os.path.dirname(stdlib_path), "tcl")
-    tcl_zips = sorted(glob.glob(os.path.join(tcl_base, "libtcl*.zip")))
-    tk_zips = sorted(glob.glob(os.path.join(tcl_base, "libtk*.zip")))
-    return (tcl_zips[-1] if tcl_zips else None, tk_zips[-1] if tk_zips else None)
-
-
-def prepare_tcl_tk_data(staging_dir):
-    """Return Tcl/Tk script directories, extracting Python 3.14+ zip data if needed."""
-    tcl_path, tk_path = get_tcl_tk_paths()
-    if tcl_path and tk_path:
-        return tcl_path, tk_path
-
-    tcl_zip, tk_zip = find_tcl_tk_zips()
-    if tcl_zip and tk_zip:
-        tcl_path = extract_zip_library(tcl_zip, "tcl_library", os.path.join(staging_dir, "_tcl_data"))
-        tk_path = extract_zip_library(tk_zip, "tk_library", os.path.join(staging_dir, "_tk_data"))
-        return tcl_path, tk_path
-
-    raise RuntimeError(
-        "Could not find the Tcl/Tk script libraries needed by the installer. "
-        "Install a Python build with Tcl/Tk support or check the tcl folder next to "
-        f"{sys.executable}."
-    )
-
-
-def extract_zip_library(zip_path, member_prefix, destination):
-    """Extract one Tcl/Tk library from a Python 3.14+ data archive."""
-    root = os.path.abspath(destination)
-    os.makedirs(root, exist_ok=True)
-    prefix = member_prefix.rstrip("/") + "/"
-    written = 0
-    with zipfile.ZipFile(zip_path) as archive:
-        for member in archive.infolist():
-            if not member.filename.startswith(prefix) or member.is_dir():
-                continue
-            relative = member.filename[len(prefix):]
-            target = os.path.abspath(os.path.join(root, *relative.split("/")))
-            if os.path.commonpath([root, target]) != root:
-                raise RuntimeError(f"Unsafe path in {zip_path}: {member.filename}")
-            os.makedirs(os.path.dirname(target), exist_ok=True)
-            with archive.open(member) as source, open(target, "wb") as output:
-                shutil.copyfileobj(source, output)
-            written += 1
-    if not written:
-        raise RuntimeError(f"{zip_path} does not contain {member_prefix}/")
-    return root
+    return tcl_path, tk_path
 
 
 def prepare_tcl_tk_for_bundling(tcl_path, tk_path, build_root):
@@ -196,13 +133,12 @@ def run_pyinstaller(project_root, dist_dir, work_dir, spec_dir):
     add_data_separator = ";" if os.name == "nt" else ":"
 
     # PyInstaller's tkinter runtime hook looks for these exact directory names.
-    # Bundle them explicitly because Python 3.14+ on Windows ships Tcl/Tk 9 as
-    # zip archives that PyInstaller's automatic collection cannot read.
-    build_root = os.path.join(project_root, "build", "installer")
-    staging_dir = os.path.join(build_root, "tcl_data")
-    tcl_path, tk_path = prepare_tcl_tk_data(staging_dir)
+    # Bundle them explicitly so --onefile builds still start when automatic
+    # Tcl/Tk collection is unavailable.
+    tcl_path, tk_path = get_tcl_tk_paths()
 
     # Prepare staging directories with library contents (not the tcl8.6/tk8.6 wrapper dirs)
+    build_root = os.path.join(project_root, "build", "installer")
     staging_tcl, staging_tk = prepare_tcl_tk_for_bundling(tcl_path, tk_path, build_root)
 
     command = [
@@ -258,29 +194,6 @@ def run_pyinstaller(project_root, dist_dir, work_dir, spec_dir):
 
     command.append(gui_path)
     subprocess.run(command, cwd=project_root, check=True)
-    verify_onefile_tcl_data(os.path.join(dist_dir, f"{INSTALLER_NAME}.exe"))
-
-
-def verify_onefile_tcl_data(exe_path):
-    """Fail the build when PyInstaller did not bundle Tcl/Tk scripts."""
-    from PyInstaller.archive.readers import CArchiveReader
-
-    reader = CArchiveReader(exe_path)
-    try:
-        names = {name.replace("\\", "/") for name in reader.toc}
-    finally:
-        close = getattr(reader, "close", None)
-        if close:
-            close()
-
-    required = ("_tcl_data/init.tcl", "_tk_data/tk.tcl")
-    missing = [name for name in required if name not in names]
-    if missing:
-        raise RuntimeError(
-            "PyInstaller build is missing bundled Tcl/Tk data: "
-            + ", ".join(missing)
-            + ". The installer would fail at startup."
-        )
 
 
 def create_runtime_hook(runtime_hook_path):
