@@ -1,6 +1,7 @@
 /** Copy game font registration into the popup without changing the game's font. */
 export function applyGameFont(root, game, enabled) {
-  if (!root || !game) return;
+  // root must be an Element with classList; game must have $gameSystem or Window_Base
+  if (!root || !game || !root.classList) return;
   root.classList.toggle("cheat-game-font", !!enabled);
   if (!enabled) {
     root.style.removeProperty("--cheat-game-font");

@@ -81,11 +81,11 @@ export default {
         <button
             type="button"
             class="cheat-icon-button"
-            :title="profile.isSidebarVisible ? 'Hide sidebar' : 'Show sidebar'"
-            :aria-label="profile.isSidebarVisible ? 'Hide sidebar' : 'Show sidebar'"
-            :aria-expanded="profile.isSidebarVisible ? 'true' : 'false'"
+            :title="isSidebarVisible ? 'Hide sidebar' : 'Show sidebar'"
+            :aria-label="isSidebarVisible ? 'Hide sidebar' : 'Show sidebar'"
+            :aria-expanded="isSidebarVisible ? 'true' : 'false'"
             @click="toggleSidebar">
-            <v-icon small>{{ profile.isSidebarVisible ? 'mdi-menu-open' : 'mdi-menu' }}</v-icon>
+            <v-icon small>{{ isSidebarVisible ? 'mdi-menu-open' : 'mdi-menu' }}</v-icon>
         </button>
         <div class="cheat-shell__titles">
             <div class="cheat-shell__title">{{ navigation.getActiveLabel() }}</div>
@@ -104,7 +104,7 @@ export default {
         </button>
     </header>
     <div class="cheat-body">
-        <nav v-if="profile.isSidebarVisible" class="cheat-nav" aria-label="Cheat panels">
+        <nav v-if="isSidebarVisible" class="cheat-nav" aria-label="Cheat panels">
             <div v-for="group in navigation.getNavGroups()" :key="group.label" class="cheat-nav__group">
                 <div class="cheat-nav__heading">{{ group.label }}</div>
                 <template v-for="item in group.items">
@@ -220,6 +220,14 @@ export default {
         return this.isWindow ? 1.0 : this.isHovered ? 1.0 : 0.9;
       }
       return this.profile.getEffectiveOpacity(this.isHovered);
+    },
+    isSidebarVisible() {
+      // profile may not be initialized yet (created() runs before mounted())
+      if (!this.profile) {
+        // Default to true (sidebar visible by default)
+        return true;
+      }
+      return this.profile.isSidebarVisible;
     },
     finderShortcut() {
       try {

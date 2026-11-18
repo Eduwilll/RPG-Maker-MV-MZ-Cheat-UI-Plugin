@@ -236,7 +236,10 @@ export function createProfileSyncModule(vuetify, rootEl, options = {}) {
   function setGameFont(enabled) {
     state.gameFont = !!enabled;
     writeBooleanSetting(GAME_FONT_SETTING, state.gameFont);
-    applyGameFont(rootEl, getGameWindow(), state.gameFont);
+    const gameWindow = getGameWindow();
+    if (gameWindow) {
+      applyGameFont(rootEl, gameWindow, state.gameFont);
+    }
     notify();
   }
 
