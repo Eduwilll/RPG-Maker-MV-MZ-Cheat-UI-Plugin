@@ -78,6 +78,23 @@ async function run() {
   );
   frame.style.width = "1100px";
   await delay();
+  const sidebarToggle = game.document.querySelector(
+    ".cheat-shell__bar .cheat-icon-button",
+  );
+  assert(sidebarToggle, "Shell bar exposes a sidebar toggle button");
+  sidebarToggle.click();
+  await delay();
+  assert(
+    !game.document.querySelector(".cheat-nav"),
+    "Sidebar toggle hides the navigation sidebar",
+  );
+  sidebarToggle.click();
+  await delay();
+  const reopenedNav = game.document.querySelector(".cheat-nav");
+  assert(
+    reopenedNav && reopenedNav.getBoundingClientRect().width > 0,
+    "Sidebar toggle reopens the navigation sidebar after closing it",
+  );
   assert(
     app.activeComponentName === "map-event-panel",
     "Preview accepts a panel from its URL",

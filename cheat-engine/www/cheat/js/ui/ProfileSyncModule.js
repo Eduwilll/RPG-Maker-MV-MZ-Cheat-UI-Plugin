@@ -29,24 +29,47 @@ const DARK_MODE_SETTING = "cheatModal.themeDarkMode";
 const DEFAULT_PRIMARY_COLOR = "#3f51b5";
 
 /**
+ * Make the profile state observable by Vue 2 so template computed properties
+ * that read it are re-evaluated when a value changes.
+ * @param {Object} state - Plain state object
+ * @param {Object} [vue] - Optional Vue constructor
+ * @returns {Object} Observed state (or the plain object when Vue is absent)
+ */
+export function observeState(state, vue) {
+  const Vue = vue || (typeof window !== "undefined" ? window.Vue : null);
+  if (!Vue || typeof Vue.observable !== "function") {
+    return state;
+  }
+  try {
+    return Vue.observable(state);
+  } catch (error) {
+    return state;
+  }
+}
+
+/**
  * Create a profile sync module
  * @param {Object} vuetify - Vuetify instance
  * @param {HTMLElement} rootEl - Root element for CSS variable application
  * @param {Object} options - Options
  * @param {boolean} options.isWindow - Whether running in separate window mode
+ * @param {Object} options.vue - Optional Vue constructor (defaults to window.Vue)
  * @returns {Object} Profile sync module
  */
 export function createProfileSyncModule(vuetify, rootEl, options = {}) {
-  const { isWindow = false } = options;
+  const { isWindow = false, vue } = options;
 
-  // Reactive state
-  const state = {
+  // Reactive state. Vue 2 computed properties only invalidate when the values
+  // they read are observed; a plain object would keep computed values cached
+  // forever (that made the sidebar toggle and hover opacity inert).
+  const initialState = {
     windowOpacity: readNumberSetting(WINDOW_OPACITY_SETTING, 0.9),
     isSidebarVisible: readBooleanSetting(SIDEBAR_VISIBLE_SETTING, true),
     primaryColor: null, // Will be loaded from storage
     darkMode: readBooleanSetting(DARK_MODE_SETTING, true),
     gameFont: readBooleanSetting(GAME_FONT_SETTING, false),
   };
+  const state = observeState(initialState, vue);
 
   const listeners = new Set();
   let boundEvents = false;
