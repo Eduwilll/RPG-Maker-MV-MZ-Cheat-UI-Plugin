@@ -61,13 +61,29 @@ async function run() {
     "Expanded sidebar labels remain readable without horizontal clipping",
   );
   const modal = child(app, "CheatModal");
-  modal.openGroups = [];
+  const groupToggles = [
+    ...nav.querySelectorAll(".cheat-nav__parent[aria-expanded='true']"),
+  ];
+  assert(
+    groupToggles.length > 0,
+    "Sidebar groups start expanded so their children are reachable",
+  );
+  groupToggles.forEach((button) => button.click());
   await delay();
+  assert(
+    [...nav.querySelectorAll(".cheat-nav__parent")].every(
+      (button) => button.getAttribute("aria-expanded") === "false",
+    ),
+    "Clicking a group header collapses its children",
+  );
   assert(
     nav.getBoundingClientRect().width <= 180 && labelsFit(),
     "Collapsed sidebar groups keep their compact readable layout",
   );
-  modal.openGroups = ["Items", "Settings"];
+  [...nav.querySelectorAll(".cheat-nav__parent")].forEach((button) =>
+    button.click(),
+  );
+  await delay();
   const frame = document.getElementById("preview-frame");
   frame.style.width = "650px";
   await delay();

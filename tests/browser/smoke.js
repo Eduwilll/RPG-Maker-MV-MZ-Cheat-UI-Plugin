@@ -751,10 +751,12 @@ async function run() {
   reopenedMap.saveView();
   await tick();
   await route("minimap-panel");
+  const minimapNav = descendants(app, "CheatModal").navigation;
+  const minimapActive = minimapNav && minimapNav.getActiveItem();
   assert(
     descendants(app, "MinimapPanel") &&
-      descendants(app, "CheatModal").navTreeModel[0].component ===
-        "map-event-panel",
+      minimapActive &&
+      minimapActive.component === "map-event-panel",
     "Legacy minimap route remains usable and selects the combined Map sidebar entry",
   );
   await route("teleport-panel");
@@ -1217,9 +1219,10 @@ async function run() {
       frame.contentWindow.__smokeErrors.join(";") +
       ")",
   );
+  const popupNav = descendants(popupRoot, "CheatModal").navigation;
+  const popupActive = popupNav && popupNav.getActiveItem();
   assert(
-    descendants(popupRoot, "CheatModal").navTreeModel[0].component ===
-      "message-log-panel",
+    popupActive && popupActive.component === "message-log-panel",
     "Shortcut navigation also updates sidebar selection",
   );
   assert(

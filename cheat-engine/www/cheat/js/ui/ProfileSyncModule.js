@@ -158,37 +158,56 @@ export function createProfileSyncModule(vuetify, rootEl, options = {}) {
   }
 
   /**
+   * Re-apply the game font after Appearance or the shell changes it.
+   */
+  function applyGameFontPreference() {
+    state.gameFont = readBooleanSetting(GAME_FONT_SETTING, false);
+    const gameWindow = getGameWindow();
+    if (gameWindow) applyGameFont(rootEl, gameWindow, state.gameFont);
+    notify();
+  }
+
+  /** @param {Event} event */
+  function onAppearanceChange(event) {
+    const detail = event && event.detail;
+    state.windowOpacity =
+      (detail && detail.windowOpacity) !== undefined
+        ? detail.windowOpacity
+        : state.windowOpacity;
+    notify();
+  }
+
+  const handlers = {
+    profile: () => syncProfile(),
+    appearance: onAppearanceChange,
+    layout: applyGameFontPreference,
+  };
+
+  function bindEvents(target) {
+    target.addEventListener("cheat-profile-change", handlers.profile);
+    target.addEventListener("cheat-appearance-change", handlers.appearance);
+    target.addEventListener("cheat-layout-change", handlers.layout);
+  }
+
+  function unbindEvents(target) {
+    target.removeEventListener("cheat-profile-change", handlers.profile);
+    target.removeEventListener("cheat-appearance-change", handlers.appearance);
+    target.removeEventListener("cheat-layout-change", handlers.layout);
+  }
+
+  /**
    * Initialize event listeners
    */
   function initEvents() {
     if (boundEvents) return;
     boundEvents = true;
 
-    // Profile change event (from AppearancePanel or separate window)
-    window.addEventListener("cheat-profile-change", syncProfile);
-
-    // Appearance change event (opacity only)
-    window.addEventListener("cheat-appearance-change", (e) => {
-      const detail = e && e.detail;
-      state.windowOpacity =
-        (detail && detail.windowOpacity) !== undefined
-          ? detail.windowOpacity
-          : state.windowOpacity;
-      notify();
-    });
+    bindEvents(window);
 
     // Cross-window sync
     const gameWindow = getGameWindow();
     if (gameWindow && gameWindow !== window) {
-      gameWindow.addEventListener("cheat-profile-change", syncProfile);
-      gameWindow.addEventListener("cheat-appearance-change", (e) => {
-        const detail = e && e.detail;
-        state.windowOpacity =
-          (detail && detail.windowOpacity) !== undefined
-            ? detail.windowOpacity
-            : state.windowOpacity;
-        notify();
-      });
+      bindEvents(gameWindow);
     }
   }
 
@@ -196,13 +215,11 @@ export function createProfileSyncModule(vuetify, rootEl, options = {}) {
    * Cleanup event listeners
    */
   function destroy() {
-    window.removeEventListener("cheat-profile-change", syncProfile);
-    window.removeEventListener("cheat-appearance-change", () => {});
+    unbindEvents(window);
 
     const gameWindow = getGameWindow();
     if (gameWindow && gameWindow !== window) {
-      gameWindow.removeEventListener("cheat-profile-change", syncProfile);
-      gameWindow.removeEventListener("cheat-appearance-change", () => {});
+      unbindEvents(gameWindow);
     }
     boundEvents = false;
   }
