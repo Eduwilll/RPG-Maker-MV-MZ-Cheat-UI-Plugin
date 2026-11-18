@@ -215,6 +215,10 @@ export default {
       );
     },
     effectiveOpacity() {
+      // profile may not be initialized yet (created() runs before mounted())
+      if (!this.profile) {
+        return this.isWindow ? 1.0 : this.isHovered ? 1.0 : 0.9;
+      }
       return this.profile.getEffectiveOpacity(this.isHovered);
     },
     finderShortcut() {

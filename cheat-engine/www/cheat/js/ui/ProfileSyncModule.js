@@ -243,7 +243,11 @@ export function createProfileSyncModule(vuetify, rootEl, options = {}) {
   // Initial load
   loadPrimaryColor();
   applyTheme(state.primaryColor);
-  applyGameFont(rootEl, getGameWindow(), state.gameFont);
+  // getGameWindow() may return null in test/preview environments; applyGameFont handles null gracefully
+  const gameWindow = getGameWindow();
+  if (gameWindow) {
+    applyGameFont(rootEl, gameWindow, state.gameFont);
+  }
   initEvents();
 
   // Initial sync
