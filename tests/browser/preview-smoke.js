@@ -153,8 +153,27 @@ async function run() {
     app.activeComponentName = panel;
     await delay();
     await delay();
-    assert(child(app, "CheatModal").$refs.panel, "Preview mounts " + panel);
+    const mounted = child(app, "CheatModal").$refs.panel;
+    assert(
+      mounted && mounted.$options && typeof mounted.$options.name === "string",
+      "Preview mounts " +
+        panel +
+        " as a real component (not an unknown element)",
+    );
   }
+  app.activeComponentName = "teleport-panel";
+  await delay();
+  await delay();
+  const teleportTable = game.document.querySelector(".v-data-table");
+  const teleportRows = teleportTable
+    ? teleportTable.querySelectorAll("tbody tr")
+    : [];
+  assert(
+    teleportTable &&
+      teleportRows.length > 1 &&
+      !teleportTable.querySelector(".v-data-table__empty-wrapper"),
+    "Teleport lists the project maps instead of an empty table",
+  );
   app.activeComponentName = "game-options-panel";
   await delay();
   await delay();
@@ -365,9 +384,10 @@ async function run() {
   for (const panel of panels) {
     mv.__cheatPreview.app.activeComponentName = panel;
     await delay();
+    const mvPanel = child(mv.__cheatPreview.app, "CheatModal").$refs.panel;
     assert(
-      child(mv.__cheatPreview.app, "CheatModal").$refs.panel,
-      "MV preview mounts " + panel,
+      mvPanel && mvPanel.$options && typeof mvPanel.$options.name === "string",
+      "MV preview mounts " + panel + " as a real component",
     );
   }
   assert(
