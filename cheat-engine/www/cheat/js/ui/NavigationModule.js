@@ -126,7 +126,7 @@ export const NAV_GROUPS = Object.freeze([
       },
       {
         name: "Locks & Favorites",
-        icon: "mdi-lock-star",
+        icon: "mdi-star",
         component: "locks-panel",
       },
     ]),

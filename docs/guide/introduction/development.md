@@ -132,9 +132,10 @@ py -3 -B -m unittest discover -s tests -p test_start_preview.py
 ```
 
 The preview regression loads the actual preview entry point and mounts all current
-panels in both engine UI modes. As with the regular smoke runner, it omits remote
-skin stylesheets to avoid a network-dependent test. Full visual styling still
-uses the Vuetify, icon and font CDNs in your normal browser.
+panels in both engine UI modes. It uses the same vendored stylesheets, icon font
+and Roboto files that ship with the plugin, so styling is exercised without a
+network dependency. The smoke checks also assert that no CDN assets are
+requested.
 
 ### Limitations of preview mode
 

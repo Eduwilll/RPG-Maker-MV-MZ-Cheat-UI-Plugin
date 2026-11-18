@@ -291,11 +291,12 @@ function applyCheat() {
 
   document.body.appendChild(appDiv);
 
-  // import in head
+  // import in head - all assets are vendored under cheat/libs so the UI
+  // works offline (no Google Fonts / jsDelivr requests at runtime).
   document.head.innerHTML +=
-    '<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">' +
-    '<link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">' +
-    '<link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">' +
+    '<link href="cheat/libs/roboto.css" rel="stylesheet">' +
+    '<link href="cheat/libs/mdi/materialdesignicons.min.css" rel="stylesheet">' +
+    '<link href="cheat/libs/vuetify.min.css" rel="stylesheet">' +
     '<link href="cheat/css/main.css" rel="stylesheet">';
 
   // import in body

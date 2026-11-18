@@ -32,6 +32,36 @@ async function run() {
   );
   const preview = game.__cheatPreview,
     app = preview.app;
+  const iconProbe = game.document.createElement("i");
+  iconProbe.className = "mdi mdi-check";
+  game.document.body.appendChild(iconProbe);
+  await delay();
+  const iconStyle = game.getComputedStyle(iconProbe, "::before");
+  assert(
+    iconStyle.fontFamily.includes("Material Design Icons") &&
+      iconStyle.content &&
+      iconStyle.content !== "none" &&
+      iconStyle.content !== '""',
+    "Vendored MDI font renders icon glyphs (" + iconStyle.content + ")",
+  );
+  iconProbe.remove();
+  await game.document.fonts.load("400 16px Roboto");
+  assert(
+    game.document.fonts.check("400 16px Roboto"),
+    "Vendored Roboto font loads without a CDN",
+  );
+  const remoteAssets = game.performance
+    .getEntriesByType("resource")
+    .map((entry) => entry.name)
+    .filter((name) =>
+      /(cdn\.jsdelivr\.net|fonts\.googleapis\.com|fonts\.gstatic\.com|unpkg\.com)/.test(
+        name,
+      ),
+    );
+  assert(
+    remoteAssets.length === 0,
+    "Preview loads no CDN assets: " + remoteAssets.join(", "),
+  );
   const nav = game.document.querySelector(".cheat-nav");
   assert(
     nav && nav.getBoundingClientRect().width <= 180,
@@ -198,8 +228,8 @@ async function run() {
   assert(
     toggles.length >= 3 &&
       toggles.every((toggle) => {
-        // This harness omits CDN skins, so verify the sizing contract rather
-        // than unstyled checkbox/label elements stacking in the fixture.
+        // The preview now loads the same vendored Vuetify CSS the plugin
+        // ships, so these are real layout measurements.
         const row = toggle.parentElement.parentElement;
         const slot = toggle.querySelector(".v-input__slot");
         const rowStyle = game.getComputedStyle(row);

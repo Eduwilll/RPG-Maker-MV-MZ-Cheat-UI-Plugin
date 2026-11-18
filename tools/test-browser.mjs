@@ -45,14 +45,10 @@ const server = http.createServer((request, response) => {
         ".js": "application/javascript",
         ".json": "application/json",
         ".css": "text/css",
+        ".woff2": "font/woff2",
       }[path.extname(target)] || "application/octet-stream",
     );
     response.setHeader("Cache-Control", "no-store");
-    // Exercise the real preview bootstrap without making CDN skin loading a test dependency.
-    if (previewMode && target === path.join(root, "preview", "index.html"))
-      buffer = Buffer.from(
-        buffer.toString().replace(/<link\b[^>]*href=["']https?:[^>]*>/gi, ""),
-      );
     response.end(buffer);
   });
 });

@@ -32,6 +32,10 @@ tests/MZ
 
 # Minified files and external libs
 cheat-engine/www/cheat/libs/*.min.js
+cheat-engine/www/cheat/libs/*.min.css
 cheat-engine/www/cheat/libs/vue.js
 cheat-engine/www/cheat/libs/vuetify.js
+cheat-engine/www/cheat/libs/roboto.css
+cheat-engine/www/cheat/libs/mdi
+cheat-engine/www/cheat/libs/fonts
 

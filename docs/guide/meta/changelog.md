@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Performance & Offline
+
+- [Feat] **Vendored Production Libraries**: Vue 2.6.14 and Vuetify 2.6.3 now ship as minified production builds instead of development builds, removing about 1.4 MB of JavaScript and the development-mode startup warnings.
+- [Feat] **Offline Skins and Fonts**: Vuetify CSS, Material Design Icons and Roboto are bundled under `cheat/libs` and loaded locally, so the cheat UI no longer depends on Google Fonts or jsDelivr.
+- [Feat] **Icon Subset**: The MDI stylesheet and font are generated from the icons the UI actually uses (134 icons), shrinking roughly 700 KB of icon assets to about 16 KB.
+- [Fix] **Locks & Favorites Icon**: The sidebar entry used a non-existent `mdi-lock-star` glyph, so it rendered blank; it now uses a shipped icon.
+
 ## v1.9.3 - Latest
 
 ### Message Log
