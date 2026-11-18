@@ -186,7 +186,7 @@ export default {
       featureCatalog: [],
       isHovered: false,
 
-      // Module instances (created in created())
+      // Module instances (created in created()/mounted())
       navigation: null,
       panelRegistry: null,
       profile: null,
@@ -228,7 +228,7 @@ export default {
   },
 
   created() {
-    // Initialize modules
+    // Initialize modules that don't need this.$el
     this.navigation = createNavigationModule(NAV_GROUPS, ["Items", "Settings"]);
 
     const components = {
@@ -261,10 +261,6 @@ export default {
       {},
     );
 
-    this.profile = createProfileSyncModule(this.$vuetify, this.$el, {
-      isWindow: this.isWindow,
-    });
-
     // Subscribe to module changes to trigger Vue reactivity
     this._unsubNavigation = this.navigation.onChange(() => {
       this.$forceUpdate();
@@ -272,12 +268,17 @@ export default {
     this._unsubPanelRegistry = this.panelRegistry.onChange(() => {
       this.$forceUpdate();
     });
-    this._unsubProfile = this.profile.onChange(() => {
-      this.$forceUpdate();
-    });
   },
 
   mounted() {
+    // Initialize profile module (needs this.$el)
+    this.profile = createProfileSyncModule(this.$vuetify, this.$el, {
+      isWindow: this.isWindow,
+    });
+    this._unsubProfile = this.profile.onChange(() => {
+      this.$forceUpdate();
+    });
+
     this._layoutChanged = () => {
       this.overlayWidth = readNumberSetting("cheatModal.width", 750);
       this.overlayHeight = readNumberSetting("cheatModal.height", 450);
