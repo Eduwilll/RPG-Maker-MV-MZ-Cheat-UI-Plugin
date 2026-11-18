@@ -5,8 +5,6 @@
 
 import { initializeCheatDiagnostics } from "./runtime/CheatDiagnostics.js";
 
-initializeCheatDiagnostics("separate-window");
-
 // Error logging helper
 function showError(msg, err) {
   const display = document.getElementById("error-display");
@@ -108,6 +106,11 @@ async function init() {
   globals.forEach((g) => {
     bridgeGlobal(opener, g);
   });
+
+  // Start file logging only once Utils is bridged: diagnostics resolve
+  // cheat-settings/ from RPGMAKER_NAME, and running earlier created a stray
+  // cheat-settings folder at the game root in MV projects.
+  initializeCheatDiagnostics("separate-window");
 
   // Provide a mocked/proxied Alert system
   if (opener.GeneralCheat) {
