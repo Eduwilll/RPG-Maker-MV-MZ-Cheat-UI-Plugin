@@ -8,6 +8,22 @@ import {
   buildInventoryTableRow,
   readInventoryPanelItems,
 } from "../js/panels/inventory/InventoryPanelState.js";
+import { deepFreeze } from "../js/ui/StaticData.js";
+
+const TABLE_HEADERS = deepFreeze([
+  {
+    text: "Name",
+    value: "name",
+  },
+  {
+    text: "Description",
+    value: "desc",
+  },
+  {
+    text: "Params",
+    value: "params",
+  },
+]);
 
 export default {
   name: "WeaponSettingPanel",
@@ -32,20 +48,7 @@ export default {
     return {
       items: [],
 
-      headers: [
-        {
-          text: "Name",
-          value: "name",
-        },
-        {
-          text: "Description",
-          value: "desc",
-        },
-        {
-          text: "Params",
-          value: "params",
-        },
-      ],
+      headers: TABLE_HEADERS,
     };
   },
 

@@ -181,7 +181,10 @@ export default {
   },
 
   props: {
-    items: [],
+    items: {
+      type: Array,
+      default: () => [],
+    },
     headers: {
       type: Array,
     },

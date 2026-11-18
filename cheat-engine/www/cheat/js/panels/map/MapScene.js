@@ -1,12 +1,13 @@
 import { getMapCharacters } from "./MapCharacters.js";
 import { markerVisible } from "./MapMarkers.js";
+import { deepFreeze } from "../../ui/StaticData.js";
 
-export const MAP_MARKER_STYLES = {
+export const MAP_MARKER_STYLES = deepFreeze({
   npc: { label: "NPC", color: "#38bdf8", glyph: "N" },
   enemy: { label: "Enemy", color: "#fb7185", glyph: "!" },
   treasure: { label: "Treasure", color: "#fbbf24", glyph: "+" },
   event: { label: "Event", color: "#c4b5fd", glyph: "?" },
-};
+});
 
 function badge(ctx, x, y, marker, scale) {
   const style = MAP_MARKER_STYLES[marker.kind] || MAP_MARKER_STYLES.event;

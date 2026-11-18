@@ -2186,11 +2186,6 @@
   white-space: nowrap;
 }
 
-.cheat-refresh-fab {
-  top: 0;
-  right: 0;
-}
-
 /* Table display toggles used to be a 2x2 grid of padded v-cols. Keep the same
    checkboxes on one compact, wrapping line so the table stays above the fold. */
 .cheat-filter-bar {

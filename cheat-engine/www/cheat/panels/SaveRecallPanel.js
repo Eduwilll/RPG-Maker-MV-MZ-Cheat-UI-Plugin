@@ -9,6 +9,61 @@ import {
   detachTranslateRefresh,
   getTranslatedPanelText,
 } from "../js/panels/PanelTranslation.js";
+import { deepFreeze } from "../js/ui/StaticData.js";
+
+const PRESET_FLAGS = deepFreeze([
+  {
+    value: "Boss Area",
+    label: "Boss Area",
+    icon: "🔴",
+    color: "error",
+  },
+  { value: "Shop", label: "Shop", icon: "🛒", color: "info" },
+  {
+    value: "Checkpoint",
+    label: "Checkpoint",
+    icon: "🚩",
+    color: "success",
+  },
+  { value: "NPC", label: "NPC", icon: "💬", color: "accent" },
+  {
+    value: "Farm Spot",
+    label: "Farm Spot",
+    icon: "⚡",
+    color: "warning",
+  },
+  {
+    value: "Danger Zone",
+    label: "Danger Zone",
+    icon: "☠️",
+    color: "error",
+  },
+]);
+
+const TABLE_HEADERS = deepFreeze([
+  {
+    text: "Name",
+    value: "name",
+  },
+  {
+    text: "Map",
+    value: "mapName",
+  },
+  {
+    text: "Coord",
+    value: "coord",
+  },
+  {
+    text: "Flags",
+    value: "flags",
+    sortable: false,
+  },
+  {
+    text: "Actions",
+    value: "actions",
+    sortable: false,
+  },
+]);
 
 export default {
   name: "SaveRecallPanel",
@@ -211,59 +266,9 @@ export default {
 
       currentMapName: "",
 
-      presetFlags: [
-        {
-          value: "Boss Area",
-          label: "Boss Area",
-          icon: "🔴",
-          color: "error",
-        },
-        { value: "Shop", label: "Shop", icon: "🛒", color: "info" },
-        {
-          value: "Checkpoint",
-          label: "Checkpoint",
-          icon: "🚩",
-          color: "success",
-        },
-        { value: "NPC", label: "NPC", icon: "💬", color: "accent" },
-        {
-          value: "Farm Spot",
-          label: "Farm Spot",
-          icon: "⚡",
-          color: "warning",
-        },
-        {
-          value: "Danger Zone",
-          label: "Danger Zone",
-          icon: "☠️",
-          color: "error",
-        },
-      ],
+      presetFlags: PRESET_FLAGS,
 
-      tableHeaders: [
-        {
-          text: "Name",
-          value: "name",
-        },
-        {
-          text: "Map",
-          value: "mapName",
-        },
-        {
-          text: "Coord",
-          value: "coord",
-        },
-        {
-          text: "Flags",
-          value: "flags",
-          sortable: false,
-        },
-        {
-          text: "Actions",
-          value: "actions",
-          sortable: false,
-        },
-      ],
+      tableHeaders: TABLE_HEADERS,
     };
   },
 

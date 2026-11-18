@@ -2,6 +2,7 @@
 
 import { KEY_VALUE_STORAGE } from "../../storage/KeyValueStorage.js";
 import { getGameWindow } from "../../runtime/FeatureRuntime.js";
+import { deepFreeze } from "../../ui/StaticData.js";
 
 export var MINIMAP_ENABLED = "minimap.enabled";
 export var MINIMAP_MOVE_MODE = "minimap.moveMode";
@@ -14,15 +15,15 @@ export var MINIMAP_MODE = "minimap.mode";
 export var MINIMAP_OPACITY = "minimap.opacity";
 export var MINIMAP_SHOW_EVENTS = "minimap.showEvents";
 
-export var MINIMAP_POSITIONS = [
+export var MINIMAP_POSITIONS = deepFreeze([
   "top-right",
   "top-left",
   "bottom-right",
   "bottom-left",
   "custom",
-];
+]);
 
-export var MINIMAP_MODES = ["follow", "full"];
+export var MINIMAP_MODES = deepFreeze(["follow", "full"]);
 
 const fallbackContext = { storage: KEY_VALUE_STORAGE, snapshot: null };
 const localContexts = new WeakMap();

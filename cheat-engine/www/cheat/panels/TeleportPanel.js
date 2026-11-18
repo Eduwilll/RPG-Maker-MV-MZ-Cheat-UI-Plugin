@@ -11,6 +11,26 @@ import {
   detachTranslateRefresh,
   getTranslatedPanelText,
 } from "../js/panels/PanelTranslation.js";
+import { deepFreeze } from "../js/ui/StaticData.js";
+
+const TABLE_HEADERS = deepFreeze([
+  {
+    text: "Id",
+    value: "id",
+  },
+  {
+    text: "Name",
+    value: "name",
+  },
+  {
+    text: "FullPath",
+    value: "fullPath",
+  },
+  {
+    text: "Actions",
+    value: "actions",
+  },
+]);
 
 export default {
   name: "TeleportPanel",
@@ -141,24 +161,7 @@ export default {
 
       maps: [],
 
-      tableHeaders: [
-        {
-          text: "Id",
-          value: "id",
-        },
-        {
-          text: "Name",
-          value: "name",
-        },
-        {
-          text: "FullPath",
-          value: "fullPath",
-        },
-        {
-          text: "Actions",
-          value: "actions",
-        },
-      ],
+      tableHeaders: TABLE_HEADERS,
     };
   },
 

@@ -26,6 +26,7 @@ import OverlayResize from "./components/OverlayResize.js";
 import { boundedSize } from "./js/ui/LayoutGeometry.js";
 import { applyGameFont } from "./js/ui/GameFont.js";
 import { createFeatureCatalog } from "./js/ui/FeatureCatalog.js";
+import { deepFreeze } from "./js/ui/StaticData.js";
 import { GLOBAL_SHORTCUT } from "./js/shortcuts/GlobalShortcut.js";
 import { KEY_VALUE_STORAGE } from "./js/storage/KeyValueStorage.js";
 import { getGameWindow } from "./js/runtime/FeatureRuntime.js";
@@ -559,9 +560,11 @@ export default {
     },
 
     openFinder() {
-      this.featureCatalog = createFeatureCatalog(
-        GLOBAL_SHORTCUT.shortcutSettings,
-        GLOBAL_SHORTCUT.shortcutConfig,
+      this.featureCatalog = deepFreeze(
+        createFeatureCatalog(
+          GLOBAL_SHORTCUT.shortcutSettings,
+          GLOBAL_SHORTCUT.shortcutConfig,
+        ),
       );
       this.finderOpen = true;
     },

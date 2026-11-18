@@ -12,6 +12,25 @@ import {
 import { addWatcherTarget } from "../js/panels/watcher/WatcherPanelState.js";
 import LockFavoriteControls from "../components/LockFavoriteControls.js";
 import { sortWithFavorites } from "../js/panels/locks/LockPanelState.js";
+import { deepFreeze } from "../js/ui/StaticData.js";
+
+const TABLE_HEADERS = deepFreeze([
+  { text: "", value: "controls", sortable: false, width: 76 },
+  {
+    text: "Name",
+    value: "name",
+  },
+  {
+    text: "Value",
+    value: "value",
+  },
+  {
+    text: "",
+    value: "watch",
+    sortable: false,
+    width: 36,
+  },
+]);
 
 export default {
   name: "SwitchSettingPanel",
@@ -116,23 +135,7 @@ export default {
 
       switchNames: [],
 
-      tableHeaders: [
-        { text: "", value: "controls", sortable: false, width: 76 },
-        {
-          text: "Name",
-          value: "name",
-        },
-        {
-          text: "Value",
-          value: "value",
-        },
-        {
-          text: "",
-          value: "watch",
-          sortable: false,
-          width: 36,
-        },
-      ],
+      tableHeaders: TABLE_HEADERS,
       tableItems: [],
     };
   },

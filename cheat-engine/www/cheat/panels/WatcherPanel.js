@@ -5,6 +5,24 @@ import {
   writeWatcherOverlayEnabled,
   writeTargetValue,
 } from "../js/panels/watcher/WatcherPanelState.js";
+import { deepFreeze } from "../js/ui/StaticData.js";
+
+const CONTEXT_FOOTER_PROPS = deepFreeze({
+  "items-per-page-options": [12, 25, 50],
+});
+
+const CONTEXT_HEADERS = deepFreeze([
+  { text: "Ref", value: "label", width: 170 },
+  { text: "Value", value: "value", width: 100 },
+  { text: "Dist", value: "distance", width: 54 },
+  { text: "Source", value: "source", sortable: false },
+]);
+
+const WATCH_HEADERS = deepFreeze([
+  { text: "Name", value: "label" },
+  { text: "Value", value: "value", width: 150 },
+  { text: "", value: "remove", sortable: false, width: 36 },
+]);
 
 export default {
   name: "WatcherPanel",
@@ -219,20 +237,9 @@ export default {
       refreshIntervalId: null,
       refreshMs: 500,
       watchedRows: [],
-      contextFooterProps: {
-        "items-per-page-options": [12, 25, 50],
-      },
-      contextHeaders: [
-        { text: "Ref", value: "label", width: 170 },
-        { text: "Value", value: "value", width: 100 },
-        { text: "Dist", value: "distance", width: 54 },
-        { text: "Source", value: "source", sortable: false },
-      ],
-      watchHeaders: [
-        { text: "Name", value: "label" },
-        { text: "Value", value: "value", width: 150 },
-        { text: "", value: "remove", sortable: false, width: 36 },
-      ],
+      contextFooterProps: CONTEXT_FOOTER_PROPS,
+      contextHeaders: CONTEXT_HEADERS,
+      watchHeaders: WATCH_HEADERS,
     };
   },
 

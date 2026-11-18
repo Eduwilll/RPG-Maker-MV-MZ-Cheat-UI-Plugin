@@ -14,9 +14,14 @@ import {
   THEME_STYLE,
   readThemeStyle,
 } from "../js/ui/CheatTheme.js";
+import { deepFreeze } from "../js/ui/StaticData.js";
 
 const WINDOW_OPACITY_SETTING = "cheatModal.windowOpacity";
 const THEME_DARK_MODE_SETTING = THEME_DARK_MODE;
+const THEME_STYLES = deepFreeze([
+  { text: "Current", value: "current" },
+  { text: "Legacy", value: "legacy" },
+]);
 
 export default {
   name: "AppearancePanel",
@@ -140,10 +145,7 @@ export default {
       primaryColor: primaryColor,
       colorOptions: ACCENT_COLOR_OPTIONS,
       themeStyle: readThemeStyle(),
-      themeStyles: [
-        { text: "Current", value: "current" },
-        { text: "Legacy", value: "legacy" },
-      ],
+      themeStyles: THEME_STYLES,
     };
   },
 

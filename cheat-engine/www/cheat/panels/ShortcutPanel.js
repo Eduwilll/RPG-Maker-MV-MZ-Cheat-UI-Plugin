@@ -4,6 +4,26 @@ import { Key } from "../js/shortcuts/KeyCodes.js";
 import { Alert } from "../js/AlertHelper.js";
 import { matchesPanelSearch } from "../js/panels/PanelGameState.js";
 import { buildShortcutPanelItems } from "../js/shortcuts/ShortcutPanelState.js";
+import { deepFreeze } from "../js/ui/StaticData.js";
+
+const TABLE_HEADERS = deepFreeze([
+  {
+    text: "Name",
+    value: "name",
+  },
+  {
+    text: "Desc",
+    value: "desc",
+  },
+  {
+    text: "Shortcut",
+    value: "shortcut",
+  },
+  {
+    text: "Param",
+    value: "param",
+  },
+]);
 
 export default {
   name: "ShortcutPanel",
@@ -161,24 +181,7 @@ export default {
       search: "",
       shortcutSearch: Key.createEmpty(),
 
-      tableHeaders: [
-        {
-          text: "Name",
-          value: "name",
-        },
-        {
-          text: "Desc",
-          value: "desc",
-        },
-        {
-          text: "Shortcut",
-          value: "shortcut",
-        },
-        {
-          text: "Param",
-          value: "param",
-        },
-      ],
+      tableHeaders: TABLE_HEADERS,
     };
   },
 

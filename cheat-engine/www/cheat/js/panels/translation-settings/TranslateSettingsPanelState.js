@@ -8,11 +8,12 @@ import {
   TRANSLATION_BANK,
 } from "../../TranslateHelper.js";
 import { IN_GAME_TRANSLATOR } from "../../translation/in-game/InGameTranslator.js";
+import { deepFreeze } from "../../ui/StaticData.js";
 
-export const TRANSLATE_SETTINGS_REST_API_METHODS = [
+export const TRANSLATE_SETTINGS_REST_API_METHODS = deepFreeze([
   { name: "GET", value: "get" },
   { name: "POST", value: "post" },
-];
+]);
 
 export function readTranslationBankStats() {
   const stats = TRANSLATION_BANK.getStats();

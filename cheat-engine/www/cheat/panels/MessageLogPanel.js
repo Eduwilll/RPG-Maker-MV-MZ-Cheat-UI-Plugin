@@ -18,6 +18,18 @@ import {
   messageLogStyle,
   PLUGIN_LOG_FONT,
 } from "../js/panels/history/MessageLogPreferences.js";
+import { deepFreeze } from "../js/ui/StaticData.js";
+
+const FONT_MODES = deepFreeze([
+  { text: "Game font (default)", value: "game" },
+  { text: "Plugin font (fallback)", value: "plugin" },
+]);
+
+const SIZE_MODES = deepFreeze([
+  { text: "Default (16 px)", value: "default" },
+  { text: "Custom", value: "custom" },
+]);
+
 export default {
   name: "MessageLogPanel",
   components: { MessagePortrait, MessageTextContent, GameAsset },
@@ -28,14 +40,8 @@ export default {
       error: "",
       confirmClear: false,
       preferences: readMessageLogPreferences(),
-      fontModes: [
-        { text: "Game font (default)", value: "game" },
-        { text: "Plugin font (fallback)", value: "plugin" },
-      ],
-      sizeModes: [
-        { text: "Default (16 px)", value: "default" },
-        { text: "Custom", value: "custom" },
-      ],
+      fontModes: FONT_MODES,
+      sizeModes: SIZE_MODES,
     };
   },
   watch: {

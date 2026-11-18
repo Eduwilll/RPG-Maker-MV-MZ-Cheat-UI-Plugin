@@ -10,6 +10,7 @@
 
 import { readBooleanSetting } from "./CheatUiSettings.js";
 import { KEY_VALUE_STORAGE } from "../storage/KeyValueStorage.js";
+import { deepFreeze } from "./StaticData.js";
 
 export const DEFAULT_PRIMARY_COLOR = "#1976D2";
 export const THEME_DARK_MODE = "cheatModal.themeDarkMode";
@@ -110,7 +111,7 @@ export function accentFocusColor(color, dark) {
  * these for chips, alerts, switches and validation states, so they need enough
  * contrast on dark slate without turning the UI into a rainbow.
  */
-export const THEME_PALETTE = {
+export const THEME_PALETTE = deepFreeze({
   secondary: "#64748b",
   accent: "#38bdf8",
   error: "#f87171",
@@ -118,17 +119,17 @@ export const THEME_PALETTE = {
   success: "#34d399",
   warning: "#fbbf24",
   anchor: "#8ab4ff",
-};
+});
 
 // Match the bundled Vuetify defaults used before the slate redesign.
-const LEGACY_PALETTE = {
+const LEGACY_PALETTE = deepFreeze({
   secondary: "#424242",
   error: "#FF5252",
   info: "#2196F3",
   success: "#4CAF50",
   warning: "#FB8C00",
   anchor: "#1976D2",
-};
+});
 
 function colorPalette(style, dark) {
   return style === "legacy"
@@ -191,7 +192,7 @@ export function createVuetifyTheme(selection) {
 /**
  * The released default followed by the modern accent swatches.
  */
-export const ACCENT_COLOR_OPTIONS = [
+export const ACCENT_COLOR_OPTIONS = deepFreeze([
   { text: "Default", value: DEFAULT_PRIMARY_COLOR, isDefault: true },
   { text: "Blue", value: "#3B82F6" },
   { text: "Sky", value: "#0EA5E9" },
@@ -204,4 +205,4 @@ export const ACCENT_COLOR_OPTIONS = [
   { text: "Purple", value: "#A855F7" },
   { text: "Indigo", value: "#6366F1" },
   { text: "Slate", value: "#94A3B8" },
-];
+]);

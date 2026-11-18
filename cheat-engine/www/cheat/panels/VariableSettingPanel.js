@@ -17,6 +17,34 @@ import {
 } from "../js/panels/watcher/WatcherPanelState.js";
 import LockFavoriteControls from "../components/LockFavoriteControls.js";
 import { sortWithFavorites } from "../js/panels/locks/LockPanelState.js";
+import { deepFreeze } from "../js/ui/StaticData.js";
+
+const VALUE_FILTER_OPTIONS = deepFreeze([
+  { text: "All Values", value: "all" },
+  { text: "Positive", value: "positive" },
+  { text: "Negative", value: "negative" },
+  { text: "Zero / Empty", value: "empty" },
+  { text: "Non-zero", value: "nonZero" },
+  { text: "Text / Other", value: "other" },
+]);
+
+const TABLE_HEADERS = deepFreeze([
+  { text: "", value: "controls", sortable: false, width: 76 },
+  {
+    text: "Name",
+    value: "displayName",
+  },
+  {
+    text: "Value",
+    value: "value",
+  },
+  {
+    text: "",
+    value: "watch",
+    sortable: false,
+    width: 36,
+  },
+]);
 
 export default {
   name: "VariableSettingPanel",
@@ -118,36 +146,13 @@ export default {
       search: "",
       excludeNameless: false,
       valueFilter: "all",
-      valueFilterOptions: [
-        { text: "All Values", value: "all" },
-        { text: "Positive", value: "positive" },
-        { text: "Negative", value: "negative" },
-        { text: "Zero / Empty", value: "empty" },
-        { text: "Non-zero", value: "nonZero" },
-        { text: "Text / Other", value: "other" },
-      ],
+      valueFilterOptions: VALUE_FILTER_OPTIONS,
 
       // Store original data separately from display data
       originalVariableNames: [],
       isInitialized: false,
 
-      tableHeaders: [
-        { text: "", value: "controls", sortable: false, width: 76 },
-        {
-          text: "Name",
-          value: "displayName",
-        },
-        {
-          text: "Value",
-          value: "value",
-        },
-        {
-          text: "",
-          value: "watch",
-          sortable: false,
-          width: 36,
-        },
-      ],
+      tableHeaders: TABLE_HEADERS,
       tableItems: [],
     };
   },
