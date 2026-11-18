@@ -9,6 +9,13 @@ import {
   getFeatureRuntime,
   getGameWindow,
 } from "../js/runtime/FeatureRuntime.js";
+import {
+  isNearBottom,
+  readMessageLogViewState,
+  recordMessageLogScroll,
+  resolveMessageLogScrollTop,
+  writeMessageLogViewState,
+} from "../js/panels/history/MessageLogScroll.js";
 import { downloadText } from "../js/ui/FileTransfer.js";
 import MessagePortrait from "../components/MessagePortrait.js";
 import MessageTextContent from "../components/MessageTextContent.js";
@@ -42,20 +49,29 @@ export default {
       preferences: readMessageLogPreferences(),
       fontModes: FONT_MODES,
       sizeModes: SIZE_MODES,
+      followLatest: true,
     };
   },
   watch: {
     search() {
+      // A new result set starts pinned to the newest match.
+      this.followLatest = true;
+      this._pendingScroll = true;
       this.refresh();
     },
   },
   mounted() {
+    const saved = readMessageLogViewState();
+    this.followLatest = saved.followLatest;
+    this._lastScrollTop = saved.scrollTop;
+    this._applyingScroll = false;
     this.applyFontPreference();
     this.refresh();
     this._timer = setInterval(this.refresh, 1000);
   },
   beforeDestroy() {
     clearInterval(this._timer);
+    this.persistScrollPosition();
   },
   template: `<v-card flat class="cheat-panel message-log">
     <div class="cheat-panel__head message-log__head">
@@ -77,7 +93,7 @@ export default {
       <v-btn x-small text class="message-log__reset" title="Reset text display" aria-label="Reset text display" @click="resetPreferences"><v-icon small>mdi-restore</v-icon></v-btn>
     </div>
     <v-alert v-if="error" type="error" dense>{{ error }}</v-alert>
-    <div class="message-log__history">
+    <div class="message-log__history" ref="history" @scroll="onHistoryScroll">
       <div v-for="row in rows" :key="row.id" :data-message-id="row.id" class="message-log__row">
         <message-portrait v-if="row.faceName || row.speaker || row.pictureName" :face-name="row.faceName" :face-index="row.faceIndex" :speaker="row.speaker" :actor-id="row.actorId" :picture-name="row.pictureName"/>
         <div class="message-log__body">
@@ -123,13 +139,60 @@ export default {
     refresh() {
       // Snapshot rows are immutable; freezing lets Vue skip observing up to
       // 1,000 message objects on every poll.
-      this.rows = deepFreeze(readMessageLog(this.search));
+      const rows = deepFreeze(readMessageLog(this.search));
+      const newestId = rows.length ? rows[rows.length - 1].id : null;
+      const grew = newestId !== this._newestId;
+      this.rows = rows;
+      this._newestId = newestId;
       const revision = messageLogPreferenceRevision();
       if (revision !== this._preferenceRevision) {
         this.preferences = readMessageLogPreferences();
         this._preferenceRevision = revision;
         this.applyFontPreference();
       }
+      if (grew || this._pendingScroll) this.applyScroll();
+    },
+
+    historyEl() {
+      return this.$refs.history || null;
+    },
+
+    applyScroll() {
+      this._pendingScroll = false;
+      this.$nextTick(() => {
+        const el = this.historyEl();
+        if (!el) return;
+        const target = resolveMessageLogScrollTop(
+          readMessageLogViewState(),
+          el,
+        );
+        // Setting scrollTop fires a scroll event; ignore it so it cannot
+        // overwrite the reader's remembered position with the restored value.
+        this._applyingScroll = true;
+        el.scrollTop = target;
+        this._lastScrollTop = el.scrollTop;
+        this.followLatest = isNearBottom(el);
+        this.$nextTick(() => {
+          this._applyingScroll = false;
+        });
+      });
+    },
+
+    onHistoryScroll() {
+      const el = this.historyEl();
+      if (!el || this._applyingScroll) return;
+      this._lastScrollTop = el.scrollTop;
+      this.followLatest = isNearBottom(el);
+      recordMessageLogScroll(el);
+    },
+
+    persistScrollPosition() {
+      // Persist the tracked intent, not the live element: the shell may
+      // already be tearing the panel down when this runs.
+      writeMessageLogViewState({
+        scrollTop: Math.max(0, Number(this._lastScrollTop) || 0),
+        followLatest: this.followLatest,
+      });
     },
     clearLog() {
       const runtime = getFeatureRuntime();

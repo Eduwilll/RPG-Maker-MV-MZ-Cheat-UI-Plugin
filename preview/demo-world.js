@@ -568,6 +568,19 @@ export function installDemoWorld(game) {
     queue.clear();
     queue.add("The evening bells echo across Lantern Village.");
     new game.Window_Message().startMessage();
+    // Enough lines for the log to overflow, so scrolling can be exercised.
+    for (let line = 1; line <= 24; line++) {
+      queue.clear();
+      queue._speakerName = line % 2 ? "Mira" : "";
+      queue._faceName = line % 2 ? "PreviewFaces" : "";
+      queue._faceIndex = line % 4;
+      queue.add(
+        "Caravan note " +
+          line +
+          ": the northern road is clear, but keep to the lantern posts after dusk.",
+      );
+      new game.Window_Message().startMessage();
+    }
     queue.clear();
   }
   setScene("map");

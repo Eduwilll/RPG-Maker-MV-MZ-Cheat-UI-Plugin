@@ -328,6 +328,45 @@ async function run() {
     log.$el.querySelector(".cheat-message-copy").style.fontSize === "16px",
     "Standalone preview uses the current readable log defaults",
   );
+  const history = log.$el.querySelector(".message-log__history");
+  assert(
+    history.scrollHeight > history.clientHeight + 40,
+    "Preview seeds enough dialogue for the log to scroll",
+  );
+  const atBottom = () =>
+    history.scrollHeight - history.clientHeight - history.scrollTop <= 2;
+  assert(
+    atBottom() && log.followLatest === true,
+    "Message Log opens pinned to the newest line",
+  );
+  history.scrollTop = 120;
+  history.dispatchEvent(new game.Event("scroll"));
+  await delay();
+  assert(
+    log.followLatest === false,
+    "Scrolling up stops the log from following the tail",
+  );
+  app.activeComponentName = "general-panel";
+  await delay();
+  app.activeComponentName = "message-log-panel";
+  await delay();
+  await delay();
+  const reopenedLog = child(app, "MessageLogPanel");
+  const reopenedHistory = reopenedLog.$el.querySelector(
+    ".message-log__history",
+  );
+  assert(
+    Math.abs(reopenedHistory.scrollTop - 120) <= 2 &&
+      reopenedLog.followLatest === false,
+    "Returning to the Message Log tab keeps the reading position",
+  );
+  reopenedHistory.scrollTop = reopenedHistory.scrollHeight;
+  reopenedHistory.dispatchEvent(new game.Event("scroll"));
+  await delay();
+  assert(
+    reopenedLog.followLatest === true,
+    "Scrolling back to the tail resumes following new messages",
+  );
   app.setScene("title");
   await delay();
   assert(
