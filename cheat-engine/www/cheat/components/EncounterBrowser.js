@@ -5,18 +5,16 @@ import {
 import { readEnemyEncounters } from "../js/panels/database/EnemyEncounters.js";
 import GameAsset from "./GameAsset.js";
 import DatabaseTooltip from "./DatabaseTooltip.js";
-
-const LIST_CHUNK = 60;
+import VirtualList from "./VirtualList.js";
 
 export default {
   name: "EncounterBrowser",
-  components: { GameAsset, DatabaseTooltip },
+  components: { GameAsset, DatabaseTooltip, VirtualList },
   data() {
     return {
       encounters: [],
       selectedTroopId: null,
       search: "",
-      listLimit: LIST_CHUNK,
       mapEvents: [],
       selectedEvent: null,
       availability: { allowed: false, reason: "No active game session." },
@@ -28,25 +26,8 @@ export default {
   computed: {
     rows() {
       const term = this.search.trim().toLowerCase();
-      return this.encounters.filter((row) =>
-        (
-          row.troopId +
-          " " +
-          row.displayName +
-          " " +
-          row.rootName +
-          " " +
-          row.parts.map((part) => part.name).join(" ")
-        )
-          .toLowerCase()
-          .includes(term),
-      );
-    },
-    visibleRows() {
-      return this.rows.slice(0, this.listLimit);
-    },
-    remainingRows() {
-      return Math.max(0, this.rows.length - this.listLimit);
+      if (!term) return this.encounters;
+      return this.encounters.filter((row) => row.searchText.includes(term));
     },
     selected() {
       return (
@@ -54,10 +35,10 @@ export default {
         null
       );
     },
-  },
-  watch: {
-    search() {
-      this.listLimit = LIST_CHUNK;
+    selectedHidden() {
+      return this.selected
+        ? this.selected.parts.filter((part) => part.hidden).length
+        : 0;
     },
   },
   created() {
@@ -70,21 +51,35 @@ export default {
     clearInterval(this._timer);
   },
   template: `<div class="encounter-browser">
-    <div class="d-flex align-center mb-2"><strong>Troops</strong><v-spacer/><v-btn x-small text @click="reload">Reload</v-btn></div>
-    <div class="caption mb-2">Each authored troop is listed once with every member, including initially hidden parts. The first visible member supplies the list artwork.</div>
+    <div class="d-flex align-center mb-2"><strong>Troops</strong><v-spacer/><v-btn x-small text title="Reload troops" aria-label="Reload troops" @click="reload"><v-icon small>mdi-refresh</v-icon></v-btn></div>
+    <div class="caption mb-2">Each authored troop is listed once. Artwork is composited from every member at its authored battle position, so creatures split into torso/head/limb records still read as one figure.</div>
     <v-alert v-if="error" type="error" dense dismissible @input="error = ''">{{ error }}</v-alert>
     <v-row dense><v-col cols="12" sm="4">
-      <v-text-field v-model="search" label="Search troop, enemy or ID" dense outlined hide-details @keydown.stop/>
-      <v-list dense class="cheat-list-scroll cheat-list-scroll--encounters">
-        <v-list-item v-for="row in visibleRows" :key="row.troopId" :input-value="selectedTroopId === row.troopId" @click="choose(row.troopId)">
-          <game-asset kind="enemy" :record-id="row.primaryId" :label="row.displayName" :size="40" :navigate="false" class="mr-2"/>
-          <v-list-item-content><v-list-item-title class="encounter-browser__item-title">{{ row.displayName }}</v-list-item-title><v-list-item-subtitle class="encounter-browser__item-subtitle">#{{ row.troopId }} / {{ row.parts.length }} members: {{ memberSummary(row) }}</v-list-item-subtitle></v-list-item-content>
-        </v-list-item>
-      </v-list>
-      <v-btn v-if="remainingRows" x-small text block class="mt-1" @click="listLimit += 60">Show more ({{ remainingRows }})</v-btn>
-      <div v-if="!rows.length" class="caption pa-2">No matching troops.</div>
+      <v-text-field v-model="search" label="Search troop, enemy or ID" dense outlined hide-details prepend-inner-icon="mdi-magnify" clearable @keydown.stop/>
+      <virtual-list v-if="rows.length" :items="rows" :height="360" :item-size="64">
+        <template v-slot="{ item: row }">
+          <div class="cheat-virtual-row encounter-row" :class="{ 'cheat-virtual-row--active': selectedTroopId === row.troopId }" role="button" tabindex="0" @click="choose(row.troopId)" @keydown.enter.stop.prevent="choose(row.troopId)">
+            <game-asset kind="troop" :record-id="row.troopId" :label="row.displayName" :size="44" :navigate="false" class="encounter-row__art"/>
+            <div class="cheat-virtual-row__main">
+              <div class="encounter-row__title">{{ row.displayName }}</div>
+              <div class="encounter-row__meta">#{{ row.troopId }} / {{ row.memberCount }} members{{ row.hiddenCount ? ' / ' + row.hiddenCount + ' hidden' : '' }}</div>
+              <div class="encounter-row__meta">{{ memberSummary(row) }}</div>
+            </div>
+          </div>
+        </template>
+      </virtual-list>
+      <div v-else class="caption pa-2">No matching troops.</div>
     </v-col><v-col cols="12" sm="8" v-if="selected">
-      <div class="encounter-browser__summary"><div class="encounter-browser__art"><game-asset v-for="part in selected.parts" :key="'art' + part.index" kind="enemy" :record-id="part.enemyId" :label="part.name" :size="64" :navigate="false"/></div><div class="encounter-browser__summary-body"><strong class="encounter-browser__name">{{ selected.displayName }}</strong><div class="caption cheat-text-wrap">{{ memberSummary(selected, true) }}</div><div class="caption">Troop #{{ selected.troopId }} / {{ selected.pageCount }} battle event pages</div><v-btn x-small text @click="editPart(selected.primaryId)">Edit first enemy</v-btn></div></div>
+      <div class="encounter-browser__summary">
+        <game-asset kind="troop" :record-id="selected.troopId" :label="selected.displayName" :size="160" :navigate="false" class="encounter-browser__hero"/>
+        <div class="encounter-browser__summary-body">
+          <strong class="encounter-browser__name">{{ selected.displayName }}</strong>
+          <div class="caption cheat-text-wrap">{{ memberSummary(selected, true) }}</div>
+          <div class="caption">Troop #{{ selected.troopId }} / {{ selected.pageCount }} battle event pages</div>
+          <div v-if="selectedHidden" class="caption">Faded artwork marks {{ selectedHidden === 1 ? 'a member that starts hidden' : selectedHidden + ' members that start hidden' }}.</div>
+          <v-btn x-small text @click="editPart(selected.primaryId)">Edit first enemy</v-btn>
+        </div>
+      </div>
       <div class="subtitle-2">Enemies in this troop</div>
       <div v-for="part in selected.parts" :key="part.index" class="encounter-browser__part">
         <div class="cheat-row__main cheat-break-word"><database-tooltip kind="enemy" :record-id="part.enemyId" :label="part.name"/><span class="caption"> #{{ part.enemyId }}</span><div class="caption">{{ part.enemyId === selected.primaryId ? 'First member. ' : '' }}{{ part.hidden ? 'Initially hidden. ' : '' }}{{ part.encyclopediaHidden ? 'Hidden from encyclopedia. ' : '' }}{{ part.doesntCount ? 'Does not count. ' : '' }}{{ part.missing ? 'Missing enemy definition. ' : '' }}Position: {{ part.x == null ? '?' : part.x }}, {{ part.y == null ? '?' : part.y }}</div></div>
@@ -103,15 +98,14 @@ export default {
   methods: {
     memberSummary(row, full) {
       const names = row.parts.map((part) => part.name);
-      if (full || names.length <= 3) return names.join(" / ");
+      if (full || names.length <= 2) return names.join(" / ");
       return (
-        names.slice(0, 3).join(" / ") + " +" + (names.length - 3) + " more"
+        names.slice(0, 2).join(" / ") + " +" + (names.length - 2) + " more"
       );
     },
     reload() {
       this.cancel();
       this.error = "";
-      this.listLimit = LIST_CHUNK;
       try {
         // Freezing the snapshot array keeps Vue 2 from walking hundreds of
         // troop/member objects while leaving the detached copies mutable.

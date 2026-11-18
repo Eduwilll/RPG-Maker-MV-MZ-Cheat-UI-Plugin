@@ -178,7 +178,7 @@ export function installDemoWorld(game) {
   const body = Object.assign({}, game.$dataEnemies[1], {
     id: 2,
     name: "Moss Guardian [body]",
-    battlerName: "PreviewGuardian",
+    battlerName: "PreviewGuardianBody",
     description: "A multipart encounter for the root/limb browser.",
     params: [850, 60, 28, 21, 14, 18, 12, 8],
     gold: 90,
@@ -194,11 +194,13 @@ export function installDemoWorld(game) {
     Object.assign({}, body, {
       id: 3,
       name: "Moss Guardian [head]",
+      battlerName: "PreviewGuardianHead",
       params: [180, 0, 8, 6, 18, 10, 10, 8],
     }),
     Object.assign({}, body, {
       id: 4,
       name: "Moss Guardian [arm]",
+      battlerName: "PreviewGuardianArm",
       params: [240, 0, 30, 14, 0, 8, 8, 4],
     }),
   );

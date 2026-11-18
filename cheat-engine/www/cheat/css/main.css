@@ -1720,12 +1720,73 @@
   max-height: 380px;
 }
 
-.cheat-list-scroll--records {
-  max-height: 330px;
+/* Windowed database lists: the spacer owns the scrollbar, the window is
+   translated so only the visible rows exist in the DOM. */
+.cheat-virtual {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  contain: content;
+  border-radius: 2px;
 }
 
-.cheat-list-scroll--encounters {
-  max-height: 360px;
+.cheat-virtual__spacer {
+  position: relative;
+  width: 100%;
+}
+
+.cheat-virtual__window {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  will-change: transform;
+}
+
+.cheat-virtual__row {
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.cheat-virtual-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 8px;
+  border-radius: 4px;
+  color: var(--cheat-text);
+  cursor: pointer;
+}
+
+.cheat-virtual-row:hover {
+  background: var(--cheat-surface-2);
+}
+
+.cheat-virtual-row:focus {
+  outline: 2px solid var(--cheat-focus);
+  outline-offset: -2px;
+}
+
+.cheat-virtual-row--active {
+  background: var(--cheat-primary-soft);
+}
+
+.cheat-virtual-row__main {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.cheat-virtual-row__flag {
+  flex: 0 0 auto;
+  margin-left: 6px;
+  color: var(--cheat-text-muted);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .cheat-dialog-scroll {
@@ -1905,16 +1966,15 @@
   margin-bottom: 8px;
 }
 
-.encounter-browser__art {
-  display: flex;
-  flex: 0 1 45%;
-  flex-wrap: wrap;
-  min-width: 0;
-  margin-right: 8px;
-}
-
-.encounter-browser__art .game-asset {
-  margin: 0 4px 4px 0;
+/* Composed troop portrait: one figure instead of detached parts. */
+.encounter-browser__hero {
+  flex: 0 0 auto;
+  width: 160px;
+  height: 160px;
+  margin-right: 10px;
+  background: var(--cheat-surface-2);
+  border: 1px solid var(--cheat-border);
+  border-radius: 4px;
 }
 
 .encounter-browser__summary-body {
@@ -1930,6 +1990,32 @@
 .encounter-browser__item-title,
 .encounter-browser__item-subtitle {
   white-space: normal;
+}
+
+/* Compact virtual rows: artwork plus two single-line labels. */
+.encounter-row {
+  align-items: center;
+}
+
+.encounter-row__art {
+  flex: 0 0 auto;
+  margin-right: 8px;
+}
+
+.encounter-row__title {
+  overflow: hidden;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.encounter-row__meta {
+  overflow: hidden;
+  color: var(--cheat-text-muted);
+  font-size: 10.5px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .encounter-browser__part {

@@ -139,8 +139,70 @@ export function loadOptionalBitmap(game, asset) {
   });
 }
 
+/* Troops are drawn the way the engine draws them: one enemy image per member,
+   anchored bottom-centre on the authored battle position. Compositing avoids
+   games that split a single creature across torso/head/limb records, where any
+   single record shows an incomplete silhouette. */
+const TROOP_MAX_MEMBERS = 32;
+const TROOP_HIDDEN_ALPHA = 0.4;
+const TROOP_MAX_COMPOSITES = 24;
+const TROOP_SIZES = [96, 160, 320];
+
+function troopSize(width, height) {
+  const longest = Math.max(Number(width) || 0, Number(height) || 0);
+  for (const size of TROOP_SIZES) if (longest <= size) return size;
+  return TROOP_SIZES[TROOP_SIZES.length - 1];
+}
+
+/** Bottom-centre anchoring mirrors Sprite_Enemy; fall back to a plain row. */
+function placeTroopMembers(placed) {
+  const positioned = placed.every(
+    (entry) =>
+      Number.isFinite(entry.member.x) && Number.isFinite(entry.member.y),
+  );
+  let cursor = 0;
+  let tallest = 0;
+  placed.forEach((entry) => {
+    tallest = Math.max(tallest, entry.image.height);
+    if (positioned) {
+      entry.left = entry.member.x - entry.image.width / 2;
+      entry.top = entry.member.y - entry.image.height;
+    } else {
+      entry.left = cursor;
+      cursor += entry.image.width + 4;
+    }
+  });
+  if (!positioned)
+    placed.forEach((entry) => {
+      entry.top = tallest - entry.image.height;
+    });
+  const left = Math.min.apply(
+    null,
+    placed.map((entry) => entry.left),
+  );
+  const top = Math.min.apply(
+    null,
+    placed.map((entry) => entry.top),
+  );
+  const right = Math.max.apply(
+    null,
+    placed.map((entry) => entry.left + entry.image.width),
+  );
+  const bottom = Math.max.apply(
+    null,
+    placed.map((entry) => entry.top + entry.image.height),
+  );
+  return {
+    left,
+    top,
+    width: Math.max(1, Math.round(right - left)),
+    height: Math.max(1, Math.round(bottom - top)),
+  };
+}
+
 export function createGameAssets(game, loader) {
   const cache = new Map();
+  const troopCache = new Map();
   const pendingGenerated = new WeakMap();
   function readyGenerated(bitmap) {
     if (!bitmap.isReady || bitmap.isReady()) return Promise.resolve(bitmap);
@@ -220,6 +282,13 @@ export function createGameAssets(game, loader) {
     }
     return cache.get(key);
   }
+  function isSideView() {
+    return !!(
+      game.$gameSystem &&
+      game.$gameSystem.isSideView &&
+      game.$gameSystem.isSideView()
+    );
+  }
   function describe(kind, id) {
     id = Number(id);
     if (kind === "actor" || kind === "actorSprite") {
@@ -253,19 +322,137 @@ export function createGameAssets(game, loader) {
             type: "enemy",
             name: String(row.battlerName || ""),
             hue: Number(row.battlerHue) || 0,
-            sideView: !!(
-              game.$gameSystem &&
-              game.$gameSystem.isSideView &&
-              game.$gameSystem.isSideView()
-            ),
+            sideView: isSideView(),
           }
+        : null;
+    }
+    if (kind === "troop") {
+      const troop = game.$dataTroops && game.$dataTroops[id];
+      if (!troop || !Array.isArray(troop.members)) return null;
+      const members = [];
+      for (const member of troop.members) {
+        if (members.length >= TROOP_MAX_MEMBERS) break;
+        if (!member) continue;
+        const row = game.$dataEnemies && game.$dataEnemies[member.enemyId];
+        const name = row ? String(row.battlerName || "") : "";
+        if (!name) continue;
+        members.push({
+          name,
+          hue: Number(row.battlerHue) || 0,
+          x: Number(member.x),
+          y: Number(member.y),
+          hidden: !!member.hidden,
+        });
+      }
+      return members.length
+        ? { type: "troop", members, sideView: isSideView() }
         : null;
     }
     const row = TABLES[kind] && game[TABLES[kind]] && game[TABLES[kind]][id];
     return row ? { type: "icon", index: Number(row.iconIndex) || 0 } : null;
   }
+  async function composeTroop(asset, size) {
+    const members = asset.members.slice(0, TROOP_MAX_MEMBERS);
+    const loaded = await Promise.all(
+      members.map((member) =>
+        readBitmap({
+          type: "enemy",
+          name: member.name,
+          hue: member.hue,
+          sideView: asset.sideView,
+        }).catch(() => null),
+      ),
+    );
+    const placed = [];
+    loaded.forEach((bitmap, index) => {
+      const image = bitmapSource(bitmap);
+      if (!image || !image.width || !image.height) return;
+      placed.push({ image, member: members[index] });
+    });
+    if (!placed.length) return null;
+    const box = placeTroopMembers(placed);
+    const scale = Math.min(1, size / Math.max(box.width, box.height));
+    const canvas = game.document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(box.width * scale));
+    canvas.height = Math.max(1, Math.round(box.height * scale));
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    placed.forEach((entry) => {
+      ctx.globalAlpha = entry.member.hidden ? TROOP_HIDDEN_ALPHA : 1;
+      ctx.drawImage(
+        entry.image,
+        Math.round((entry.left - box.left) * scale),
+        Math.round((entry.top - box.top) * scale),
+        Math.max(1, Math.round(entry.image.width * scale)),
+        Math.max(1, Math.round(entry.image.height * scale)),
+      );
+    });
+    ctx.globalAlpha = 1;
+    return { canvas, width: canvas.width, height: canvas.height };
+  }
+  function troopBitmap(asset, width, height) {
+    const size = troopSize(width, height);
+    const key = [
+      "troop",
+      size,
+      asset.sideView ? "sv" : "front",
+      asset.members
+        .map(
+          (member) =>
+            member.name +
+            "@" +
+            member.hue +
+            "@" +
+            member.x +
+            "," +
+            member.y +
+            (member.hidden ? "?" : ""),
+        )
+        .join("|"),
+    ].join(":");
+    if (!troopCache.has(key)) {
+      if (troopCache.size >= TROOP_MAX_COMPOSITES)
+        troopCache.delete(troopCache.keys().next().value);
+      troopCache.set(
+        key,
+        composeTroop(asset, size).catch(() => null),
+      );
+    }
+    return troopCache.get(key);
+  }
+  async function paintTroop(canvas, asset, current) {
+    const composed = await troopBitmap(
+      asset,
+      canvas.width,
+      canvas.height,
+    ).catch(() => null);
+    if (!composed || (current && !current())) return false;
+    try {
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return false;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const fit = Math.min(
+        canvas.width / composed.width,
+        canvas.height / composed.height,
+      );
+      const w = composed.width * fit,
+        h = composed.height * fit;
+      ctx.drawImage(
+        composed.canvas,
+        (canvas.width - w) / 2,
+        (canvas.height - h) / 2,
+        w,
+        h,
+      );
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
   async function paint(canvas, asset, current) {
-    if (!asset || (!asset.name && asset.type !== "icon")) return false;
+    if (!asset) return false;
+    if (asset.type === "troop") return paintTroop(canvas, asset, current);
+    if (!asset.name && asset.type !== "icon") return false;
     const bitmap = await readBitmap(asset).catch(() => null);
     if (!bitmap || (current && !current())) return false;
     try {

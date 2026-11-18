@@ -112,6 +112,33 @@ export function installDemoArt(game) {
   ec.fillRect(116, 88, 16, 21);
   ec.fillStyle = "#d5e5a0";
   ec.fillRect(69, 130, 57, 8);
+  /* Multipart fixture: the browser composites these at the troop positions. */
+  const body = canvas(120, 200),
+    bc = body.getContext("2d");
+  bc.fillStyle = "#4d6b52";
+  bc.fillRect(28, 20, 64, 180);
+  bc.fillStyle = "#7fa383";
+  bc.fillRect(40, 40, 40, 120);
+  bc.fillStyle = "#2b3f31";
+  bc.fillRect(20, 178, 26, 22);
+  bc.fillRect(74, 178, 26, 22);
+  const head = canvas(90, 110),
+    hc = head.getContext("2d");
+  hc.fillStyle = "#7fa383";
+  hc.beginPath();
+  hc.ellipse(45, 60, 40, 46, 0, 0, Math.PI * 2);
+  hc.fill();
+  hc.fillStyle = "#1d2b22";
+  hc.fillRect(22, 52, 14, 12);
+  hc.fillRect(54, 52, 14, 12);
+  hc.fillStyle = "#d9efc8";
+  hc.fillRect(30, 88, 30, 6);
+  const arm = canvas(40, 120),
+    ac = arm.getContext("2d");
+  ac.fillStyle = "#6b8f70";
+  ac.fillRect(8, 0, 24, 120);
+  ac.fillStyle = "#93b596";
+  ac.fillRect(12, 96, 16, 20);
   const bitmap = (image) => ({
     canvas: image,
     isReady: () => true,
@@ -120,6 +147,12 @@ export function installDemoArt(game) {
       fn(this);
     },
   });
+  const enemyByName = (url) => {
+    if (/PreviewGuardianBody/.test(url)) return body;
+    if (/PreviewGuardianHead/.test(url)) return head;
+    if (/PreviewGuardianArm/.test(url)) return arm;
+    return enemy;
+  };
   game.Bitmap = {
     load(url) {
       return bitmap(
@@ -130,7 +163,7 @@ export function installDemoArt(game) {
             : url.includes("/system/")
               ? icons
               : url.includes("/enemies/") || url.includes("/sv_enemies/")
-                ? enemy
+                ? enemyByName(url)
                 : tiles,
       );
     },

@@ -14,12 +14,16 @@ import { databaseParamNames } from "../js/ui/DatabaseDetails.js";
 import DatabaseRowsEditor from "../components/DatabaseRowsEditor.js";
 import DatabaseTooltip from "../components/DatabaseTooltip.js";
 import EncounterBrowser from "../components/EncounterBrowser.js";
-
-const LIST_CHUNK = 60;
+import VirtualList from "../components/VirtualList.js";
 
 export default {
   name: "DatabaseEditorPanel",
-  components: { DatabaseRowsEditor, DatabaseTooltip, EncounterBrowser },
+  components: {
+    DatabaseRowsEditor,
+    DatabaseTooltip,
+    EncounterBrowser,
+    VirtualList,
+  },
   props: { kind: { type: String, default: "enemy" } },
   data() {
     return {
@@ -28,7 +32,6 @@ export default {
       mapEvents: [],
       selectedEvent: null,
       search: "",
-      listLimit: LIST_CHUNK,
       descriptions: {},
       error: "",
       level: 1,
@@ -48,18 +51,12 @@ export default {
       return { enemy: "Enemies", skill: "Skills", class: "Classes" }[this.kind];
     },
     rows() {
-      const term = this.search.toLowerCase();
-      return this.state
-        ? this.state.rows.filter((row) =>
-            (row.id + " " + row.name).toLowerCase().includes(term),
-          )
-        : [];
-    },
-    visibleRows() {
-      return this.rows.slice(0, this.listLimit);
-    },
-    remainingRows() {
-      return Math.max(0, this.rows.length - this.listLimit);
+      const term = this.search.trim().toLowerCase();
+      if (!this.state) return [];
+      if (!term) return this.state.rows;
+      return this.state.rows.filter((row) =>
+        (row.id + " " + row.name).toLowerCase().includes(term),
+      );
     },
     numericFields() {
       if (this.kind === "enemy")
@@ -115,9 +112,6 @@ export default {
     },
   },
   watch: {
-    search() {
-      this.listLimit = LIST_CHUNK;
-    },
     enemyView(value) {
       // Troops is the default view, so the record editor is loaded on demand.
       if (value === "records" && !this.state) this.initialize();
@@ -140,9 +134,16 @@ export default {
     <div class="d-flex align-center mb-2"><strong>{{ title }}</strong><v-spacer/><v-btn x-small text @click="reload">Reload</v-btn></div>
     <v-alert v-if="error" type="error" dense dismissible @input="error = ''">{{ error }}</v-alert>
     <v-row dense v-if="state"><v-col cols="12" sm="4">
-      <v-text-field v-model="search" label="Search name or ID" dense outlined hide-details @keydown.stop/>
-      <v-list dense class="cheat-list-scroll cheat-list-scroll--records"><v-list-item v-for="row in visibleRows" :key="row.id" :input-value="state.selectedId === row.id" @click="choose(row.id)"><v-list-item-content><v-list-item-title><database-tooltip :kind="kind" :record-id="row.id" :label="'#' + row.id + ' ' + row.name"/></v-list-item-title><v-list-item-subtitle v-if="descriptions[row.id]">{{ descriptions[row.id] }}</v-list-item-subtitle><v-list-item-subtitle v-if="row.edited">Save-specific edit</v-list-item-subtitle></v-list-item-content></v-list-item></v-list>
-      <v-btn v-if="remainingRows" x-small text block class="mt-1" @click="listLimit += 60">Show more ({{ remainingRows }})</v-btn>
+      <v-text-field v-model="search" label="Search name or ID" dense outlined hide-details prepend-inner-icon="mdi-magnify" clearable @keydown.stop/>
+      <virtual-list v-if="rows.length" :items="rows" :height="330" :item-size="48">
+        <template v-slot="{ item: row }">
+          <div class="cheat-virtual-row" :class="{ 'cheat-virtual-row--active': state.selectedId === row.id }" role="button" tabindex="0" :title="descriptions[row.id] || null" @click="choose(row.id)" @keydown.enter.stop.prevent="choose(row.id)">
+            <div class="cheat-virtual-row__main"><database-tooltip :kind="kind" :record-id="row.id" :label="'#' + row.id + ' ' + row.name"/></div>
+            <span v-if="row.edited" class="cheat-virtual-row__flag">edited</span>
+          </div>
+        </template>
+      </virtual-list>
+      <div v-else class="caption pa-2">No matching records.</div>
     </v-col><v-col cols="12" sm="8" v-if="state.draft">
       <div class="caption mb-2">{{ state.draft.name }} #{{ state.selectedId }}. Apply changes, then save the game. Original game files are never changed.</div>
       <v-alert v-if="state.status" dense type="info" class="caption">{{ state.status }}</v-alert>
@@ -253,7 +254,6 @@ export default {
           readDatabaseReferences(getGameWindow()),
         );
         this.paramNames = databaseParamNames(getGameWindow()).slice();
-        this.listLimit = LIST_CHUNK;
         this.cacheDescriptions();
         if (this.state.rows.length)
           selectDatabaseRecord(
