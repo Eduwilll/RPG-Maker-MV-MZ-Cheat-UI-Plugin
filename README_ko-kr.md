@@ -2,7 +2,14 @@
 
 RPG Maker MV/MZ 게임을 위한 강력한 GUI 기반 치트 툴이며, **실시간 기계 번역** 기능을 지원합니다.
 
-### 최신 릴리스: v1.9.2
+### 최신 릴리스: v1.9.3
+- **메시지 로그**: 새로운 대화가 자동으로 따라가며, 위로 스크롤했을 때 읽던 위치가 유지됩니다.
+- **텔레포트 수정**: TeleportPanel이 CheatModal 셸에 올바르게 등록되어 텔레포트 기능이 복구되었습니다.
+- **MV 호환성**: RPG Maker MV의 설정과 로그가 `www/` 폴더 안에 올바르게 유지됩니다.
+- **내부 리팩토링**: GeneralCheat가 이동(노클립), 갓 모드, 영속성 모듈로 분리되고, CheatModal 셸이 NavigationModule, PanelRegistryModule, ProfileSyncModule로 심화되었습니다.
+- **프로필 및 사이드바**: 반응형 프로필 상태, 널 안전성 수정, ProfileSyncModule 초기화 수정.
+- **데이터베이스 패널**: 전체 트룹 아트워크 합성, 대용량 데이터셋을 위한 윈도우 렌더링, 아트워크 및 테마 수정.
+- **성능**: 정적 패널 설정 고정, 데드 코드 제거.
 - **인터랙티브 맵 / 미니맵**: 드래그 이동, 확대/축소, 플레이어 추적, 이벤트 검색과 맵 내부 설정을 제공합니다. 위치를 선택한 뒤 Teleport 버튼으로 이동합니다.
 - **실시간 표시**: 방향이 표시되는 플레이어 화살표, 게임 캐릭터 이미지와 종류별 마커를 프레임 단위로 갱신합니다.
 - **간결한 UI와 테마**: 정리된 탐색 메뉴, 작은 X/Y 입력란, Current / Legacy 색상 테마를 지원합니다.
@@ -135,12 +142,16 @@ docker-compose up -d
 - **Map Event Panel**: [Justype](https://github.com/Justype/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 - **Maintained & Enhanced by**: [Eduwilll](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 
-Latest Release: v1.9.1
+Latest Release: v1.9.3
 
-### v1.9.1 주요 변경 사항
-- **설치 프로그램 정보**: GitHub 및 문서 링크, 버그 신고, 제작진 크레딧과 MIT 라이선스를 설치 프로그램 안에서 확인할 수 있습니다.
-- **일관된 패널**: 공통 패널 헤더와 새로 고침 버튼을 사용하며, Current / Legacy 테마에 맞춰 컨트롤 색상이 바뀝니다.
-- **설치 프로그램 안정성**: Tcl/Tk 데이터를 포함해 별도 Python/Tk 설치 없이 패키지 설치 프로그램이 실행됩니다.
+### v1.9.3 주요 변경 사항
+- **메시지 로그**: 새로운 대화가 자동으로 따라가며, 위로 스크롤했을 때 읽던 위치가 유지됩니다.
+- **텔레포트 수정**: TeleportPanel이 CheatModal 셸에 올바르게 등록되어 텔레포트 기능이 복구되었습니다.
+- **MV 호환성**: RPG Maker MV의 설정과 로그가 `www/` 폴더 안에 올바르게 유지됩니다.
+- **내부 리팩토링**: GeneralCheat가 이동(노클립), 갓 모드, 영속성 모듈로 분리되고, CheatModal 셸이 NavigationModule, PanelRegistryModule, ProfileSyncModule로 심화되었습니다.
+- **프로필 및 사이드바**: 반응형 프로필 상태, 널 안전성 수정, ProfileSyncModule 초기화 수정.
+- **데이터베이스 패널**: 전체 트룹 아트워크 합성, 대용량 데이터셋을 위한 윈도우 렌더링, 아트워크 및 테마 수정.
+- **성능**: 정적 패널 설정 고정, 데드 코드 제거.
 
 ---
 

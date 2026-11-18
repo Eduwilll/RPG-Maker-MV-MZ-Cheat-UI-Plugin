@@ -1,6 +1,36 @@
 # Changelog
 
-## v1.9.2 - Latest
+## v1.9.3 - Latest
+
+### Message Log
+- [Feat] **Follow New Dialogue**: Message Log now automatically follows newly captured dialogue while preserving your reading position when you scroll up.
+
+### UI & Teleport
+- [Fix] **Teleport Panel Registration**: TeleportPanel is now properly registered in the CheatModal shell, restoring teleport functionality.
+
+### Runtime & MV Compatibility
+- [Fix] **MV Settings & Logs**: Settings and diagnostic logs for RPG Maker MV games are now correctly kept inside the `www/` folder.
+
+### Refactoring & Architecture
+- [Refactor] **GeneralCheat Split**: Split the monolithic `GeneralCheat` into focused modules for movement (No Clip), god mode, and persistence, improving maintainability.
+- [Feat] **CheatModal Shell Deepening**: Refactored the CheatModal shell into `NavigationModule`, `PanelRegistryModule`, and `ProfileSyncModule` for cleaner separation of concerns.
+
+### Profile & Sidebar Fixes
+- [Fix] **Reactive Profile State**: Profile state is now Vue-reactive, so the sidebar toggle works correctly.
+- [Fix] **Profile Null Safety**: Added null checks for profile in templates and `ProfileSyncModule`; handle null in `effectiveOpacity` and `getGameWindow`.
+- [Fix] **ProfileSyncModule Initialization**: Moved `ProfileSyncModule` creation to `mounted()` where `this` is available.
+
+### Database Panels
+- [Fix] **Troop Artwork**: Composite full troop artwork in database panels.
+- [Fix] **Database Performance**: Sped up database panels, repaired artwork rendering, and fixed log/theme chrome issues.
+- [Fix] **Windowed Lists**: Database lists now use windowed rendering for better performance with large datasets.
+
+### Performance
+- [Perf] **Static Panel Config**: Froze static panel configuration and removed dead polish leftovers for leaner runtime.
+
+---
+
+## v1.9.2
 
 ### Installer
 - [Fix] **Tcl/Tk 9 Startup**: Detect the Tcl/Tk 9 data archives shipped with Python 3.14+, extract them into the one-file installer, and fail the build if the `_tcl_data` / `_tk_data` scripts are missing. This fixes the startup error in `RPGMakerCheatInstaller.exe`.

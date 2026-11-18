@@ -39,8 +39,15 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 - **[Full Engine Reference](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/features)**
 - **[Keyboard Shortcuts](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/shortcuts)**
 
-### Latest Release: v1.9.2
+### Latest Release: v1.9.3
 - Windows installer ZIP with `RPGMakerCheatInstaller.exe`
+- **Message Log**: Automatically follows new dialogue while preserving reading position when scrolled up
+- **Teleport Fixed**: TeleportPanel properly registered in CheatModal shell
+- **MV Compatibility**: Settings and logs correctly kept inside `www/` folder for RPG Maker MV
+- **Refactored Internals**: GeneralCheat split into movement, god mode, and persistence modules; CheatModal shell deepened into NavigationModule, PanelRegistryModule, ProfileSyncModule
+- **Profile & Sidebar**: Reactive profile state, null safety fixes, ProfileSyncModule initialization fixed
+- **Database Panels**: Full troop artwork compositing, windowed rendering for performance, artwork and theme fixes
+- **Performance**: Static panel config frozen, dead code removed
 - **Interactive Map / Minimap**: Pan, zoom, follow, fit, find events and configure layers directly on the map; live sprites, directional player arrow and explicit teleport actions
 - **Compact UI**: Grouped navigation, denser controls, improved Feature Finder and compact Teleport coordinates
 - **Current / Legacy Themes**: Choose slate or the older charcoal colors, with saved accents and dark/light mode
@@ -97,7 +104,7 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 ## 🛠️ Installation
 
 ### Step 1: Download
-Recommended: download `RPGMakerCheatInstaller-v1.9.1-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
+Recommended: download `RPGMakerCheatInstaller-v1.9.3-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
 
 Manual install is still available: download the latest `-core.tar.gz` package for your engine from the same Releases page.
 
@@ -183,7 +190,7 @@ Link your development folder to a test game. Any saved changes in your IDE are i
 Generate the MV/MZ manual cheat packages from the repository root:
 
 ```powershell
-py -3 deploy\main.py --version 1.9.1
+py -3 deploy\main.py --version 1.9.3
 ```
 
 This creates:
@@ -196,13 +203,13 @@ output\rpg-mz-cheat-1.9.1-core.tar.gz
 After generating the manual packages, build the Windows installer ZIP:
 
 ```powershell
-py -3 tools\installer\build_windows.py --version 1.9.1
+py -3 tools\installer\build_windows.py --version 1.9.3
 ```
 
 This creates:
 
 ```text
-output\RPGMakerCheatInstaller-v1.9.1-windows.zip
+output\RPGMakerCheatInstaller-v1.9.3-windows.zip
 ```
 
 ### 4. Automated Formatting (Prettier & Husky)
