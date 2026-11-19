@@ -178,6 +178,19 @@ export class SequenceTracer {
           })),
         };
         break;
+
+      case "battle":
+        result = {
+          ...this._resolveBattleProcessing(node.params || []),
+          kind: "battle",
+          commandIndex: node.commandIndex,
+          indent: node.indent,
+          sections: node.sections.map((section) => ({
+            ...section,
+            nodes: this._resolveNodes(section.nodes, stack, eventKey),
+          })),
+        };
+        break;
     }
 
     if (result) {
@@ -187,8 +200,13 @@ export class SequenceTracer {
   }
 
   /**
-   * Resolve a command node.  Execution bridges (Call CE, Battle Processing)
-   * are turned into reference nodes; everything else passes through.
+   * Resolve a command node. Execution bridges (Call CE, Battle Processing) are
+   * turned into reference nodes; everything else passes through.
+   *
+   * Battle Processing (301) is parsed as a block, so it arrives here as
+   * `kind: "battle"` and is handled by _resolveNode's own case, which resolves
+   * the troop reference and recurses into each outcome section.
+   *
    * @param {any} node
    * @param {Set<string>} stack
    */
@@ -198,14 +216,6 @@ export class SequenceTracer {
       const ceId = Number(node.params[0]);
       return {
         ...this._resolveCommonEventCall(ceId, stack),
-        commandIndex: node.commandIndex,
-      };
-    }
-
-    // ── Battle Processing ──────────────────────────────────────────────────
-    if (node.code === 301) {
-      return {
-        ...this._resolveBattleProcessing(node.params),
         commandIndex: node.commandIndex,
       };
     }

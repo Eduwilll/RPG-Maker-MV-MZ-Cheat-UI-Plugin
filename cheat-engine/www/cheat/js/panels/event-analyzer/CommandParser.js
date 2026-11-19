@@ -57,14 +57,37 @@ export class CommandParser {
     const nodes = [];
 
     while (this.i < this.commands.length) {
+      const before = this.i;
       const cmd = this.commands[this.i];
-      if (!cmd || cmd.code === 0) break;
+      if (!cmd) break;
+
+      // Code 0 terminates the event, but only at the list's base level
+      // (indent 0). The editor also writes a 0 to close an inner section, such
+      // as the last command of a choice branch or a battle outcome, and the
+      // event continues afterwards with 402/404/601/604 at indent 0. Treating
+      // every 0 as end-of-list truncated most of those events: 21% of the
+      // pages in the bundled test games lost commands.
+      if (cmd.code === 0) {
+        if (cmd.indent === 0) break;
+        this.i++;
+        continue;
+      }
 
       // Returned to a parent indent level — stop, let parent handle
       if (parentIndent >= 0 && cmd.indent <= parentIndent) break;
 
       const node = this._parseNextCommand();
       if (node !== null) nodes.push(node);
+
+      // Guarantee forward progress. _parseNextCommand intentionally returns
+      // null without advancing for a block-end that a parent is expected to
+      // consume, but a malformed list can leave no such parent. Without this
+      // guard the loop would spin on the same command forever. Real RPG Maker
+      // data is well formed; this keeps a corrupt or hand-edited event file
+      // from freezing the panel.
+      if (this.i === before) {
+        this.i++;
+      }
     }
 
     return nodes;
@@ -102,6 +125,8 @@ export class CommandParser {
         return this._parseLoop();
       case 102:
         return this._parseShowChoices();
+      case 301:
+        return this._parseBattleProcessing();
       case 101:
         return this._parseShowText(101, 401);
       case 105:
@@ -124,6 +149,76 @@ export class CommandParser {
   }
 
   // ── Structured blocks ──────────────────────────────────────────────────────
+
+  /**
+   * Parse a Battle Processing block (301) with its outcome branches.
+   *
+   * RPG Maker writes the battle result as sibling sections at the command's own
+   * indent: 601 (win), 602 (escape), 603 (lose), then 604 to end. Each section
+   * body is indented one level deeper. Without this the parser treated 601/602
+   * /603/604 as ordinary commands and stopped at the 0 that closes the first
+   * inner section, dropping the remaining branches.
+   *
+   * @returns {any}
+   */
+  _parseBattleProcessing() {
+    const cmdIndex = this.i;
+    const cmd = this.commands[this.i];
+    const battleIndent = cmd.indent;
+    this.i++; // consume 301
+
+    /** @type {{ label: string, kind: string, nodes: any[] }[]} */
+    const sections = [];
+
+    const SECTION_LABELS = {
+      601: "Win",
+      602: "Escape",
+      603: "Lose",
+    };
+
+    while (this.i < this.commands.length) {
+      const section = this.commands[this.i];
+      if (!section) break;
+
+      // 604 ends the battle block.
+      if (section.code === 604 && section.indent === battleIndent) {
+        this.i++;
+        break;
+      }
+
+      if (
+        section.indent === battleIndent &&
+        Object.prototype.hasOwnProperty.call(SECTION_LABELS, section.code)
+      ) {
+        const kind = SECTION_LABELS[section.code];
+        const code = section.code;
+        this.i++; // consume the section header
+        const nodes = this._parseBlock(battleIndent);
+        // Each section body ends with its own code 0 at the deeper indent.
+        if (
+          this.i < this.commands.length &&
+          this.commands[this.i].code === 0 &&
+          this.commands[this.i].indent > battleIndent
+        ) {
+          this.i++;
+        }
+        void code;
+        sections.push({ label: kind, kind, nodes });
+        continue;
+      }
+
+      // Not part of the battle block: stop and let the caller handle it.
+      break;
+    }
+
+    return {
+      kind: "battle",
+      commandIndex: cmdIndex,
+      indent: battleIndent,
+      params: cmd.parameters || [],
+      sections,
+    };
+  }
 
   /**
    * Parse code 101/105/108 + their continuation lines (401/405/408).

@@ -10317,10 +10317,16 @@ var Ts = class {
 	_parseBlock(e) {
 		let t = [];
 		for (; this.i < this.commands.length;) {
-			let n = this.commands[this.i];
-			if (!n || n.code === 0 || e >= 0 && n.indent <= e) break;
-			let r = this._parseNextCommand();
-			r !== null && t.push(r);
+			let n = this.i, r = this.commands[this.i];
+			if (!r) break;
+			if (r.code === 0) {
+				if (r.indent === 0) break;
+				this.i++;
+				continue;
+			}
+			if (e >= 0 && r.indent <= e) break;
+			let i = this._parseNextCommand();
+			i !== null && t.push(i), this.i === n && this.i++;
 		}
 		return t;
 	}
@@ -10334,6 +10340,7 @@ var Ts = class {
 			case 111: return this._parseConditionalBranch();
 			case 112: return this._parseLoop();
 			case 102: return this._parseShowChoices();
+			case 301: return this._parseBattleProcessing();
 			case 101: return this._parseShowText(101, 401);
 			case 105: return this._parseShowText(105, 405);
 			case 108: return this._parseShowText(108, 408);
@@ -10349,6 +10356,42 @@ var Ts = class {
 				};
 			}
 		}
+	}
+	_parseBattleProcessing() {
+		let e = this.i, t = this.commands[this.i], n = t.indent;
+		this.i++;
+		let r = [], i = {
+			601: "Win",
+			602: "Escape",
+			603: "Lose"
+		};
+		for (; this.i < this.commands.length;) {
+			let e = this.commands[this.i];
+			if (!e) break;
+			if (e.code === 604 && e.indent === n) {
+				this.i++;
+				break;
+			}
+			if (e.indent === n && Object.prototype.hasOwnProperty.call(i, e.code)) {
+				let t = i[e.code];
+				e.code, this.i++;
+				let a = this._parseBlock(n);
+				this.i < this.commands.length && this.commands[this.i].code === 0 && this.commands[this.i].indent > n && this.i++, r.push({
+					label: t,
+					kind: t,
+					nodes: a
+				});
+				continue;
+			}
+			break;
+		}
+		return {
+			kind: "battle",
+			commandIndex: e,
+			indent: n,
+			params: t.parameters || [],
+			sections: r
+		};
 	}
 	_parseShowText(e, t) {
 		let n = this.i, r = this.commands[this.i], i = r.parameters || [];
@@ -10521,6 +10564,18 @@ var Ts = class {
 					}))
 				};
 				break;
+			case "battle":
+				r = {
+					...this._resolveBattleProcessing(e.params || []),
+					kind: "battle",
+					commandIndex: e.commandIndex,
+					indent: e.indent,
+					sections: e.sections.map((e) => ({
+						...e,
+						nodes: this._resolveNodes(e.nodes, t, n)
+					}))
+				};
+				break;
 		}
 		return r && (r.eventKey = n), r;
 	}
@@ -10532,10 +10587,7 @@ var Ts = class {
 				commandIndex: e.commandIndex
 			};
 		}
-		return e.code === 301 ? {
-			...this._resolveBattleProcessing(e.params),
-			commandIndex: e.commandIndex
-		} : e;
+		return e;
 	}
 	_resolveCommonEventCall(e, t) {
 		let n = `common:${e}`, r = this.db.getCommonEvent(e), i = r && r.name || `Common Event ${e}`;
@@ -10604,6 +10656,14 @@ var Ts = class {
 	"choice-branch": {
 		icon: "mdi-menu-right",
 		color: "accent"
+	},
+	battle: {
+		icon: "mdi-sword-cross",
+		color: "primary"
+	},
+	"battle-section": {
+		icon: "mdi-chevron-right",
+		color: "primary"
 	},
 	loop: {
 		icon: "mdi-repeat",
@@ -10870,6 +10930,26 @@ var Ts = class {
 						commandIndex: e.commandIndex,
 						icon: Q.choices.icon,
 						color: Q.choices.color,
+						children: n
+					};
+				}
+				case "battle": {
+					let n = e.sections.map((e) => ({
+						id: ++this._treeId,
+						name: e.label,
+						kind: "battle-section",
+						icon: Q["battle-section"].icon,
+						color: Q["battle-section"].color,
+						children: this._toTreeItems(e.nodes)
+					}));
+					return {
+						id: t,
+						name: "Battle Processing",
+						kind: "battle",
+						eventKey: e.eventKey,
+						commandIndex: e.commandIndex,
+						icon: Q.battle.icon,
+						color: Q.battle.color,
 						children: n
 					};
 				}

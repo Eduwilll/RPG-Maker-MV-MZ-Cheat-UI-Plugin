@@ -17,6 +17,8 @@ const KIND_META = {
   "branch-false": { icon: "mdi-close-circle", color: "error" },
   choices: { icon: "mdi-format-list-bulleted", color: "accent" },
   "choice-branch": { icon: "mdi-menu-right", color: "accent" },
+  battle: { icon: "mdi-sword-cross", color: "primary" },
+  "battle-section": { icon: "mdi-chevron-right", color: "primary" },
   loop: { icon: "mdi-repeat", color: "info" },
   command: { icon: null /* per-code */, color: "secondary" },
 };
@@ -735,6 +737,30 @@ export default {
             icon: KIND_META.choices.icon,
             color: KIND_META.choices.color,
             children: branchItems,
+          };
+        }
+
+        case "battle": {
+          const battleChildren = node.sections.map((section) => {
+            const sectionId = ++this._treeId;
+            return {
+              id: sectionId,
+              name: section.label,
+              kind: "battle-section",
+              icon: KIND_META["battle-section"].icon,
+              color: KIND_META["battle-section"].color,
+              children: this._toTreeItems(section.nodes),
+            };
+          });
+          return {
+            id,
+            name: "Battle Processing",
+            kind: "battle",
+            eventKey: node.eventKey,
+            commandIndex: node.commandIndex,
+            icon: KIND_META.battle.icon,
+            color: KIND_META.battle.color,
+            children: battleChildren,
           };
         }
 
