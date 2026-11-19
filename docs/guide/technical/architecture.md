@@ -47,6 +47,29 @@ The UI sources are plain JavaScript modules, not single-file Vue components. Bot
 - feature-specific panel support modules can live under subfolders there, such as `cheat/js/panels/about/` for the About panel state reader.
 - The UI listens for global key events so the overlay can be opened while gameplay is running.
 - In NW.js, the UI can also open as a separate window using `window.html` plus the generated `window-init.bundle.js` (built from `window-init.js`).
+- `js/ui/CheatApp.js` builds the Vue root for both surfaces and injects the feature runtime into every component as `this.cheatRuntime`. The locator (`js/runtime/FeatureRuntime.js`) remains as the fallback for the preview and pop-out.
+
+## Feature runtime
+
+The runtime object graph is built once by `initializeFeatureRuntime` and
+installed on the game window as `window.__cheatFeatures`. That indirection is
+not an accident: the separate cheat window runs in its own browser realm and
+must read the *game's* live objects, not a copy.
+
+On top of that bridge:
+
+- Components read `this.cheatRuntime` (injected by `CheatApp`) and fall back
+  to `getFeatureRuntime()` when they run outside an injected app, such as the
+  preview.
+- `js/panels/**/*State.js` take the runtime as an argument, so a panel state
+  helper is a pure function over the runtime and can be tested with a fake
+  instead of a fake `window`.
+- `getFeatureRuntime(viewWindow, dependencies)` accepts an explicit runtime,
+  which is the same contract the state modules use.
+
+Adding a panel therefore needs no knowledge of where the runtime lives: it
+declares `inject: { cheatRuntime: { default: null } }` and passes it to the
+state helpers it calls.
 
 Because the game and the UI share the same process, panel code can read and write RPG Maker globals directly.
 

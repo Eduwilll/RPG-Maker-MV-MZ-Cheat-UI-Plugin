@@ -39,6 +39,7 @@ const SIZE_MODES = deepFreeze([
 
 export default {
   name: "MessageLogPanel",
+  inject: { cheatRuntime: { default: null } },
   components: { MessagePortrait, MessageTextContent, GameAsset },
   data() {
     return {
@@ -195,14 +196,14 @@ export default {
       });
     },
     clearLog() {
-      const runtime = getFeatureRuntime();
+      const runtime = this.cheatRuntime || getFeatureRuntime();
       if (runtime) runtime.history.clear();
       this.confirmClear = false;
       this.refresh();
     },
     exportLog() {
       try {
-        const runtime = getFeatureRuntime();
+        const runtime = this.cheatRuntime || getFeatureRuntime();
         if (runtime)
           downloadText("cheat-dialogue.txt", runtime.history.exportText());
       } catch (error) {

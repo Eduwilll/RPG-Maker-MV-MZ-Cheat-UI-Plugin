@@ -1,6 +1,7 @@
 import { getFeatureRuntime } from "../js/runtime/FeatureRuntime.js";
 export default {
   name: "MapPreview",
+  inject: { cheatRuntime: { default: null } },
   props: { mapId: Number, x: Number, y: Number },
   data() {
     return { status: "Loading destination...", width: 0, height: 0 };
@@ -34,7 +35,8 @@ export default {
       this.height = 0;
       this.status = "Loading destination...";
       try {
-        const data = await getFeatureRuntime().previews.load(this.mapId);
+        const runtime = this.cheatRuntime || getFeatureRuntime();
+        const data = await runtime.previews.load(this.mapId);
         if (this._request !== request) return;
         this._map = data;
         this.width = data.width;
@@ -46,7 +48,7 @@ export default {
     },
     paint() {
       if (!this._map || !this.$refs.preview) return;
-      const renderer = getFeatureRuntime().previews;
+      const renderer = (this.cheatRuntime || getFeatureRuntime()).previews;
       const base = renderer.render(this._map, this.mapId);
       this.status = base ? "Destination preview." : renderer.status().detail;
       const canvas = this.$refs.preview,

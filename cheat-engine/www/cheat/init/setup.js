@@ -8,6 +8,7 @@ import "../libs/vuetify.js";
 
 import { initializeCheatDiagnostics } from "../js/runtime/CheatDiagnostics.js";
 import { createCheatApp } from "../js/ui/CheatApp.js";
+import { getFeatureRuntime } from "../js/runtime/FeatureRuntime.js";
 import MainComponent from "../MainComponent.js";
 
 function markCheatStarted() {
@@ -71,6 +72,9 @@ try {
     Vue,
     Vuetify,
     components: { MainComponent },
+    // MainComponent's created() hook builds the runtime, so resolve lazily:
+    // the first panel that mounts reads the installed object.
+    resolveRuntime: () => getFeatureRuntime(),
   }).$mount("#app");
   markCheatStarted();
 } catch (e) {

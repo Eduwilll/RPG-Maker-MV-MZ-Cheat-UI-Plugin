@@ -2,6 +2,7 @@ import { getFeatureRuntime } from "../js/runtime/FeatureRuntime.js";
 import { requestActorNavigation } from "../js/ui/RecordNavigation.js";
 export default {
   name: "MessagePortrait",
+  inject: { cheatRuntime: { default: null } },
   props: {
     faceName: String,
     faceIndex: Number,
@@ -44,7 +45,7 @@ export default {
       const request = {};
       this._request = request;
       this.ready = false;
-      const runtime = getFeatureRuntime();
+      const runtime = this.cheatRuntime || getFeatureRuntime();
       if (!runtime || !this.$refs.face) return;
       const current = () => this._request === request;
       const asset = this.faceName

@@ -52,12 +52,30 @@ context, but the parts that need testing no longer live inside them:
 | --- | --- | --- |
 | `js/runtime/RpgMakerGlobals.js` | the 60-name global list and `bridgeGlobals(window, opener)` | `window-init.js` |
 | `js/runtime/CheatVersion.js` | version file path, `readCheatVersion`, numeric `compareVersions` | `MainComponent.checkVersion()` |
-| `js/ui/CheatApp.js` | `createCheatApp({ Vue, Vuetify, components, options })` | both `setup.js` and `window-init.js` |
+| `js/ui/CheatApp.js` | `createCheatApp({ Vue, Vuetify, components, options })`, plus the lazy `cheatRuntime` provider | both `setup.js` and `window-init.js` |
 
 `import.js` deliberately stays a classic script: it must run before any ES
 module exists, so its watchdog and DOM injection are unchanged. `CheatApp` is
-also the composition root for any future `provide`, which is why the popup and
+also the composition root for the feature runtime, which is why the popup and
 overlay can no longer drift apart on their theme shell.
+
+### Feature runtime injection
+
+The runtime is still installed on the game window (`window.__cheatFeatures`),
+because the pop-out must read the *game's* instance across realms. What changed
+is that components no longer have to go through the global:
+
+- `createCheatApp({ resolveRuntime })` registers a lazy `provide` mixin, so
+  every component reads `this.cheatRuntime`. Lazy matters: `MainComponent`'s
+  `created()` hook builds the runtime after the app is constructed.
+- Components declare `inject: { cheatRuntime: { default: null } }` and use
+  `this.cheatRuntime || getFeatureRuntime()`. The locator is the fallback for
+  the preview and pop-out, not the only path.
+- `js/panels/**/*State.js` take the runtime as a parameter:
+  `readMapLayers(runtime = getFeatureRuntime())`. Panels pass
+  `this.cheatRuntime`; tests pass a fake. No `window` mutation needed.
+- `getFeatureRuntime(viewWindow, dependencies)` accepts an explicit runtime,
+  which is what makes the state modules testable without a game window.
 
 `pnpm run test:unit` fails when the manifest does not match the current sources or the committed artifacts. `pnpm run test:browser` boots both shipped bundles, so the artifacts that actually install are exercised.
 

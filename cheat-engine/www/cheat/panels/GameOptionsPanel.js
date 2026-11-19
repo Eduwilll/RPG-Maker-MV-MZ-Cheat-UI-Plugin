@@ -3,6 +3,7 @@ import { readGameOptionsState } from "../js/panels/options/GameOptionsPanelState
 import { downloadText } from "../js/ui/FileTransfer.js";
 export default {
   name: "GameOptionsPanel",
+  inject: { cheatRuntime: { default: null } },
   data() {
     return {
       rows: [],
@@ -25,7 +26,11 @@ export default {
   </v-card>`,
   methods: {
     refresh() {
-      this.rows = readGameOptionsState();
+      // cheatRuntime is undefined outside a createCheatApp app (the preview
+      // mounts from sources), so fall back to the locator.
+      this.rows = readGameOptionsState(
+        this.cheatRuntime || getFeatureRuntime(),
+      );
     },
     anchor(symbol) {
       return symbol === "alwaysDash"
@@ -38,7 +43,8 @@ export default {
     },
     set(row, value) {
       try {
-        getFeatureRuntime().options.set(row.symbol, value);
+        const runtime = this.cheatRuntime || getFeatureRuntime();
+        runtime.options.set(row.symbol, value);
         this.error = "";
         this.refresh();
       } catch (error) {
@@ -47,12 +53,14 @@ export default {
       }
     },
     exclude(row) {
-      getFeatureRuntime().options.removeFromProfile(row.symbol);
+      const runtime = this.cheatRuntime || getFeatureRuntime();
+      runtime.options.removeFromProfile(row.symbol);
       this.refresh();
     },
     exportProfile() {
       try {
-        this.profileText = getFeatureRuntime().options.exportProfile();
+        const runtime = this.cheatRuntime || getFeatureRuntime();
+        this.profileText = runtime.options.exportProfile();
         downloadText(
           "cheat-settings-profile.json",
           this.profileText,
@@ -82,9 +90,8 @@ export default {
     },
     previewImport() {
       try {
-        this.preview = getFeatureRuntime().options.previewProfile(
-          this.profileText,
-        );
+        const runtime = this.cheatRuntime || getFeatureRuntime();
+        this.preview = runtime.options.previewProfile(this.profileText);
         this.confirmImport = true;
         this.error = "";
       } catch (error) {
@@ -93,9 +100,8 @@ export default {
     },
     importProfile() {
       try {
-        const result = getFeatureRuntime().options.importProfile(
-          this.profileText,
-        );
+        const runtime = this.cheatRuntime || getFeatureRuntime();
+        const result = runtime.options.importProfile(this.profileText);
         this.status =
           "Applied " +
           result.applied.length +

@@ -18,6 +18,7 @@ import VirtualList from "../components/VirtualList.js";
 
 export default {
   name: "DatabaseEditorPanel",
+  inject: { cheatRuntime: { default: null } },
   components: {
     DatabaseRowsEditor,
     DatabaseTooltip,
@@ -191,7 +192,7 @@ export default {
       if (!this.state) this.initialize();
       if (!this.state) return;
       this.state.rows = Object.freeze(
-        getFeatureRuntime().database.list(this.kind),
+        (this.cheatRuntime || getFeatureRuntime()).database.list(this.kind),
       );
       this.cacheDescriptions();
       this.choose(id);
@@ -211,8 +212,8 @@ export default {
       try {
         this.mapEvents =
           this.kind === "enemy"
-            ? getFeatureRuntime()
-                .battle.mapEvents(this.state.selectedId)
+            ? (this.cheatRuntime || getFeatureRuntime()).battle
+                .mapEvents(this.state.selectedId)
                 .map((row) =>
                   Object.assign({}, row, {
                     label:
@@ -243,7 +244,7 @@ export default {
     },
     initialize() {
       try {
-        const runtime = getFeatureRuntime();
+        const runtime = this.cheatRuntime || getFeatureRuntime();
         if (!runtime)
           throw new Error(
             "Game feature runtime is not ready. Reload this panel after the game starts.",
@@ -288,7 +289,8 @@ export default {
     },
     select(id) {
       try {
-        selectDatabaseRecord(this.state, getFeatureRuntime().database, id);
+        const runtime = this.cheatRuntime || getFeatureRuntime();
+        selectDatabaseRecord(this.state, runtime.database, id);
         this.level = 1;
         this.refreshMapEvents();
       } catch (error) {
@@ -297,10 +299,9 @@ export default {
     },
     apply() {
       try {
-        applyDatabaseDraft(this.state, getFeatureRuntime().database);
-        this.state.rows = Object.freeze(
-          getFeatureRuntime().database.list(this.kind),
-        );
+        const runtime = this.cheatRuntime || getFeatureRuntime();
+        applyDatabaseDraft(this.state, runtime.database);
+        this.state.rows = Object.freeze(runtime.database.list(this.kind));
         this.cacheDescriptions();
         this.error = "";
       } catch (error) {
@@ -309,7 +310,8 @@ export default {
     },
     discard() {
       try {
-        discardDatabaseDraft(this.state, getFeatureRuntime().database);
+        const runtime = this.cheatRuntime || getFeatureRuntime();
+        discardDatabaseDraft(this.state, runtime.database);
         this.error = "";
       } catch (error) {
         this.error = error.message;
@@ -335,7 +337,7 @@ export default {
       const action = this.pending;
       this.confirmation = "";
       try {
-        const runtime = getFeatureRuntime();
+        const runtime = this.cheatRuntime || getFeatureRuntime();
         if (action === "reset") {
           resetDatabaseRecord(this.state, runtime.database);
           this.state.rows = Object.freeze(runtime.database.list(this.kind));
@@ -370,7 +372,7 @@ export default {
       }
     },
     updateAvailability() {
-      const runtime = getFeatureRuntime();
+      const runtime = this.cheatRuntime || getFeatureRuntime();
       if (!runtime) return;
       const next = runtime.battle.availability();
       // Availability is polled every second. Only assign when it changes so

@@ -159,11 +159,10 @@ export function createMapCharacters(game, assets) {
   };
 }
 
-export function getMapCharacters() {
+export function getMapCharacters(runtime = getFeatureRuntime()) {
   const game = getGameWindow();
   if (!game) return null;
   if (!game.__cheatMapCharacters) {
-    const runtime = getFeatureRuntime();
     game.__cheatMapCharacters = createMapCharacters(
       game,
       (runtime && runtime.assets) || createGameAssets(game),

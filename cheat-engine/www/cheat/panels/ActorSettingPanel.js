@@ -19,6 +19,7 @@ import { getFeatureRuntime } from "../js/runtime/FeatureRuntime.js";
 
 export default {
   name: "ActorSettingPanel",
+  inject: { cheatRuntime: { default: null } },
   components: { DatabaseTooltip, LockFavoriteControls, GameAsset },
 
   template: `
@@ -348,7 +349,7 @@ export default {
     changeParty() {
       this.partyConfirmation = false;
       try {
-        getFeatureRuntime().actors.setPartyMember(
+        (this.cheatRuntime || getFeatureRuntime()).actors.setPartyMember(
           this.selectedActorId,
           !this.selectedInParty,
         );

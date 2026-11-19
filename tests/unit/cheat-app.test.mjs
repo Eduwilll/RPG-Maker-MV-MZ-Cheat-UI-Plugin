@@ -1,15 +1,20 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createCheatApp } from "../../cheat-engine/www/cheat/js/ui/CheatApp.js";
+import {
+  createCheatApp,
+  createFeatureRuntimeProvide,
+} from "../../cheat-engine/www/cheat/js/ui/CheatApp.js";
 
 function makeHarness() {
-  const calls = { Vue: [], Vuetify: [] };
+  const calls = { Vue: [], Vuetify: [], mixins: [] };
 
   class Vue {
     constructor(options) {
       calls.Vue.push(options);
     }
   }
+
+  Vue.mixin = (mixin) => calls.mixins.push(mixin);
 
   class Vuetify {
     constructor(options) {
@@ -94,4 +99,40 @@ test("the overlay and the pop-out share the same theme source", () => {
     overlayHarness.calls.Vuetify[0].theme,
     popupHarness.calls.Vuetify[0].theme,
   );
+});
+
+test("resolveRuntime registers a provider mixin on the Vue constructor", () => {
+  const { calls, Vue, Vuetify } = makeHarness();
+
+  createCheatApp({ Vue, Vuetify, resolveRuntime: () => "runtime" });
+
+  assert.equal(calls.mixins.length, 1);
+  assert.equal(typeof calls.mixins[0].provide, "function");
+});
+
+test("the provider resolves the runtime when a component is created", () => {
+  const runtime = { database: {} };
+  const provide = createFeatureRuntimeProvide(() => runtime);
+
+  assert.deepEqual(provide(), { cheatRuntime: runtime });
+});
+
+test("the provider is lazy, so a runtime built after app creation is seen", () => {
+  // MainComponent's created() hook installs the runtime after createCheatApp
+  // has already run, so the provider must not capture a value eagerly.
+  let runtime = null;
+  const provide = createFeatureRuntimeProvide(() => runtime);
+
+  assert.deepEqual(provide(), { cheatRuntime: null });
+
+  runtime = { database: {} };
+  assert.deepEqual(provide(), { cheatRuntime: runtime });
+});
+
+test("no mixin is registered without resolveRuntime", () => {
+  const { calls, Vue, Vuetify } = makeHarness();
+
+  createCheatApp({ Vue, Vuetify });
+
+  assert.equal(calls.mixins.length, 0);
 });

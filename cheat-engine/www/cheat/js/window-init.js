@@ -4,6 +4,7 @@
  */
 
 import { initializeCheatDiagnostics } from "./runtime/CheatDiagnostics.js";
+import { getFeatureRuntime } from "./runtime/FeatureRuntime.js";
 import { bridgeGlobals } from "./runtime/RpgMakerGlobals.js";
 import { createCheatApp } from "./ui/CheatApp.js";
 
@@ -90,6 +91,9 @@ async function init() {
         AlertSnackbar,
         ConfirmDialog,
       },
+      // The runtime belongs to the game window; resolve it lazily so the
+      // first panel that mounts reads the opener's installed object.
+      resolveRuntime: () => getFeatureRuntime(),
       options: {
         el: "#app",
         data: {

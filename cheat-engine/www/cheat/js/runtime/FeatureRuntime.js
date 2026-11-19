@@ -25,7 +25,24 @@ export function getGameWindow(viewWindow) {
     return view;
   }
 }
-export function getFeatureRuntime(viewWindow) {
+/**
+ * Resolve the feature runtime for a view.
+ *
+ * The runtime lives on the *game* window, not the view: the pop-out reaches it
+ * through `__cheatOpener`. When a component is created by `createCheatApp`
+ * with `provide`, `this.cheatRuntime` already holds the same object, so callers
+ * that can name a runtime pass it as `dependencies.runtime` instead of relying
+ * on the global. The global stays as the fallback for the pop-out and for
+ * modules that have no component instance.
+ *
+ * @param {Window} [viewWindow] window the caller runs in (defaults to `window`)
+ * @param {{ runtime?: any }} [dependencies] explicit dependency, wins when present
+ * @returns {any} the runtime, or `null` when the game window has none
+ */
+export function getFeatureRuntime(viewWindow, dependencies) {
+  if (dependencies && dependencies.runtime) {
+    return dependencies.runtime;
+  }
   const game = getGameWindow(viewWindow);
   return game && game.__cheatFeatures ? game.__cheatFeatures : null;
 }

@@ -9,6 +9,7 @@ import VirtualList from "./VirtualList.js";
 
 export default {
   name: "EncounterBrowser",
+  inject: { cheatRuntime: { default: null } },
   components: { GameAsset, DatabaseTooltip, VirtualList },
   data() {
     return {
@@ -135,7 +136,7 @@ export default {
         this.$emit("edit", enemyId);
     },
     updateAvailability() {
-      const runtime = getFeatureRuntime();
+      const runtime = this.cheatRuntime || getFeatureRuntime();
       const next = runtime
         ? JSON.parse(JSON.stringify(runtime.battle.availability().start))
         : { allowed: false, reason: "No active game session." };
@@ -148,7 +149,7 @@ export default {
       this.selectedEvent = null;
       this.mapEvents = [];
       try {
-        const runtime = getFeatureRuntime();
+        const runtime = this.cheatRuntime || getFeatureRuntime();
         if (!runtime || !this.selected) return;
         this.mapEvents = JSON.parse(
           JSON.stringify(
@@ -200,7 +201,7 @@ export default {
       this.cancel();
       this.error = "";
       try {
-        const runtime = getFeatureRuntime();
+        const runtime = this.cheatRuntime || getFeatureRuntime();
         if (!runtime) throw new Error("No active game session.");
         if (action.mapEvent) runtime.battle.startMapEvent(action.mapEvent);
         else runtime.battle.startTroop(action.troopId);

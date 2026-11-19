@@ -6,6 +6,7 @@ import { readLocksState } from "../js/panels/locks/LockPanelState.js";
 import LockFavoriteControls from "../components/LockFavoriteControls.js";
 export default {
   name: "LocksPanel",
+  inject: { cheatRuntime: { default: null } },
   components: { LockFavoriteControls },
   data() {
     return {
@@ -42,7 +43,9 @@ export default {
   </v-card>`,
   methods: {
     refresh() {
-      this.rows = readLocksState();
+      // cheatRuntime is undefined outside a createCheatApp app (the preview
+      // mounts from sources), so fall back to the locator.
+      this.rows = readLocksState(this.cheatRuntime || getFeatureRuntime());
       const game = getGameWindow();
       if (!game) return;
       const timer = game.$gameTimer;
@@ -61,7 +64,7 @@ export default {
       return typeof value === "object" ? JSON.stringify(value) : String(value);
     },
     remove(row) {
-      const locks = getFeatureRuntime().locks;
+      const locks = (this.cheatRuntime || getFeatureRuntime()).locks;
       locks.remove(row.target);
       locks.setFavorite(row.target, false);
       this.refresh();

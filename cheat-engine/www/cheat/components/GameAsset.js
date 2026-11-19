@@ -2,6 +2,7 @@ import { getFeatureRuntime } from "../js/runtime/FeatureRuntime.js";
 import { requestActorNavigation } from "../js/ui/RecordNavigation.js";
 export default {
   name: "GameAsset",
+  inject: { cheatRuntime: { default: null } },
   props: {
     kind: String,
     recordId: Number,
@@ -15,7 +16,7 @@ export default {
   },
   computed: {
     asset() {
-      const runtime = getFeatureRuntime();
+      const runtime = this.cheatRuntime || getFeatureRuntime();
       return (
         this.descriptor ||
         (runtime && runtime.assets.describe(this.kind, this.recordId))
@@ -67,7 +68,7 @@ export default {
       this._request = request;
       this.ready = false;
       if (!this._visible) return;
-      const runtime = getFeatureRuntime();
+      const runtime = this.cheatRuntime || getFeatureRuntime();
       if (!runtime || !this.$refs.image) return;
       const current = () => this._request === request;
       let ready = await runtime.assets.paint(

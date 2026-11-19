@@ -134,7 +134,7 @@ export default {
       const id = this.pendingActorId;
       this.cancelRecruitment();
       try {
-        const runtime = getFeatureRuntime();
+        const runtime = this.cheatRuntime || getFeatureRuntime();
         if (!runtime || !runtime.actors) {
           throw Error("Party editing is unavailable. Open a game first.");
         }

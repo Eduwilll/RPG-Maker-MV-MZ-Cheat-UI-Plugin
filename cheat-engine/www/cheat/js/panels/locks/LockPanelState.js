@@ -1,13 +1,23 @@
 import { getFeatureRuntime } from "../../runtime/FeatureRuntime.js";
-export function readLocksState() {
-  const runtime = getFeatureRuntime();
+
+/** @param {any} [runtime] the feature runtime; defaults to the locator */
+export function readLocksState(runtime = getFeatureRuntime()) {
   return runtime ? runtime.locks.list() : [];
 }
-export function favoriteSort(rows, targetForRow) {
-  const runtime = getFeatureRuntime();
+export function favoriteSort(
+  rows,
+  targetForRow,
+  runtime = getFeatureRuntime(),
+) {
   return runtime ? runtime.locks.sortFavorites(rows, targetForRow) : rows;
 }
-export function sortWithFavorites(rows, sortBy, sortDesc, targetForRow) {
+export function sortWithFavorites(
+  rows,
+  sortBy,
+  sortDesc,
+  targetForRow,
+  runtime = getFeatureRuntime(),
+) {
   const sorted = rows.slice();
   if (sortBy && sortBy.length)
     sorted.sort((left, right) => {
@@ -26,5 +36,5 @@ export function sortWithFavorites(rows, sortBy, sortDesc, targetForRow) {
       }
       return 0;
     });
-  return favoriteSort(sorted, targetForRow);
+  return favoriteSort(sorted, targetForRow, runtime);
 }
