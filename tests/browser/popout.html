@@ -9,7 +9,7 @@
       <span id="status-text">Initializing...</span>
       <div id="error-display"></div>
     </div>
-    <div id="app" style="display:none;">
+    <div id="app" class="cheat-window-app">
       <v-app
         ><v-main
           ><cheat-modal
@@ -19,6 +19,16 @@
         ><alert-snackbar></alert-snackbar><confirm-dialog></confirm-dialog
       ></v-app>
     </div>
+    <style>
+      /* Mirrors cheat/window.html: the pop-out stays hidden until the ready
+         class lands on the rendered root. */
+      #app.cheat-window-ready {
+        display: block !important;
+      }
+      #app.cheat-window-app:not(.cheat-window-ready) {
+        display: none;
+      }
+    </style>
     <script>
       window.__cheatOpener=parent;window.__smokeErrors=[];
     </script>

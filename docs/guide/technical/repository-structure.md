@@ -35,7 +35,7 @@ Most contributor work happens under `cheat-engine/www/`.
 | `cheat-engine/www/cheat/js/ui/` | Small UI-facing services that bridge components and panel actions, plus the shared `CheatApp.js` Vue root |
 | `cheat-engine/www/cheat/init/` | App bootstrapping, the generated `setup.bundle.js` and `bundle-manifest.json`, and RPG Maker customization hooks |
 | `cheat-engine/www/cheat/components/` | Shared Vue UI components such as dialogs and snackbars |
-| `cheat-engine/www/cheat/libs/` | Vendored production libraries (Vue, Vuetify, axios), Vuetify CSS, MDI icon subset and Roboto fonts |
+| `cheat-engine/www/cheat/libs/` | Vendored production libraries (Vue 2.7.16, Vuetify 2.6.3, axios), Vuetify CSS, MDI icon subset and Roboto fonts |
 | `cheat-engine/www/_cheat_initialize/` | Engine-specific bootstrap templates merged into release packages |
 
 ## Files contributors will touch most often

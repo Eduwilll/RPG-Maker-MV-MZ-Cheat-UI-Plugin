@@ -1,9 +1,9 @@
 {
   "generatedBy": "tools/vendor/build-bundles.mjs",
   "vite": "8.1.6",
-  "sourcesHash": "85737b3c94fda617e8023134543fab18ec53a7f3419195ee2dba5ac5fa6f3296",
+  "sourcesHash": "1a4e1a6b036ca914a1c94a15aa52af1e435754927cbeac07658d8292b6dd122a",
   "bundles": {
     "cheat-engine/www/cheat/init/setup.bundle.js": "1da3c6a7fb5b0b5ee96c74420aa4971facd774e4f2450600c72a745f662fa601",
-    "cheat-engine/www/cheat/js/window-init.bundle.js": "b302f5e2fdc9724e99f12cded1d85f0d6b235c18d7f7c08179e01db16cafd590"
+    "cheat-engine/www/cheat/js/window-init.bundle.js": "b1a3e92ce454ebcae6b20728e37349290cec4c3e9ebc1722ef02cf402d3be80a"
   }
 }

@@ -86,8 +86,13 @@ export const RPG_MAKER_GLOBALS = Object.freeze([
 /**
  * Bridge one global from `source` onto `target`.
  *
- * The source is read on every access, so a global that is still `undefined`
- * during startup becomes available as soon as the game creates it.
+ * The source is read on every access so RPG Maker's live values (`$gameMap`,
+ * `$dataMap`, ...) are never a stale snapshot.
+ *
+ * The getter is guarded against re-entrancy: if resolving the source comes back
+ * to this same property (the separate-window fixture sets the opener to another
+ * window in the same process, so a lookup can loop back), the last resolved
+ * value is returned instead of recursing until the stack overflows.
  *
  * @param {any} target window that receives the property
  * @param {any} source window that owns the value
@@ -95,14 +100,31 @@ export const RPG_MAKER_GLOBALS = Object.freeze([
  * @returns {BridgeOutcome}
  */
 export function bridgeGlobal(target, source, name) {
+  let resolving = false;
+  let cached;
+  let hasCached = false;
+
   try {
     Object.defineProperty(target, name, {
       configurable: true,
       enumerable: true,
       get() {
-        return source[name];
+        if (resolving) return cached;
+
+        resolving = true;
+        try {
+          cached = source[name];
+          hasCached = true;
+          return cached;
+        } catch (error) {
+          return hasCached ? cached : undefined;
+        } finally {
+          resolving = false;
+        }
       },
       set(value) {
+        cached = value;
+        hasCached = true;
         source[name] = value;
       },
     });

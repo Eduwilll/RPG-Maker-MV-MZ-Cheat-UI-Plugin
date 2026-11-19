@@ -26,6 +26,14 @@ Both cheat surfaces ship as generated files:
   imports. Output: `cheat-engine/www/cheat/js/window-init.bundle.js`.
 - Manifest: `cheat-engine/www/cheat/init/bundle-manifest.json`.
 
+Both surfaces run on the vendored Vue 2.7.16 build (`cheat/libs/vue.js`) and
+Vuetify 2.6.3 (`cheat/libs/vuetify.js`). Vue stays an external file rather than
+being inlined, so it keeps its own caching and the bundles stay small. Vue 2.7
+is the last 2.x release and keeps the Options API, so the runtime code is
+unchanged by the upgrade; what it does change is DOM behaviour, which is why the
+pop-out reveals itself through a `cheat-window-ready` class rather than an inline
+style on the mount node.
+
 Regenerate both with:
 
 ::: code-group
@@ -39,7 +47,7 @@ The bundles are committed because installing and packaging must not require Node
 The build uses Vite in library mode with these deliberate constraints:
 
 - `target: "chrome61"` matches the oldest NW.js version MV supports.
-- Vue and Vuetify stay external relative imports for the overlay. The pop-out reuses the host page's Vue/Vuetify globals, so it never imports them.
+- Vue and Vuetify stay external relative imports for the overlay, and the pop-out reuses the host page's Vue/Vuetify globals, so neither bundle inlines them. The pinned versions are Vue 2.7.16 and Vuetify 2.6.3.
 - `fs`, `path` and `nw.gui` stay external runtime `require()` calls. Without that, Vite would replace them with empty browser shims and break NW.js persistence.
 - The pop-out keeps its intentional load ordering: it imports the UI only after it bridged the game globals. Its `import()` calls are inlined into a single file (`codeSplitting: false`), and no module touches RPG Maker globals at evaluation time, so eager evaluation is safe. A leftover dynamic import would point at a source module that bundle-only installs omit.
 

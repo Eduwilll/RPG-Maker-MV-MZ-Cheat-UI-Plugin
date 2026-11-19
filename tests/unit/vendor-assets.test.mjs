@@ -30,7 +30,10 @@ function assetUrls(cssText) {
 
 test("Vue ships as the pinned production build", () => {
   const vue = readFileSync(path.join(libs, "vue.js"), "utf8");
-  assert.match(vue, /version="2\.6\.14"/);
+  // 2.7's minified UMD exposes the version as a local `var`, not a
+  // `version="..."` attribute, so match the version string itself.
+  assert.match(vue, /Vue\.js v2\.7\.16/);
+  assert.match(vue, /"2\.7\.16"/);
   assert.ok(vue.length < 200_000, "Vue dev build would be much larger");
   assert.ok(
     !vue.includes("You are running Vue in development mode"),

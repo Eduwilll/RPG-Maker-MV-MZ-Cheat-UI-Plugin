@@ -1134,15 +1134,24 @@ var O = t((() => {
 y(), O();
 var Re = Object.freeze(/* @__PURE__ */ "$gameParty.$gamePlayer.$gameSystem.$gameVariables.$gameSwitches.$gameSelfSwitches.$gameTemp.$gameActors.$gameMap.$gameTroop.$gameMessage.$gameTimer.$gameEnemies.$gameData.SceneManager.DataManager.Utils.ImageManager.SoundManager.TextManager.Graphics.Input.TouchInput.Game_Actor.Game_Enemy.Game_Message.Game_Party.Game_Variables.Game_Switches.Game_Timer.Sprite_Enemy.ConfigManager.Window_Options.Rectangle.Scene_Base.Scene_Map.Scene_Battle.Scene_Title.Scene_Save.Scene_Load.Scene_Debug.BattleManager.$dataActors.$dataClasses.$dataSkills.$dataItems.$dataWeapons.$dataArmors.$dataEnemies.$dataTroops.$dataStates.$dataAnimations.$dataTilesets.$dataCommonEvents.$dataSystem.$dataMapInfos.$dataMap".split("."));
 function ze(e, t, n) {
+	let r = !1, i, a = !1;
 	try {
 		return Object.defineProperty(e, n, {
 			configurable: !0,
 			enumerable: !0,
 			get() {
-				return t[n];
+				if (r) return i;
+				r = !0;
+				try {
+					return i = t[n], a = !0, i;
+				} catch (e) {
+					return a ? i : void 0;
+				} finally {
+					r = !1;
+				}
 			},
 			set(e) {
-				t[n] = e;
+				i = e, a = !0, t[n] = e;
 			}
 		}), "live";
 	} catch (r) {
@@ -12046,7 +12055,9 @@ async function Ku() {
 						openMessageLog: () => {
 							this.activeComponentName = "message-log-panel";
 						}
-					}), window.addEventListener("keydown", this._onFeatureKey, !0), document.getElementById("status-overlay").style.display = "none", document.getElementById("app").style.display = "block";
+					}), window.addEventListener("keydown", this._onFeatureKey, !0);
+					let e = document.getElementById("status-overlay");
+					e && (e.style.display = "none"), this.$el && this.$el.classList && this.$el.classList.add("cheat-window-ready");
 				},
 				beforeDestroy() {
 					window.removeEventListener("keydown", this._onFeatureKey, !0);

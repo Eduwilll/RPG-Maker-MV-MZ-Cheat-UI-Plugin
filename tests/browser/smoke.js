@@ -435,6 +435,11 @@ async function run() {
   );
   mapPanel.drawer = "";
   mapPanel.fitMap();
+  // Vue 2.7 flushes the render watcher a tick later than 2.6, so the camera is
+  // built by renderMap() on a later microtask. Wait for it before reading.
+  for (let n = 0; n < 20 && !mapPanel._camera; n++) {
+    await tick();
+  }
   await tick();
   const mapCanvas = mapPanel.$refs.mapCanvas;
   const mapPoint = (panel, x, y) => ({
@@ -1127,9 +1132,16 @@ async function run() {
   for (let n = 0; n < 100; n++) {
     await tick();
     const node = frame.contentDocument.getElementById("app");
-    if (node && node.style.display === "block") {
-      popupRoot = node.__vue__;
-      break;
+    // Vue 2.7 keeps id="app" on the rendered root and leaves the original
+    // mount node behind as an empty wrapper, so the first #app in document
+    // order can be the stale one. The live root is whichever #app actually
+    // holds the rendered .v-application tree.
+    if (
+      node &&
+      (node.style.display === "block" || node.querySelector(".v-application"))
+    ) {
+      popupRoot = node.__vue__ || null;
+      if (popupRoot) break;
     }
   }
   assert(!!popupRoot, "Actual window-init mounts in a separate browser realm");
@@ -1345,6 +1357,13 @@ async function run() {
     _characterSprites: [makeNpcSprite($gameMap._events[2])],
   };
   popupMap.renderMap();
+  // renderMap() can bail out while the panel has no layout yet (Vue 2.7
+  // flushes the initial render a tick later than 2.6). Retry until the camera
+  // exists so this exercises the real draw path.
+  for (let n = 0; n < 20 && !popupMap._camera; n++) {
+    popupMap.renderMap();
+    await tick();
+  }
   const popupNpcPixel = mapPixel(popupMap, 10.5, 2.5);
   assert(
     popupNpcPixel[0] === 208 && popupNpcPixel[2] === 221,

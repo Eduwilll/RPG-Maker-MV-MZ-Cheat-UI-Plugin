@@ -109,9 +109,16 @@ async function init() {
               },
             });
           window.addEventListener("keydown", this._onFeatureKey, true);
-          // Success! Hide the overlay
-          document.getElementById("status-overlay").style.display = "none";
-          document.getElementById("app").style.display = "block";
+          // Show the element Vue actually rendered. Reaching for
+          // document.getElementById("app") is a trap: Vue 2.7 keeps id="app" on
+          // the rendered root while the original mount node survives as an
+          // empty, still-hidden wrapper, so getElementById can return the stale
+          // node and the window would stay hidden. Toggling the class on $el
+          // (the live root) avoids that entirely.
+          const overlay = document.getElementById("status-overlay");
+          if (overlay) overlay.style.display = "none";
+          if (this.$el && this.$el.classList)
+            this.$el.classList.add("cheat-window-ready");
         },
         beforeDestroy() {
           window.removeEventListener("keydown", this._onFeatureKey, true);

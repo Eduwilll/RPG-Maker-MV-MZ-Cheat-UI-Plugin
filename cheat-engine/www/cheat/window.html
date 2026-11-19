@@ -26,6 +26,18 @@
           min-height: 100vh;
       }
 
+      /* The pop-out stays hidden until Vue mounts. The class lives on the
+         mount node and is toggled on the live root, because Vue 2.7 keeps
+         id="app" on the rendered element while leaving the original mount node
+         behind as an empty, still-hidden wrapper. */
+      #app.cheat-window-ready {
+          display: block !important;
+      }
+
+      #app.cheat-window-app:not(.cheat-window-ready) {
+          display: none;
+      }
+
       #status-overlay {
           position: fixed;
           top: 0;
@@ -68,7 +80,7 @@
       <div id="error-display" style="display: none;" class="error-text"></div>
     </div>
 
-    <div id="app" style="display: none;">
+    <div id="app" class="cheat-window-app">
       <v-app>
         <v-main>
           <cheat-modal v-model="activeComponentName" is-window></cheat-modal>
