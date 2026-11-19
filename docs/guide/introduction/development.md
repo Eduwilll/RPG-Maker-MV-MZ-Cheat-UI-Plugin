@@ -15,7 +15,7 @@ You will usually use both.
 
 ### Node and pnpm
 
-Needed for the documentation site and repo formatting tasks.
+Needed for the documentation site, the generated overlay bundle, and repo formatting tasks.
 
 ::: code-group
 ```sh [pnpm]
@@ -47,6 +47,7 @@ Phase 1 uses a lightweight TypeScript configuration for JavaScript projects:
 - `pnpm run typecheck` is the main verification step for this foundation.
 - `pnpm run check:mv-compat` scans the cheat runtime for newer syntax and array helpers that have caused older MV NW.js regressions before.
 - `pnpm run test:unit` runs the behavioral runtime tests (Node 22.14 or newer).
+- `pnpm run build:cheat` regenerates the committed overlay bundle from `cheat/init/setup.js` and writes its freshness manifest.
 - `pnpm run check:repo` runs unit tests, typecheck, MV compatibility scan, and docs build.
 
 ### Automated UI smoke tests
@@ -59,8 +60,9 @@ This launches an installed Chromium/Edge in an isolated headless profile and ser
 local fixtures over loopback. On other installations, set `CHEAT_TEST_BROWSER` to
 the browser executable. It exercises rendered Vue panels plus the real pop-out
 bootstrap in a separate browser realm, without changing any game installation or
-save. The temporary browser profile is removed when unlocked. A sandbox may require
-permission to launch the browser process.
+save. It also boots the committed `cheat/init/setup.bundle.js` in an iframe, so the
+file that actually ships is covered. The temporary browser profile is removed when
+unlocked. A sandbox may require permission to launch the browser process.
 
 These checks complement, but do not replace, manual MV/MZ NW.js testing, particularly
 for third-party battle systems, filesystem persistence, and game-specific options.
@@ -137,6 +139,8 @@ and Roboto files that ship with the plugin, so styling is exercised without a
 network dependency. The smoke checks also assert that no CDN assets are
 requested.
 
+The preview imports the source modules directly, so UI iteration does not need a bundle rebuild. The generated bundle is only used by the game bootstrap and by the shipped-artifact smoke check.
+
 ### Limitations of preview mode
 
 Preview mode is not a replacement for in-game testing.
@@ -171,6 +175,33 @@ Use this when you need to validate behavior inside an actual RPG Maker MV or MZ 
 ```
 :::
 
+### Bundle-only mode (test the shipped bundle)
+
+Default dev-sync **junctions** the source `cheat/` folder, so the game sees every source module plus `setup.bundle.js`. To test the game with only the generated bundle available, add `--bundle-only`:
+
+::: code-group
+```sh [.py]
+.venv\Scripts\python.exe deploy\dev.py --mv --bundle-only
+.venv\Scripts\python.exe deploy\dev.py --mz --bundle-only
+```
+:::
+
+In this mode the `cheat/` tree is **copied** instead of linked, keeping only `init/setup.bundle.js`, `init/import.js`, `init/customize_functions.js`, `window.html`, `js/window-init.js`, and the `libs/`/`css/` assets. All other source modules (`CheatModal.js`, `MainComponent.js`, `js/*.js`, `panels/*.js`, and `init/setup.js`) are excluded. The target still loads the separate vendored files the bundle imports (`cheat/libs/vue.js`, `cheat/libs/vuetify.js`, Vuetify CSS, the MDI subset and Roboto) plus `cheat/init/setup.bundle.js`; the difference is that the ~150 plugin **source modules** (`cheat/js/*.js`, `cheat/panels/*.js`, etc.) are no longer present, so the only plugin code the game can execute is the bundle. "Bundle-only" means no source modules, not a single file. The sync validates that `setup.bundle.js` is present. Because the target is a copy (not a live link), rebuild and re-sync after every runtime change:
+
+::: code-group
+```sh [pnpm]
+pnpm run build:cheat
+```
+:::
+
+Then re-run the same `--bundle-only` sync command. You can also validate an existing bundle-only target without changing it:
+
+::: code-group
+```sh [.py]
+.venv\Scripts\python.exe deploy\dev.py --mv --bundle-only --validate-only
+```
+:::
+
 ### Validate an existing dev-sync target
 
 Use this when you want to confirm that a game still has the expected cheat bootstrap files without rewriting the target.
@@ -194,8 +225,11 @@ Use this when you want to confirm that a game still has the expected cheat boots
 
 1. Run `deploy/dev.py` once for the target game.
 2. Edit files under `cheat-engine/www/cheat/`.
-3. Save changes.
-4. Press <kbd>F5</kbd> inside the game to reload.
+3. Run `pnpm run build:cheat` after runtime JavaScript changes.
+4. Save changes.
+5. Press <kbd>F5</kbd> inside the game to reload.
+
+Games load `cheat/init/setup.bundle.js`, not `setup.js`, so a source edit without the rebuild appears to do nothing. The unit suite fails when the committed bundle is stale.
 
 ## Where to make changes
 

@@ -28,14 +28,14 @@ The plugin does not run as a normal RPG Maker plugin entry in `plugins.js`. Inst
 - The injected templates live under `cheat-engine/www/_cheat_initialize/`.
 - There are separate templates for MV and MZ because the two engines boot differently.
 - Those templates load `cheat/init/import.js` before the standard RPG Maker scripts.
-- `cheat/init/import.js` creates the app root, injects CSS and libraries, and then loads `cheat/init/setup.js`.
-- `cheat/init/setup.js` mounts the Vue app and renders `MainComponent`.
+- `cheat/init/import.js` creates the app root, injects CSS and libraries, and then loads the prebuilt `cheat/init/setup.bundle.js`.
+- The bundle mounts the Vue app and renders `MainComponent`. It is generated from `cheat/init/setup.js` and its imports by `pnpm run build:cheat`.
 
 This is the reason installation requires replacing the game's original `main.js`.
 
 ## UI model
 
-The UI is written in plain JavaScript modules, not single-file Vue components.
+The UI sources are plain JavaScript modules, not single-file Vue components. The overlay entry is shipped as one generated bundle, so edit the source modules and rebuild; never edit `cheat/init/setup.bundle.js` directly.
 
 - `MainComponent.js` is the top-level controller.
 - `CheatModal.js` defines the left navigation tree and panel container.
@@ -198,6 +198,7 @@ The repo includes its own contributor tooling because testing inside a real game
 
 - `start-preview.py` serves the `preview/` directory for fast browser iteration.
 - `preview/` contains browser mocks so panels can render without a running game.
+- `pnpm run build:cheat` regenerates the committed overlay bundle and its manifest.
 - `deploy/dev.py` links the source tree into a test game and injects the right bootstrap files.
 - `deploy/main.py` creates the MV and MZ release archives.
 - GitHub Actions build docs and draft release artifacts.
@@ -207,7 +208,7 @@ The repo includes its own contributor tooling because testing inside a real game
 If you are new to the fork, learn these in order:
 
 1. The plugin replaces `main.js`; it is not a normal drop-in plugin script.
-2. The app is plain-module Vue 2 code rendered inside the game process.
+2. The app is plain-module Vue 2 source shipped as a prebuilt overlay bundle.
 3. Most behavior depends on direct interaction with RPG Maker globals.
 4. Translation is batch-first and cache-driven, not draw-time API translation.
 5. Safe contributions require testing both in preview mode and in a real MV or MZ game.

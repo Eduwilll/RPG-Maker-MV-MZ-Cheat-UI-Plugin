@@ -22,8 +22,70 @@ from core import GameTarget, GameType, ensure_mz_html_bootstraps
 
 EPHEMERAL_RUNTIME_DIRS = ['cheat-settings']
 
+# Bundle-only mode ships the generated overlay bundle plus everything it needs at
+# runtime that is not a source module: the bootstrap (import.js), the RPG Maker
+# customization hook (customize_functions.js), the pop-out (window.html +
+# js/window-init.js, still source-loaded in this phase), and the vendored libs,
+# CSS and fonts. Every other .js under cheat/ is a source module that the bundle
+# inlines, so it must not be copied into a bundle-only target.
+BUNDLE_ONLY_KEEP_TOPLEVEL = {'window.html'}
+BUNDLE_ONLY_KEEP_INIT = {'import.js', 'customize_functions.js', 'setup.bundle.js'}
+BUNDLE_ONLY_KEEP_DIRS = {'libs', 'css'}
+BUNDLE_ONLY_KEEP_JS_FILES = {'window-init.js'}
+
+
 def quote_cmd_arg(value):
     return '"' + value.replace('"', '\\"') + '"'
+
+
+def copy_bundle_only_tree(src, dest):
+    """Copy cheat/ into a bundle-only target.
+
+    Keeps the bootstrap (init/import.js), the customization hook
+    (init/customize_functions.js), the generated bundle (init/setup.bundle.js),
+    the source-loaded pop-out (window.html + js/window-init.js), and the vendored
+    libs/css/fonts. Every other .js is a source module inlined into the bundle,
+    so it is excluded; the game can only execute setup.bundle.js for plugin code.
+    """
+    copied = 0
+    for root, dirs, files in os.walk(src):
+        rel_root = os.path.relpath(root, src)
+        rel_root = "" if rel_root == "." else rel_root
+        parts = [] if rel_root == "" else rel_root.split(os.sep)
+
+        # Prune directories that are pure source modules or not needed at runtime.
+        if parts == []:
+            dirs[:] = [
+                d for d in dirs
+                if d in BUNDLE_ONLY_KEEP_DIRS or d in ("init", "js")
+            ]
+        elif parts == ["js"]:
+            dirs[:] = []  # only window-init.js is kept, directly under js/
+        else:
+            dirs[:] = [
+                d for d in dirs
+                if parts[0] in BUNDLE_ONLY_KEEP_DIRS
+            ]
+
+        for name in files:
+            if parts == ["init"]:
+                keep = name in BUNDLE_ONLY_KEEP_INIT
+            elif parts == ["js"]:
+                keep = name in BUNDLE_ONLY_KEEP_JS_FILES
+            elif parts == []:
+                keep = name in BUNDLE_ONLY_KEEP_TOPLEVEL
+            elif parts[0] in BUNDLE_ONLY_KEEP_DIRS:
+                keep = True
+            else:
+                keep = False
+            if not keep:
+                continue
+            dest_dir = os.path.join(dest, rel_root) if rel_root else dest
+            os.makedirs(dest_dir, exist_ok=True)
+            shutil.copy2(os.path.join(root, name), os.path.join(dest_dir, name))
+            copied += 1
+    print(f"  Copied {copied} bundle-only files to {dest}")
+
 
 class DevPaths:
     def __init__(self, game_path):
@@ -60,17 +122,22 @@ class DevPaths:
         self.target = CheatPaths(self.root)
 
 
-def validate_dev_sync_install(paths):
+def validate_dev_sync_install(paths, require_source_entry=True):
+    required = [
+        os.path.join('cheat', 'init', 'import.js'),
+        os.path.join('cheat', 'init', 'setup.bundle.js'),
+        os.path.join('js', 'main.js'),
+        'cheat-version-description.json',
+    ]
+    if require_source_entry:
+        # Default (junctioned) sync also exposes the source modules; bundle-only
+        # sync deliberately ships only the bundle, so these are optional there.
+        required.insert(1, os.path.join('cheat', 'init', 'setup.js'))
+        required.append(os.path.join('cheat', 'CheatModal.js'))
+        required.append(os.path.join('cheat', 'MainComponent.js'))
     validate_required_paths(
         paths.target.root_dir,
-        [
-            os.path.join('cheat', 'init', 'import.js'),
-            os.path.join('cheat', 'init', 'setup.js'),
-            os.path.join('cheat', 'CheatModal.js'),
-            os.path.join('cheat', 'MainComponent.js'),
-            os.path.join('js', 'main.js'),
-            'cheat-version-description.json',
-        ],
+        required,
         'Dev-sync target',
     )
 
@@ -173,7 +240,7 @@ def select_game_interactively(game_paths, type_name):
             print("\nSync cancelled.")
             return None
 
-def setup_dev_sync(game_path, version='vDEV-SYNC'):
+def setup_dev_sync(game_path, version='vDEV-SYNC', bundle_only=False):
     try:
         paths = DevPaths(game_path)
     except Exception as e:
@@ -182,6 +249,8 @@ def setup_dev_sync(game_path, version='vDEV-SYNC'):
 
     validate_source_layout(paths.source)
     print(f"Detected {paths.game_type.name} game at {paths.game_path}")
+    if bundle_only:
+        print("Bundle-only mode: overlay will load setup.bundle.js without setup.js")
 
     for runtime_dir in EPHEMERAL_RUNTIME_DIRS:
         target_runtime_path = os.path.join(paths.root, runtime_dir)
@@ -225,9 +294,10 @@ def setup_dev_sync(game_path, version='vDEV-SYNC'):
     # but we sync our cheat-specific js files.
     merge_directory(paths.source.get_js_source_path(), paths.target.get_js_source_path())
 
-    # 4. SYMLINK 'cheat' folder
-    # This is the "Magic": links your active dev folder to the game.
-    # Any UI change in panels/*.js is updated instantly!
+    # 4. Publish the 'cheat' folder
+    # Default is a junction so edits in cheat-engine/www/cheat/ appear instantly.
+    # Bundle-only mode copies a filtered tree instead, excluding the source
+    # overlay entry (setup.js), so the target can only load setup.bundle.js.
     cheat_src = paths.source.get_cheat_source_path()
     cheat_dst = paths.target.get_cheat_source_path()
     
@@ -245,29 +315,38 @@ def setup_dev_sync(game_path, version='vDEV-SYNC'):
             except OSError:
                 # If it's a real directory with files, use rmtree
                 shutil.rmtree(cheat_dst, ignore_errors=True)
-                 
-    print(f"Linking: {cheat_src} <===> {cheat_dst}")
-    
-    # Use Junctions on Windows (/J) as they don't require Admin privileges 
-    # in most local developer environments.
-    if os.name == 'nt':
-        command = f'mklink /J {quote_cmd_arg(cheat_dst)} {quote_cmd_arg(cheat_src)}'
-        subprocess.run(command, shell=True, check=True)
+
+    if bundle_only:
+        print(f"Copying (bundle-only): {cheat_src} -> {cheat_dst}")
+        copy_bundle_only_tree(cheat_src, cheat_dst)
     else:
-        os.symlink(cheat_src, cheat_dst, target_is_directory=True)
+        print(f"Linking: {cheat_src} <===> {cheat_dst}")
+
+        # Use Junctions on Windows (/J) as they don't require Admin privileges 
+        # in most local developer environments.
+        if os.name == 'nt':
+            command = f'mklink /J {quote_cmd_arg(cheat_dst)} {quote_cmd_arg(cheat_src)}'
+            subprocess.run(command, shell=True, check=True)
+        else:
+            os.symlink(cheat_src, cheat_dst, target_is_directory=True)
 
     # 5. Version file
     with open(os.path.join(paths.root, 'cheat-version-description.json'), 'w') as wf:
         json.dump({'version': version}, wf, indent=2)
 
-    validate_dev_sync_install(paths)
+    validate_dev_sync_install(paths, require_source_entry=not bundle_only)
         
     print("\n" + "="*40)
     print("[SUCCESS] Dev-Sync setup complete!")
     print("="*40)
-    print("1. Your UI source is now LINKED to the game.")
+    print("1. Your UI source is now LINKED to the game." if not bundle_only
+          else "1. Your UI source was COPIED to the game (bundle-only mode).")
     print("2. Simply EDIT your .js files in 'cheat-engine/www/cheat/'.")
-    print("3. Press [F5] in the game to see changes INSTANTLY.")
+    if bundle_only:
+        print("   Run 'pnpm run build:cheat' and dev-sync again after edits.")
+        print("   setup.js is not present; the game loads setup.bundle.js only.")
+    print("3. Press [F5] in the game to see changes INSTANTLY." if not bundle_only
+          else "3. Press [F5] in the game to reload the bundled UI.")
     print("="*40)
 
 if __name__ == '__main__':
@@ -277,6 +356,7 @@ if __name__ == '__main__':
     parser.add_argument('--mz', action='store_true', help='Target local MZ test game')
     parser.add_argument('--version', type=str, default='vDEV-SYNC', help='Version string to write to cheat-version-description.json')
     parser.add_argument('--validate-only', action='store_true', help='Validate an existing dev-sync target without changing files')
+    parser.add_argument('--bundle-only', action='store_true', help='Copy the cheat tree without the source setup.js entry, so the game loads only setup.bundle.js')
     args = parser.parse_args()
     
     # Auto-target common test paths if flags provided
@@ -299,10 +379,10 @@ if __name__ == '__main__':
             try:
                 paths = DevPaths(target)
                 validate_source_layout(paths.source)
-                validate_dev_sync_install(paths)
+                validate_dev_sync_install(paths, require_source_entry=not args.bundle_only)
                 print(f"Dev-sync validation passed for {paths.game_path}")
             except Exception as error:
                 print(f"Dev-sync validation failed: {error}")
         else:
-            setup_dev_sync(target, args.version)
+            setup_dev_sync(target, args.version, bundle_only=args.bundle_only)
 

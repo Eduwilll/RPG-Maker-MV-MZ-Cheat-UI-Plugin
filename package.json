@@ -10,6 +10,7 @@
     "test:unit": "node tools/test-unit.mjs",
     "test:browser": "node tools/test-browser.mjs",
     "test:preview": "node tools/test-browser.mjs --preview",
+    "build:cheat": "node tools/vendor/build-bundles.mjs",
     "check:mv-compat": "node tools/check-mv-compat.mjs",
     "check:repo": "pnpm run test:unit && pnpm run typecheck && pnpm run check:mv-compat && pnpm run docs:build",
     "format": "prettier . --write",

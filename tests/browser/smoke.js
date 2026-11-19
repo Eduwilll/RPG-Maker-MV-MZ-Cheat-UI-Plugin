@@ -1467,6 +1467,63 @@ async function run() {
   );
   popupRoot.$destroy();
   frame.remove();
+
+  // Boot the committed artifact exactly where it ships. The preview and main
+  // smoke app import sources, so this is the only check that exercises
+  // setup.bundle.js itself.
+  const bundleFrame = document.createElement("iframe");
+  bundleFrame.setAttribute("aria-hidden", "true");
+  bundleFrame.style.cssText =
+    "position:absolute;left:-10000px;width:800px;height:500px;border:0;";
+  bundleFrame.src = "./overlay-bundle.html";
+  document.body.appendChild(bundleFrame);
+  await new Promise((resolve) => {
+    bundleFrame.onload = resolve;
+  });
+  const bundleWindow = bundleFrame.contentWindow;
+  let bundleStarted = false;
+  for (let n = 0; n < 150; n++) {
+    await tick();
+    if (bundleWindow.__cheatStarted) {
+      bundleStarted = true;
+      break;
+    }
+  }
+  assert(
+    bundleStarted,
+    "Shipped setup.bundle.js boots the overlay" +
+      (bundleStarted
+        ? ""
+        : ": " +
+          JSON.stringify(bundleWindow.__cheatBoot) +
+          " / " +
+          (bundleWindow.__bundleErrors || []).join("; ")),
+  );
+  const bundleErrors = bundleWindow.__bundleErrors || [];
+  assert(
+    bundleErrors.length === 0 &&
+      !(bundleWindow.__cheatBoot && bundleWindow.__cheatBoot.error),
+    "Shipped overlay bundle reports no boot errors: " +
+      bundleErrors.join("; ") +
+      " " +
+      ((bundleWindow.__cheatBoot && bundleWindow.__cheatBoot.error) || ""),
+  );
+  assert(
+    !!bundleFrame.contentDocument.querySelector(".v-application") &&
+      !!bundleFrame.contentDocument.querySelector(".v-application .v-main"),
+    "Shipped overlay bundle renders the Vuetify shell",
+  );
+  const bundleScripts = bundleWindow.performance
+    .getEntriesByType("resource")
+    .map((entry) => entry.name)
+    .filter((name) => /\.js(\?|$)/.test(name));
+  assert(
+    bundleScripts.some((name) =>
+      name.endsWith("/cheat/init/setup.bundle.js"),
+    ) && !bundleScripts.some((name) => /\/cheat\/js\/[^/]+\.js$/.test(name)),
+    "Overlay smoke loads the bundle instead of source modules",
+  );
+  bundleFrame.remove();
   assert(
     errors.length === 0,
     "All mounted Vue templates render without errors: " + errors.join("; "),

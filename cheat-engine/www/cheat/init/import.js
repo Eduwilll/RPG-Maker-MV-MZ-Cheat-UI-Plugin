@@ -300,8 +300,9 @@ function applyCheat() {
     '<link href="cheat/css/main.css" rel="stylesheet">';
 
   // import in body
-  // __loadJavaScript('cheat/init/setup.js')
-  __addScript("module", "cheat/init/setup.js");
+  // setup.js is bundled by pnpm run build:cheat; the committed bundle keeps
+  // startup to one script instead of ~150 native module requests.
+  __addScript("module", "cheat/init/setup.bundle.js");
 }
 
 function hasCheatBootstrapped() {

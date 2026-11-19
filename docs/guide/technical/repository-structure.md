@@ -11,6 +11,7 @@ This page maps the main folders in the repo and explains what each one is respon
 | `preview/` | Browser preview shell and RPG Maker mocks for faster UI iteration |
 | `docs/` | VitePress documentation site |
 | `tests/` | Local test game folders used by the dev-sync workflow |
+| `tools/vendor/` | Vendored asset generators and the overlay bundle build |
 | `dummy-translator/` | Minimal translator helper artifacts for local experimentation |
 | `.github/workflows/` | CI for release archives and docs deployment |
 
@@ -32,7 +33,7 @@ Most contributor work happens under `cheat-engine/www/`.
 | `cheat-engine/www/cheat/js/runtime/` | Home of shared runtime and MV/MZ environment helpers |
 | `cheat-engine/www/cheat/js/storage/` | Home of shared persistence helpers |
 | `cheat-engine/www/cheat/js/ui/` | Small UI-facing services that bridge components and panel actions |
-| `cheat-engine/www/cheat/init/` | App bootstrapping and RPG Maker customization hooks |
+| `cheat-engine/www/cheat/init/` | App bootstrapping, the generated `setup.bundle.js`, its manifest, and RPG Maker customization hooks |
 | `cheat-engine/www/cheat/components/` | Shared Vue UI components such as dialogs and snackbars |
 | `cheat-engine/www/cheat/libs/` | Vendored production libraries (Vue, Vuetify, axios), Vuetify CSS, MDI icon subset and Roboto fonts |
 | `cheat-engine/www/_cheat_initialize/` | Engine-specific bootstrap templates merged into release packages |
@@ -75,6 +76,7 @@ Most contributor work happens under `cheat-engine/www/`.
 | `cheat-engine/www/cheat/js/translation/in-game/InGameTranslator.js` | Change how cached translations are applied at runtime |
 | `cheat-engine/www/cheat/js/CheatHelper.js` | Thin compatibility barrel that re-exports split cheat helper modules |
 | `cheat-engine/www/cheat/init/customize_functions.js` | Patch RPG Maker behavior or initialize runtime hooks |
+| `cheat-engine/www/cheat/init/setup.js` | Change overlay bootstrapping, then run `pnpm run build:cheat` |
 | `cheat-engine/www/cheat/css/main.css` | Style the in-game overlay |
 
 ## Packaging and installation files
@@ -82,6 +84,7 @@ Most contributor work happens under `cheat-engine/www/`.
 The packaging flow works by starting from `cheat-engine/www/` and then merging engine-specific files from `_cheat_initialize/`.
 
 - `deploy/main.py` builds one archive for MV and one for MZ.
+- Packaging requires the committed `cheat/init/setup.bundle.js`; run `pnpm run build:cheat` after runtime changes.
 - The release artifacts are written to `output/`.
 - The installer instructions in the docs mirror that package structure.
 
@@ -109,7 +112,7 @@ This mode is useful for layout and interaction work, but it is not enough for va
 | --- | --- |
 | `.github/workflows/release.yml` | Builds MV and MZ archives when a `v*` tag is pushed and opens a draft release |
 | `.github/workflows/deploy-docs.yml` | Builds and deploys the VitePress site to GitHub Pages |
-| `package.json` | VitePress and formatting scripts |
+| `package.json` | VitePress, overlay bundle, and formatting scripts |
 
 ## How to navigate the repo quickly
 

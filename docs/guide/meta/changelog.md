@@ -4,6 +4,8 @@
 
 ### Performance & Offline
 
+- [Feat] **Bundled Overlay Startup**: The overlay entry now ships as `cheat/init/setup.bundle.js`, replacing roughly 150 source-module requests with one minified script for the plugin code itself. Vue, Vuetify, CSS and fonts remain separate cached files, and `pnpm run build:cheat` regenerates the bundle from the editable source modules.
+- [Feat] **Stale-Bundle Guard**: A committed manifest records the bundle and source hashes, so `pnpm run test:unit` fails when runtime code changed without rebuilding the shipped overlay.
 - [Feat] **Vendored Production Libraries**: Vue 2.6.14 and Vuetify 2.6.3 now ship as minified production builds instead of development builds, removing about 1.4 MB of JavaScript and the development-mode startup warnings.
 - [Feat] **Offline Skins and Fonts**: Vuetify CSS, Material Design Icons and Roboto are bundled under `cheat/libs` and loaded locally, so the cheat UI no longer depends on Google Fonts or jsDelivr.
 - [Feat] **Icon Subset**: The MDI stylesheet and font are generated from the icons the UI actually uses (134 icons), shrinking roughly 700 KB of icon assets to about 16 KB.

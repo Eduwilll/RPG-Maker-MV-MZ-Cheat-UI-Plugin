@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Shipped overlay bundle smoke</title>
+  </head>
+  <body>
+    <!-- Mirrors the overlay contract in cheat/init/import.js: the game page
+         provides RPG Maker globals and an #app root, then the module bundle
+         loads Vue/Vuetify itself. -->
+    <script src="/preview/rpg-mocks.js"></script>
+    <script src="/cheat-engine/www/cheat/libs/axios.min.js"></script>
+    <script type="module">
+      import { installBrowserFixture } from "/preview/feature-mocks.js";
+
+      installBrowserFixture(window);
+      window.__bundleErrors = [];
+      window.__cheatBoot = {
+        phase: "bundle-smoke",
+        started: false,
+        warned: false,
+        error: null,
+      };
+      window.addEventListener("error", function (event) {
+        if (event.message) window.__bundleErrors.push(event.message);
+      });
+      window.addEventListener("unhandledrejection", function (event) {
+        window.__bundleErrors.push(String(event.reason));
+      });
+    </script>
+
+    <div id="app">
+      <v-app app dark style="background-color: black">
+        <v-main dark><main-component></main-component></v-main>
+      </v-app>
+    </div>
+
+    <script
+      type="module"
+      src="/cheat-engine/www/cheat/init/setup.bundle.js"
+    ></script>
+  </body>
+</html>

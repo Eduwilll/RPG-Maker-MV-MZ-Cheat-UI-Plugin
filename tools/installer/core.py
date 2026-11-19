@@ -94,6 +94,7 @@ def validate_source_root(source_root):
     required_paths = [
         os.path.join("cheat", "init", "import.js"),
         os.path.join("cheat", "init", "setup.js"),
+        os.path.join("cheat", "init", "setup.bundle.js"),
         os.path.join("cheat", "CheatModal.js"),
         os.path.join("cheat", "MainComponent.js"),
         os.path.join("cheat", "js", "window-init.js"),
@@ -109,6 +110,7 @@ def validate_installed_layout(target):
         [
             os.path.join("cheat", "init", "import.js"),
             os.path.join("cheat", "init", "setup.js"),
+            os.path.join("cheat", "init", "setup.bundle.js"),
             os.path.join("cheat", "CheatModal.js"),
             os.path.join("cheat", "MainComponent.js"),
             os.path.join("js", "main.js"),

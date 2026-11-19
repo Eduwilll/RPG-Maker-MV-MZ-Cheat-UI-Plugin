@@ -72,8 +72,9 @@ pnpm run docs:dev
 
 This repo intentionally stays close to its runtime constraints:
 
-- plain JavaScript modules
-- Vue 2 and Vuetify 2 without a bundler for the game runtime
+- plain JavaScript source modules
+- Vue 2 and Vuetify 2 kept as separate vendored scripts
+- one generated overlay bundle (`pnpm run build:cheat`) committed for startup speed; never edit it by hand
 - minimal complexity in boot and packaging code
 
 Follow existing patterns unless there is a strong reason to refactor. When you do refactor, document the reasoning.
@@ -83,6 +84,7 @@ Follow existing patterns unless there is a strong reason to refactor. When you d
 - Be careful when patching RPG Maker engine methods.
 - Do not store live RPG Maker objects directly in Vue reactive state when they may be serialized by saves.
 - Test MV and MZ assumptions when touching paths or bootstrap files.
+- Run `pnpm run build:cheat` after editing runtime JavaScript; the committed bundle is what games load.
 - Treat translation as a cache-first system, not a draw-time network system.
 - Keep installation docs aligned with the actual release archive layout.
 

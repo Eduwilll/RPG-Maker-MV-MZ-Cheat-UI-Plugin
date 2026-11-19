@@ -8,8 +8,8 @@ When the plugin is installed into a game, the startup path is:
 
 1. The game launches the injected `main.js`.
 2. That file loads `cheat/init/import.js` before the standard engine scripts.
-3. `import.js` creates the app root, injects CSS and libraries, and loads `cheat/init/setup.js`.
-4. `setup.js` mounts the Vue app and renders `MainComponent`.
+3. `import.js` creates the app root, injects CSS and libraries, and loads the prebuilt `cheat/init/setup.bundle.js`.
+4. That bundle mounts the Vue app and renders `MainComponent`. It is generated from `setup.js` and its imports by `pnpm run build:cheat`.
 5. `MainComponent` initializes RPG Maker customizations, registers keyboard listeners, and exposes helper actions.
 6. `CheatModal` renders the active panel tree.
 
@@ -22,7 +22,7 @@ The top-level UI is intentionally simple:
 - Each panel is a plain JavaScript Vue component.
 - Shared dialogs and snackbars are mounted once at the top level.
 
-This structure keeps the app small enough to run directly inside the game without a bundling pipeline.
+This structure keeps the UI source small and module-based. The overlay entry is shipped as one prebuilt file so the game does not resolve roughly 150 separate module requests at startup; the source modules remain the unit contributors edit.
 
 ## Shortcut flow
 

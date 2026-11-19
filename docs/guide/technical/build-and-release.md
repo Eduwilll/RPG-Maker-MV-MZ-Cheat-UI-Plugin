@@ -16,6 +16,33 @@ pnpm run docs:build
 
 The built site is emitted under `docs/.vitepress/dist`.
 
+## Runtime bundle
+
+The overlay entry ships as a generated file:
+
+- Source: `cheat-engine/www/cheat/init/setup.js` and the modules it imports.
+- Output: `cheat-engine/www/cheat/init/setup.bundle.js`.
+- Manifest: `cheat-engine/www/cheat/init/bundle-manifest.json`.
+
+Regenerate both with:
+
+::: code-group
+```sh [pnpm]
+pnpm run build:cheat
+```
+:::
+
+The bundle is committed because installing and packaging must not require Node. Run the build after any runtime JavaScript change, then commit the bundle and manifest together with the source edit.
+
+The build uses Vite in library mode with these deliberate constraints:
+
+- `target: "chrome61"` matches the oldest NW.js version MV supports.
+- Vue and Vuetify stay external relative imports, so they keep their own files and caching.
+- `fs`, `path` and `nw.gui` stay external runtime `require()` calls. Without that, Vite would replace them with empty browser shims and break NW.js persistence.
+- The pop-out window (`js/window-init.js`) is not bundled in this phase; it keeps its intentional dynamic imports and load ordering.
+
+`pnpm run test:unit` fails when the manifest does not match the current sources or the committed artifact. `pnpm run test:browser` boots the shipped bundle in an iframe in addition to testing the source modules, so the artifact that actually installs is exercised.
+
 ## Local release packaging
 
 Release archives are created with the Python script in `deploy/main.py`.
@@ -42,6 +69,8 @@ The release script:
 5. Creates compressed archives for both engines.
 
 The important architectural consequence is that the repo stores shared runtime code once, then merges engine-specific bootstrap files during packaging.
+
+Packaging consumes the committed `setup.bundle.js`; it does not rebuild it. Run `pnpm run build:cheat` before packaging whenever runtime JavaScript changed.
 
 ## Release automation
 
@@ -75,6 +104,7 @@ On pushes to `main`, the workflow:
 ## Maintainer checklist before publishing
 
 - Confirm the docs still build.
+- Rebuild the overlay bundle (`pnpm run build:cheat`) and confirm its manifest is current.
 - Confirm MV and MZ packaging still complete successfully.
 - Confirm installation docs still match the archive layout.
 - Test at least one real game if the release changes bootstrap or engine patching.

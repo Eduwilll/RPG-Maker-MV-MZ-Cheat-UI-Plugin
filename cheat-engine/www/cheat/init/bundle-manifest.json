@@ -1,0 +1,8 @@
+{
+  "generatedBy": "tools/vendor/build-bundles.mjs",
+  "vite": "8.1.6",
+  "sourcesHash": "4f1a9e280893925000166b4d01de8d60638a3a070e3e0e16337f997d43f9da39",
+  "bundles": {
+    "cheat-engine/www/cheat/init/setup.bundle.js": "5ee62652293e91e58b71ac5a000c1335b39a4dc79467715e0568cd1d9f2cba43"
+  }
+}

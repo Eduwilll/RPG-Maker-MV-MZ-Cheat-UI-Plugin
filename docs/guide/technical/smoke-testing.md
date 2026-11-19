@@ -14,11 +14,14 @@ pnpm run check:repo
 
 That currently runs:
 
+- `pnpm run test:unit`, including a check that the committed overlay bundle matches its sources
 - `pnpm run typecheck`
 - `pnpm run check:mv-compat`
 - `pnpm run docs:build`
 
 Use this after changes to shared helpers, bootstrap files, translation code, or panel conventions.
+
+If the unit suite reports that the bundle is stale, run `pnpm run build:cheat` and commit the regenerated `setup.bundle.js` with its manifest.
 
 ## Runtime smoke checklist
 
@@ -59,6 +62,7 @@ Check:
 
 Run:
 
+- `pnpm run build:cheat`
 - `pnpm run check:repo`
 - MV smoke check
 - MZ boot and overlay open check

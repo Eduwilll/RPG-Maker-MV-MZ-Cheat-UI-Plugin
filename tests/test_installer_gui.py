@@ -24,7 +24,7 @@ class InstallerWindowTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.source = self.root / "source"
-        for name in ["cheat/init/import.js", "cheat/init/setup.js", "cheat/CheatModal.js", "cheat/MainComponent.js", "cheat/js/window-init.js", "_cheat_initialize/mv/js/main.js", "_cheat_initialize/mz/js/main.js"]:
+        for name in ["cheat/init/import.js", "cheat/init/setup.js", "cheat/init/setup.bundle.js", "cheat/CheatModal.js", "cheat/MainComponent.js", "cheat/js/window-init.js", "_cheat_initialize/mv/js/main.js", "_cheat_initialize/mz/js/main.js"]:
             path = self.source / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text("// cheat/init/import.js")

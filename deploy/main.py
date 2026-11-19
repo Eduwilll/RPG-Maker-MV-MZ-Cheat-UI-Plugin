@@ -78,6 +78,7 @@ def validate_source_layout(paths):
         [
             os.path.join('cheat', 'init', 'import.js'),
             os.path.join('cheat', 'init', 'setup.js'),
+            os.path.join('cheat', 'init', 'setup.bundle.js'),
             os.path.join('cheat', 'CheatModal.js'),
             os.path.join('cheat', 'MainComponent.js'),
             os.path.join('cheat', 'js', 'window-init.js'),
@@ -94,6 +95,7 @@ def validate_packaged_layout(paths):
         [
             os.path.join('cheat', 'init', 'import.js'),
             os.path.join('cheat', 'init', 'setup.js'),
+            os.path.join('cheat', 'init', 'setup.bundle.js'),
             os.path.join('cheat', 'CheatModal.js'),
             os.path.join('cheat', 'MainComponent.js'),
             os.path.join('js', 'main.js'),

@@ -24,6 +24,7 @@
     "docs/.vitepress/dist",
     "output",
     "tmp",
-    ".venv"
+    ".venv",
+    "**/*.bundle.js"
   ]
 }
