@@ -43,6 +43,22 @@ The build uses Vite in library mode with these deliberate constraints:
 - `fs`, `path` and `nw.gui` stay external runtime `require()` calls. Without that, Vite would replace them with empty browser shims and break NW.js persistence.
 - The pop-out keeps its intentional load ordering: it imports the UI only after it bridged the game globals. Its `import()` calls are inlined into a single file (`codeSplitting: false`), and no module touches RPG Maker globals at evaluation time, so eager evaluation is safe. A leftover dynamic import would point at a source module that bundle-only installs omit.
 
+### Bootstrap seams
+
+The three startup files stay separate, because each runs in a different
+context, but the parts that need testing no longer live inside them:
+
+| Module | Owns | Called by |
+| --- | --- | --- |
+| `js/runtime/RpgMakerGlobals.js` | the 60-name global list and `bridgeGlobals(window, opener)` | `window-init.js` |
+| `js/runtime/CheatVersion.js` | version file path, `readCheatVersion`, numeric `compareVersions` | `MainComponent.checkVersion()` |
+| `js/ui/CheatApp.js` | `createCheatApp({ Vue, Vuetify, components, options })` | both `setup.js` and `window-init.js` |
+
+`import.js` deliberately stays a classic script: it must run before any ES
+module exists, so its watchdog and DOM injection are unchanged. `CheatApp` is
+also the composition root for any future `provide`, which is why the popup and
+overlay can no longer drift apart on their theme shell.
+
 `pnpm run test:unit` fails when the manifest does not match the current sources or the committed artifacts. `pnpm run test:browser` boots both shipped bundles, so the artifacts that actually install are exercised.
 
 ## Local release packaging

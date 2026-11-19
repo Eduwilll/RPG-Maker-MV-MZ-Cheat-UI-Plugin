@@ -7,7 +7,7 @@ import "../libs/vue.js";
 import "../libs/vuetify.js";
 
 import { initializeCheatDiagnostics } from "../js/runtime/CheatDiagnostics.js";
-import { createVuetifyTheme } from "../js/ui/CheatTheme.js";
+import { createCheatApp } from "../js/ui/CheatApp.js";
 import MainComponent from "../MainComponent.js";
 
 function markCheatStarted() {
@@ -67,8 +67,9 @@ initializeCheatDiagnostics("overlay");
 // Saved Appearance settings win when present; fresh installs fall back to dark.
 // initialize vue
 try {
-  new Vue({
-    vuetify: new Vuetify({ theme: createVuetifyTheme() }),
+  createCheatApp({
+    Vue,
+    Vuetify,
     components: { MainComponent },
   }).$mount("#app");
   markCheatStarted();

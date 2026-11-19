@@ -1152,6 +1152,14 @@ async function run() {
       popupSourceModules.join(", "),
   );
   const popupApp = frame.contentDocument.querySelector(".v-application");
+  const popupWindow = frame.contentWindow;
+  // The bundle replaced the inline bridgeGlobal() with RpgMakerGlobals.js, so
+  // the pop-out realm must still see the game window's live globals.
+  assert(
+    popupWindow.$gameParty === popupWindow.__cheatOpener.$gameParty &&
+      popupWindow.SceneManager === popupWindow.__cheatOpener.SceneManager,
+    "Pop-out realm exposes the game window's live globals",
+  );
   assert(
     popupApp.getAttribute("data-cheat-theme") === "legacy" &&
       popupRoot.$vuetify.theme.themes.dark.accent === "#FF4081",

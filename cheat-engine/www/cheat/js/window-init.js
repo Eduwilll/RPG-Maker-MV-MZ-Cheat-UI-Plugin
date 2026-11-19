@@ -4,6 +4,8 @@
  */
 
 import { initializeCheatDiagnostics } from "./runtime/CheatDiagnostics.js";
+import { bridgeGlobals } from "./runtime/RpgMakerGlobals.js";
+import { createCheatApp } from "./ui/CheatApp.js";
 
 // Error logging helper
 function showError(msg, err) {
@@ -42,70 +44,7 @@ async function init() {
   // --- 1. Proxy RPG Maker Globals IMMEDIATELY ---
   // We do this before importing anything because the imports might
   // try to access these globals during evaluation.
-  const globals = [
-    "$gameParty",
-    "$gamePlayer",
-    "$gameSystem",
-    "$gameVariables",
-    "$gameSwitches",
-    "$gameSelfSwitches",
-    "$gameTemp",
-    "$gameActors",
-    "$gameMap",
-    "$gameTroop",
-    "$gameMessage",
-    "$gameTimer",
-    "$gameEnemies",
-    "$gameData",
-    "SceneManager",
-    "DataManager",
-    "Utils",
-    "ImageManager",
-    "SoundManager",
-    "TextManager",
-    "Graphics",
-    "Input",
-    "TouchInput",
-    "Game_Actor",
-    "Game_Enemy",
-    "Game_Message",
-    "Game_Party",
-    "Game_Variables",
-    "Game_Switches",
-    "Game_Timer",
-    "Sprite_Enemy",
-    "ConfigManager",
-    "Window_Options",
-    "Rectangle",
-    "Scene_Base",
-    "Scene_Map",
-    "Scene_Battle",
-    "Scene_Title",
-    "Scene_Save",
-    "Scene_Load",
-    "Scene_Debug",
-    "BattleManager",
-    // Database
-    "$dataActors",
-    "$dataClasses",
-    "$dataSkills",
-    "$dataItems",
-    "$dataWeapons",
-    "$dataArmors",
-    "$dataEnemies",
-    "$dataTroops",
-    "$dataStates",
-    "$dataAnimations",
-    "$dataTilesets",
-    "$dataCommonEvents",
-    "$dataSystem",
-    "$dataMapInfos",
-    "$dataMap",
-  ];
-
-  globals.forEach((g) => {
-    bridgeGlobal(opener, g);
-  });
+  bridgeGlobals(window, opener);
 
   // Start file logging only once Utils is bridged: diagnostics resolve
   // cheat-settings/ from RPGMAKER_NAME, and running earlier created a stray
@@ -139,38 +78,40 @@ async function init() {
       .default;
     const { GLOBAL_SHORTCUT } = await import("./shortcuts/GlobalShortcut.js");
     const { handleFeatureShortcut } = await import("./ui/FeatureShortcuts.js");
-    const { createVuetifyTheme } = await import("./ui/CheatTheme.js");
 
     status.textContent = "Mounting UI...";
 
     // --- 3. Setup Vue App ---
-    new Vue({
-      el: "#app",
-      vuetify: new Vuetify({ theme: createVuetifyTheme() }),
+    createCheatApp({
+      Vue,
+      Vuetify,
       components: {
         CheatModal,
         AlertSnackbar,
         ConfirmDialog,
       },
-      data: {
-        activeComponentName: null,
-      },
-      mounted() {
-        this._onFeatureKey = (event) =>
-          handleFeatureShortcut(event, GLOBAL_SHORTCUT, {
-            openFeatureFinder: () =>
-              window.dispatchEvent(new CustomEvent("cheat-open-finder")),
-            openMessageLog: () => {
-              this.activeComponentName = "message-log-panel";
-            },
-          });
-        window.addEventListener("keydown", this._onFeatureKey, true);
-        // Success! Hide the overlay
-        document.getElementById("status-overlay").style.display = "none";
-        document.getElementById("app").style.display = "block";
-      },
-      beforeDestroy() {
-        window.removeEventListener("keydown", this._onFeatureKey, true);
+      options: {
+        el: "#app",
+        data: {
+          activeComponentName: null,
+        },
+        mounted() {
+          this._onFeatureKey = (event) =>
+            handleFeatureShortcut(event, GLOBAL_SHORTCUT, {
+              openFeatureFinder: () =>
+                window.dispatchEvent(new CustomEvent("cheat-open-finder")),
+              openMessageLog: () => {
+                this.activeComponentName = "message-log-panel";
+              },
+            });
+          window.addEventListener("keydown", this._onFeatureKey, true);
+          // Success! Hide the overlay
+          document.getElementById("status-overlay").style.display = "none";
+          document.getElementById("app").style.display = "block";
+        },
+        beforeDestroy() {
+          window.removeEventListener("keydown", this._onFeatureKey, true);
+        },
       },
     });
   } catch (err) {
@@ -190,30 +131,3 @@ async function init() {
 init().catch((err) => {
   console.error("Critical Init Error:", err);
 });
-
-/**
- * Keep separate-window game globals live instead of copying a snapshot.
- * RPG Maker replaces values like $dataMap during map loads/transfers, and the
- * Watch panel needs the current game-window objects to detect nearby refs.
- *
- * @param {Window} opener
- * @param {string} name
- */
-function bridgeGlobal(opener, name) {
-  try {
-    Object.defineProperty(window, name, {
-      configurable: true,
-      enumerable: true,
-      get() {
-        return opener[name];
-      },
-      set(value) {
-        opener[name] = value;
-      },
-    });
-  } catch (error) {
-    if (opener[name]) {
-      window[name] = opener[name];
-    }
-  }
-}

@@ -9,6 +9,10 @@ import { customizeRPGMakerFunctions } from "./init/customize_functions.js";
 import { Key } from "./js/shortcuts/KeyCodes.js";
 import { Alert } from "./js/AlertHelper.js";
 import { CHEAT_DIAGNOSTICS } from "./js/runtime/CheatDiagnostics.js";
+import {
+  compareVersions,
+  readCheatVersion,
+} from "./js/runtime/CheatVersion.js";
 import { handleFeatureShortcut } from "./js/ui/FeatureShortcuts.js";
 import {
   readNumberSetting,
@@ -300,14 +304,15 @@ export default {
         ).data;
 
         const currentCheatVersion = this.getCurrentCheatVersion();
+        const latestCheatVersion = releaseInfo && releaseInfo.tag_name;
 
-        if (!currentCheatVersion) {
+        if (!currentCheatVersion || !latestCheatVersion) {
           return;
         }
 
-        if (currentCheatVersion < releaseInfo.tag_name) {
+        if (compareVersions(currentCheatVersion, latestCheatVersion) < 0) {
           Alert.warn(
-            `New cheat version has been released : ${currentCheatVersion} → ${releaseInfo.tag_name}`,
+            `New cheat version has been released : ${currentCheatVersion} → ${latestCheatVersion}`,
             null,
             3000,
           );
@@ -317,16 +322,10 @@ export default {
 
     getCurrentCheatVersion() {
       try {
-        const targetDir = Utils.RPGMAKER_NAME === "MV" ? "www" : ".";
-
-        const description = JSON.parse(
-          require("fs").readFileSync(
-            targetDir + "/cheat-version-description.json",
-            "utf-8",
-          ),
-        );
-
-        return description.version;
+        return readCheatVersion({
+          fileSystem: require("fs"),
+          rpgMakerName: Utils.RPGMAKER_NAME,
+        });
       } catch (err) {
         return null;
       }

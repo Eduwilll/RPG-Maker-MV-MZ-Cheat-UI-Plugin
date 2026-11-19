@@ -31,6 +31,8 @@ The plugin does not run as a normal RPG Maker plugin entry in `plugins.js`. Inst
 - `cheat/init/import.js` creates the app root, injects CSS and libraries, and then loads the prebuilt `cheat/init/setup.bundle.js`.
 - The bundle mounts the Vue app and renders `MainComponent`. It is generated from `cheat/init/setup.js` and its imports by `pnpm run build:cheat`.
 - The separate cheat window follows the same rule: `window.html` loads the generated `js/window-init.bundle.js`, which is built from `js/window-init.js`.
+- Both surfaces build their Vue root through `js/ui/CheatApp.js`, so the Vuetify theme shell is shared instead of duplicated.
+- `js/runtime/RpgMakerGlobals.js` owns the pop-out's global list and the live `Object.defineProperty` bridge; `js/runtime/CheatVersion.js` owns the packaged-version read and its numeric comparison.
 
 This is the reason installation requires replacing the game's original `main.js`.
 

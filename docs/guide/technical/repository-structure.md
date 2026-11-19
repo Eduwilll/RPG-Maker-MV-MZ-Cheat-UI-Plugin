@@ -30,9 +30,9 @@ Most contributor work happens under `cheat-engine/www/`.
 | `cheat-engine/www/cheat/js/translation/` | Home of the translation subsystem implementation files |
 | `cheat-engine/www/cheat/js/translation/in-game/` | Runtime cache-application helpers used after bulk translation completes |
 | `cheat-engine/www/cheat/js/shortcuts/` | Home of the shortcut subsystem implementation files |
-| `cheat-engine/www/cheat/js/runtime/` | Home of shared runtime and MV/MZ environment helpers |
+| `cheat-engine/www/cheat/js/runtime/` | Shared runtime and MV/MZ environment helpers, plus the bootstrap seams (`RpgMakerGlobals.js`, `CheatVersion.js`) |
 | `cheat-engine/www/cheat/js/storage/` | Home of shared persistence helpers |
-| `cheat-engine/www/cheat/js/ui/` | Small UI-facing services that bridge components and panel actions |
+| `cheat-engine/www/cheat/js/ui/` | Small UI-facing services that bridge components and panel actions, plus the shared `CheatApp.js` Vue root |
 | `cheat-engine/www/cheat/init/` | App bootstrapping, the generated `setup.bundle.js` and `bundle-manifest.json`, and RPG Maker customization hooks |
 | `cheat-engine/www/cheat/components/` | Shared Vue UI components such as dialogs and snackbars |
 | `cheat-engine/www/cheat/libs/` | Vendored production libraries (Vue, Vuetify, axios), Vuetify CSS, MDI icon subset and Roboto fonts |

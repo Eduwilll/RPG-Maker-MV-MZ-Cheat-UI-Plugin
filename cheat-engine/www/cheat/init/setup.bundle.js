@@ -460,7 +460,23 @@ var _e = S([
 		text: "Slate",
 		value: "#94A3B8"
 	}
-]), T = class {
+]);
+//#endregion
+//#region cheat-engine/www/cheat/js/ui/CheatApp.js
+function ve(e) {
+	let t = e.Vue, n = e.Vuetify, r = e.components || {}, i = e.options || {};
+	return new t({
+		...i,
+		vuetify: new n({ theme: ge() }),
+		components: {
+			...r,
+			...i.components || {}
+		}
+	});
+}
+//#endregion
+//#region cheat-engine/www/cheat/js/AlertHelper.js
+var T = class {
 	static alertInternal(e, t, n = null, r = 1500) {
 		let i = e === "success" ? "info" : e, a = n ? t + " | cause=" + n : t;
 		f.record(i, "alert", a), alert(n ? `[cheat plugin ${e}] ${t}\n\n[cause] ${n}` : `[cheat plugin ${e}] ${t}`);
@@ -480,7 +496,7 @@ var _e = S([
 };
 //#endregion
 //#region cheat-engine/www/cheat/js/cheats/movement/MovementCheat.js
-function ve() {
+function ye() {
 	return {
 		getPlayer: () => $gamePlayer,
 		getTouchInput: () => TouchInput,
@@ -490,8 +506,8 @@ function ve() {
 		getAlert: () => T
 	};
 }
-function ye(e = {}) {
-	let t = Object.assign(ve(), e), n = !1, r = !1, i = null, a = null;
+function be(e = {}) {
+	let t = Object.assign(ye(), e), n = !1, r = !1, i = null, a = null;
 	function o(e, n) {
 		let r = t.getAlert();
 		r && typeof r[e] == "function" && r[e](n);
@@ -607,11 +623,11 @@ function ye(e = {}) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/cheats/actors/GodModeCheat.js
-function be() {
+function xe() {
 	return { getGameActor: () => Game_Actor };
 }
-function xe(e = {}) {
-	let t = Object.assign(be(), e), n = /* @__PURE__ */ new WeakMap(), r = [];
+function Se(e = {}) {
+	let t = Object.assign(xe(), e), n = /* @__PURE__ */ new WeakMap(), r = [];
 	function i() {
 		return {
 			godMode: !1,
@@ -681,7 +697,7 @@ function xe(e = {}) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/cheats/persistence/PersistenceCheat.js
-function Se() {
+function Ce() {
 	return {
 		getGameSystemPrototype: () => typeof Game_System > "u" ? null : Game_System.prototype,
 		getWindowMenuCommand: () => typeof Window_MenuCommand > "u" ? null : Window_MenuCommand,
@@ -693,8 +709,8 @@ function Se() {
 		getAlert: () => T
 	};
 }
-function Ce(e = {}) {
-	let t = Object.assign(Se(), e), n = !1, r = null, i = !1;
+function we(e = {}) {
+	let t = Object.assign(Ce(), e), n = !1, r = null, i = !1;
 	function a(e, n) {
 		let r = t.getAlert();
 		r && typeof r[e] == "function" && r[e](n);
@@ -761,39 +777,39 @@ function Ce(e = {}) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/cheats/GeneralCheat.js
-var we = ye(), Te = xe(), Ee = Ce(), E = class {
+var Te = be(), Ee = Se(), De = we(), E = class {
 	static openFeatureFinder() {}
 	static toggleCheatModal(e = null) {}
 	static openCheatModal(e = null) {}
 	static toggleNoClip(e = !1) {
-		we.toggleNoClip(e);
+		Te.toggleNoClip(e);
 	}
 	static changeName(e, t) {
 		e && typeof e.setName == "function" && e.setName(t);
 	}
 	static getGodModeOnActorIds() {
-		return Te.getGodModeOnActorIds();
+		return Ee.getGodModeOnActorIds();
 	}
 	static getGodModeData(e) {
-		return Te.getGodModeData(e);
+		return Ee.getGodModeData(e);
 	}
 	static godModeOn(e) {
-		Te.godModeOn(e);
+		Ee.godModeOn(e);
 	}
 	static godModeOff(e) {
-		Te.godModeOff(e);
+		Ee.godModeOff(e);
 	}
 	static toggleGodMode(e) {
-		Te.toggleGodMode(e);
+		Ee.toggleGodMode(e);
 	}
 	static isGodMode(e) {
-		return Te.isGodMode(e);
+		return Ee.isGodMode(e);
 	}
 	static forceEnableSave(e) {
-		Ee.forceEnableSave(e);
+		De.forceEnableSave(e);
 	}
 	static isForceSaveEnabled() {
-		return Ee.isForceSaveEnabled();
+		return De.isForceSaveEnabled();
 	}
 	static openConsole() {
 		try {
@@ -814,19 +830,19 @@ var we = ye(), Te = xe(), Ee = Ce(), E = class {
 		}
 	}
 	static toggleMouseTeleport(e) {
-		we.toggleMouseTeleport(e);
+		Te.toggleMouseTeleport(e);
 	}
 	static isMouseTeleportEnabled() {
-		return we.isMouseTeleportEnabled();
+		return Te.isMouseTeleportEnabled();
 	}
 	static toggleMouseMove(e) {
-		we.toggleMouseMove(e);
+		Te.toggleMouseMove(e);
 	}
 	static isMouseMoveEnabled() {
-		return we.isMouseMoveEnabled();
+		return Te.isMouseMoveEnabled();
 	}
 	static isMouseInputPatchEnabled() {
-		return we.isMouseInputPatchEnabled();
+		return Te.isMouseInputPatchEnabled();
 	}
 }, D = class {
 	static gotoTitle() {
@@ -966,7 +982,7 @@ var we = ye(), Te = xe(), Ee = Ce(), E = class {
 	}
 };
 k.fixedSpeed = null, k.origin_Game_Player_update = null;
-var De = class e {
+var Oe = class e {
 	static initialize() {
 		this.skip = !1;
 		let t = Window_Message.prototype.updateShowFast;
@@ -999,7 +1015,7 @@ var De = class e {
 		this.gameSpeedBackup && (O.setGameSpeed(this.gameSpeedBackup.rate, this.gameSpeedBackup.sceneOption), this.gameSpeedBackup = null), this.skip = !1;
 	}
 };
-async function Oe(e, t, n) {
+async function ke(e, t, n) {
 	let r = 0, i = setInterval(() => {
 		try {
 			++r, e();
@@ -1009,25 +1025,25 @@ async function Oe(e, t, n) {
 		clearInterval(i);
 	}, t);
 }
-function ke() {
-	[k.__readSettings, O.__readSettings].forEach((e) => Oe(e, 500, 100));
+function Ae() {
+	[k.__readSettings, O.__readSettings].forEach((e) => ke(e, 500, 100));
 }
-ke();
+Ae();
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/PanelGameState.js
-function Ae(e) {
+function je(e) {
 	return $gameParty.members().find((t) => t._actorId === e) || null;
 }
-function je(e) {
+function Me(e) {
 	let t = [], n = e, r = Array.isArray(n._paramPlus) ? n._paramPlus.length : 0;
 	for (let e = 0; e < r; e++) t.push(n.param(e));
 	return t;
 }
-function Me(e) {
+function Ne(e) {
 	return String(e || "").trim().toLowerCase();
 }
-function Ne(e, t) {
-	let n = Me(e);
+function Pe(e, t) {
+	let n = Ne(e);
 	return !n || t.some((e) => String(e || "").toLowerCase().includes(n));
 }
 function A(e, t = {}) {
@@ -1038,17 +1054,17 @@ function j(e, t) {
 	let n = t();
 	return e && typeof e.initializeVariables == "function" && e.initializeVariables(), n;
 }
-async function Pe(e, t) {
+async function Fe(e, t) {
 	typeof t == "function" && t(), e && typeof e.initializeVariables == "function" && await e.initializeVariables();
 }
-function Fe(e) {
+function Ie(e) {
 	return JSON.parse(JSON.stringify(e));
 }
-function Ie(e, t) {
+function Le(e, t) {
 	if (!e) return [];
 	let n = e.filter(Boolean), r = e.map((e) => e ? t(e.name || "") : "");
 	return n.map((t) => {
-		let n = Re(e, t.id).map((e) => r[e] || "");
+		let n = ze(e, t.id).map((e) => r[e] || "");
 		return {
 			id: t.id,
 			name: r[t.id] || "",
@@ -1057,9 +1073,9 @@ function Ie(e, t) {
 		};
 	});
 }
-function Le(e, t, n = (e) => e) {
+function Re(e, t, n = (e) => e) {
 	if (!e || !t) return "NULL";
-	let r = Re(e, t);
+	let r = ze(e, t);
 	if (r.length === 0) return "NULL";
 	let i = r.map((t) => {
 		let r = e[t];
@@ -1067,7 +1083,7 @@ function Le(e, t, n = (e) => e) {
 	}).filter(Boolean);
 	return i.length > 0 ? i.join(" / ") : "NULL";
 }
-function Re(e, t) {
+function ze(e, t) {
 	let n = [], r = /* @__PURE__ */ new Set(), i = t;
 	for (; i && !r.has(i);) {
 		let t = e[i];
@@ -1078,18 +1094,18 @@ function Re(e, t) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/general/GeneralPanelState.js
-function ze() {
+function Be() {
 	return typeof $gameParty > "u" || !$gameParty ? 0 : Number($gameParty._gold || 0);
 }
-function Be() {
+function Ve() {
 	return typeof $gamePlayer < "u" && !!$gamePlayer && typeof $gamePlayer.moveSpeed == "function" && typeof $gameParty < "u" && !!$gameParty;
 }
-function Ve() {
+function He() {
 	let e = typeof $gamePlayer > "u" ? null : $gamePlayer, t = O.getSceneOption(), n = t === O.sceneOptions().all;
 	return {
-		gameReady: Be(),
+		gameReady: Ve(),
 		noClip: !!(e && e._through),
-		gold: ze(),
+		gold: Be(),
 		moveSpeed: k.isFixed() ? k.fixedSpeed : e && typeof e.moveSpeed == "function" ? e.moveSpeed() : 4,
 		fixSpeed: k.isFixed(),
 		forceSave: E.isForceSaveEnabled(),
@@ -1102,11 +1118,11 @@ function Ve() {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/DatabaseOverrides.js
-var He = {
+var Ue = {
 	enemy: "$dataEnemies",
 	skill: "$dataSkills",
 	class: "$dataClasses"
-}, Ue = {
+}, We = {
 	enemy: [
 		"name",
 		"params",
@@ -1142,7 +1158,7 @@ var He = {
 		"learnings",
 		"traits"
 	]
-}, We = {
+}, Ge = {
 	exp: [0, 999999999],
 	gold: [0, 999999999],
 	mpCost: [0, 999999],
@@ -1163,16 +1179,16 @@ function M(e, t, n, r) {
 	if (!Number.isFinite(i) || i < t || i > n || r && !Number.isInteger(i)) throw Error("Number must be " + t + " to " + n + (r ? " (integer)" : ""));
 	return i;
 }
-function Ge(e, t) {
+function Ke(e, t) {
 	if (t > 16) throw Error("Edit data is too deeply nested");
 	!e || typeof e != "object" || Object.keys(e).forEach((n) => {
 		if (n === "__proto__" || n === "constructor" || n === "prototype") throw Error("Unsafe edit key");
-		Ge(e[n], t + 1);
+		Ke(e[n], t + 1);
 	});
 }
-function Ke(e) {
+function qe(e) {
 	let t = e.JSON || JSON, n = /* @__PURE__ */ new Map(), r = !1, i = (e) => e === void 0 ? void 0 : t.parse(t.stringify(e)), a = (e, t) => e + ":" + t, o = (t, n) => {
-		let r = Object.prototype.hasOwnProperty.call(He, t) ? e[He[t]] : null;
+		let r = Object.prototype.hasOwnProperty.call(Ue, t) ? e[Ue[t]] : null;
 		if (!Number.isInteger(Number(n)) || Number(n) <= 0 || !r || !r[Number(n)]) throw Error("Database entry not available");
 		return r[Number(n)];
 	}, s = (e, t) => {
@@ -1183,7 +1199,7 @@ function Ke(e) {
 		return n;
 	};
 	function l(t, n, r, a) {
-		if (We[n]) return M(r, We[n][0], We[n][1], !0);
+		if (Ge[n]) return M(r, Ge[n][0], Ge[n][1], !0);
 		if ([
 			"name",
 			"description",
@@ -1270,10 +1286,10 @@ function Ke(e) {
 	function d(e, r, s, c) {
 		let d = o(e, r);
 		if (!s || typeof s != "object" || Array.isArray(s)) throw Error("Invalid database edit");
-		if (Ge(s, 0), t.stringify(s).length > 2e6) throw Error("Edit is too large");
+		if (Ke(s, 0), t.stringify(s).length > 2e6) throw Error("Edit is too large");
 		let f = Object.keys(s), p = {};
 		if (f.forEach((t) => {
-			if (!Ue[e].includes(t)) throw Error("Field cannot be edited: " + t);
+			if (!We[e].includes(t)) throw Error("Field cannot be edited: " + t);
 			p[t] = l(e, t, s[t], d);
 		}), !f.length) return i(d);
 		let m = a(e, Number(r)), h = n.get(m) || {
@@ -1363,7 +1379,7 @@ function Ke(e) {
 	}
 	return {
 		list(t) {
-			let r = Object.prototype.hasOwnProperty.call(He, t) ? e[He[t]] : null;
+			let r = Object.prototype.hasOwnProperty.call(Ue, t) ? e[Ue[t]] : null;
 			return r ? r.filter((e) => e && e.id > 0).map((e) => ({
 				id: e.id,
 				name: e.name || "#" + e.id,
@@ -1384,7 +1400,7 @@ function Ke(e) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/MapBattleEvents.js
-function qe(e, t) {
+function Je(e, t) {
 	function n(t, n) {
 		let r = e.$gameMap;
 		return !r || typeof r.events != "function" ? [] : r.events().filter(Boolean).reduce((i, a) => {
@@ -1450,7 +1466,7 @@ function qe(e, t) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/BattleActions.js
-function Je(e) {
+function Ye(e) {
 	let t = /* @__PURE__ */ new WeakMap();
 	function n(e, t, n) {
 		if (!Number.isInteger(e) || e < 1 || !t || !t[e]) throw Error("Invalid " + n + " ID.");
@@ -1550,7 +1566,7 @@ function Je(e) {
 			index: r._enemies.indexOf(l)
 		};
 	}
-	let u = qe(e, () => i().start);
+	let u = Je(e, () => i().start);
 	return {
 		startTroop: s,
 		startEnemies: c,
@@ -1563,10 +1579,10 @@ function Je(e) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/MessagePictures.js
-function Ye(e) {
+function Xe(e) {
 	return String(e || "").trim().toLocaleLowerCase().replace(/[\s_-]+/g, " ");
 }
-function Xe(e, t) {
+function Ze(e, t) {
 	let n = e.$gameScreen;
 	if (!n || !t || typeof n.picture != "function") return "";
 	let r = [];
@@ -1576,26 +1592,26 @@ function Xe(e, t) {
 		let a = String(typeof i.name == "function" ? i.name() : i._name || ""), o = typeof i.opacity == "function" ? i.opacity() : i._opacity;
 		if (!(Number(o) > 0 || Number(i._targetOpacity) > 0)) continue;
 		let s = a.split("/");
-		s.some((e) => Ye(e) === Ye(t)) && /portrait|bust|face/i.test(s.slice(0, -1).join("/")) && r.push(a);
+		s.some((e) => Xe(e) === Xe(t)) && /portrait|bust|face/i.test(s.slice(0, -1).join("/")) && r.push(a);
 	}
 	let i = Array.from(new Set(r));
 	return i.length === 1 ? i[0] : "";
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/MessageText.js
-function Ze(e, t) {
+function Qe(e, t) {
 	let n = e.$gameActors && e.$gameActors._data;
 	return n && n[t] || e.$dataActors && e.$dataActors[t];
 }
-function Qe(e, t) {
-	let n = Ze(e, t);
+function $e(e, t) {
+	let n = Qe(e, t);
 	return n ? String(typeof n.name == "function" ? n.name() : n.name || n._name || "") : "";
 }
-function $e(e, t) {
+function et(e, t) {
 	let n = e.$gameParty && e.$gameParty._actors;
 	return n ? n[t - 1] : 0;
 }
-function et(e) {
+function tt(e) {
 	return e ? {
 		faceName: String(typeof e.faceName == "function" ? e.faceName() : e.faceName || e._faceName || ""),
 		faceIndex: Number(typeof e.faceIndex == "function" ? e.faceIndex() : e.faceIndex || e._faceIndex) || 0
@@ -1604,16 +1620,16 @@ function et(e) {
 		faceIndex: 0
 	};
 }
-function tt(e) {
-	let t = Number($e(e, 1)) || 0, n = Ze(e, t);
+function nt(e) {
+	let t = Number(et(e, 1)) || 0, n = Qe(e, t);
 	return Object.assign({
-		speaker: n && Qe(e, t) || "Player",
+		speaker: n && $e(e, t) || "Player",
 		actorId: n ? t : 0,
 		speakerIcon: 0,
 		pictureName: ""
-	}, et(n));
+	}, tt(n));
 }
-function nt(e, t, n) {
+function rt(e, t, n) {
 	let r = (e) => String(e).replace(/\\\\/g, "").replace(/\\/g, "\x1B"), i = n ? String(t).replace(/\\/g, "") : r(t);
 	if (!n) {
 		for (let t = 0; t < 4; t++) {
@@ -1624,7 +1640,7 @@ function nt(e, t, n) {
 			if (t === i) break;
 			i = t.slice(0, 1e5);
 		}
-		i = i.replace(/\x1bN\[(\d+)\]/gi, (t, n) => Qe(e, Number(n)) || t), i = i.replace(/\x1bP\[(\d+)\]/gi, (t, n) => Qe(e, $e(e, Number(n))) || t), i = i.replace(/\x1bG\b/gi, () => e.$dataSystem ? String(e.$dataSystem.currencyUnit || "") : "G");
+		i = i.replace(/\x1bN\[(\d+)\]/gi, (t, n) => $e(e, Number(n)) || t), i = i.replace(/\x1bP\[(\d+)\]/gi, (t, n) => $e(e, et(e, Number(n))) || t), i = i.replace(/\x1bG\b/gi, () => e.$dataSystem ? String(e.$dataSystem.currencyUnit || "") : "G");
 	}
 	let a = "", o = "", s = 0, c = !1, l = i.match(/^[ \t]*\x1b>\x1bI\[(\d+)\]\x1b\}([^\r\n]*?)\x1b\{\x1b<[ \t]*(?:\r?\n|$)/i);
 	if (l) {
@@ -1632,13 +1648,13 @@ function nt(e, t, n) {
 		let t = [];
 		(e.$dataActors || []).forEach((n, r) => {
 			if (!n) return;
-			let i = Qe(e, r).trim();
+			let i = $e(e, r).trim();
 			a.length >= 3 && i.slice(1).toLocaleUpperCase() === a.toLocaleUpperCase() && t.push(i);
 		}), t.length === 1 && (a = t[0], s = 0);
 	}
 	i = i.replace(/\x1bN(?:[DT])?(?:[1-5CR])?<([^>]*)>/gi, (e, t) => (a = t, ""));
 	let u = null;
-	i = i.replace(/\x1b([AP])F\[(\d+)\]/gi, (t, n, r) => (u = et(Ze(e, n.toUpperCase() === "P" ? $e(e, Number(r)) : Number(r))), ""));
+	i = i.replace(/\x1b([AP])F\[(\d+)\]/gi, (t, n, r) => (u = tt(Qe(e, n.toUpperCase() === "P" ? et(e, Number(r)) : Number(r))), ""));
 	let d = (e) => e.replace(/\x1b(?:C|FS|FN|OC|OW|PX|PY|S|W)\[[^\]]*\]/gi, "").replace(/\x1bI\[(\d+)\]/gi, "[icon $1]").replace(/\x1b[{}$.|!><^]/g, "").replace(/<\/?(?:WordWrap|br)>/gi, (e) => /br/i.test(e) ? "\n" : "").replace(/\x1b/g, "\\").replace(/\ue000/g, "\\");
 	return {
 		text: d(i),
@@ -1649,37 +1665,37 @@ function nt(e, t, n) {
 		face: u
 	};
 }
-function rt(e, t, n, r, i) {
+function it(e, t, n, r, i) {
 	let a = typeof r == "string" ? r : r && r.speaker || "", o = i === void 0 ? typeof t.speakerName == "function" ? t.speakerName() : t._speakerName : i, s = typeof t.faceName == "function" ? t.faceName() : t._faceName, c = typeof t.faceIndex == "function" ? t.faceIndex() : t._faceIndex, l = n.face || {
 		faceName: String(s || ""),
 		faceIndex: Math.max(0, Math.min(7, Number(c) || 0))
-	}, u = o && (typeof o == "object" ? o : nt(e, o)), d = u ? u.speaker || u.text : n.speaker || a, f = u ? u.speakerIcon || 0 : n.speaker ? n.speakerIcon || 0 : r && r.speakerIcon || 0, p = [];
+	}, u = o && (typeof o == "object" ? o : rt(e, o)), d = u ? u.speaker || u.text : n.speaker || a, f = u ? u.speakerIcon || 0 : n.speaker ? n.speakerIcon || 0 : r && r.speakerIcon || 0, p = [];
 	if ((e.$dataActors || []).forEach((t, n) => {
 		if (!t) return;
-		let r = et(Ze(e, n));
-		(d ? !f && Qe(e, n).trim().toLocaleUpperCase() === d.trim().toLocaleUpperCase() : l.faceName && r.faceName === l.faceName && r.faceIndex === l.faceIndex) && p.push(n);
+		let r = tt(Qe(e, n));
+		(d ? !f && $e(e, n).trim().toLocaleUpperCase() === d.trim().toLocaleUpperCase() : l.faceName && r.faceName === l.faceName && r.faceIndex === l.faceIndex) && p.push(n);
 	}), !d && l.faceName) {
 		let t = [];
 		(e.$dataActors || []).forEach((n, r) => {
 			if (!n) return;
-			let i = et(Ze(e, r));
-			i.faceName === l.faceName && i.faceIndex === l.faceIndex && t.push(Qe(e, r));
+			let i = tt(Qe(e, r));
+			i.faceName === l.faceName && i.faceIndex === l.faceIndex && t.push($e(e, r));
 		}), t.length === 1 && (d = t[0]);
 	}
 	let m = p.length === 1 ? p[0] : 0;
-	return !l.faceName && m && (l = et(Ze(e, m))), {
+	return !l.faceName && m && (l = tt(Qe(e, m))), {
 		speaker: String(d),
 		speakerDisplay: u && u.speakerDisplay || n.speaker === d && n.speakerDisplay || r && r.speaker === d && r.speakerDisplay || "",
 		faceName: l.faceName,
 		faceIndex: l.faceIndex,
 		actorId: m,
 		speakerIcon: f,
-		pictureName: l.faceName ? "" : Xe(e, d)
+		pictureName: l.faceName ? "" : Ze(e, d)
 	};
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/MessagePresentation.js
-var it = [
+var at = [
 	"fontFace",
 	"fontSize",
 	"fontBold",
@@ -1688,11 +1704,11 @@ var it = [
 	"outlineColor",
 	"outlineWidth"
 ];
-function at(e) {
+function ot(e) {
 	let t = e && e.contents;
 	if (!t) return "";
 	let n = {};
-	return it.forEach((e) => {
+	return at.forEach((e) => {
 		let r = t[e];
 		[
 			"string",
@@ -1701,16 +1717,16 @@ function at(e) {
 		].indexOf(typeof r) >= 0 && (n[e] = r);
 	}), JSON.stringify(n);
 }
-function ot(e) {
+function st(e) {
 	return typeof e == "string" && e.length <= 100 && /^(?:#[\da-f]{3}|#[\da-f]{4}|#[\da-f]{6}|#[\da-f]{8}|[a-z]{1,24}|rgba?\([\d.,%\s]+\)|hsla?\([\d.,%\s]+\))$/i.test(e) ? e : "";
 }
-function st(e) {
+function ct(e) {
 	try {
 		if (!e || e.length > 2048) return {};
 		let t = JSON.parse(e), n = {};
 		if (!t || Array.isArray(t) || typeof t != "object") return {};
-		typeof t.fontFace == "string" && t.fontFace.length <= 256 && !/[;:{}()<>\\]/.test(t.fontFace) && (n.fontFamily = t.fontFace), typeof t.fontSize == "number" && Number.isFinite(t.fontSize) && (n.fontSize = Math.max(12, Math.min(40, t.fontSize)) + "px"), typeof t.fontBold == "boolean" && (n.fontWeight = t.fontBold ? "700" : "400"), typeof t.fontItalic == "boolean" && (n.fontStyle = t.fontItalic ? "italic" : "normal"), ot(t.textColor) && (n.color = ot(t.textColor));
-		let r = ot(t.outlineColor), i = Math.max(0, Math.min(3, Number(t.outlineWidth) / 2 || 0));
+		typeof t.fontFace == "string" && t.fontFace.length <= 256 && !/[;:{}()<>\\]/.test(t.fontFace) && (n.fontFamily = t.fontFace), typeof t.fontSize == "number" && Number.isFinite(t.fontSize) && (n.fontSize = Math.max(12, Math.min(40, t.fontSize)) + "px"), typeof t.fontBold == "boolean" && (n.fontWeight = t.fontBold ? "700" : "400"), typeof t.fontItalic == "boolean" && (n.fontStyle = t.fontItalic ? "italic" : "normal"), st(t.textColor) && (n.color = st(t.textColor));
+		let r = st(t.outlineColor), i = Math.max(0, Math.min(3, Number(t.outlineWidth) / 2 || 0));
 		return r && i && (n.textShadow = [
 			[-1, -1],
 			[0, -1],
@@ -1727,7 +1743,7 @@ function st(e) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/MessageChoices.js
-function ct(e, t) {
+function lt(e, t) {
 	let n = /* @__PURE__ */ new WeakMap();
 	return {
 		clear(e) {
@@ -1742,7 +1758,7 @@ function ct(e, t) {
 					let r = typeof this.choices == "function" ? this.choices() : t;
 					Array.isArray(r) && n.set(this, r.map((t) => ({
 						raw: String(t),
-						decoded: nt(e, t)
+						decoded: rt(e, t)
 					})));
 				} catch (e) {}
 				return r;
@@ -1754,8 +1770,8 @@ function ct(e, t) {
 					if ((!e.$gameMessage || this === e.$gameMessage) && i && Number.isInteger(r) && r >= 0 && r < i.length) {
 						let t = e.SceneManager && e.SceneManager._scene, n = t && t._messageWindow;
 						o = Object.assign({}, i[r], {
-							metadata: tt(e),
-							textStyle: at(n && n._choiceWindow)
+							metadata: nt(e),
+							textStyle: ot(n && n._choiceWindow)
 						});
 					}
 				} catch (e) {}
@@ -1773,8 +1789,8 @@ function ct(e, t) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/MessageHistory.js
-function lt(e) {
-	let t = [], n = 1, r = !1, i = !1, a = null, o = null, s = 0, c = /* @__PURE__ */ new WeakMap(), l = /* @__PURE__ */ new WeakMap(), u = ct(e, (e, t) => {
+function ut(e) {
+	let t = [], n = 1, r = !1, i = !1, a = null, o = null, s = 0, c = /* @__PURE__ */ new WeakMap(), l = /* @__PURE__ */ new WeakMap(), u = lt(e, (e, t) => {
 		let n = s, r = f(e, t.raw, "choice", t);
 		return () => {
 			r && n === s && d(r);
@@ -1795,7 +1811,7 @@ function lt(e) {
 			faceIndex: 0
 		};
 		try {
-			u = e.$gameMap && e.$gameMap.mapId ? e.$gameMap.mapId() : 0, f = e.$gameMap && e.$gameMap.displayName ? e.$gameMap.displayName() : "", f || (f = e.$dataMapInfos && e.$dataMapInfos[u] ? e.$dataMapInfos[u].name : ""), p = s ? s.decoded : nt(e, r), m = s ? s.metadata : rt(e, t, p, c.get(t)), s || c.set(t, m);
+			u = e.$gameMap && e.$gameMap.mapId ? e.$gameMap.mapId() : 0, f = e.$gameMap && e.$gameMap.displayName ? e.$gameMap.displayName() : "", f || (f = e.$dataMapInfos && e.$dataMapInfos[u] ? e.$dataMapInfos[u].name : ""), p = s ? s.decoded : rt(e, r), m = s ? s.metadata : it(e, t, p, c.get(t)), s || c.set(t, m);
 		} catch (e) {}
 		if (p.isHeading && !p.text.trim()) return;
 		let h = {
@@ -1853,11 +1869,11 @@ function lt(e) {
 	function h(n) {
 		let r = e.$gameMessage, i = r && l.get(r), s = n && n._textState;
 		if (!(!i || !i.length || !s || typeof s.text != "string")) try {
-			let u = nt(e, s.text, !0), d = rt(e, r, u, c.get(r)), f = n._nameBoxWindow || n._nameWindow, p = f && (f._name || f._lastNameText), m = !f || typeof f.isOpen != "function" || f.isOpen();
-			!u.isHeading && m && typeof p == "string" && p.trim() && Object.assign(d, rt(e, r, u, d, nt(e, p)));
+			let u = rt(e, s.text, !0), d = it(e, r, u, c.get(r)), f = n._nameBoxWindow || n._nameWindow, p = f && (f._name || f._lastNameText), m = !f || typeof f.isOpen != "function" || f.isOpen();
+			!u.isHeading && m && typeof p == "string" && p.trim() && Object.assign(d, it(e, r, u, d, rt(e, p)));
 			let h = i[0];
 			if (t.indexOf(h) < 0) return;
-			h.text = u.text, h.rawText = (r._texts || []).join("\n"), h.textStyle = at(n), Object.assign(h, d), c.set(r, d);
+			h.text = u.text, h.rawText = (r._texts || []).join("\n"), h.textStyle = ot(n), Object.assign(h, d), c.set(r, d);
 			for (let e = t.length - 1; e >= 0; e--) t[e] !== h && i.indexOf(t[e]) >= 0 && t.splice(e, 1);
 			l.set(r, [h]), a = r, o = h.id;
 		} catch (e) {}
@@ -1887,7 +1903,7 @@ function lt(e) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/ValueLocks.js
-var ut = [
+var dt = [
 	"item",
 	"weapon",
 	"armor",
@@ -1896,16 +1912,16 @@ var ut = [
 	"switch",
 	"state",
 	"timer"
-], dt = {
+], ft = {
 	item: "$dataItems",
 	weapon: "$dataWeapons",
 	armor: "$dataArmors",
 	state: "$dataStates"
-}, ft = "locks-and-favorites-v1";
-function pt(e, t) {
+}, pt = "locks-and-favorites-v1";
+function mt(e, t) {
 	let n = /* @__PURE__ */ new Map(), r = [], i = e.JSON || JSON, a = (e) => i.parse(i.stringify(e)), o = !1, s = !1, c = null, l = 0;
 	function u(e) {
-		if (!e || !ut.includes(e.kind)) throw Error("Invalid lock kind");
+		if (!e || !dt.includes(e.kind)) throw Error("Invalid lock kind");
 		let t = { kind: e.kind };
 		if (!["gold", "timer"].includes(e.kind)) {
 			if (!Number.isInteger(e.id) || e.id < 1) throw Error("Invalid target ID");
@@ -1924,9 +1940,9 @@ function pt(e, t) {
 		return !!e.$gameSystem && !(e.Scene_Title && e.SceneManager && e.SceneManager._scene instanceof e.Scene_Title);
 	}
 	function p(t) {
-		let n = dt[t.kind] ? e[dt[t.kind]] : null;
+		let n = ft[t.kind] ? e[ft[t.kind]] : null;
 		if (n && !n[t.id]) throw Error("Target is missing or unavailable");
-		if (dt[t.kind] && !n) throw Error("Database is unavailable");
+		if (ft[t.kind] && !n) throw Error("Database is unavailable");
 		if (t.kind === "variable" || t.kind === "switch") {
 			let n = e.$dataSystem && e.$dataSystem[t.kind === "variable" ? "variables" : "switches"];
 			if (!n || t.id >= n.length) throw Error("Target ID is missing");
@@ -1967,7 +1983,7 @@ function pt(e, t) {
 	}
 	function h() {
 		if (t) try {
-			t.setItem(ft, i.stringify({
+			t.setItem(pt, i.stringify({
 				version: 1,
 				entries: Array.from(n.values())
 			}));
@@ -2068,7 +2084,7 @@ function pt(e, t) {
 					"item",
 					"weapon",
 					"armor"
-				].find((n) => e[dt[n]] && t && e[dt[n]][t.id] === t), i = r && _({
+				].find((n) => e[ft[n]] && t && e[ft[n]][t.id] === t), i = r && _({
 					kind: r,
 					id: t.id
 				});
@@ -2174,7 +2190,7 @@ function pt(e, t) {
 		}, n.set(d(e), r)), r && (r.favorite = !!t, !r.favorite && !r.locked && n.delete(d(e))), h();
 	}
 	try {
-		let e = t && t.getItem(ft), r = e ? i.parse(e) : null;
+		let e = t && t.getItem(pt), r = e ? i.parse(e) : null;
 		r && r.version === 1 && Array.isArray(r.entries) && r.entries.length <= 5e3 && r.entries.forEach((e) => {
 			try {
 				let t = u(e.target), r = e.locked ? m(t, e.value) : null;
@@ -2230,7 +2246,7 @@ function pt(e, t) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/shortcuts/KeyCodes.js
-var mt = {
+var ht = {
 	Backspace: 8,
 	Tab: 9,
 	Enter: 13,
@@ -2331,11 +2347,11 @@ var mt = {
 	"\\": 220,
 	"]": 221,
 	"'": 222
-}, ht = {};
-for (let e of Object.keys(mt)) ht[e.toLowerCase()] = mt[e];
-var gt = {};
-for (let e of Object.keys(ht)) gt[ht[e]] = e;
-var _t = /* @__PURE__ */ new Set([
+}, gt = {};
+for (let e of Object.keys(ht)) gt[e.toLowerCase()] = ht[e];
+var _t = {};
+for (let e of Object.keys(gt)) _t[gt[e]] = e;
+var vt = /* @__PURE__ */ new Set([
 	17,
 	18,
 	16,
@@ -2370,13 +2386,13 @@ var _t = /* @__PURE__ */ new Set([
 				break;
 			default:
 				if (r !== null) throw Error("여러 일반키를 조합할 수 없습니다.");
-				if (!Object.hasOwnProperty.call(ht, e)) throw Error("알 수 없는 키입니다. : " + e);
-				r = ht[e];
+				if (!Object.hasOwnProperty.call(gt, e)) throw Error("알 수 없는 키입니다. : " + e);
+				r = gt[e];
 		}
 		return r === null && (r = 256), new e(r, i, a, o, s);
 	}
 	static fromEvent(t) {
-		return _t.has(t.keyCode) ? e._fromCombiningAloneEvent(t) : new e(t.keyCode, t.ctrlKey, t.altKey, t.shiftKey, t.metaKey);
+		return vt.has(t.keyCode) ? e._fromCombiningAloneEvent(t) : new e(t.keyCode, t.ctrlKey, t.altKey, t.shiftKey, t.metaKey);
 	}
 	static _fromCombiningAloneEvent(t) {
 		return new e(256, t.keyCode === 17 || t.ctrlKey, t.keyCode === 18 || t.altKey, t.keyCode === 16 || t.shiftKey, t.keyCode === 91 || t.metaKey);
@@ -2403,20 +2419,20 @@ var _t = /* @__PURE__ */ new Set([
 	asStringArray() {
 		if (this.isEmpty()) return [];
 		let e = [];
-		return this.ctrl && e.push("ctrl"), this.alt && e.push("alt"), this.shift && e.push("shift"), this.meta && e.push("meta"), this.code !== 256 && e.push(gt[this.code]), e;
+		return this.ctrl && e.push("ctrl"), this.alt && e.push("alt"), this.shift && e.push("shift"), this.meta && e.push("meta"), this.code !== 256 && e.push(_t[this.code]), e;
 	}
 	adjustCombiningKey(e) {
 		this.ctrl = e.ctrlKey, this.alt = e.altKey, this.shift = e.shiftKey, this.meta = e.metaKey;
 	}
 	add(e) {
-		if (_t.has(e)) {
+		if (vt.has(e)) {
 			this._setCombiningKey(e, !0);
 			return;
 		}
 		this.code = e;
 	}
 	remove(e) {
-		if (_t.has(e)) {
+		if (vt.has(e)) {
 			this._setCombiningKey(e, !1);
 			return;
 		}
@@ -2447,13 +2463,13 @@ var _t = /* @__PURE__ */ new Set([
 	asDisplayString() {
 		return this.asStringArray().map((e) => this.capitalize(e)).join(" + ");
 	}
-}, vt = [
+}, yt = [
 	"windowOpacity",
 	"isDarkMode",
 	"primaryColor",
 	"themeStyle",
 	"sidebarVisible"
-], yt = [
+], bt = [
 	"toggleCheatModal",
 	"toggleCheatModalToSaveLocationComponent",
 	"toggleCheatModalToMapEventComponent",
@@ -2486,7 +2502,7 @@ var _t = /* @__PURE__ */ new Set([
 	7,
 	8,
 	9
-].map((e) => "setSpeed" + e)), bt = [
+].map((e) => "setSpeed" + e)), xt = [
 	"__proto__",
 	"constructor",
 	"prototype",
@@ -2494,10 +2510,10 @@ var _t = /* @__PURE__ */ new Set([
 	"load",
 	"applyData",
 	"makeData"
-], xt = (e) => !!e && typeof e == "object" && !Array.isArray(e);
-function St(e) {
+], St = (e) => !!e && typeof e == "object" && !Array.isArray(e);
+function Ct(e) {
 	if (typeof e != "string" || e.length > 80) throw Error("Invalid shortcut");
-	let t = e.trim().toLowerCase().split(/\s+/).filter(Boolean), n = Object.keys(mt).map((e) => e.toLowerCase()).concat(["meta"]);
+	let t = e.trim().toLowerCase().split(/\s+/).filter(Boolean), n = Object.keys(ht).map((e) => e.toLowerCase()).concat(["meta"]);
 	if (!t.length || t.some((e) => !n.includes(e)) || new Set(t).size !== t.length || t.filter((e) => ![
 		"ctrl",
 		"alt",
@@ -2512,8 +2528,8 @@ function St(e) {
 	].filter((e) => t.includes(e));
 	return r.concat(t.filter((e) => !r.includes(e))).join(" ");
 }
-function Ct(e) {
-	if (!xt(e) || e.version !== 1) throw Error("Unsupported settings profile version");
+function wt(e) {
+	if (!St(e) || e.version !== 1) throw Error("Unsupported settings profile version");
 	Object.keys(e).forEach((e) => {
 		if (![
 			"version",
@@ -2534,60 +2550,60 @@ function Ct(e) {
 		"shortcuts"
 	].forEach((n) => {
 		let r = e[n] === void 0 ? {} : e[n];
-		if (!xt(r) || Object.keys(r).length > 512) throw Error("Invalid profile section");
+		if (!St(r) || Object.keys(r).length > 512) throw Error("Invalid profile section");
 		Object.keys(r).forEach((e) => {
-			if (bt.includes(e) || !/^[A-Za-z][A-Za-z0-9_]*$/.test(e)) throw Error("Invalid profile key");
+			if (xt.includes(e) || !/^[A-Za-z][A-Za-z0-9_]*$/.test(e)) throw Error("Invalid profile key");
 			let i = r[e];
 			if (n === "options") {
 				if (!(typeof i == "boolean" || typeof i == "number" && Number.isFinite(i))) throw Error("Option values must be boolean or finite numeric values");
 			} else if (n === "appearance") {
-				if (!vt.includes(e)) throw Error("Unsupported appearance preference");
+				if (!yt.includes(e)) throw Error("Unsupported appearance preference");
 				if (e === "windowOpacity" && (typeof i != "number" || !Number.isFinite(i) || i < .1 || i > 1)) throw Error("Invalid opacity");
 				if (["isDarkMode", "sidebarVisible"].includes(e) && typeof i != "boolean") throw Error("Invalid boolean appearance preference");
 				if (e === "primaryColor" && (typeof i != "string" || !/^#[0-9a-f]{6}$/i.test(i))) throw Error("Invalid accent color");
 				if (e === "themeStyle" && !["current", "legacy"].includes(i)) throw Error("Invalid color theme");
 			} else {
-				if (!yt.includes(e)) throw Error("Unsupported shortcut");
-				t.shortcuts[e] = St(i);
+				if (!bt.includes(e)) throw Error("Unsupported shortcut");
+				t.shortcuts[e] = Ct(i);
 				return;
 			}
 			t[n][e] = i;
 		});
 	}), t;
 }
-function wt(e) {
+function Tt(e) {
 	if (typeof e != "string") throw Error("Profile must be JSON text");
 	if ((typeof TextEncoder < "u" ? new TextEncoder().encode(e).length : encodeURIComponent(e).replace(/%[A-F\d]{2}/gi, "x").length) > 1048576) throw Error("Profile is too large (maximum 1 MiB)");
-	return Ct(JSON.parse(e));
+	return wt(JSON.parse(e));
 }
-function Tt(e) {
-	let t = Ct(Object.assign({ version: 1 }, e)), n = JSON.stringify(t, null, 2);
-	return wt(n), n;
+function Et(e) {
+	let t = wt(Object.assign({ version: 1 }, e)), n = JSON.stringify(t, null, 2);
+	return Tt(n), n;
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/GameOptions.js
-var Et = [
+var Dt = [
 	"alwaysDash",
 	"commandRemember",
 	"bgmVolume",
 	"bgsVolume",
 	"meVolume",
 	"seVolume"
-], Dt = {
+], Ot = {
 	alwaysDash: "Always Dash",
 	commandRemember: "Remember Commands",
 	bgmVolume: "Music (BGM)",
 	bgsVolume: "Ambient (BGS)",
 	meVolume: "Fanfares (ME)",
 	seVolume: "Sound Effects (SE)"
-}, Ot = {
+}, kt = {
 	windowOpacity: "cheatModal.windowOpacity",
 	isDarkMode: "cheatModal.themeDarkMode",
 	primaryColor: "cheatModal.themePrimaryColor",
 	themeStyle: "cheatModal.themeStyle",
 	sidebarVisible: "cheatModal.sidebarVisible"
-}, kt = "game-options-changed-v1";
-function At(e, t, n) {
+}, At = "game-options-changed-v1";
+function jt(e, t, n) {
 	let r = {}, i = n && n.shortcuts;
 	function a(e) {
 		try {
@@ -2600,12 +2616,12 @@ function At(e, t, n) {
 		t && t.setItem(e, n);
 	}
 	try {
-		let e = a(kt);
-		e && Object.assign(r, wt(e).options);
+		let e = a(At);
+		e && Object.assign(r, Tt(e).options);
 	} catch (e) {}
 	function s() {
 		try {
-			o(kt, Tt({ options: r }));
+			o(At, Et({ options: r }));
 		} catch (t) {
 			e.console && e.console.warn("[Cheat] Option profile was not saved", t.message);
 		}
@@ -2626,9 +2642,9 @@ function At(e, t, n) {
 		}
 	}
 	function l(t) {
-		let n = t && Array.isArray(t._list) ? t._list : [], i = n.filter((e) => e && typeof e.symbol == "string" && !Et.includes(e.symbol)).concat(Et.map((t) => n.find((e) => e.symbol === t) || {
+		let n = t && Array.isArray(t._list) ? t._list : [], i = n.filter((e) => e && typeof e.symbol == "string" && !Dt.includes(e.symbol)).concat(Dt.map((t) => n.find((e) => e.symbol === t) || {
 			symbol: t,
-			name: e.TextManager && e.TextManager[t] || Dt[t],
+			name: e.TextManager && e.TextManager[t] || Ot[t],
 			enabled: !0
 		})), a = /* @__PURE__ */ new Set();
 		return i.filter((e) => !/^[A-Za-z][A-Za-z0-9_]*$/.test(e.symbol) || [
@@ -2644,10 +2660,10 @@ function At(e, t, n) {
 			} catch (e) {
 				a = null;
 			}
-			let o = typeof a == "boolean", s = typeof a == "number" && Number.isFinite(a), c = n.ext && typeof n.ext == "object" ? n.ext : {}, l = Et.includes(i) && /Volume$/.test(i), u = s && (Number.isFinite(c.min) && Number.isFinite(c.max) && c.min <= c.max || l), d = !!e.ConfigManager && n.enabled !== !1 && (o || u);
+			let o = typeof a == "boolean", s = typeof a == "number" && Number.isFinite(a), c = n.ext && typeof n.ext == "object" ? n.ext : {}, l = Dt.includes(i) && /Volume$/.test(i), u = s && (Number.isFinite(c.min) && Number.isFinite(c.max) && c.min <= c.max || l), d = !!e.ConfigManager && n.enabled !== !1 && (o || u);
 			return {
 				symbol: i,
-				label: String(n.name || Dt[i] || i),
+				label: String(n.name || Ot[i] || i),
 				value: o || s ? a : null,
 				type: o ? "boolean" : s ? "number" : "unsupported",
 				min: l ? 0 : c.min,
@@ -2655,7 +2671,7 @@ function At(e, t, n) {
 				step: l ? 1 : Number.isFinite(c.step) && c.step > 0 ? c.step : 1,
 				supported: d,
 				reason: d ? "" : n.enabled === !1 ? "Disabled by the game" : "Unsupported or complex game option; no safe editor available",
-				custom: !Et.includes(i),
+				custom: !Dt.includes(i),
 				included: Object.prototype.hasOwnProperty.call(r, i)
 			};
 		});
@@ -2674,7 +2690,7 @@ function At(e, t, n) {
 		return c((i) => {
 			let a = u(l(i).find((e) => e.symbol === t), n);
 			if (i && typeof i.changeValue == "function") i.changeValue(t, a);
-			else if (Et.includes(t)) e.ConfigManager[t] = a;
+			else if (Dt.includes(t)) e.ConfigManager[t] = a;
 			else throw Error("Custom option has no safe setter");
 			let o = e.ConfigManager.save && e.ConfigManager.save();
 			o && typeof o.catch == "function" && o.catch((t) => {
@@ -2686,11 +2702,11 @@ function At(e, t, n) {
 	}
 	function f() {
 		let e = {};
-		return Object.keys(Ot).forEach((t) => {
-			let n = a(Ot[t]);
+		return Object.keys(kt).forEach((t) => {
+			let n = a(kt[t]);
 			if (n != null) try {
 				let r = t === "windowOpacity" ? Number(n) : ["isDarkMode", "sidebarVisible"].includes(t) ? n === "true" || n !== "false" && n : n;
-				Object.assign(e, wt(JSON.stringify({
+				Object.assign(e, Tt(JSON.stringify({
 					version: 1,
 					appearance: { [t]: r }
 				})).appearance);
@@ -2701,19 +2717,19 @@ function At(e, t, n) {
 		let e = i ? i.read() : {}, t = {};
 		return Object.keys(e || {}).forEach((n) => {
 			if (e[n]) try {
-				Object.assign(t, wt(JSON.stringify({
+				Object.assign(t, Tt(JSON.stringify({
 					version: 1,
 					shortcuts: { [n]: e[n] }
 				})).shortcuts);
 			} catch (e) {}
-		}), Tt({
+		}), Et({
 			options: r,
 			appearance: f(),
 			shortcuts: t
 		});
 	}
 	function m(e) {
-		let t = wt(e), n = c(l), r = [], a = [];
+		let t = Tt(e), n = c(l), r = [], a = [];
 		if (Object.keys(t.options).forEach((e) => {
 			let i = n.find((t) => t.symbol === e);
 			!i || !i.supported ? a.push({
@@ -2738,7 +2754,7 @@ function At(e, t, n) {
 			let e = Object.assign({}, i.read(), t.shortcuts), n = /* @__PURE__ */ new Map();
 			Object.keys(e).forEach((t) => {
 				if (!e[t]) return;
-				let r = St(e[t]);
+				let r = Ct(e[t]);
 				if (n.has(r)) throw Error("Shortcut conflict: " + t + " / " + n.get(r));
 				n.set(r, t);
 			}), Object.keys(t.shortcuts).forEach((e) => r.push({
@@ -2762,7 +2778,7 @@ function At(e, t, n) {
 		if (n.changes.forEach((e) => {
 			try {
 				if (e.section === "options") d(e.symbol, e.value);
-				else if (e.section === "appearance") o(Ot[e.symbol], String(e.value));
+				else if (e.section === "appearance") o(kt[e.symbol], String(e.value));
 				else {
 					a[e.symbol] = e.value;
 					return;
@@ -2800,7 +2816,7 @@ function At(e, t, n) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/EncryptedImage.js
-function jt(e, t, n) {
+function Mt(e, t, n) {
 	return new Promise((r, i) => {
 		let a = !1, o = null, s = null, c = e.URL || URL, l = new e.XMLHttpRequest(), u = setTimeout(() => d(Error("Image timed out.")), 8e3);
 		function d(e, t) {
@@ -2837,7 +2853,7 @@ function jt(e, t, n) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/CompositeAssets.js
-function Mt(e, t) {
+function Nt(e, t) {
 	let n = e.KCDev && e.KCDev.CompositeBitmaps;
 	if (!n) return null;
 	let r = t.type === "face" ? n.faceLayers : t.type === "character" ? n.tvCharLayers : t.type === "picture" ? n.picLayers : null;
@@ -2849,7 +2865,7 @@ function Mt(e, t) {
 		type: t.type
 	};
 }
-async function Nt(e, t, n, r) {
+async function Pt(e, t, n, r) {
 	let i = await Promise.all(t.layers.map(async (e) => ({
 		info: e,
 		bitmap: await n(e.filename, r)
@@ -2878,14 +2894,14 @@ async function Nt(e, t, n, r) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/GameAssets.js
-var Pt = {
+var Ft = {
 	item: "$dataItems",
 	weapon: "$dataWeapons",
 	armor: "$dataArmors",
 	skill: "$dataSkills",
 	state: "$dataStates"
 };
-function Ft(e) {
+function It(e) {
 	if (!e) return null;
 	for (let t of [
 		"__canvas",
@@ -2898,10 +2914,10 @@ function Ft(e) {
 	}
 	return null;
 }
-function It(e, t, n) {
+function Lt(e, t, n) {
 	return e ? typeof e[t] == "function" ? e[t]() : e[t] === void 0 ? n : e[t] : n;
 }
-function Lt(e, t, n) {
+function Rt(e, t, n) {
 	if (e.type === "face") {
 		let t = e.frameWidth || n.faceWidth || 144, r = e.frameHeight || n.faceHeight || 144, i = Math.max(0, Math.min(7, Number(e.index) || 0));
 		return {
@@ -2941,7 +2957,7 @@ function Lt(e, t, n) {
 		height: t.height
 	};
 }
-function Rt(e, t) {
+function zt(e, t) {
 	return new Promise((n, r) => {
 		let i;
 		try {
@@ -2956,7 +2972,7 @@ function Rt(e, t) {
 			if (!o || /(^|\/)\.\.(\/|$)|[:\\]/.test(o) || !a[t.type]) throw Error("Invalid asset name");
 			let s = new URL("img/" + a[t.type] + "/" + o.split("/").map(encodeURIComponent).join("/") + ".png", e.location.href).href, c = !!(e.Decrypter && e.Decrypter.hasEncryptedImages && !e.Decrypter.checkImgIgnore(s)), l = !!(e.Utils && e.Utils.hasEncryptedImages && e.Utils.hasEncryptedImages());
 			if (c || l) {
-				jt(e, s, c).then((e) => (t.hue && e.rotateHue && e.rotateHue(t.hue), e)).then(n, r);
+				Mt(e, s, c).then((e) => (t.hue && e.rotateHue && e.rotateHue(t.hue), e)).then(n, r);
 				return;
 			}
 			let u;
@@ -2976,17 +2992,17 @@ function Rt(e, t) {
 		}
 	});
 }
-var zt = 32, Bt = .4, Vt = 24, Ht = [
+var Bt = 32, Vt = .4, Ht = 24, Ut = [
 	96,
 	160,
 	320
 ];
-function Ut(e, t) {
+function Wt(e, t) {
 	let n = Math.max(Number(e) || 0, Number(t) || 0);
-	for (let e of Ht) if (n <= e) return e;
-	return Ht[Ht.length - 1];
+	for (let e of Ut) if (n <= e) return e;
+	return Ut[Ut.length - 1];
 }
-function Wt(e) {
+function Gt(e) {
 	let t = e.every((e) => Number.isFinite(e.member.x) && Number.isFinite(e.member.y)), n = 0, r = 0;
 	e.forEach((e) => {
 		r = Math.max(r, e.image.height), t ? (e.left = e.member.x - e.image.width / 2, e.top = e.member.y - e.image.height) : (e.left = n, n += e.image.width + 4);
@@ -3001,7 +3017,7 @@ function Wt(e) {
 		height: Math.max(1, Math.round(s - a))
 	};
 }
-function Gt(e, t) {
+function Kt(e, t) {
 	let n = /* @__PURE__ */ new Map(), r = /* @__PURE__ */ new Map(), i = /* @__PURE__ */ new WeakMap();
 	function a(e) {
 		return !e.isReady || e.isReady() ? Promise.resolve(e) : (i.has(e) || i.set(e, new Promise((t) => {
@@ -3015,7 +3031,7 @@ function Gt(e, t) {
 		})), i.get(e));
 	}
 	async function o(r, i) {
-		let s = Mt(e, r);
+		let s = Nt(e, r);
 		if (s) {
 			if (s.bitmap) return s.bitmap.isError && s.bitmap.isError() ? null : a(s.bitmap);
 			if (r.type !== "face") return null;
@@ -3023,7 +3039,7 @@ function Gt(e, t) {
 			if (t.has(r.name) || t.size >= 8) return null;
 			t.add(r.name);
 			let c = "composite:" + r.type + ":" + r.name + ":" + JSON.stringify(s.layers);
-			return n.has(c) || (n.size >= 64 && n.delete(n.keys().next().value), n.set(c, Nt(e, s, (e, t) => o({
+			return n.has(c) || (n.size >= 64 && n.delete(n.keys().next().value), n.set(c, Pt(e, s, (e, t) => o({
 				type: "face",
 				name: e
 			}, t).catch(() => null), t).catch(() => null))), n.get(c);
@@ -3034,7 +3050,7 @@ function Gt(e, t) {
 			r.hue || 0,
 			r.sideView || !1
 		].join(":");
-		return n.has(c) || (n.size >= 64 && n.delete(n.keys().next().value), n.set(c, Promise.resolve().then(() => (t || Rt)(e, r)).catch(() => null))), n.get(c);
+		return n.has(c) || (n.size >= 64 && n.delete(n.keys().next().value), n.set(c, Promise.resolve().then(() => (t || zt)(e, r)).catch(() => null))), n.get(c);
 	}
 	function s() {
 		return !!(e.$gameSystem && e.$gameSystem.isSideView && e.$gameSystem.isSideView());
@@ -3043,16 +3059,16 @@ function Gt(e, t) {
 		if (n = Number(n), t === "actor" || t === "actorSprite") {
 			let r = e.$gameActors && e.$gameActors._data && e.$gameActors._data[n] || e.$dataActors && e.$dataActors[n];
 			if (!r) return null;
-			let i = It(r, "faceName", r._faceName || "");
+			let i = Lt(r, "faceName", r._faceName || "");
 			return t === "actor" && i ? {
 				type: "face",
 				name: String(i),
-				index: Number(It(r, "faceIndex", r._faceIndex || 0)),
+				index: Number(Lt(r, "faceIndex", r._faceIndex || 0)),
 				actorId: n
 			} : {
 				type: "character",
-				name: String(It(r, "characterName", r._characterName || "")),
-				index: Number(It(r, "characterIndex", r._characterIndex || 0)),
+				name: String(Lt(r, "characterName", r._characterName || "")),
+				index: Number(Lt(r, "characterIndex", r._characterIndex || 0)),
 				actorId: n
 			};
 		}
@@ -3070,7 +3086,7 @@ function Gt(e, t) {
 			if (!t || !Array.isArray(t.members)) return null;
 			let r = [];
 			for (let n of t.members) {
-				if (r.length >= zt) break;
+				if (r.length >= Bt) break;
 				if (!n) continue;
 				let t = e.$dataEnemies && e.$dataEnemies[n.enemyId], i = t ? String(t.battlerName || "") : "";
 				i && r.push({
@@ -3087,31 +3103,31 @@ function Gt(e, t) {
 				sideView: s()
 			} : null;
 		}
-		let r = Pt[t] && e[Pt[t]] && e[Pt[t]][n];
+		let r = Ft[t] && e[Ft[t]] && e[Ft[t]][n];
 		return r ? {
 			type: "icon",
 			index: Number(r.iconIndex) || 0
 		} : null;
 	}
 	async function l(t, n) {
-		let r = t.members.slice(0, zt), i = await Promise.all(r.map((e) => o({
+		let r = t.members.slice(0, Bt), i = await Promise.all(r.map((e) => o({
 			type: "enemy",
 			name: e.name,
 			hue: e.hue,
 			sideView: t.sideView
 		}).catch(() => null))), a = [];
 		if (i.forEach((e, t) => {
-			let n = Ft(e);
+			let n = It(e);
 			!n || !n.width || !n.height || a.push({
 				image: n,
 				member: r[t]
 			});
 		}), !a.length) return null;
-		let s = Wt(a), c = Math.min(1, n / Math.max(s.width, s.height)), l = e.document.createElement("canvas");
+		let s = Gt(a), c = Math.min(1, n / Math.max(s.width, s.height)), l = e.document.createElement("canvas");
 		l.width = Math.max(1, Math.round(s.width * c)), l.height = Math.max(1, Math.round(s.height * c));
 		let u = l.getContext("2d");
 		return u ? (a.forEach((e) => {
-			u.globalAlpha = e.member.hidden ? Bt : 1, u.drawImage(e.image, Math.round((e.left - s.left) * c), Math.round((e.top - s.top) * c), Math.max(1, Math.round(e.image.width * c)), Math.max(1, Math.round(e.image.height * c)));
+			u.globalAlpha = e.member.hidden ? Vt : 1, u.drawImage(e.image, Math.round((e.left - s.left) * c), Math.round((e.top - s.top) * c), Math.max(1, Math.round(e.image.width * c)), Math.max(1, Math.round(e.image.height * c)));
 		}), u.globalAlpha = 1, {
 			canvas: l,
 			width: l.width,
@@ -3119,13 +3135,13 @@ function Gt(e, t) {
 		}) : null;
 	}
 	function u(e, t, n) {
-		let i = Ut(t, n), a = [
+		let i = Wt(t, n), a = [
 			"troop",
 			i,
 			e.sideView ? "sv" : "front",
 			e.members.map((e) => e.name + "@" + e.hue + "@" + e.x + "," + e.y + (e.hidden ? "?" : "")).join("|")
 		].join(":");
-		return r.has(a) || (r.size >= Vt && r.delete(r.keys().next().value), r.set(a, l(e, i).catch(() => null))), r.get(a);
+		return r.has(a) || (r.size >= Ht && r.delete(r.keys().next().value), r.set(a, l(e, i).catch(() => null))), r.get(a);
 	}
 	async function d(e, t, n) {
 		let r = await u(t, e.width, e.height).catch(() => null);
@@ -3147,9 +3163,9 @@ function Gt(e, t) {
 		let i = await o(n).catch(() => null);
 		if (!i || r && !r()) return !1;
 		try {
-			let r = Ft(i);
+			let r = It(i);
 			if (!r) return !1;
-			let a = Lt(n.type === "face" && Mt(e, n) ? Object.assign({}, n, {
+			let a = Rt(n.type === "face" && Nt(e, n) ? Object.assign({}, n, {
 				frameWidth: r.width / 4,
 				frameHeight: r.height / 2
 			}) : n, r, e.ImageManager || {});
@@ -3165,8 +3181,8 @@ function Gt(e, t) {
 	}
 	async function p(t) {
 		if (!t || t.type !== "character" || !t.name) return null;
-		let n = Ft(await o(t).catch(() => null));
-		return n ? Object.assign({ image: n }, Lt(t, n, e.ImageManager || {})) : null;
+		let n = It(await o(t).catch(() => null));
+		return n ? Object.assign({ image: n }, Rt(t, n, e.ImageManager || {})) : null;
 	}
 	return {
 		describe: c,
@@ -3176,7 +3192,7 @@ function Gt(e, t) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/ActorActions.js
-function Kt(e) {
+function qt(e) {
 	return { setPartyMember(t, n) {
 		let r = e.$gameParty;
 		if (!Number.isInteger(t) || t < 1 || !e.$dataActors || !e.$dataActors[t]) throw Error("Invalid actor ID.");
@@ -3192,14 +3208,14 @@ function Kt(e) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/minimap/MapArtwork.js
-function qt(e) {
+function Jt(e) {
 	try {
 		return !e || e.isReady && !e.isReady() ? null : e.canvas || e._canvas || e._image || null;
 	} catch (e) {
 		return null;
 	}
 }
-function Jt(e, t, n, r, i, a, o) {
+function Yt(e, t, n, r, i, a, o) {
 	let s = e.Tilemap && e.Tilemap.prototype;
 	if (!s || !s._drawTile && !s._addTile) return null;
 	let c = Object.create(s), l = e.$gameMap, u = a ? Number(i.tileWidth || e.$dataSystem && e.$dataSystem.tileSize) || 48 : l.tileWidth ? l.tileWidth() : 48, d = a ? Number(i.tileHeight || e.$dataSystem && e.$dataSystem.tileSize) || 48 : l.tileHeight ? l.tileHeight() : 48;
@@ -3212,7 +3228,7 @@ function Jt(e, t, n, r, i, a, o) {
 	let f = (e, t, i, a, o) => {
 		n.fillStyle = o, n.fillRect(e * r / u, t * r / d, i * r / u, a * r / d);
 	}, p = (e, t, i, a, o, s, c, l, f) => {
-		let p = qt(e);
+		let p = Jt(e);
 		p && n.drawImage(p, t, i, a, o, s * r / u, c * r / d, l * r / u, f * r / d);
 	}, m = {
 		bltImage: p,
@@ -3240,7 +3256,7 @@ function Jt(e, t, n, r, i, a, o) {
 		return c.flags[x] & 128 && !(c.flags[g[1]] & 128) && !(e.Tilemap.isShadowingTile && e.Tilemap.isShadowingTile(g[0])) && h("_drawTableEdge", "_addTableEdge", x, v, y), b(g[2]), b(g[3]), o.upperTiles !== !1 && _.forEach((e) => h("_drawTile", "_addTile", e, v, y)), g.some((e) => e >= 2048 && e < 2816);
 	} };
 }
-function Yt(e, t) {
+function Xt(e, t) {
 	let n = null, r = null, i = {
 		stage: "idle",
 		detail: "",
@@ -3274,7 +3290,7 @@ function Yt(e, t) {
 				createdAt: Date.now()
 			};
 		}
-		return n.canvases = n.bitmaps.map(qt), n.flags = i ? i.flags : [], n.hasImage = n.names.map(Boolean), n.allReady = n.names.every((e, t) => !e || !!n.canvases[t]), n;
+		return n.canvases = n.bitmaps.map(Jt), n.flags = i ? i.flags : [], n.hasImage = n.names.map(Boolean), n.allReady = n.names.every((e, t) => !e || !!n.canvases[t]), n;
 	}
 	function s(t, n, i = {}) {
 		let s = t || e.$dataMap, c = e.$gameMap;
@@ -3292,7 +3308,7 @@ function Yt(e, t) {
 				let a = n.getContext("2d");
 				if (!a) throw Error("Canvas 2D unavailable");
 				a.imageSmoothingEnabled = !1;
-				let o = Jt(e, l, a, f, s, !!t, i);
+				let o = Yt(e, l, a, f, s, !!t, i);
 				if (!o) throw Error("Game Tilemap drawing methods unavailable");
 				let c = [];
 				for (let e = 0; e < d; e++) for (let t = 0; t < u; t++) o.cell(s, t, e, m) && c.push({
@@ -3326,8 +3342,8 @@ function Yt(e, t) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/MapPreviews.js
-function Xt(e) {
-	let t = /* @__PURE__ */ new Map(), n = Yt(e, (t) => Rt(e, {
+function Zt(e) {
+	let t = /* @__PURE__ */ new Map(), n = Xt(e, (t) => zt(e, {
 		type: "tileset",
 		name: t
 	}));
@@ -3362,7 +3378,7 @@ function Xt(e) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/MapLayers.js
-var Zt = {
+var Qt = {
 	sprites: !0,
 	shadows: !0,
 	upperTiles: !0,
@@ -3376,29 +3392,29 @@ var Zt = {
 	grid: !1,
 	markerScale: 1
 };
-function Qt(e) {
-	let t = Object.assign({}, Zt);
+function $t(e) {
+	let t = Object.assign({}, Qt);
 	return Object.keys(t).forEach((n) => {
 		n === "markerScale" ? e && typeof e[n] == "number" && Number.isFinite(e[n]) && (t[n] = Math.max(.5, Math.min(2, e[n]))) : e && typeof e[n] == "boolean" && (t[n] = e[n]);
 	}), t;
 }
-function $t(e) {
-	let t = Qt(null);
+function en(e) {
+	let t = $t(null);
 	try {
-		t = Qt(JSON.parse(e.getItem("map.layers") || "null"));
+		t = $t(JSON.parse(e.getItem("map.layers") || "null"));
 	} catch (e) {}
 	return {
 		read: () => Object.assign({}, t),
 		write(n, r) {
-			if (Object.prototype.hasOwnProperty.call(Zt, n)) {
-				t = Qt(Object.assign({}, t, { [n]: r }));
+			if (Object.prototype.hasOwnProperty.call(Qt, n)) {
+				t = $t(Object.assign({}, t, { [n]: r }));
 				try {
 					e.setItem("map.layers", JSON.stringify(t));
 				} catch (e) {}
 			}
 		},
 		reset() {
-			t = Qt(null);
+			t = $t(null);
 			try {
 				e.setItem("map.layers", JSON.stringify(t));
 			} catch (e) {}
@@ -3407,12 +3423,12 @@ function $t(e) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/history/MessageLogPreferences.js
-var en = "\"Roboto\", sans-serif", tn = {
+var tn = "\"Roboto\", sans-serif", nn = {
 	fontMode: "game",
 	sizeMode: "default",
 	fontSize: 16
 };
-function nn(e) {
+function rn(e) {
 	let t = e && typeof e == "object" ? e : {}, n = typeof t.fontSize == "number" || typeof t.fontSize == "string" && t.fontSize.trim() !== "" ? Number(t.fontSize) : NaN;
 	return {
 		fontMode: t.fontMode === "plugin" ? "plugin" : "game",
@@ -3420,13 +3436,13 @@ function nn(e) {
 		fontSize: Number.isFinite(n) ? Math.round(Math.max(12, Math.min(40, n))) : 16
 	};
 }
-function rn(e) {
-	let t = nn(null), n = 0;
+function an(e) {
+	let t = rn(null), n = 0;
 	try {
-		t = nn(JSON.parse(e.getItem("messageLog.appearance") || "null"));
+		t = rn(JSON.parse(e.getItem("messageLog.appearance") || "null"));
 	} catch (e) {}
 	function r(r) {
-		let i = nn(Object.assign({}, t, r));
+		let i = rn(Object.assign({}, t, r));
 		if (JSON.stringify(i) !== JSON.stringify(t)) {
 			t = i, n++;
 			try {
@@ -3438,12 +3454,12 @@ function rn(e) {
 		read: () => Object.assign({}, t),
 		revision: () => n,
 		write: r,
-		reset: () => r(tn)
+		reset: () => r(nn)
 	};
 }
-function an(e, t) {
-	let n = nn(t), r = st(e);
-	return r.fontSize = (n.sizeMode === "custom" ? n.fontSize : 16) + "px", n.fontMode === "plugin" && (r.fontFamily = en), r;
+function on(e, t) {
+	let n = rn(t), r = ct(e);
+	return r.fontSize = (n.sizeMode === "custom" ? n.fontSize : 16) + "px", n.fontMode === "plugin" && (r.fontFamily = tn), r;
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/FeatureRuntime.js
@@ -3460,26 +3476,26 @@ function F(e) {
 	let t = P(e);
 	return t && t.__cheatFeatures ? t.__cheatFeatures : null;
 }
-function on(e, t) {
+function sn(e, t) {
 	if (!e) return null;
 	if (e.__cheatFeatures) return e.__cheatFeatures;
 	let n = t || {}, r = e.Utils && e.Utils.RPGMAKER_NAME === "MV" ? "www" : ".", i = {
-		messageLogPreferences: rn(n.settingsStorage || g),
-		mapLayers: $t(n.settingsStorage || g),
-		assets: Gt(e, n.assetLoader),
-		actors: Kt(e),
-		previews: Xt(e),
-		database: Ke(e),
-		battle: Je(e),
-		history: lt(e),
-		locks: pt(e, n.lockStorage || new h("./" + r + "/cheat-settings/value-locks.json")),
-		options: At(e, n.settingsStorage || g, n)
+		messageLogPreferences: an(n.settingsStorage || g),
+		mapLayers: en(n.settingsStorage || g),
+		assets: Kt(e, n.assetLoader),
+		actors: qt(e),
+		previews: Zt(e),
+		database: qe(e),
+		battle: Ye(e),
+		history: ut(e),
+		locks: mt(e, n.lockStorage || new h("./" + r + "/cheat-settings/value-locks.json")),
+		options: jt(e, n.settingsStorage || g, n)
 	};
 	return e.__cheatFeatures = i, i.history.install(), i.locks.install(), i.database.install(), i;
 }
 //#endregion
 //#region cheat-engine/www/cheat/components/LockFavoriteControls.js
-var sn = {
+var cn = {
 	name: "LockFavoriteControls",
 	props: {
 		target: Object,
@@ -3536,9 +3552,9 @@ var sn = {
 			this.refresh(), this.$emit("change");
 		}
 	}
-}, cn = {
+}, ln = {
 	name: "GeneralPanel",
-	components: { LockFavoriteControls: sn },
+	components: { LockFavoriteControls: cn },
 	template: "\n<v-card flat class=\"cheat-panel\">\n    <div class=\"cheat-panel__head\">\n        <div>\n            <div class=\"cheat-panel__title\">Gameplay</div>\n            <div class=\"cheat-panel__meta\">{{ gameReady ? 'Changes apply to the running game immediately' : 'Waiting for a game session' }}</div>\n        </div>\n        <v-btn\n            small\n            text\n            title=\"Reload values from game data\"\n            aria-label=\"Reload values from game data\"\n            @click=\"initializeVariables\">\n            <v-icon left small>mdi-refresh</v-icon>\n            Refresh\n        </v-btn>\n    </div>\n\n    <v-alert v-if=\"!gameReady\" dense text type=\"info\" class=\"mb-3\">\n        Start or load a game to use gameplay controls. Other cheat panels remain available.\n    </v-alert>\n\n    <section class=\"cheat-section\">\n        <div class=\"cheat-section__title\">Toggles</div>\n        <div class=\"cheat-filter-bar\">\n            <v-checkbox\n                data-feature=\"no-clip\"\n                v-model=\"noClip\"\n                :disabled=\"!gameReady\"\n                label=\"No clip\"\n                hide-details\n                dense\n                @change=\"onNoClipChange\" />\n            <v-checkbox\n                v-model=\"forceSave\"\n                :disabled=\"!gameReady\"\n                label=\"Force save\"\n                hide-details\n                dense\n                @change=\"onForceSaveChange\" />\n            <v-checkbox\n                data-feature=\"mouse-controls\"\n                v-model=\"mouseMove\"\n                :disabled=\"!gameReady\"\n                label=\"Mouse controls\"\n                hide-details\n                dense\n                @change=\"onMouseMoveChange\" />\n            <v-checkbox\n                data-feature=\"mouse-teleport\"\n                v-model=\"mouseTeleport\"\n                :disabled=\"!gameReady\"\n                label=\"Click to teleport\"\n                hide-details\n                dense\n                @change=\"onMouseTeleportChange\" />\n        </div>\n    </section>\n\n    <section class=\"cheat-section\">\n        <div class=\"cheat-section__title\">Gold</div>\n        <div class=\"cheat-inline\">\n            <v-text-field\n                data-feature=\"gold\"\n                v-model=\"gold\"\n                :disabled=\"!gameReady\"\n                label=\"Party gold\"\n                outlined\n                dense\n                hide-details\n                class=\"cheat-field-gold\"\n                @keydown.self.stop\n                @change=\"onGoldChange\"\n                @focus=\"$event.target.select()\" />\n            <lock-favorite-controls v-if=\"gameReady\" :target=\"{kind:'gold'}\" :value=\"Number(gold)\" @change=\"initializeVariables\"/>\n        </div>\n    </section>\n\n    <section class=\"cheat-section\">\n        <div class=\"cheat-section__title\">Speeds</div>\n\n        <div class=\"cheat-slider__head\">\n            <span class=\"cheat-slider__label\">Move speed</span>\n            <span class=\"cheat-stepper-group\">\n                <button type=\"button\" class=\"cheat-stepper\" aria-label=\"Decrease move speed\" @click=\"addSpeed(-stepSpeed)\">\n                    <v-icon small>mdi-minus</v-icon>\n                </button>\n                <span class=\"cheat-value cheat-value--centre\">{{ speed.toFixed(1) }}</span>\n                <button type=\"button\" class=\"cheat-stepper\" aria-label=\"Increase move speed\" @click=\"addSpeed(stepSpeed)\">\n                    <v-icon small>mdi-plus</v-icon>\n                </button>\n            </span>\n        </div>\n        <v-slider\n            data-feature=\"move-speed\"\n            v-model=\"speed\"\n            :disabled=\"!gameReady\"\n            :min=\"minSpeed\"\n            :max=\"maxSpeed\"\n            :step=\"stepSpeed\"\n            color=\"primary\"\n            hide-details\n            class=\"cheat-slider\"\n            @change=\"onSpeedChange\" />\n        <v-checkbox\n            v-model=\"fixSpeed\"\n            :disabled=\"!gameReady\"\n            class=\"cheat-checkbox\"\n            hide-details\n            dense\n            label=\"Keep move speed fixed\"\n            @change=\"onSpeedChange\" />\n\n        <div class=\"cheat-slider__head cheat-slider__head--spaced\">\n            <span class=\"cheat-slider__label\">Game speed</span>\n            <span class=\"cheat-stepper-group\">\n                <button type=\"button\" class=\"cheat-stepper\" aria-label=\"Decrease game speed\" @click=\"addGameSpeed(-stepGameSpeed)\">\n                    <v-icon small>mdi-minus</v-icon>\n                </button>\n                <span class=\"cheat-value cheat-value--centre\">x{{ gameSpeed.toFixed(1) }}</span>\n                <button type=\"button\" class=\"cheat-stepper\" aria-label=\"Increase game speed\" @click=\"addGameSpeed(stepGameSpeed)\">\n                    <v-icon small>mdi-plus</v-icon>\n                </button>\n                <button type=\"button\" class=\"cheat-stepper cheat-stepper--reset\" aria-label=\"Reset game speed to normal\" title=\"Reset to normal speed\" @click=\"setGameSpeed(1)\">\n                    <v-icon small>mdi-restore</v-icon>\n                </button>\n            </span>\n        </div>\n        <v-slider\n            data-feature=\"game-speed\"\n            v-model=\"gameSpeed\"\n            :disabled=\"!gameReady\"\n            :min=\"minGameSpeed\"\n            :max=\"maxGameSpeed\"\n            :step=\"stepGameSpeed\"\n            color=\"primary\"\n            hide-details\n            class=\"cheat-slider\"\n            @change=\"onGameSpeedChange\" />\n        <div class=\"cheat-grid cheat-grid--toggles\">\n            <v-checkbox\n                v-model=\"applyAllForGameSpeed\"\n                :disabled=\"!gameReady\"\n                class=\"cheat-checkbox\"\n                hide-details\n                dense\n                label=\"All scenes\"\n                @change=\"onApplyAllForGameSpeedChange\" />\n            <v-checkbox\n                v-model=\"applyBattleForGameSpeed\"\n                :disabled=\"!gameReady\"\n                class=\"cheat-checkbox\"\n                hide-details\n                dense\n                label=\"Battle scenes\"\n                @change=\"onApplyBattleForGameSpeedChange\" />\n        </div>\n    </section>\n\n    <section class=\"cheat-section\">\n        <div class=\"cheat-section__title\">Screens</div>\n        <div class=\"cheat-actions\">\n            <v-btn small outlined :disabled=\"!gameReady\" @click=\"toggleSaveScene\">Open Save</v-btn>\n            <v-btn small outlined @click=\"toggleLoadScene\">Open Load</v-btn>\n            <v-btn small outlined @click=\"gotoTitle\">To Title</v-btn>\n        </div>\n    </section>\n\n    <section class=\"cheat-section\">\n        <div class=\"cheat-section__title\">Developer</div>\n        <div class=\"cheat-actions\">\n            <v-btn\n                small\n                outlined\n                :disabled=\"!gameReady\"\n                title=\"Open RPG Maker Debug Menu (F9)\"\n                @click=\"openDebugMenu\">\n                Debug Menu\n            </v-btn>\n            <v-btn\n                v-if=\"canOpenConsole\"\n                small\n                outlined\n                title=\"Open NW.js Developer Console\"\n                @click=\"openConsole\">\n                Open Console\n            </v-btn>\n            <v-btn\n                v-if=\"canOpenConsole\"\n                small\n                color=\"primary\"\n                title=\"Pop out Cheat Engine to a separate window\"\n                @click=\"openCheatWindow\">\n                Pop Out\n            </v-btn>\n        </div>\n    </section>\n</v-card>\n    ",
 	data() {
 		return {
@@ -3568,7 +3584,7 @@ var sn = {
 	},
 	mounted() {
 		this._sessionCheck = setInterval(() => {
-			Be() !== this.gameReady && this.initializeVariables();
+			Ve() !== this.gameReady && this.initializeVariables();
 		}, 500), window.addEventListener("cheat-move-speed-change", this.initializeVariables), window.addEventListener("cheat-game-speed-change", this.initializeVariables);
 	},
 	beforeDestroy() {
@@ -3576,11 +3592,11 @@ var sn = {
 	},
 	methods: {
 		initializeVariables() {
-			let e = Ve();
+			let e = He();
 			this.gameReady = e.gameReady, this.noClip = e.noClip, this.speed = e.moveSpeed, this.fixSpeed = e.fixSpeed, this.gold = e.gold, this.forceSave = e.forceSave, this.mouseMove = e.mouseMove, this.mouseTeleport = e.mouseTeleport, this.gameSpeed = e.gameSpeed, this.applyAllForGameSpeed = e.applyAllForGameSpeed, this.applyBattleForGameSpeed = e.applyBattleForGameSpeed;
 		},
 		runGameMutation(e) {
-			if (!Be()) {
+			if (!Ve()) {
 				this.initializeVariables();
 				return;
 			}
@@ -3600,18 +3616,18 @@ var sn = {
 			this.speed = Math.min(Math.max(this.speed + e, this.minSpeed), this.maxSpeed), this.onSpeedChange();
 		},
 		onGoldChange() {
-			if (!Be()) {
+			if (!Ve()) {
 				this.initializeVariables();
 				return;
 			}
 			this.gold = A(this.gold, {
-				fallback: ze(),
+				fallback: Be(),
 				integer: !0,
 				min: 0
 			});
-			let e = ze(), t = this.gold - e;
+			let e = Be(), t = this.gold - e;
 			t < 0 ? $gameParty.loseGold(-t) : t > 0 && $gameParty.gainGold(t), j(this, () => {
-				this.gold = ze();
+				this.gold = Be();
 			});
 		},
 		gotoTitle() {
@@ -3670,33 +3686,33 @@ var sn = {
 };
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/actors/ActorPanelState.js
-function ln(e) {
+function un(e) {
 	try {
 		var t = window[e];
 		if (Array.isArray(t)) return t;
 	} catch (e) {}
 	return [];
 }
-function un(e) {
+function dn(e) {
 	try {
 		if (typeof $gameActors < "u" && $gameActors) return $gameActors.actor(e);
 	} catch (e) {}
 	return null;
 }
-function dn(e) {
-	var t = ln("$dataSkills")[e];
+function fn(e) {
+	var t = un("$dataSkills")[e];
 	return t && t.name ? t.name : "Skill " + e;
 }
-function fn(e) {
-	var t = ln("$dataStates")[e];
+function pn(e) {
+	var t = un("$dataStates")[e];
 	return t && t.name ? t.name : "State " + e;
 }
-function pn(e) {
-	var t = ln("$dataClasses")[e];
+function mn(e) {
+	var t = un("$dataClasses")[e];
 	return t && t.name ? t.name : "Class " + e;
 }
-function mn(e) {
-	var t = un(e);
+function hn(e) {
+	var t = dn(e);
 	if (!t) return null;
 	var n = t, r = "";
 	try {
@@ -3723,7 +3739,7 @@ function mn(e) {
 			var u = c[l];
 			u && typeof u.id == "number" && s.push({
 				id: u.id,
-				name: u.name || dn(u.id)
+				name: u.name || fn(u.id)
 			});
 		}
 	} catch (e) {
@@ -3735,7 +3751,7 @@ function mn(e) {
 			var m = f[p];
 			m && typeof m.id == "number" && d.push({
 				id: m.id,
-				name: m.name || fn(m.id)
+				name: m.name || pn(m.id)
 			});
 		}
 	} catch (e) {
@@ -3765,16 +3781,16 @@ function mn(e) {
 		tp: _,
 		mhp: v,
 		mmp: y,
-		param: je(t),
+		param: Me(t),
 		godMode: E.isGodMode(t),
 		learnedSkills: s,
 		activeStates: d
 	};
 }
 function I(e) {
-	return un(e);
+	return dn(e);
 }
-function hn() {
+function gn() {
 	var e = {}, t = {}, n = 0;
 	try {
 		for (var r = $gameParty.allMembers() || [], i = 0; i < r.length; i++) e[r[i].actorId()] = !0;
@@ -3792,10 +3808,10 @@ function hn() {
 	} catch (e) {
 		n = 0;
 	}
-	for (var c = [], l = ln("$dataActors"), u = 1; u < l.length; u++) {
+	for (var c = [], l = un("$dataActors"), u = 1; u < l.length; u++) {
 		var d = l[u];
 		if (!(!d || !d.name)) {
-			var f = un(u), p = {
+			var f = dn(u), p = {
 				id: u,
 				name: d.name,
 				nickname: "",
@@ -3828,8 +3844,8 @@ function hn() {
 				} catch (e) {
 					p.classId = 0;
 				}
-				p.className = pn(p.classId);
-			} else d.classId && (p.classId = d.classId, p.className = pn(d.classId));
+				p.className = mn(p.classId);
+			} else d.classId && (p.classId = d.classId, p.className = mn(d.classId));
 			c.push(p);
 		}
 	}
@@ -3848,21 +3864,21 @@ function hn() {
 			"LUK"
 		];
 	}
-	for (var g = [], _ = ln("$dataClasses"), v = 1; v < _.length; v++) {
+	for (var g = [], _ = un("$dataClasses"), v = 1; v < _.length; v++) {
 		var y = _[v];
 		y && y.name && g.push({
 			id: y.id || v,
 			name: y.name
 		});
 	}
-	for (var b = [], x = ln("$dataSkills"), S = 1; S < x.length; S++) {
+	for (var b = [], x = un("$dataSkills"), S = 1; S < x.length; S++) {
 		var C = x[S];
 		C && C.name && b.push({
 			id: C.id || S,
 			name: C.name
 		});
 	}
-	for (var ee = [], te = ln("$dataStates"), ne = 1; ne < te.length; ne++) {
+	for (var ee = [], te = un("$dataStates"), ne = 1; ne < te.length; ne++) {
 		var w = te[ne];
 		w && w.name && ee.push({
 			id: w.id || ne,
@@ -3877,19 +3893,19 @@ function hn() {
 		allStates: ee
 	};
 }
-function gn(e, t) {
-	var n = un(e);
+function _n(e, t) {
+	var n = dn(e);
 	n && E.changeName(n, t);
 }
-function _n(e, t) {
-	var n = un(e);
+function vn(e, t) {
+	var n = dn(e);
 	if (n) try {
 		n.setNickname(t);
 	} catch (e) {}
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/ui/DatabaseDetails.js
-var vn = {
+var yn = {
 	item: "$dataItems",
 	weapon: "$dataWeapons",
 	armor: "$dataArmors",
@@ -3897,7 +3913,7 @@ var vn = {
 	class: "$dataClasses",
 	state: "$dataStates",
 	enemy: "$dataEnemies"
-}, yn = {
+}, bn = {
 	11: "Element Rate",
 	12: "Debuff Rate",
 	13: "State Rate",
@@ -3922,7 +3938,7 @@ var vn = {
 	62: "Special Flag",
 	63: "Collapse Type",
 	64: "Party Ability"
-}, bn = {
+}, xn = {
 	11: "Recover HP",
 	12: "Recover MP",
 	13: "Gain TP",
@@ -3936,7 +3952,7 @@ var vn = {
 	42: "Grow Parameter",
 	43: "Learn Skill",
 	44: "Common Event"
-}, xn = [
+}, Sn = [
 	"Max HP",
 	"Max MP",
 	"Attack",
@@ -3945,7 +3961,7 @@ var vn = {
 	"Magic Defense",
 	"Agility",
 	"Luck"
-], Sn = [
+], Cn = [
 	"Hit",
 	"Evasion",
 	"Critical",
@@ -3956,7 +3972,7 @@ var vn = {
 	"HP Regen",
 	"MP Regen",
 	"TP Regen"
-], Cn = [
+], wn = [
 	"Target Rate",
 	"Guard",
 	"Recovery",
@@ -3967,11 +3983,11 @@ var vn = {
 	"Magic Damage",
 	"Floor Damage",
 	"EXP Rate"
-], wn = (e) => Math.round(Number(e) * 1e4) / 100 + "%";
-function Tn(e) {
-	return e.$dataSystem && e.$dataSystem.terms && e.$dataSystem.terms.params || xn;
+], Tn = (e) => Math.round(Number(e) * 1e4) / 100 + "%";
+function En(e) {
+	return e.$dataSystem && e.$dataSystem.terms && e.$dataSystem.terms.params || Sn;
 }
-function En(e, t) {
+function Dn(e, t) {
 	let n = e.$dataSystem || {}, r = "#" + t.dataId, i = {
 		13: "$dataStates",
 		14: "$dataStates",
@@ -3980,9 +3996,9 @@ function En(e, t) {
 		44: "$dataSkills"
 	}[t.code];
 	if (i) r = e[i] && e[i][t.dataId] ? e[i][t.dataId].name : r;
-	else if ([12, 21].includes(t.code)) r = Tn(e)[t.dataId] || r;
-	else if (t.code === 22) r = Sn[t.dataId] || r;
-	else if (t.code === 23) r = Cn[t.dataId] || r;
+	else if ([12, 21].includes(t.code)) r = En(e)[t.dataId] || r;
+	else if (t.code === 22) r = Cn[t.dataId] || r;
+	else if (t.code === 23) r = wn[t.dataId] || r;
 	else {
 		let e = {
 			11: "elements",
@@ -4006,20 +4022,20 @@ function En(e, t) {
 		32,
 		61
 	].includes(t.code);
-	return (yn[t.code] || "Trait " + t.code) + ": " + r + " = " + (a ? wn(t.value) : t.value);
+	return (bn[t.code] || "Trait " + t.code) + ": " + r + " = " + (a ? Tn(t.value) : t.value);
 }
-function Dn(e, t) {
+function On(e, t) {
 	let n = "";
-	return n = [11, 12].includes(t.code) ? wn(t.value1) + (t.value2 ? " + " + t.value2 : "") : [21, 22].includes(t.code) ? (e.$dataStates && e.$dataStates[t.dataId] ? e.$dataStates[t.dataId].name : t.dataId === 0 ? "Normal attack states" : "#" + t.dataId) + " " + wn(t.value1) : t.code === 43 ? e.$dataSkills && e.$dataSkills[t.dataId] ? e.$dataSkills[t.dataId].name : "#" + t.dataId : t.code === 44 ? e.$dataCommonEvents && e.$dataCommonEvents[t.dataId] ? e.$dataCommonEvents[t.dataId].name : "#" + t.dataId : [
+	return n = [11, 12].includes(t.code) ? Tn(t.value1) + (t.value2 ? " + " + t.value2 : "") : [21, 22].includes(t.code) ? (e.$dataStates && e.$dataStates[t.dataId] ? e.$dataStates[t.dataId].name : t.dataId === 0 ? "Normal attack states" : "#" + t.dataId) + " " + Tn(t.value1) : t.code === 43 ? e.$dataSkills && e.$dataSkills[t.dataId] ? e.$dataSkills[t.dataId].name : "#" + t.dataId : t.code === 44 ? e.$dataCommonEvents && e.$dataCommonEvents[t.dataId] ? e.$dataCommonEvents[t.dataId].name : "#" + t.dataId : [
 		31,
 		32,
 		33,
 		34,
 		42
-	].includes(t.code) ? (Tn(e)[t.dataId] || "#" + t.dataId) + " " + t.value1 : String(t.value1 || 0), (bn[t.code] || "Effect " + t.code) + ": " + n;
+	].includes(t.code) ? (En(e)[t.dataId] || "#" + t.dataId) + " " + t.value1 : String(t.value1 || 0), (xn[t.code] || "Effect " + t.code) + ": " + n;
 }
-function On(e, t, n) {
-	let r = Object.prototype.hasOwnProperty.call(vn, t) ? e[vn[t]] : null, i = r && r[n];
+function kn(e, t, n) {
+	let r = Object.prototype.hasOwnProperty.call(yn, t) ? e[yn[t]] : null, i = r && r[n];
 	if (!i) return null;
 	let a = [], o = (e, t) => {
 		t.length && a.push({
@@ -4032,13 +4048,13 @@ function On(e, t, n) {
 		"weapon",
 		"armor"
 	].includes(t) && typeof i.price == "number" && o("Price", [i.price + " " + (e.$dataSystem && e.$dataSystem.currencyUnit || "Gold")]), Array.isArray(i.params) && o("Parameters", i.params.map((t, n) => {
-		let r = Tn(e)[n] || xn[n];
+		let r = En(e)[n] || Sn[n];
 		return Array.isArray(t) ? r + ": Lv1 " + t[1] + " / Lv" + (t.length - 1) + " " + t[t.length - 1] : r + ": " + t;
 	})), t === "skill" && (o("Skill", ["MP " + (i.mpCost || 0) + " / TP " + (i.tpCost || 0), "Success " + i.successRate + "% / Repeats " + (i.repeats || 1)]), i.damage && i.damage.type && o("Damage", [
 		"Type " + i.damage.type + " / Element " + (e.$dataSystem && e.$dataSystem.elements && e.$dataSystem.elements[i.damage.elementId] || i.damage.elementId),
 		"Formula: " + i.damage.formula,
 		"Variance " + i.damage.variance + "%"
-	])), i.expParams && o("EXP Curve", ["Base " + i.expParams[0] + ", Extra " + i.expParams[1] + ", Acceleration " + i.expParams[2] + "/" + i.expParams[3]]), i.learnings && o("Level-up Skills", i.learnings.map((t) => "Lv" + t.level + ": " + (e.$dataSkills && e.$dataSkills[t.skillId] ? e.$dataSkills[t.skillId].name : "#" + t.skillId))), i.traits && o("Traits", i.traits.map((t) => En(e, t))), i.effects && o("Effects", i.effects.map((t) => Dn(e, t))), t === "enemy" && (o("Base Rewards", ["EXP " + (i.exp || 0), "Gold " + (i.gold || 0)]), o("Base Drops", (i.dropItems || []).filter((e) => e.kind > 0).map((t) => {
+	])), i.expParams && o("EXP Curve", ["Base " + i.expParams[0] + ", Extra " + i.expParams[1] + ", Acceleration " + i.expParams[2] + "/" + i.expParams[3]]), i.learnings && o("Level-up Skills", i.learnings.map((t) => "Lv" + t.level + ": " + (e.$dataSkills && e.$dataSkills[t.skillId] ? e.$dataSkills[t.skillId].name : "#" + t.skillId))), i.traits && o("Traits", i.traits.map((t) => Dn(e, t))), i.effects && o("Effects", i.effects.map((t) => On(e, t))), t === "enemy" && (o("Base Rewards", ["EXP " + (i.exp || 0), "Gold " + (i.gold || 0)]), o("Base Drops", (i.dropItems || []).filter((e) => e.kind > 0).map((t) => {
 		let n = {
 			1: e.$dataItems,
 			2: e.$dataWeapons,
@@ -4055,7 +4071,7 @@ function On(e, t, n) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/ui/RecordNavigation.js
-function kn(e, t) {
+function An(e, t) {
 	let n = t || window;
 	!Number.isInteger(Number(e)) || Number(e) < 1 || n.dispatchEvent(new n.CustomEvent("cheat-navigate-actor", { detail: Number(e) }));
 }
@@ -4106,7 +4122,7 @@ var L = {
 	},
 	methods: {
 		openActor(e) {
-			this.actorId && (e && e.stopPropagation(), kn(this.actorId));
+			this.actorId && (e && e.stopPropagation(), An(this.actorId));
 		},
 		async draw() {
 			var e = this;
@@ -4118,7 +4134,7 @@ var L = {
 			!i && e.asset && e.asset.actorId && r() && (i = await n.assets.paint(e.$refs.image, n.assets.describe("actorSprite", e.asset.actorId), r)), r() && (e.ready = i);
 		}
 	}
-}, An = {
+}, jn = {
 	name: "DatabaseTooltip",
 	components: { GameAsset: L },
 	props: {
@@ -4134,7 +4150,7 @@ var L = {
 	},
 	watch: { open(e) {
 		if (e) try {
-			this.details = On(P(), this.kind, this.recordId);
+			this.details = kn(P(), this.kind, this.recordId);
 		} catch (e) {
 			this.details = null;
 		}
@@ -4143,15 +4159,15 @@ var L = {
 };
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/locks/LockPanelState.js
-function jn() {
+function Mn() {
 	let e = F();
 	return e ? e.locks.list() : [];
 }
-function Mn(e, t) {
+function Nn(e, t) {
 	let n = F();
 	return n ? n.locks.sortFavorites(e, t) : e;
 }
-function Nn(e, t, n, r) {
+function Pn(e, t, n, r) {
 	let i = e.slice();
 	return t && t.length && i.sort((e, r) => {
 		for (let i = 0; i < t.length; i++) {
@@ -4162,15 +4178,15 @@ function Nn(e, t, n, r) {
 			if (s) return n && n[i] ? -s : s;
 		}
 		return 0;
-	}), Mn(i, r);
+	}), Nn(i, r);
 }
 //#endregion
 //#region cheat-engine/www/cheat/panels/ActorSettingPanel.js
-var Pn = {
+var Fn = {
 	name: "ActorSettingPanel",
 	components: {
-		DatabaseTooltip: An,
-		LockFavoriteControls: sn,
+		DatabaseTooltip: jn,
+		LockFavoriteControls: cn,
 		GameAsset: L
 	},
 	template: "\n<v-card flat class=\"ma-0 pa-0\">\n    <v-row class=\"ma-0\" dense>\n        <v-col cols=\"12\" sm=\"4\" class=\"pa-1\">\n            <v-card-subtitle class=\"pa-1\">Actors ({{ actors.length }})</v-card-subtitle>\n            <v-list dense class=\"cheat-list-scroll cheat-list-scroll--actors\">\n                <template v-for=\"group in groupedActors\">\n                    <v-subheader :key=\"'h-' + group.key\" class=\"pa-1\">{{ group.label }}</v-subheader>\n                    <v-list-item\n                        v-for=\"actor in group.items\"\n                        :key=\"actor.id\"\n                        :input-value=\"actor.id === selectedActorId\"\n                        @click=\"selectActor(actor.id)\">\n                        <game-asset kind=\"actor\" :record-id=\"actor.id\" :label=\"actor.name\" :size=\"40\" :navigate=\"false\" class=\"mr-2\"/>\n                        <v-list-item-content>\n                            <v-list-item-title>{{ actor.name }} <span class=\"caption cheat-muted\">Lv{{ actor.level }}</span></v-list-item-title>\n                            <v-list-item-subtitle>{{ actor.className }}<span v-if=\"actor.nickname\"> · {{ actor.nickname }}</span></v-list-item-subtitle>\n                        </v-list-item-content>\n                        <v-list-item-action v-if=\"actor.isLeader\">\n                            <v-icon x-small color=\"warning\">mdi-crown</v-icon>\n                        </v-list-item-action>\n                        <v-list-item-action v-else-if=\"actor.isBattleMember\">\n                            <v-icon x-small color=\"success\">mdi-sword-cross</v-icon>\n                        </v-list-item-action>\n                        <v-list-item-action v-else-if=\"actor.isInParty\">\n                            <v-icon x-small color=\"info\">mdi-account</v-icon>\n                        </v-list-item-action>\n                    </v-list-item>\n                </template>\n            </v-list>\n            <v-btn small block class=\"mt-2\" @click=\"initializeVariables\">\n                <v-icon x-small left>mdi-refresh</v-icon> Reload\n            </v-btn>\n        </v-col>\n        <v-col cols=\"12\" sm=\"8\" class=\"pa-1\" v-if=\"detail\">\n            <v-card-subtitle class=\"pa-1\">Identity — {{ detail.name }}</v-card-subtitle>\n            <div class=\"pa-1\"><v-btn x-small :color=\"selectedInParty ? 'warning' : 'primary'\" @click=\"partyConfirmation = true\">{{ selectedInParty ? 'Remove from Party' : 'Add to Party' }}</v-btn><span class=\"caption cheat-muted ml-2\">{{ selectedInParty ? 'Current party member' : 'Not in party' }}</span></div>\n            <v-row dense class=\"ma-0\">\n                <v-col cols=\"12\" md=\"6\">\n                    <v-text-field\n                        label=\"Name\"\n                        v-model=\"detail.name\"\n                        outlined dense hide-details\n                        @keydown.self.stop\n                        @change=\"onNameChange\"\n                        @focus=\"$event.target.select()\"></v-text-field>\n                </v-col>\n                <v-col cols=\"12\" md=\"6\">\n                    <v-text-field\n                        label=\"Nickname\"\n                        v-model=\"detail.nickname\"\n                        outlined dense hide-details\n                        @keydown.self.stop\n                        @change=\"onNicknameChange\"\n                        @focus=\"$event.target.select()\"></v-text-field>\n                </v-col>\n                <v-col cols=\"6\">\n                    <v-text-field\n                        label=\"Lv\"\n                        v-model=\"detail.level\"\n                        type=\"number\" outlined dense hide-details\n                        @keydown.self.stop\n                        @change=\"onLevelChange\"\n                        @focus=\"$event.target.select()\"></v-text-field>\n                </v-col>\n                <v-col cols=\"6\">\n                    <v-text-field\n                        label=\"EXP\"\n                        v-model=\"detail.exp\"\n                        outlined dense hide-details\n                        @keydown.self.stop\n                        @change=\"onExpChange\"\n                        @focus=\"$event.target.select()\"></v-text-field>\n                </v-col>\n                <v-col cols=\"12\">\n                    <v-select\n                        label=\"Class\"\n                        v-model=\"detail.classId\"\n                        :items=\"classes\"\n                        item-text=\"name\"\n                        item-value=\"id\"\n                        outlined dense hide-details\n                        @change=\"onClassChange\"></v-select>\n                </v-col>\n                <v-col cols=\"12\">\n                    <v-checkbox\n                        v-model=\"detail.godMode\"\n                        label=\"God Mode\"\n                        dense hide-details class=\"my-0\"\n                        @change=\"onGodModeChange\"></v-checkbox>\n                </v-col>\n            </v-row>\n\n            <v-card-subtitle class=\"pa-1 mt-2\">Vitals</v-card-subtitle>\n            <v-row dense class=\"ma-0\">\n                <v-col cols=\"4\">\n                    <v-text-field\n                        :label=\"'HP / ' + detail.mhp\"\n                        v-model=\"detail.hp\"\n                        outlined dense hide-details\n                        @keydown.self.stop\n                        @change=\"onHpChange\"\n                        @focus=\"$event.target.select()\"></v-text-field>\n                </v-col>\n                <v-col cols=\"4\">\n                    <v-text-field\n                        :label=\"'MP / ' + detail.mmp\"\n                        v-model=\"detail.mp\"\n                        outlined dense hide-details\n                        @keydown.self.stop\n                        @change=\"onMpChange\"\n                        @focus=\"$event.target.select()\"></v-text-field>\n                </v-col>\n                <v-col cols=\"4\">\n                    <v-text-field\n                        label=\"TP\"\n                        v-model=\"detail.tp\"\n                        outlined dense hide-details\n                        @keydown.self.stop\n                        @change=\"onTpChange\"\n                        @focus=\"$event.target.select()\"></v-text-field>\n                </v-col>\n                <v-col cols=\"12\">\n                    <v-btn x-small @click=\"onRecoverAll\">Recover All</v-btn>\n                </v-col>\n            </v-row>\n\n            <v-card-subtitle class=\"pa-1 mt-2\">Params</v-card-subtitle>\n            <v-row dense class=\"ma-0\">\n                <v-col\n                    v-for=\"(_, paramIdx) in detail.param.length\"\n                    :key=\"paramIdx\"\n                    cols=\"6\">\n                    <v-text-field\n                        :label=\"paramNames[paramIdx] || ('Param ' + paramIdx)\"\n                        v-model=\"detail.param[paramIdx]\"\n                        type=\"number\" outlined dense hide-details\n                        @keydown.self.stop\n                        @change=\"onParamChange(paramIdx)\"\n                        @focus=\"$event.target.select()\"></v-text-field>\n                </v-col>\n            </v-row>\n\n            <v-card-subtitle class=\"pa-1 mt-2\">Skills ({{ detail.learnedSkills.length }})</v-card-subtitle>\n            <div class=\"cheat-chip-row\">\n                <v-chip\n                    v-for=\"skill in detail.learnedSkills\"\n                    :key=\"skill.id\"\n                    x-small label close\n                    @click:close=\"onForgetSkill(skill.id)\">\n                    <database-tooltip kind=\"skill\" :record-id=\"skill.id\" :label=\"skill.name\"/>\n                </v-chip>\n                <span v-if=\"detail.learnedSkills.length === 0\" class=\"caption cheat-muted\">No skills learned</span>\n            </div>\n            <v-row dense class=\"ma-0 mt-1\">\n                <v-col cols=\"12\">\n                    <v-text-field\n                        label=\"Search skills\"\n                        v-model=\"skillSearch\"\n                        outlined dense hide-details\n                        @keydown.self.stop></v-text-field>\n                </v-col>\n                <v-col cols=\"12\">\n                    <v-select\n                        label=\"Learn skill\"\n                        v-model=\"skillToLearn\"\n                        :items=\"filteredLearnableSkills\"\n                        item-text=\"name\"\n                        item-value=\"id\"\n                        outlined dense hide-details></v-select>\n                </v-col>\n                <v-col cols=\"12\">\n                    <v-btn x-small color=\"primary\" :disabled=\"!skillToLearn\" @click=\"onLearnSkill\">Learn</v-btn>\n                </v-col>\n            </v-row>\n\n            <v-card-subtitle class=\"pa-1 mt-2\">Status Effects ({{ detail.activeStates.length }})</v-card-subtitle>\n            <div class=\"cheat-chip-row\">\n                <v-chip\n                    v-for=\"st in favoriteStates\"\n                    :key=\"st.id\"\n                    x-small label close color=\"warning\"\n                    @click:close=\"onRemoveState(st.id)\">\n                    <database-tooltip kind=\"state\" :record-id=\"st.id\" :label=\"st.name\"/>\n                    <lock-favorite-controls :target=\"{kind:'state',actorId:detail.id,id:st.id}\" :value=\"true\" @change=\"initializeVariables\"/>\n                </v-chip>\n                <span v-if=\"detail.activeStates.length === 0\" class=\"caption cheat-muted\">No active states</span>\n            </div>\n            <v-row dense class=\"ma-0 mt-1\">\n                <v-col cols=\"12\">\n                    <v-select\n                        label=\"Add state\"\n                        v-model=\"stateToAdd\"\n                        :items=\"allStates\"\n                        item-text=\"name\"\n                        item-value=\"id\"\n                        outlined dense hide-details></v-select>\n                </v-col>\n                <v-col cols=\"12\">\n                    <v-btn x-small :disabled=\"!stateToAdd\" @click=\"onAddState\">Add</v-btn>\n                    <v-btn x-small class=\"ml-2\" @click=\"clearStatesConfirmation = true\">Clear All</v-btn>\n                </v-col>\n            </v-row>\n        </v-col>\n        <v-col cols=\"12\" sm=\"8\" class=\"pa-1\" v-else>\n            <p class=\"caption cheat-muted pa-2\">No actor selected. Open a game with a party first.</p>\n        </v-col>\n    </v-row>\n    <v-alert v-if=\"partyError\" type=\"error\" dense>{{ partyError }}</v-alert>\n    <v-dialog v-model=\"partyConfirmation\" max-width=\"400\"><v-card><v-card-text class=\"pt-4\">{{ selectedInParty ? 'Remove this actor from your party?' : 'Recruit this actor? This may bypass story progression and does not override battle-party limits.' }}</v-card-text><v-card-actions><v-btn text @click=\"partyConfirmation = false\">Cancel</v-btn><v-btn text @click=\"changeParty\">Confirm</v-btn></v-card-actions></v-card></v-dialog>\n    <v-dialog v-model=\"clearStatesConfirmation\" max-width=\"360\"><v-card><v-card-text class=\"pt-4\">Remove all status effects from this actor?</v-card-text><v-card-actions><v-btn text @click=\"clearStatesConfirmation = false\">Cancel</v-btn><v-btn text @click=\"clearStatesConfirmation = false; onClearStates()\">Clear effects</v-btn></v-card-actions></v-card></v-dialog>\n</v-card>\n    ",
@@ -4197,7 +4213,7 @@ var Pn = {
 			return !!(e && e.isInParty);
 		},
 		favoriteStates() {
-			return this.detail ? Mn(this.detail.activeStates, (e) => ({
+			return this.detail ? Nn(this.detail.activeStates, (e) => ({
 				kind: "state",
 				actorId: this.detail.id,
 				id: e.id
@@ -4246,28 +4262,28 @@ var Pn = {
 			}
 		},
 		initializeVariables() {
-			var e = this.selectedActorId, t = hn();
+			var e = this.selectedActorId, t = gn();
 			if (this.paramNames = t.paramNames, this.actors = t.actors, this.classes = t.classes, this.allSkills = t.allSkills, this.allStates = t.allStates, this.actors.length > 0) {
 				for (var n = !1, r = 0; r < this.actors.length; r++) if (this.actors[r].id === e) {
 					n = !0;
 					break;
 				}
-				this.selectedActorId = n ? e : this.actors[0].id, this.detail = mn(this.selectedActorId);
+				this.selectedActorId = n ? e : this.actors[0].id, this.detail = hn(this.selectedActorId);
 			} else this.selectedActorId = null, this.detail = null;
 			this.skillToLearn = null;
 		},
 		selectActor(e) {
-			this.selectedActorId = e, this.detail = mn(e), this.skillToLearn = null, this.stateToAdd = null;
+			this.selectedActorId = e, this.detail = hn(e), this.skillToLearn = null, this.stateToAdd = null;
 		},
 		liveActor() {
 			return I(this.selectedActorId);
 		},
 		onNameChange() {
 			var e = String(this.detail && this.detail.name || "").trim();
-			e && gn(this.selectedActorId, e), j(this, function() {});
+			e && _n(this.selectedActorId, e), j(this, function() {});
 		},
 		onNicknameChange() {
-			_n(this.selectedActorId, String(this.detail && this.detail.nickname || "")), j(this, function() {});
+			vn(this.selectedActorId, String(this.detail && this.detail.nickname || "")), j(this, function() {});
 		},
 		onLevelChange() {
 			var e = this.liveActor(), t = e ? e.level : 1, n = A(this.detail.level, {
@@ -4391,7 +4407,7 @@ var Pn = {
 			}.bind(this));
 		}
 	}
-}, Fn = S([
+}, In = S([
 	{
 		text: "Name",
 		value: "name"
@@ -4405,18 +4421,18 @@ var Pn = {
 		value: "mp"
 	}
 ]);
-function In(e) {
-	return Fe(e);
+function Ln(e) {
+	return Ie(e);
 }
 //#endregion
 //#region cheat-engine/www/cheat/panels/HealthSettingTab.js
-var Ln = {
+var Rn = {
 	name: "HealthSettingTab",
 	components: { GameAsset: L },
 	template: "\n<div>\n    <v-data-table\n        v-if=\"tableHeaders\"\n        dense\n        hide-default-footer\n        :headers=\"tableHeaders\"\n        :items=\"editingItems\">\n        <template\n            v-slot:item.name=\"{ item }\">\n            <game-asset v-if=\"item.actorId || item.enemyId\" :kind=\"item.actorId ? 'actor' : 'enemy'\" :record-id=\"item.actorId || item.enemyId\" :label=\"item.name\" :size=\"32\"/><span class=\"caption\">{{item.name}}</span>\n        </template>\n        <template\n            v-slot:item.hp=\"{ item }\">\n            <v-text-field\n                class=\"d-inline-flex x-small-field caption cheat-field-w50\"\n                hide-details\n                solo\n                v-model=\"item.hp.hp\"\n                label=\"Curr Hp\"\n                dense\n                @keydown.self.stop\n                @change=\"onDataChange\"\n                @focus=\"$event.target.select()\">\n            </v-text-field>\n            <span class=\"caption\">/ {{item.hp.mhp}}</span>\n        </template>\n        <template\n            v-slot:item.mp=\"{ item }\">\n            <v-text-field\n                class=\"d-inline-flex x-small-field caption cheat-field-w50\"\n                hide-details\n                solo\n                v-model=\"item.mp.mp\"\n                label=\"Curr Mp\"\n                dense\n                @keydown.self.stop\n                @change=\"onDataChange\"\n                @focus=\"$event.target.select()\">\n            </v-text-field>\n            <span class=\"caption\">/ {{item.mp.mmp}}</span>\n        </template>\n    </v-data-table>\n</div>\n    ",
 	data() {
 		return {
-			tableHeaders: Fn,
+			tableHeaders: In,
 			editingItems: []
 		};
 	},
@@ -4427,7 +4443,7 @@ var Ln = {
 	watch: { items: {
 		immediate: !0,
 		handler() {
-			this.editingItems = In(this.items);
+			this.editingItems = Ln(this.items);
 		}
 	} },
 	methods: { onDataChange() {
@@ -4532,7 +4548,7 @@ var Ln = {
 };
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/health/HealthSettingPanelState.js
-function Rn(e, t) {
+function zn(e, t) {
 	let n = e;
 	return {
 		id: t,
@@ -4549,22 +4565,22 @@ function Rn(e, t) {
 		}
 	};
 }
-function zn() {
+function Bn() {
 	return {
-		enemy: $gameTroop.members().map((e, t) => Rn(e, t)),
-		party: $gameParty.members().map((e) => Rn(e, e.actorId())),
+		enemy: $gameTroop.members().map((e, t) => zn(e, t)),
+		party: $gameParty.members().map((e) => zn(e, e.actorId())),
 		oneHitKill: R.isOneHitKillEnabled(),
 		disableRandomEncounter: R.isDisableRandomEncounter()
 	};
 }
-function Bn(e, t) {
+function Vn(e, t) {
 	return e === "party" ? $gameParty.members().find((e) => e.actorId() === t) || null : $gameTroop.members()[t] || null;
 }
 //#endregion
 //#region cheat-engine/www/cheat/panels/HealthSettingPanel.js
-var Vn = {
+var Hn = {
 	name: "HealthSettingPanel",
-	components: { HealthSettingTab: Ln },
+	components: { HealthSettingTab: Rn },
 	template: "\n<v-card flat class=\"cheat-panel\">\n    <div class=\"cheat-panel__head\">\n        <div>\n            <div class=\"cheat-panel__title\">HP / MP / Battle</div>\n        </div>\n        <v-btn small text title=\"Reload from game data\" aria-label=\"Reload from game data\" @click=\"initializeVariables\">\n            <v-icon left small>mdi-refresh</v-icon>Refresh\n        </v-btn>\n    </div>\n\n    <section class=\"cheat-section\">\n        <div class=\"cheat-section__title\">Battle</div>\n        <div class=\"cheat-filter-bar\">\n            <v-checkbox\n                data-feature=\"random-encounters\"\n                v-model=\"disableRandomEncounter\"\n                hide-details\n                dense\n                x-small\n                class=\"my-0 py-0\"\n                @change=\"onDisableRandomEncounterChange\">\n                <template v-slot:label>\n                    <span class=\"caption\">Disable Random Encounter</span>\n                </template>\n            </v-checkbox>\n            <v-checkbox\n                data-feature=\"one-hit-kill\"\n                v-model=\"oneHitKill\"\n                hide-details\n                dense\n                x-small\n                class=\"my-0 py-0\"\n                @change=\"onOneHitKillChange\">\n                <template v-slot:label>\n                    <span class=\"caption\">One-Hit Kill</span>\n                </template>\n            </v-checkbox>\n        </div>\n        <div class=\"cheat-actions\">\n            <v-btn small @click.prevent=\"encounterBattle\">Encounter</v-btn>\n            <v-btn small @click.prevent=\"victory\">Victory</v-btn>\n            <v-btn small @click.prevent=\"defeat\">Defeat</v-btn>\n            <v-btn small @click.prevent=\"escape\">Escape</v-btn>\n            <v-btn small @click.prevent=\"abort\">Abort</v-btn>\n        </div>\n    </section>\n\n    <section class=\"cheat-section\">\n        <div class=\"cheat-section__title\">Enemy</div>\n        <div class=\"cheat-actions\">\n            <v-btn small @click.prevent=\"changeAllEnemyHealth(0)\">Set 0</v-btn>\n            <v-btn small @click.prevent=\"changeAllEnemyHealth(1)\">Set 1</v-btn>\n            <v-btn small @click.prevent=\"recoverAllEnemy\">Recovery</v-btn>\n            <v-btn small @click.prevent=\"fillTpAllEnemy\">Fill TP</v-btn>\n            <v-btn small @click.prevent=\"clearStatesAllEnemy\">Clear States</v-btn>\n        </div>\n    </section>\n\n    <section class=\"cheat-section\">\n        <div class=\"cheat-section__title\">Party</div>\n        <div class=\"cheat-actions\">\n            <v-btn small @click.prevent=\"changeAllPartyHealth(0)\">Set 0</v-btn>\n            <v-btn small @click.prevent=\"changeAllPartyHealth(1)\">Set 1</v-btn>\n            <v-btn small @click.prevent=\"recoverAllParty\">Recovery</v-btn>\n            <v-btn small @click.prevent=\"fillTpAllParty\">Fill TP</v-btn>\n            <v-btn small @click.prevent=\"clearStatesAllParty\">Clear States</v-btn>\n        </div>\n    </section>\n\n    <template v-if=\"enemy && enemy.length > 0\">\n        <section class=\"cheat-section\">\n            <div class=\"cheat-section__title\">Enemy Details</div>\n            <health-setting-tab\n                :items=\"enemy\"\n                @change=\"onDetailChange($event, 'enemy')\">\n            </health-setting-tab>\n        </section>\n    </template>\n\n    <template v-if=\"party && party.length > 0\">\n        <section class=\"cheat-section\">\n            <div class=\"cheat-section__title\">Party Details</div>\n            <health-setting-tab\n                :items=\"party\"\n                @change=\"onDetailChange($event, 'party')\">\n            </health-setting-tab>\n        </section>\n    </template>\n</v-card>\n    ",
 	data() {
 		return {
@@ -4579,7 +4595,7 @@ var Vn = {
 	},
 	methods: {
 		initializeVariables() {
-			let e = zn();
+			let e = Bn();
 			this.enemy = e.enemy, this.party = e.party, this.oneHitKill = e.oneHitKill, this.disableRandomEncounter = e.disableRandomEncounter;
 		},
 		recoverAllEnemy() {
@@ -4630,7 +4646,7 @@ var Vn = {
 		onDetailChange(e, t) {
 			j(this, () => {
 				for (let n of e) {
-					let e = Bn(t, n.id);
+					let e = Vn(t, n.id);
 					e && (e.setHp(A(n.hp.hp, {
 						fallback: e.hp,
 						integer: !0
@@ -4642,7 +4658,7 @@ var Vn = {
 			});
 		}
 	}
-}, Hn = {
+}, Un = {
 	name: "PartyRecruitment",
 	components: { GameAsset: L },
 	template: "\n<div class=\"stats-party-recruitment\" data-testid=\"stats-party-recruitment\">\n    <v-menu\n        v-model=\"menuOpen\"\n        offset-y\n        left\n        nudge-bottom=\"4\"\n        max-height=\"320\"\n        :close-on-content-click=\"false\">\n        <template v-slot:activator=\"{ on, attrs }\">\n            <v-btn\n                icon\n                small\n                class=\"stats-party-recruitment__add\"\n                aria-label=\"Add party member\"\n                title=\"Add party member\"\n                data-testid=\"stats-recruitment-add\"\n                v-bind=\"attrs\"\n                v-on=\"on\"\n                @click=\"refreshCandidates\">\n                <v-icon small>mdi-plus</v-icon>\n            </v-btn>\n        </template>\n        <v-list dense class=\"stats-party-recruitment__menu\">\n            <v-list-item\n                v-for=\"candidate in candidates\"\n                :key=\"candidate.id\"\n                :data-testid=\"'stats-recruitment-option-' + candidate.id\"\n                @click=\"selectCandidate(candidate.id)\">\n                <game-asset kind=\"actor\" :record-id=\"candidate.id\" :label=\"candidate.name\" :size=\"28\" :navigate=\"false\" class=\"mr-2\"/>\n                <v-list-item-content>\n                    <v-list-item-title>{{ candidate.name }}</v-list-item-title>\n                    <v-list-item-subtitle>Actor #{{ candidate.id }}</v-list-item-subtitle>\n                </v-list-item-content>\n            </v-list-item>\n            <v-list-item v-if=\"!candidates.length\" disabled>\n                <v-list-item-content>\n                    <v-list-item-title>All actors are already in the party</v-list-item-title>\n                </v-list-item-content>\n            </v-list-item>\n        </v-list>\n    </v-menu>\n    <v-snackbar v-model=\"errorVisible\" :timeout=\"6000\" color=\"error\">\n        {{ partyError }}\n    </v-snackbar>\n    <v-dialog v-model=\"partyConfirmation\" max-width=\"440\">\n        <v-card>\n            <v-card-title>Confirm recruitment</v-card-title>\n            <v-card-text>Recruit {{ pendingActorName }}? Forced recruitment bypasses story progression and does not override battle-party limits. Save a backup first.</v-card-text>\n            <v-card-actions>\n                <v-spacer/>\n                <v-btn text @click=\"cancelRecruitment\">Cancel</v-btn>\n                <v-btn text color=\"warning\" data-testid=\"stats-recruitment-confirm\" @click=\"confirmRecruitment\">Confirm recruitment</v-btn>\n            </v-card-actions>\n        </v-card>\n    </v-dialog>\n</div>",
@@ -4702,36 +4718,36 @@ var Vn = {
 };
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/stats/StatsSettingPanelState.js
-function Un(e) {
+function Wn(e) {
 	return {
 		id: e.actorId(),
 		name: e.name(),
 		godMode: E.isGodMode(e),
 		level: e.level,
 		exp: e.currentExp(),
-		param: je(e)
+		param: Me(e)
 	};
 }
-function Wn() {
+function Gn() {
 	return {
 		paramNames: $dataSystem.terms.params,
-		actors: $gameParty.members().map((e) => Un(Kn(e)))
+		actors: $gameParty.members().map((e) => Wn(qn(e)))
 	};
 }
-function Gn(e, t) {
+function Kn(e, t) {
 	let n = $gameActors.actor(e);
 	E.changeName(n, t);
 }
-function Kn(e) {
+function qn(e) {
 	return e;
 }
 //#endregion
 //#region cheat-engine/www/cheat/panels/StatsSettingPanel.js
-var qn = {
+var Jn = {
 	name: "StatsSettingPanel",
 	components: {
 		GameAsset: L,
-		PartyRecruitment: Hn
+		PartyRecruitment: Un
 	},
 	template: "\n<v-card flat class=\"ma-0 pa-0\">\n    <div class=\"stats-actor-tabs\">\n        <v-tabs\n            v-model=\"selectedTab\"\n            class=\"stats-actor-tabs__strip\"\n            show-arrows>\n            <v-tab\n                v-for=\"(actor, actorIdx) in actors\"\n                :key=\"actor.id\">\n                <div\n                    v-if=\"editingNameActorId !== actor.id\"\n                    class=\"d-flex align-center\">\n                    <game-asset kind=\"actor\" :record-id=\"actor.id\" :label=\"actor.name\" :size=\"32\" class=\"mr-1\"/><span>{{actor.name}}</span>\n                    <v-icon\n                        x-small\n                        class=\"ml-2\"\n                        title=\"Edit name\"\n                        @click.stop.prevent=\"startNameEdit(actor, actorIdx)\">\n                        mdi-pencil\n                    </v-icon>\n                </div>\n                <v-text-field\n                    v-else\n                    ref=\"nameEditField\"\n                    v-model=\"nameEditDraft\"\n                    class=\"stats-actor-name-field\"\n                    solo\n                    dense\n                    flat\n                    hide-details\n                    single-line\n                    @click.stop\n                    @mousedown.stop\n                    @keydown.stop\n                    @keyup.enter.stop=\"finishNameEdit(actor)\"\n                    @keyup.esc.stop=\"cancelNameEdit\"\n                    @blur=\"finishNameEdit(actor)\">\n                </v-text-field>\n            </v-tab>\n        </v-tabs>\n        <party-recruitment @change=\"onPartyRecruitmentChange\"/>\n    </div>\n    <v-tabs-items\n        v-model=\"selectedTab\">\n        <v-tab-item\n            v-for=\"actor in actors\"\n            :key=\"actor.id\">\n            <v-card\n                flat\n                class=\"ma-0\">\n                <v-card-actions\n                    class=\"pa-0 \">\n                    <v-btn x-small text @click=\"manageActor(actor.id)\">Party / Skills / Status</v-btn>\n                    \n                    <v-spacer></v-spacer>\n                    <v-tooltip\n                        bottom>\n                        <span>Reload from game data</span>\n                        <template v-slot:activator=\"{ on, attrs }\">\n                            <v-btn\n                                small\n                                fab\n                                v-bind=\"attrs\"\n                                v-on=\"on\"\n                                @click=\"initializeVariables\">\n                                <v-icon>mdi-refresh</v-icon>\n                            </v-btn>\n                        </template>\n                    </v-tooltip>\n                </v-card-actions>\n\n                <div class=\"cheat-filter-bar\">\n                      <v-checkbox\n                          v-model=\"actor.godMode\"\n                          label=\"God Mode\"\n                          @change=\"onGodModeChange(actor)\">\n                      </v-checkbox>\n                    </div>    \n                    \n                <v-card-subtitle class=\"pa-0\">Level / EXP</v-card-subtitle>\n                <v-row class=\"mt-0\">\n                    <v-col>\n                        <v-text-field\n                            label=\"Lv\"\n                            v-model=\"actor.level\"\n                            type=\"number\"\n                            outlined\n                            dense\n                            hide-details\n                            @keydown.self.stop\n                            @change=\"onLevelChange(actor)\"\n                            @focus=\"$event.target.select()\"></v-text-field>\n                    </v-col>\n                    <v-col>\n                        <v-text-field\n                            label=\"EXP\"\n                            v-model=\"actor.exp\"\n                            outlined\n                            dense\n                            hide-details\n                            @keydown.self.stop\n                            @change=\"onExpChange(actor)\"\n                            @focus=\"$event.target.select()\"></v-text-field>\n                    </v-col>\n                </v-row>\n                \n                <v-card-subtitle class=\"pa-0 mt-4\">Stats</v-card-subtitle>\n                <v-row class=\"mt-0\">\n                    <v-col\n                        v-for=\"(_, paramIdx) in actor.param.length\"\n                        :key=\"paramIdx\"\n                        cols=\"6\"\n                        md=\"6\">\n                        <v-text-field\n                            :label=\"paramNames[paramIdx]\"\n                            v-model=\"actor.param[paramIdx]\"\n                            type=\"number\"\n                            outlined\n                            dense\n                            hide-details\n                            @keydown.self.stop\n                            @change=\"onParamChange(actor, paramIdx)\"\n                            @focus=\"$event.target.select()\"></v-text-field>\n                    </v-col>\n                </v-row>\n            </v-card>\n        </v-tab-item>\n    </v-tabs-items>\n</v-card>\n    ",
 	data() {
@@ -4754,10 +4770,10 @@ var qn = {
 			});
 		},
 		manageActor(e) {
-			kn(e);
+			An(e);
 		},
 		initializeVariables() {
-			let e = Wn();
+			let e = Gn();
 			this.paramNames = e.paramNames, this.actors = e.actors;
 		},
 		startNameEdit(e, t) {
@@ -4769,13 +4785,13 @@ var qn = {
 		finishNameEdit(e) {
 			if (this.editingNameActorId !== e.id) return;
 			let t = String(this.nameEditDraft || "").trim();
-			t && t !== e.name && (e.name = t, Gn(e.id, t)), this.editingNameActorId = null, this.nameEditDraft = "";
+			t && t !== e.name && (e.name = t, Kn(e.id, t)), this.editingNameActorId = null, this.nameEditDraft = "";
 		},
 		cancelNameEdit() {
 			this.editingNameActorId = null, this.nameEditDraft = "";
 		},
 		onLevelChange(e) {
-			let t = Ae(e.id);
+			let t = je(e.id);
 			j(this, () => {
 				t && t.changeLevel(A(e.level, {
 					fallback: t.level,
@@ -4784,7 +4800,7 @@ var qn = {
 			});
 		},
 		onExpChange(e) {
-			let t = Ae(e.id);
+			let t = je(e.id);
 			j(this, () => {
 				t && t.changeExp(A(e.exp, {
 					fallback: t.currentExp(),
@@ -4793,7 +4809,7 @@ var qn = {
 			});
 		},
 		onParamChange(e, t) {
-			let n = Ae(e.id);
+			let n = je(e.id);
 			j(this, () => {
 				if (n) {
 					let r = A(e.param[t], {
@@ -4805,13 +4821,13 @@ var qn = {
 			});
 		},
 		onGodModeChange(e) {
-			let t = Ae(e.id);
+			let t = je(e.id);
 			j(this, () => {
 				t && E.toggleGodMode(t);
 			});
 		}
 	}
-}, z = "${TEXT}", Jn = {
+}, z = "${TEXT}", Yn = {
 	ezTransWeb: {
 		id: "ezTransWeb",
 		name: "ezTransWeb (JP → KR)",
@@ -4968,7 +4984,7 @@ var qn = {
 			targetLang: "English"
 		}
 	}
-}, Yn = {
+}, Xn = {
 	ezTransWeb: 500,
 	ezTransServer: 100,
 	lingva: 10,
@@ -4981,7 +4997,7 @@ var qn = {
 	openai: 100,
 	googleGemini: 100,
 	llmCustom: 100
-}, Xn = {
+}, Zn = {
 	ezTransWeb: 1e3,
 	ezTransServer: 500,
 	lingva: 20,
@@ -4994,7 +5010,7 @@ var qn = {
 	openai: 200,
 	googleGemini: 200,
 	llmCustom: 200
-}, Zn = {
+}, Qn = {
 	ezTransWeb: 50,
 	ezTransServer: 20,
 	lingva: 1,
@@ -5007,7 +5023,7 @@ var qn = {
 	openai: 10,
 	googleGemini: 10,
 	llmCustom: 3
-}, Qn = {
+}, $n = {
 	delimiter: " ⟨SEP⟩ ",
 	maxBatchLength: {
 		lingva: 500,
@@ -5056,7 +5072,7 @@ var qn = {
 	unsubscribe(e) {
 		this.callbacks = this.callbacks.filter((t) => t !== e);
 	}
-}, $n = class {
+}, er = class {
 	constructor() {
 		this.storage = new h(`./${i()}/cheat-settings/translation-bank.json`), this.cache = this.loadCache(), this._dirty = !1, this._saveTimer = null;
 	}
@@ -5131,7 +5147,7 @@ var qn = {
 			return console.error("Failed to import translation data:", e), !1;
 		}
 	}
-}, er = class {
+}, tr = class {
 	constructor() {
 		this.reset();
 	}
@@ -5165,15 +5181,15 @@ var qn = {
 		for (let [e, t] of Object.entries(this.requestsPerNode)) console.log(`    ${e}: ${t} requests`);
 		console.log(`${"=".repeat(60)}\n`);
 	}
-}, V = new $n(), H = new er();
+}, V = new er(), H = new tr();
 //#endregion
 //#region cheat-engine/www/cheat/js/translation/TranslationBatching.js
-function tr(e, t, n) {
+function nr(e, t, n) {
 	if (e) return 999999;
-	let r = Xn[n] || 50;
+	let r = Zn[n] || 50;
 	return t <= r ? t : (console.warn(`Chunk size ${t} too large for ${n}. Using safe limit: ${r}`), r);
 }
-async function nr(e, t, n) {
+async function rr(e, t, n) {
 	console.log(`Using original translation method for ${e.length} texts`);
 	let r = [];
 	for (let i = 0; i < e.length; i += t) {
@@ -5183,8 +5199,8 @@ async function nr(e, t, n) {
 	let i = [].concat(...r);
 	return console.log(`Original translation completed. Input: ${e.length}, Output: ${i.length}`), i;
 }
-function rr(e, t) {
-	let n = Qn, r = n.maxBatchLength[t] || 1e3, i = n.maxBatchEncodedLength && Object.prototype.hasOwnProperty.call(n.maxBatchEncodedLength, t) ? n.maxBatchEncodedLength[t] : null, a = n.maxBatchItems[t] || 20, o = n.delimiter, s = encodeURIComponent(o).length, c = [], l = [], u = 0, d = 0;
+function ir(e, t) {
+	let n = $n, r = n.maxBatchLength[t] || 1e3, i = n.maxBatchEncodedLength && Object.prototype.hasOwnProperty.call(n.maxBatchEncodedLength, t) ? n.maxBatchEncodedLength[t] : null, a = n.maxBatchItems[t] || 20, o = n.delimiter, s = encodeURIComponent(o).length, c = [], l = [], u = 0, d = 0;
 	for (let t of e) {
 		if (!t || !t.trim()) {
 			l.push("");
@@ -5195,8 +5211,8 @@ function rr(e, t) {
 	}
 	return l.length > 0 && c.push(l), c;
 }
-async function ir(e, t) {
-	let n = Qn.delimiter, r = [], i = [];
+async function ar(e, t) {
+	let n = $n.delimiter, r = [], i = [];
 	if (e.forEach((e, t) => {
 		e && e.trim() ? (r.push({
 			originalIndex: t,
@@ -5224,18 +5240,18 @@ async function ir(e, t) {
 				t[n] = e || "";
 			}), t;
 		}
-		let s = Math.floor(i.length / 2), c = e.slice(0, s), l = e.slice(s), [u, d] = await Promise.all([ir(c, t), ir(l, t)]);
+		let s = Math.floor(i.length / 2), c = e.slice(0, s), l = e.slice(s), [u, d] = await Promise.all([ar(c, t), ar(l, t)]);
 		return [...u, ...d];
 	}
 }
-async function ar(e, t, n) {
-	let r = rr(e, t), i = Qn.delimiter;
+async function or(e, t, n) {
+	let r = ir(e, t), i = $n.delimiter;
 	for (let e of r) {
 		let t = e.filter((e) => e && e.trim()), n = t.join(i).length;
 		H.recordBatch(t.length, n);
 	}
 	H.totalStrings = e.length, console.log(`[Translator] ${r.length} batches × ${t} — ${e.length} strings`);
-	let a = Array(r.length), o = Zn[t] || 5, s = 0, c = 0, l = e.length, u = -1, d = async () => {
+	let a = Array(r.length), o = Qn[t] || 5, s = 0, c = 0, l = e.length, u = -1, d = async () => {
 		for (; s < r.length;) {
 			let e = s++, t = r[e];
 			try {
@@ -5252,7 +5268,7 @@ async function ar(e, t, n) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/translation/TranslationBasicRequest.js
-async function or(e, t) {
+async function sr(e, t) {
 	let n = encodeURI(t), r = e.urlPattern.replace(z, n), i;
 	try {
 		if (e.method === "get") i = (await axios.get(r)).data;
@@ -5267,7 +5283,7 @@ async function or(e, t) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/translation/TranslationExtractors.js
-function sr() {
+function cr() {
 	let e = [], t = window.$dataSystem;
 	if (!t) return e;
 	if (t.terms && t.terms.basic && e.push(...t.terms.basic.filter((e) => e && typeof e == "string" && e.trim())), t.terms && t.terms.commands && e.push(...t.terms.commands.filter((e) => e && typeof e == "string" && e.trim())), t.terms && t.terms.params && e.push(...t.terms.params.filter((e) => e && typeof e == "string" && e.trim())), t.terms && t.terms.messages) for (let n in t.terms.messages) {
@@ -5282,7 +5298,7 @@ function sr() {
 	]) t[n] && e.push(...t[n].filter((e) => e && typeof e == "string" && e.trim()));
 	return t.gameTitle && e.push(t.gameTitle), e;
 }
-function cr(e) {
+function lr(e) {
 	let t = [];
 	if (!e || !Array.isArray(e)) return t;
 	for (let n = 0; n < e.length; n++) {
@@ -5305,13 +5321,13 @@ function cr(e) {
 	}
 	return t;
 }
-function lr() {
+function ur() {
 	let e = [];
 	if (!window.$dataCommonEvents) return e;
-	for (let t of window.$dataCommonEvents) !t || !t.list || (e.push(...cr(t.list)), t.name && typeof t.name == "string" && t.name.trim() && e.push(t.name));
+	for (let t of window.$dataCommonEvents) !t || !t.list || (e.push(...lr(t.list)), t.name && typeof t.name == "string" && t.name.trim() && e.push(t.name));
 	return console.log(`[Translator] Extracted ${e.length} strings from Common Events`), e;
 }
-async function ur(t) {
+async function dr(t) {
 	let r = [];
 	if (!n()) return console.warn("[Translator] Event dialogue extraction requires NW.js (desktop game)"), r;
 	try {
@@ -5325,7 +5341,7 @@ async function ur(t) {
 			try {
 				let e = i.join(a, s), t = JSON.parse(n.readFileSync(e, "utf-8"));
 				if (t.displayName && typeof t.displayName == "string" && t.displayName.trim() && r.push(t.displayName), t.events) {
-					for (let e of t.events) if (!(!e || !e.pages)) for (let t of e.pages) !t || !t.list || r.push(...cr(t.list));
+					for (let e of t.events) if (!(!e || !e.pages)) for (let t of e.pages) !t || !t.list || r.push(...lr(t.list));
 				}
 			} catch (e) {
 				console.warn(`[Translator] Failed to read ${s}:`, e.message);
@@ -5335,7 +5351,7 @@ async function ur(t) {
 			let e = i.join(a, "Troops.json");
 			if (n.existsSync(e)) {
 				let t = JSON.parse(n.readFileSync(e, "utf-8"));
-				for (let e of t) if (!(!e || !e.pages)) for (let t of e.pages) !t || !t.list || r.push(...cr(t.list));
+				for (let e of t) if (!(!e || !e.pages)) for (let t of e.pages) !t || !t.list || r.push(...lr(t.list));
 				console.log("[Translator] Also scanned Troops.json for battle events");
 			}
 		} catch (e) {
@@ -5347,7 +5363,7 @@ async function ur(t) {
 	}
 	return r;
 }
-async function dr(e, t) {
+async function fr(e, t) {
 	let n = [];
 	if (e.variables && window.$dataSystem && window.$dataSystem.variables && n.push({
 		type: "Variables",
@@ -5397,7 +5413,7 @@ async function dr(e, t) {
 		type: "Actors",
 		list: i(window.$dataActors)
 	}), e.system && window.$dataSystem) {
-		let e = sr();
+		let e = cr();
 		e.length > 0 && n.push({
 			type: "System Terms",
 			list: e
@@ -5405,14 +5421,14 @@ async function dr(e, t) {
 	}
 	if (e.dialogues) {
 		t.update(!0, 0, "Scanning map files...");
-		let e = await ur(t);
+		let e = await dr(t);
 		e.length > 0 && n.push({
 			type: "Dialogues",
 			list: e
 		});
 	}
 	if (e.dialogues && window.$dataCommonEvents) {
-		let e = lr();
+		let e = ur();
 		e.length > 0 && n.push({
 			type: "Common Events",
 			list: e
@@ -5422,14 +5438,14 @@ async function dr(e, t) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/translation/TranslationLingvaRequest.js
-var fr = void 0, pr = /* @__PURE__ */ new Set();
-async function mr(e, t, n) {
+var pr = void 0, mr = /* @__PURE__ */ new Set();
+async function hr(e, t, n) {
 	let r = e.sourceLang || "auto", i = e.isLocal ? (e.localDomain || "http://localhost:3000").split(",") : ["https://lingva.ml"], a = typeof n == "number" ? n : 0, o = e.isLocal ? 2 : Math.max(i.length, 4);
 	if (!e.isLocal) {
 		let e = Date.now(), t = 1500;
-		fr === void 0 && (fr = 0);
-		let n = e - fr;
-		n < t && await new Promise((e) => setTimeout(e, t - n)), fr = Date.now();
+		pr === void 0 && (pr = 0);
+		let n = e - pr;
+		n < t && await new Promise((e) => setTimeout(e, t - n)), pr = Date.now();
 	}
 	for (let n = 0; n < o; n++) {
 		let s = i[a % i.length].trim();
@@ -5457,7 +5473,7 @@ async function mr(e, t, n) {
 			if (d && e.isLocal && n === 0) continue;
 			if (e.isLocal) {
 				if (n < o - 1) {
-					pr.has(s) || (pr.add(s), console.info(`[Lingva] Local endpoint failed on ${s}; trying next node`));
+					mr.has(s) || (mr.add(s), console.info(`[Lingva] Local endpoint failed on ${s}; trying next node`));
 					continue;
 				}
 				return {
@@ -5485,7 +5501,7 @@ async function mr(e, t, n) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/translation/TranslationLlmRequest.js
-async function hr(e, t, n) {
+async function gr(e, t, n) {
 	let r = t.apiUrl || e.apiUrl, i = t.model || e.model, a = t.apiKey || "", o = e.sourceLang || "Japanese", s = e.targetLang || "English", c = t.systemPrompt || `You are a professional RPG game translator. Translate the following ${o} game text to ${s}.\n\nRules:\n- Translate ONLY the text, output NOTHING else (no explanations, no notes)\n- Preserve the delimiter âŸ¨SEPâŸ© exactly as-is between translated segments\n- Keep game variables like \\V[123], \\N[1], %1, %2 unchanged\n- Keep newline characters (\\n) unchanged\n- Maintain the tone and personality of game dialogue\n- For RPG terms (skills, items, spells), use natural English equivalents\n- Do NOT add quotes around the translation`, l = {
 		"Content-Type": "application/json",
 		Accept: "application/json"
@@ -5531,7 +5547,7 @@ async function hr(e, t, n) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/translation/TranslationPool.js
-function gr(e, t) {
+function _r(e, t) {
 	let n = [], r = /* @__PURE__ */ new Map();
 	e.forEach((e) => {
 		let i = /* @__PURE__ */ new Set();
@@ -5551,7 +5567,7 @@ function gr(e, t) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/translation/TranslationWorkflow.js
-async function _r(e, t, n, r, i, a, o) {
+async function vr(e, t, n, r, i, a, o) {
 	let s = 0;
 	for (let [c, l] of e.entries()) {
 		if (B.update(!0, Math.round(s / t * 100), `${c} (${s}/${t})`), r || !i) {
@@ -5616,7 +5632,7 @@ var U = new class {
 	}
 	getEndPointData() {
 		if (this.getEndPointSelection() === "custom") return this.getCustomEndPointData();
-		let e = Jn[this.getEndPointSelection()].data;
+		let e = Yn[this.getEndPointSelection()].data;
 		if (e.isLLM) {
 			let t = this.getLLMConfig();
 			return {
@@ -5717,7 +5733,7 @@ var U = new class {
 	isDialogueTranslateEnabled() {
 		return this.isEnabled() && this.getTargets().dialogues;
 	}
-}(), vr = new class {
+}(), yr = new class {
 	constructor(e) {
 		this.settings = e;
 	}
@@ -5732,16 +5748,16 @@ var U = new class {
 	async __translate(e) {
 		var t = this;
 		let n = t.settings.getEndPointData();
-		return n.isLingva ? await t.__translateLingva(e) : n.isLLM ? await t.__translateLLM(e) : await or(n, e);
+		return n.isLingva ? await t.__translateLingva(e) : n.isLLM ? await t.__translateLLM(e) : await sr(n, e);
 	}
 	async __translateLingva(e) {
 		var t = this;
-		let n = await mr(t.settings.getEndPointData(), e, t._rrIndex);
+		let n = await hr(t.settings.getEndPointData(), e, t._rrIndex);
 		return t._rrIndex = n.rrIndex, n.translated;
 	}
 	async __translateLLM(e) {
 		var t = this;
-		return await hr(t.settings.getEndPointData(), t.settings.getLLMConfig(), e);
+		return await gr(t.settings.getEndPointData(), t.settings.getLLMConfig(), e);
 	}
 	async __translateBulk(e) {
 		return (await this.translate(e.join("\n"))).split("\n");
@@ -5758,7 +5774,7 @@ var U = new class {
 		}
 	}
 	getAdaptiveChunkSize(e, t) {
-		return tr(this.settings.getEndPointData().isLingva, e, t);
+		return nr(this.settings.getEndPointData().isLingva, e, t);
 	}
 	async translateBulk(e) {
 		var t = this;
@@ -5774,22 +5790,22 @@ var U = new class {
 	}
 	async translateBulkOriginal(e) {
 		var t = this;
-		return await nr(e, t.settings.getBulkTranslateChunkSize(), async (e) => t.__translateBulk(e));
+		return await rr(e, t.settings.getBulkTranslateChunkSize(), async (e) => t.__translateBulk(e));
 	}
 	createBatches(e, t) {
-		return rr(e, t);
+		return ir(e, t);
 	}
 	async translateBatch(e) {
 		var t = this;
-		return await ir(e, async (e) => t.translate(e));
+		return await ar(e, async (e) => t.translate(e));
 	}
 	async translateLingvaChunk(e) {
 		var t = this;
-		return await ar(e, t.settings.getEndPointData().id || t.settings.getEndPointSelection(), async (e) => t.translateBatch(e));
+		return await or(e, t.settings.getEndPointData().id || t.settings.getEndPointSelection(), async (e) => t.translateBatch(e));
 	}
 	async translateAllGlobals() {
 		var e = this;
-		let t = e.settings.getTargets(), n = e.settings.getEndPointData(), r = n.id === "ezTransWeb" || n.id === "ezTransServer", i = e.settings.getBulkTranslateChunkSize(), a = localStorage.getItem("useBatchTranslation") !== "false", { uncachedSets: o, finalPool: s, totalUncached: c } = gr(await dr(t, B), V);
+		let t = e.settings.getTargets(), n = e.settings.getEndPointData(), r = n.id === "ezTransWeb" || n.id === "ezTransServer", i = e.settings.getBulkTranslateChunkSize(), a = localStorage.getItem("useBatchTranslation") !== "false", { uncachedSets: o, finalPool: s, totalUncached: c } = _r(await fr(t, B), V);
 		if (c === 0) {
 			B.update(!1, 100, "All Cached"), T.success("All text already translated! Applying to game..."), window.dispatchEvent(new CustomEvent("cheat-translate-finish")), setTimeout(() => B.update(!1, 0, ""), 2e3);
 			return;
@@ -5798,7 +5814,7 @@ var U = new class {
 			console.log(`  ${t}: ${e.length} strings`);
 		}), B.update(!0, 0, `Translating Pool (0/${c})`), H.reset(), H.totalStrings = c;
 		try {
-			n.isLingva ? await e.translateBulk(s) : await _r(o, c, i, r, a, async (t) => e.translate(t), async (t) => e.translateBulk(t));
+			n.isLingva ? await e.translateBulk(s) : await vr(o, c, i, r, a, async (t) => e.translate(t), async (t) => e.translateBulk(t));
 		} catch (e) {
 			console.error("[Translator] Global translation failed", e);
 		}
@@ -5810,34 +5826,34 @@ setTimeout(() => {
 }, 1e3);
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/PanelTranslation.js
-function yr(e) {
+function br(e) {
 	if (!e || !e.trim()) return e || "";
 	let t = V.get(e);
 	return t ? t.translated : e;
 }
-function br(e, t) {
-	return t ? yr(e) : e || "";
-}
 function xr(e, t) {
+	return t ? br(e) : e || "";
+}
+function Sr(e, t) {
 	return t ? {
-		name: yr(e.name),
-		desc: yr(e.description)
+		name: br(e.name),
+		desc: br(e.description)
 	} : {
 		name: e.name || "",
 		desc: e.description
 	};
 }
-function Sr(e, t) {
+function Cr(e, t) {
 	e._translateListener = () => {
 		t() && typeof e.initializeVariables == "function" && e.initializeVariables();
 	}, window.addEventListener("cheat-translate-finish", e._translateListener);
 }
-function Cr(e) {
+function wr(e) {
 	e._translateListener && (window.removeEventListener("cheat-translate-finish", e._translateListener), e._translateListener = null);
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/inventory/InventoryPanelState.js
-var wr = [
+var Tr = [
 	"MHP",
 	"MMP",
 	"ATK",
@@ -5847,73 +5863,73 @@ var wr = [
 	"AGI",
 	"LUK"
 ];
-function Tr(e, t) {
+function Er(e, t) {
 	return Array.isArray(e) ? e.filter((e) => !!e).map((e) => ({
 		_itemId: Number(e.id) || 0,
 		_itemKind: t
 	})) : [];
 }
-function Er(e, t) {
+function Dr(e, t) {
 	return {
-		...xr(e, t),
-		params: kr(e),
-		paramsSort: Ar(e),
-		effects: jr(e),
-		effectsSort: Mr(e),
+		...Sr(e, t),
+		params: Ar(e),
+		paramsSort: jr(e),
+		effects: Mr(e),
+		effectsSort: Nr(e),
 		price: typeof e.price == "number" ? e.price : 0
 	};
 }
-function Dr(e) {
+function Or(e) {
 	return e && $dataItems && $dataItems[e.id] === e ? "item" : e && $dataWeapons && $dataWeapons[e.id] === e ? "weapon" : e && $dataArmors && $dataArmors[e.id] === e ? "armor" : "";
 }
-function Or() {
+function kr() {
 	let e = $dataSystem && $dataSystem.terms && Array.isArray($dataSystem.terms.params) ? $dataSystem.terms.params : null;
-	return e && e.length === wr.length ? e : wr;
+	return e && e.length === Tr.length ? e : Tr;
 }
-function kr(e) {
+function Ar(e) {
 	if (!Array.isArray(e.params)) return "";
-	let t = Or();
+	let t = kr();
 	return e.params.map((e, n) => {
 		if (!e) return "";
 		let r = e > 0 ? "+" : "";
-		return `${t[n] || wr[n] || `P${n}`}: ${r}${e}`;
+		return `${t[n] || Tr[n] || `P${n}`}: ${r}${e}`;
 	}).filter(Boolean).join(", ");
 }
-function Ar(e) {
+function jr(e) {
 	return Array.isArray(e.params) ? e.params.reduce((e, t) => {
 		let n = Math.abs(Number(t) || 0);
 		return n > e ? n : e;
 	}, 0) : 0;
 }
-function jr(e) {
-	return Array.isArray(e.effects) ? e.effects.map((e) => Nr(e)).filter(Boolean).join(", ") : "";
-}
 function Mr(e) {
+	return Array.isArray(e.effects) ? e.effects.map((e) => Pr(e)).filter(Boolean).join(", ") : "";
+}
+function Nr(e) {
 	return Array.isArray(e.effects) ? e.effects.reduce((e, t) => {
-		let n = Pr(t);
+		let n = Fr(t);
 		return n > e ? n : e;
 	}, 0) : 0;
 }
-function Nr(e) {
+function Pr(e) {
 	if (!e || typeof e.code != "number") return "";
 	switch (e.code) {
-		case 11: return Fr("HP", e);
-		case 12: return Fr("MP", e);
+		case 11: return Ir("HP", e);
+		case 12: return Ir("MP", e);
 		case 13: return e.value1 ? `TP +${Math.round(e.value1)}` : "";
-		case 21: return Ir("Add State", e.dataId, e.value1);
-		case 22: return Ir("Remove State", e.dataId, e.value1);
-		case 31: return Lr("Buff", e.dataId, e.value1);
-		case 32: return Lr("Debuff", e.dataId, e.value1);
-		case 33: return Lr("Clear Buff", e.dataId, e.value1);
-		case 34: return Lr("Clear Debuff", e.dataId, e.value1);
+		case 21: return Lr("Add State", e.dataId, e.value1);
+		case 22: return Lr("Remove State", e.dataId, e.value1);
+		case 31: return Rr("Buff", e.dataId, e.value1);
+		case 32: return Rr("Debuff", e.dataId, e.value1);
+		case 33: return Rr("Clear Buff", e.dataId, e.value1);
+		case 34: return Rr("Clear Debuff", e.dataId, e.value1);
 		case 41: return "Special: Escape";
-		case 42: return Rr(e.dataId, e.value1);
-		case 43: return zr(e.dataId);
+		case 42: return zr(e.dataId, e.value1);
+		case 43: return Br(e.dataId);
 		case 44: return e.dataId ? `Common Event #${e.dataId}` : "Common Event";
 		default: return `Effect #${e.code}`;
 	}
 }
-function Pr(e) {
+function Fr(e) {
 	if (!e || typeof e.code != "number") return 0;
 	switch (e.code) {
 		case 11:
@@ -5929,7 +5945,7 @@ function Pr(e) {
 		default: return 0;
 	}
 }
-function Fr(e, t) {
+function Ir(e, t) {
 	let n = [];
 	if (t.value1 && n.push(`${Math.round(t.value1 * 100)}%`), t.value2) {
 		let e = Math.round(t.value2), r = e > 0 ? "+" : "";
@@ -5937,24 +5953,24 @@ function Fr(e, t) {
 	}
 	return n.length ? `${e} ${n.join(" + ")}` : "";
 }
-function Ir(e, t, n) {
+function Lr(e, t, n) {
 	let r = t && $dataStates && $dataStates[t] && $dataStates[t].name ? $dataStates[t].name : t ? `#${t}` : "", i = typeof n == "number" && n > 0 ? ` ${Math.round(n * 100)}%` : "";
 	return r ? `${e}: ${r}${i}` : e;
 }
-function Lr(e, t, n) {
-	return `${e}: ${Or()[t || 0] || `P${t || 0}`}${typeof n == "number" && n > 0 ? ` ${Math.round(n)}t` : ""}`;
+function Rr(e, t, n) {
+	return `${e}: ${kr()[t || 0] || `P${t || 0}`}${typeof n == "number" && n > 0 ? ` ${Math.round(n)}t` : ""}`;
 }
-function Rr(e, t) {
-	let n = Or()[e || 0] || `P${e || 0}`, r = Math.round(t || 0);
+function zr(e, t) {
+	let n = kr()[e || 0] || `P${e || 0}`, r = Math.round(t || 0);
 	return `Grow: ${n} ${r > 0 ? "+" : ""}${r}`;
 }
-function zr(e) {
+function Br(e) {
 	let t = e && $dataSkills && $dataSkills[e] && $dataSkills[e].name ? $dataSkills[e].name : e ? `#${e}` : "";
 	return t ? `Learn: ${t}` : "Learn Skill";
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/inventory/ItemTableTabState.js
-function Br(e, t, n) {
+function Vr(e, t, n) {
 	let r = e.slice(0);
 	return r.push({
 		text: "Price",
@@ -5970,14 +5986,14 @@ function Br(e, t, n) {
 	}), {
 		tableHeaders: r,
 		tableItems: t.filter((e) => !!e).map((e) => {
-			let t = Vr(e);
+			let t = Hr(e);
 			if (!t) return null;
 			let r = n(t);
-			return r._itemId = t.id, r._itemKind = Dr(t), r.amount = $gameParty.numItems(t), r;
+			return r._itemId = t.id, r._itemKind = Or(t), r.amount = $gameParty.numItems(t), r;
 		}).filter((e) => !!e)
 	};
 }
-function Vr(e) {
+function Hr(e) {
 	let t = Number(e && e._itemId) || 0;
 	switch (e && e._itemKind) {
 		case "item": return $dataItems && $dataItems[t];
@@ -5988,17 +6004,17 @@ function Vr(e) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/panels/ItemTableTab.js
-var Hr = "itemTable.hideNamelessItems", Ur = {
+var Ur = "itemTable.hideNamelessItems", Wr = {
 	name: "ItemTableTab",
 	components: {
-		LockFavoriteControls: sn,
-		DatabaseTooltip: An
+		LockFavoriteControls: cn,
+		DatabaseTooltip: jn
 	},
 	template: "\n<v-card flat class=\"ma-0 pa-0\">\n <v-data-table\n        v-if=\"tableHeaders\"\n        dense\n        :headers=\"visibleTableHeaders\"\n        :items=\"filteredTableItems\"\n        :search=\"search\"\n        :custom-filter=\"tableItemFilter\"\n        :custom-sort=\"sortTableItems\"\n        :items-per-page=\"10\">\n        <template v-slot:top>\n            <div class=\"cheat-table-top\">\n                <v-text-field\n                    label=\"Search...\"\n                    solo\n                    v-model=\"search\"\n                    dense\n                    hide-details\n                    @keydown.self.stop\n                    @focus=\"$event.target.select()\">\n                </v-text-field>\n                <v-tooltip bottom>\n                    <span>Reload from game data</span>\n                    <template v-slot:activator=\"{ on, attrs }\">\n                        <v-btn\n                            small\n                            text\n                            class=\"cheat-table-top__action\"\n                            aria-label=\"Reload from game data\"\n                            v-bind=\"attrs\"\n                            v-on=\"on\"\n                            @click=\"initializeVariables\">\n                            <v-icon small left>mdi-refresh</v-icon>\n                            Reload\n                        </v-btn>\n                    </template>\n                </v-tooltip>\n            </div>\n            <div class=\"cheat-filter-bar\" role=\"group\" aria-label=\"Table display options\">\n                <v-checkbox\n                    v-model=\"excludeNameless\"\n                    dense\n                    hide-details\n                    label=\"Hide Nameless Items\"\n                    @change=\"onTableFilterChange\">\n                </v-checkbox>\n                <v-checkbox\n                    v-model=\"onlyOwnedItems\"\n                    dense\n                    hide-details\n                    label=\"Only Owned Items\"\n                    @change=\"onTableFilterChange\">\n                </v-checkbox>\n                <v-checkbox\n                    v-if=\"hasPriceColumn\"\n                    v-model=\"showPriceColumn\"\n                    dense\n                    hide-details\n                    label=\"Show Price\">\n                </v-checkbox>\n                <v-checkbox\n                    v-if=\"hasDetailColumn\"\n                    v-model=\"showDetailColumn\"\n                    dense\n                    hide-details\n                    :label=\"detailColumnToggleLabel\">\n                </v-checkbox>\n            </div>\n        </template>\n        <template\n            v-slot:item.name=\"{ item }\">\n            <div class=\"cheat-cell-clamp cheat-cell-clamp--sm\">\n                <database-tooltip :kind=\"item._itemKind\" :record-id=\"item._itemId\" :label=\"item.name\"/>\n            </div>\n        </template>\n        <template\n            v-slot:item.desc=\"{ item }\">\n            <v-tooltip\n                bottom\n                max-width=\"420\">\n                <template v-slot:activator=\"{ on, attrs }\">\n                    <div\n                        class=\"cheat-cell-clamp cheat-cell-clamp--lg\"\n                        v-bind=\"attrs\"\n                        v-on=\"on\">\n                        {{ item.desc }}\n                    </div>\n                </template>\n                <span>{{ item.desc }}</span>\n            </v-tooltip>\n        </template>\n        <template\n            v-slot:item.effects=\"{ item }\">\n            <v-tooltip\n                bottom\n                max-width=\"420\">\n                <template v-slot:activator=\"{ on, attrs }\">\n                    <div\n                        class=\"cheat-cell-clamp cheat-cell-clamp--md\"\n                        v-bind=\"attrs\"\n                        v-on=\"on\">\n                        {{ item.effects }}\n                    </div>\n                </template>\n                <span>{{ item.effects }}</span>\n            </v-tooltip>\n        </template>\n        <template\n            v-slot:item.params=\"{ item }\">\n            <v-tooltip\n                bottom\n                max-width=\"420\">\n                <template v-slot:activator=\"{ on, attrs }\">\n                    <div\n                        class=\"cheat-cell-clamp cheat-cell-clamp--md\"\n                        v-bind=\"attrs\"\n                        v-on=\"on\">\n                        {{ item.params }}\n                    </div>\n                </template>\n                <span>{{ item.params }}</span>\n            </v-tooltip>\n        </template>\n        <template\n            v-slot:item.controls=\"{ item }\">\n            <lock-favorite-controls :target=\"{kind:item._itemKind,id:item._itemId}\" :value=\"item.amount\" @change=\"initializeVariables\"/>\n        </template>\n        <template\n            v-slot:item.amount=\"{ item }\">\n            <v-text-field\n                class=\"d-inline-flex cheat-field-w60\"\n                height=\"10\"\n                hide-details\n                solo\n                :value=\"item.amount\"\n                label=\"Amount\"\n                dense\n                @keydown.self.stop\n                @click.native.stop\n                @change=\"onItemChange(item, $event)\"\n                @focus=\"$event.target.select()\">\n            </v-text-field>\n        </template>\n    </v-data-table>\n</v-card>\n    ",
 	data() {
 		return {
 			search: "",
-			excludeNameless: v(Hr, !0),
+			excludeNameless: v(Ur, !0),
 			onlyOwnedItems: !1,
 			showPriceColumn: !1,
 			showDetailColumn: !1,
@@ -6050,11 +6066,11 @@ var Hr = "itemTable.hideNamelessItems", Ur = {
 	},
 	methods: {
 		initializeVariables() {
-			let e = Br(this.headers, this.items, this.asTableData);
+			let e = Vr(this.headers, this.items, this.asTableData);
 			this.tableHeaders = e.tableHeaders, this.tableItems = e.tableItems;
 		},
 		onItemChange(e, t) {
-			let n = Vr(e);
+			let n = Hr(e);
 			if (!n) return;
 			t !== void 0 && (e.amount = A(t, {
 				fallback: e.amount,
@@ -6065,16 +6081,16 @@ var Hr = "itemTable.hideNamelessItems", Ur = {
 			r !== 0 && $gameParty.gainItem(n, r), e.amount = $gameParty.numItems(n);
 		},
 		onTableFilterChange() {
-			y(Hr, this.excludeNameless);
+			y(Ur, this.excludeNameless);
 		},
 		tableItemFilter(e, t, n) {
-			return Ne(t, this.searchableAttrs.map((e) => n[e]));
+			return Pe(t, this.searchableAttrs.map((e) => n[e]));
 		},
 		sortTableItems(e, t, n) {
-			return !Array.isArray(t) || !t.length ? Mn(e, (e) => ({
+			return !Array.isArray(t) || !t.length ? Nn(e, (e) => ({
 				kind: e._itemKind,
 				id: e._itemId
-			})) : Mn(e.slice().sort((e, r) => {
+			})) : Nn(e.slice().sort((e, r) => {
 				for (let i = 0; i < t.length; i += 1) {
 					let a = t[i], o = !!n[i], s = this.getSortableTableValue(e, a), c = this.getSortableTableValue(r, a), l = this.compareTableValues(s, c);
 					if (l !== 0) return o ? -l : l;
@@ -6101,7 +6117,7 @@ var Hr = "itemTable.hideNamelessItems", Ur = {
 			});
 		}
 	}
-}, Wr = S([
+}, Gr = S([
 	{
 		text: "Name",
 		value: "name"
@@ -6114,31 +6130,31 @@ var Hr = "itemTable.hideNamelessItems", Ur = {
 		text: "Effects",
 		value: "effects"
 	}
-]), Gr = {
+]), Kr = {
 	name: "ItemSettingPanel",
-	components: { ItemTableTab: Ur },
+	components: { ItemTableTab: Wr },
 	template: "\n<v-card flat class=\"ma-0 pa-0\">\n    <item-table-tab\n        :items=\"items\"\n        :headers=\"headers\"\n        :as-table-data=\"convertToTableData\"\n        :searchable-attrs=\"['name', 'desc', 'effects']\">\n        \n    </item-table-tab>\n</v-card>\n    ",
 	data() {
 		return {
 			items: [],
-			headers: Wr
+			headers: Gr
 		};
 	},
 	created() {
-		this.initializeVariables(), Sr(this, () => U.isItemTranslateEnabled());
+		this.initializeVariables(), Cr(this, () => U.isItemTranslateEnabled());
 	},
 	beforeDestroy() {
-		Cr(this);
+		wr(this);
 	},
 	methods: {
 		initializeVariables() {
-			this.items = Tr($dataItems, "item");
+			this.items = Er($dataItems, "item");
 		},
 		convertToTableData(e) {
-			return Er(e, !!U.getTargets().items);
+			return Dr(e, !!U.getTargets().items);
 		}
 	}
-}, Kr = S([
+}, qr = S([
 	{
 		text: "Name",
 		value: "name"
@@ -6151,31 +6167,31 @@ var Hr = "itemTable.hideNamelessItems", Ur = {
 		text: "Params",
 		value: "params"
 	}
-]), qr = {
+]), Jr = {
 	name: "WeaponSettingPanel",
-	components: { ItemTableTab: Ur },
+	components: { ItemTableTab: Wr },
 	template: "\n<v-card flat class=\"ma-0 pa-0\">\n    <item-table-tab\n        :items=\"items\"\n        :headers=\"headers\"\n        :as-table-data=\"convertToTableData\"\n        :searchable-attrs=\"['name', 'desc', 'params']\">\n        \n    </item-table-tab>\n</v-card>\n    ",
 	data() {
 		return {
 			items: [],
-			headers: Kr
+			headers: qr
 		};
 	},
 	created() {
-		this.initializeVariables(), Sr(this, () => U.isWeaponTranslateEnabled());
+		this.initializeVariables(), Cr(this, () => U.isWeaponTranslateEnabled());
 	},
 	beforeDestroy() {
-		Cr(this);
+		wr(this);
 	},
 	methods: {
 		initializeVariables() {
-			this.items = Tr($dataWeapons, "weapon");
+			this.items = Er($dataWeapons, "weapon");
 		},
 		convertToTableData(e) {
-			return Er(e, !!U.getTargets().weapons);
+			return Dr(e, !!U.getTargets().weapons);
 		}
 	}
-}, Jr = S([
+}, Yr = S([
 	{
 		text: "Name",
 		value: "name"
@@ -6188,145 +6204,145 @@ var Hr = "itemTable.hideNamelessItems", Ur = {
 		text: "Params",
 		value: "params"
 	}
-]), Yr = {
+]), Xr = {
 	name: "ArmorSettingPanel",
-	components: { ItemTableTab: Ur },
+	components: { ItemTableTab: Wr },
 	template: "\n<v-card flat class=\"ma-0 pa-0\">\n    <item-table-tab\n        :items=\"items\"\n        :headers=\"headers\"\n        :as-table-data=\"convertToTableData\"\n        :searchable-attrs=\"['name', 'desc', 'params']\">\n        \n    </item-table-tab>\n</v-card>\n    ",
 	data() {
 		return {
 			items: [],
-			headers: Jr
+			headers: Yr
 		};
 	},
 	created() {
-		this.initializeVariables(), Sr(this, () => U.isArmorTranslateEnabled());
+		this.initializeVariables(), Cr(this, () => U.isArmorTranslateEnabled());
 	},
 	beforeDestroy() {
-		Cr(this);
+		wr(this);
 	},
 	methods: {
 		initializeVariables() {
-			this.items = Tr($dataArmors, "armor");
+			this.items = Er($dataArmors, "armor");
 		},
 		convertToTableData(e) {
-			return Er(e, !!U.getTargets().armors);
+			return Dr(e, !!U.getTargets().armors);
 		}
 	}
-}, Xr = "cheat.variableSwitchWatcher.items", Zr = "cheat.variableSwitchWatcher.overlayEnabled", Qr = new h(`./${i()}/cheat-settings/watcher.json`);
-function $r() {
+}, Zr = "cheat.variableSwitchWatcher.items", Qr = "cheat.variableSwitchWatcher.overlayEnabled", $r = new h(`./${i()}/cheat-settings/watcher.json`);
+function ei() {
 	try {
-		let e = ci(Xr), t = e ? JSON.parse(e) : [];
-		return Array.isArray(t) ? t.filter(xi) : [];
+		let e = li(Zr), t = e ? JSON.parse(e) : [];
+		return Array.isArray(t) ? t.filter(Si) : [];
 	} catch (e) {
 		return console.warn("[WatcherPanel] Failed to read watch list", e), [];
 	}
 }
-function ei(e) {
-	li(Xr, JSON.stringify(e));
+function ti(e) {
+	ui(Zr, JSON.stringify(e));
 }
-function ti(e, t) {
-	let n = $r();
+function ni(e, t) {
+	let n = ei();
 	return !n.some((n) => n.type === e && n.id === t) && t > 0 && (n.push({
 		type: e,
 		id: t
-	}), ei(n)), n;
+	}), ti(n)), n;
 }
-function ni(e, t) {
-	let n = $r().filter((n) => !(n.type === e && n.id === t));
-	return ei(n), n;
-}
-function ri(e = null) {
-	let t = $r();
-	return {
-		targets: t,
-		overlayEnabled: oi(),
-		watchedRows: ui(t),
-		variableRows: di("variable"),
-		switchRows: di("switch"),
-		context: ii(e)
-	};
+function ri(e, t) {
+	let n = ei().filter((n) => !(n.type === e && n.id === t));
+	return ti(n), n;
 }
 function ii(e = null) {
-	let t = wi() ? Ti() : null;
+	let t = ei();
 	return {
-		currentMapId: Ci(),
-		mapReady: wi(),
-		facingEvent: Ei(t),
-		facingRows: t ? ki(t, "Facing") : [],
-		mapRows: wi() ? Di() : [],
-		mapEventCount: Oi()
+		targets: t,
+		overlayEnabled: si(),
+		watchedRows: di(t),
+		variableRows: fi("variable"),
+		switchRows: fi("switch"),
+		context: ai(e)
 	};
 }
-function ai() {
-	return ui($r());
+function ai(e = null) {
+	let t = Ti() ? Ei() : null;
+	return {
+		currentMapId: wi(),
+		mapReady: Ti(),
+		facingEvent: Di(t),
+		facingRows: t ? Ai(t, "Facing") : [],
+		mapRows: Ti() ? Oi() : [],
+		mapEventCount: ki()
+	};
 }
 function oi() {
-	return ci(Zr) === "true";
+	return di(ei());
 }
-function si(e) {
-	li(Zr, e ? "true" : "false");
+function si() {
+	return li(Qr) === "true";
 }
 function ci(e) {
-	let t = Qr.getItem(e);
+	ui(Qr, e ? "true" : "false");
+}
+function li(e) {
+	let t = $r.getItem(e);
 	if (t != null) return t;
 	let n = localStorage.getItem(e);
-	return n !== null && Qr.setItem(e, n), n;
+	return n !== null && $r.setItem(e, n), n;
 }
-function li(e, t) {
-	Qr.setItem(e, t), localStorage.setItem(e, t);
-}
-function ui(e) {
-	return e.map((e) => fi(e.type, e.id));
+function ui(e, t) {
+	$r.setItem(e, t), localStorage.setItem(e, t);
 }
 function di(e) {
-	return gi(e).map((t, n) => fi(e, n, t)).filter((e) => e.id > 0);
+	return e.map((e) => pi(e.type, e.id));
 }
-function fi(e, t, n) {
-	let r = n || hi(e, t), i = mi(e, t);
+function fi(e) {
+	return _i(e).map((t, n) => pi(e, n, t)).filter((e) => e.id > 0);
+}
+function pi(e, t, n) {
+	let r = n || gi(e, t), i = hi(e, t);
 	return {
 		type: e,
 		id: t,
 		name: r,
-		label: _i(e, t, r),
+		label: vi(e, t, r),
 		value: i,
-		valueText: yi(e, i)
+		valueText: bi(e, i)
 	};
 }
-function pi(e, t, n) {
-	return e === "selfSwitch" ? n : e === "switch" ? ($gameSwitches.setValue(t, !!n), $gameSwitches.value(t)) : ($gameVariables.setValue(t, bi(n)), $gameVariables.value(t));
-}
-function mi(e, t) {
-	return e === "selfSwitch" ? !1 : e === "switch" ? $gameSwitches ? $gameSwitches.value(t) : !1 : $gameVariables ? $gameVariables.value(t) : 0;
+function mi(e, t, n) {
+	return e === "selfSwitch" ? n : e === "switch" ? ($gameSwitches.setValue(t, !!n), $gameSwitches.value(t)) : ($gameVariables.setValue(t, xi(n)), $gameVariables.value(t));
 }
 function hi(e, t) {
-	return gi(e)[t] || vi(e, t);
+	return e === "selfSwitch" ? !1 : e === "switch" ? $gameSwitches ? $gameSwitches.value(t) : !1 : $gameVariables ? $gameVariables.value(t) : 0;
 }
-function gi(e) {
+function gi(e, t) {
+	return _i(e)[t] || yi(e, t);
+}
+function _i(e) {
 	return $dataSystem ? e === "switch" ? ($dataSystem.switches || []).slice() : ($dataSystem.variables || []).slice() : [];
 }
-function _i(e, t, n) {
-	return `${e === "switch" ? "Switch" : "Variable"} ${t}: ${n || vi(e, t)}`;
-}
-function vi(e, t) {
-	return `${e === "switch" ? "Switch" : "Variable"} ${t}`;
+function vi(e, t, n) {
+	return `${e === "switch" ? "Switch" : "Variable"} ${t}: ${n || yi(e, t)}`;
 }
 function yi(e, t) {
+	return `${e === "switch" ? "Switch" : "Variable"} ${t}`;
+}
+function bi(e, t) {
 	return e === "switch" ? t ? "ON" : "OFF" : String(t);
 }
-function bi(e) {
+function xi(e) {
 	if (typeof e == "number" || typeof e != "string") return e;
 	let t = e.trim();
 	if (t === "") return 0;
 	let n = Number(t);
 	return Number.isNaN(n) ? e : n;
 }
-function xi(e) {
+function Si(e) {
 	return e && (e.type === "variable" || e.type === "switch") && Number.isInteger(e.id) && e.id > 0;
 }
-function Si(e, t) {
+function Ci(e, t) {
 	if (e.type === "selfSwitch") {
 		if (!e.mapId || !e.eventId || !e.selfSwitchKey) return !1;
-		let n = Ii();
+		let n = Li();
 		if (!n) return !1;
 		let r = [
 			e.mapId,
@@ -6335,18 +6351,18 @@ function Si(e, t) {
 		];
 		return n.setValue(r, !!t), n.value(r);
 	}
-	return pi(e.type, e.id, t);
-}
-function Ci() {
-	return wi() && typeof $gameMap.mapId == "function" ? $gameMap.mapId() : 0;
+	return mi(e.type, e.id, t);
 }
 function wi() {
+	return Ti() && typeof $gameMap.mapId == "function" ? $gameMap.mapId() : 0;
+}
+function Ti() {
 	if (!$gameMap || !$gamePlayer || !$dataMap) return !1;
 	let e = $dataMap;
 	return typeof e.scrollType == "number" && Array.isArray(e.events);
 }
-function Ti() {
-	if (!wi()) return null;
+function Ei() {
+	if (!Ti()) return null;
 	try {
 		let e = $gamePlayer.direction(), t = $gameMap.roundXWithDirection($gamePlayer.x, e), n = $gameMap.roundYWithDirection($gamePlayer.y, e), r = typeof $gameMap.eventsXy == "function" ? $gameMap.eventsXy(t, n) : [];
 		return r && r.length > 0 ? r[0] : null;
@@ -6354,7 +6370,7 @@ function Ti() {
 		return console.warn("[WatcherPanel] Map context not ready", e), null;
 	}
 }
-function Ei(e) {
+function Di(e) {
 	if (!e) return null;
 	let t = e, n = e.event ? e.event() : null, r = t._eventId || n && n.id || 0, i = n && n.name || `Event ${r}`;
 	return {
@@ -6365,90 +6381,90 @@ function Ei(e) {
 		label: `${i} (#${r})`
 	};
 }
-function Di() {
+function Oi() {
 	if (!$dataMap || !$dataMap.events) return [];
-	let e = [], t = Li();
+	let e = [], t = Ri();
 	for (let n of t) if (n.dataEvent) {
-		let t = Ai(n.dataEvent, `Nearby ${n.distanceText}`, n.distance);
+		let t = ji(n.dataEvent, `Nearby ${n.distanceText}`, n.distance);
 		for (let n of t) e.push(n);
 	}
-	return Vi(e);
+	return Hi(e);
 }
-function Oi() {
+function ki() {
 	return !$dataMap || !$dataMap.events ? 0 : $dataMap.events.filter(Boolean).length;
 }
-function ki(e, t) {
-	let n = e.event ? e.event() : null, r = Ri(e.x, e.y);
-	return n ? Ai(n, t, r) : [];
+function Ai(e, t) {
+	let n = e.event ? e.event() : null, r = zi(e.x, e.y);
+	return n ? ji(n, t, r) : [];
 }
-function Ai(e, t, n = null) {
-	let r = [], i = Ci(), a = e.id, o = Bi(t, e.name || `Event ${a}`, n);
+function ji(e, t, n = null) {
+	let r = [], i = wi(), a = e.id, o = Vi(t, e.name || `Event ${a}`, n);
 	for (let t of e.pages || []) {
-		ji(r, t, i, a, o, n);
-		for (let e of t.list || []) Mi(r, e, i, a, o, n);
+		Mi(r, t, i, a, o, n);
+		for (let e of t.list || []) Ni(r, e, i, a, o, n);
 	}
-	return Vi(r);
+	return Hi(r);
 }
-function ji(e, t, n, r, i, a) {
+function Mi(e, t, n, r, i, a) {
 	let o = t.conditions;
-	o && (o.switch1Valid && e.push(Pi("switch", o.switch1Id, {
+	o && (o.switch1Valid && e.push(Fi("switch", o.switch1Id, {
 		source: `${i} page condition`,
 		distance: a
-	})), o.switch2Valid && e.push(Pi("switch", o.switch2Id, {
+	})), o.switch2Valid && e.push(Fi("switch", o.switch2Id, {
 		source: `${i} page condition`,
 		distance: a
-	})), o.variableValid && e.push(Pi("variable", o.variableId, {
+	})), o.variableValid && e.push(Fi("variable", o.variableId, {
 		source: `${i} page condition >= ${o.variableValue}`,
 		distance: a
-	})), o.selfSwitchValid && e.push(Fi(n, r, o.selfSwitchCh, {
+	})), o.selfSwitchValid && e.push(Ii(n, r, o.selfSwitchCh, {
 		source: `${i} page condition`,
 		distance: a
 	})));
 }
-function Mi(e, t, n, r, i, a) {
+function Ni(e, t, n, r, i, a) {
 	let o = t.parameters || [];
 	if (t.code === 121) {
 		let t = Number(o[0] || 0), n = Number(o[1] || t);
-		for (let r = t; r <= n; r++) e.push(Pi("switch", r, {
+		for (let r = t; r <= n; r++) e.push(Fi("switch", r, {
 			source: `${i} controls switch`,
 			distance: a
 		}));
 	}
 	if (t.code === 122) {
 		let t = Number(o[0] || 0), n = Number(o[1] || t);
-		for (let r = t; r <= n; r++) e.push(Pi("variable", r, {
+		for (let r = t; r <= n; r++) e.push(Fi("variable", r, {
 			source: `${i} controls variable`,
 			distance: a
 		}));
 	}
-	t.code === 123 && e.push(Fi(n, r, String(o[0] || "A"), {
+	t.code === 123 && e.push(Ii(n, r, String(o[0] || "A"), {
 		source: `${i} controls self switch`,
 		distance: a
-	})), t.code === 111 && Ni(e, o, n, r, i, a);
+	})), t.code === 111 && Pi(e, o, n, r, i, a);
 }
-function Ni(e, t, n, r, i, a) {
+function Pi(e, t, n, r, i, a) {
 	let o = Number(t[0]);
-	o === 0 && e.push(Pi("switch", Number(t[1] || 0), {
+	o === 0 && e.push(Fi("switch", Number(t[1] || 0), {
 		source: `${i} conditional branch`,
 		distance: a
-	})), o === 1 && e.push(Pi("variable", Number(t[1] || 0), {
+	})), o === 1 && e.push(Fi("variable", Number(t[1] || 0), {
 		source: `${i} conditional branch`,
 		distance: a
-	})), o === 2 && e.push(Fi(n, r, String(t[1] || "A"), {
+	})), o === 2 && e.push(Ii(n, r, String(t[1] || "A"), {
 		source: `${i} conditional branch`,
 		distance: a
 	}));
 }
-function Pi(e, t, n = {}) {
-	let r = fi(e, t);
+function Fi(e, t, n = {}) {
+	let r = pi(e, t);
 	return r.source = n.source || "", r.distance = n.distance, r;
 }
-function Fi(e, t, n, r = {}) {
+function Ii(e, t, n, r = {}) {
 	let i = [
 		e,
 		t,
 		n
-	], a = Ii(), o = a ? a.value(i) : !1;
+	], a = Li(), o = a ? a.value(i) : !1;
 	return {
 		type: "selfSwitch",
 		id: t,
@@ -6458,38 +6474,38 @@ function Fi(e, t, n, r = {}) {
 		name: `Self Switch ${n}`,
 		label: `Self Switch ${n} (Event ${t})`,
 		value: o,
-		valueText: yi("switch", o),
+		valueText: bi("switch", o),
 		source: r.source || "",
 		distance: r.distance
 	};
 }
-function Ii() {
+function Li() {
 	return typeof $gameSelfSwitches < "u" ? $gameSelfSwitches : null;
 }
-function Li() {
+function Ri() {
 	let e = [];
 	if (!$dataMap || !$dataMap.events || !$gameMap || !$gamePlayer) return e;
 	for (let t of $dataMap.events) {
 		if (!t || !t.id) continue;
-		let n = typeof $gameMap.event == "function" ? $gameMap.event(t.id) : null, r = Ri(n && typeof n.x == "number" ? n.x : t.x, n && typeof n.y == "number" ? n.y : t.y);
+		let n = typeof $gameMap.event == "function" ? $gameMap.event(t.id) : null, r = zi(n && typeof n.x == "number" ? n.x : t.x, n && typeof n.y == "number" ? n.y : t.y);
 		e.push({
 			dataEvent: t,
 			distance: r,
-			distanceText: zi(r)
+			distanceText: Bi(r)
 		});
 	}
 	return e.sort((e, t) => e.distance - t.distance), e;
 }
-function Ri(e, t) {
+function zi(e, t) {
 	return !$gamePlayer || typeof e != "number" || typeof t != "number" ? Infinity : Math.abs($gamePlayer.x - e) + Math.abs($gamePlayer.y - t);
 }
-function zi(e) {
+function Bi(e) {
 	return Number.isFinite(e) ? `${e} tile${e === 1 ? "" : "s"}` : "? tiles";
 }
-function Bi(e, t, n) {
-	return `${e}${n === null ? "" : ` (${zi(n)})`}: ${t}`;
+function Vi(e, t, n) {
+	return `${e}${n === null ? "" : ` (${Bi(n)})`}: ${t}`;
 }
-function Vi(e) {
+function Hi(e) {
 	let t = /* @__PURE__ */ new Set(), n = [];
 	for (let r of e) {
 		let e = r.type === "selfSwitch" ? `${r.type}:${r.mapId}:${r.eventId}:${r.selfSwitchKey}` : `${r.type}:${r.id}`;
@@ -6499,7 +6515,7 @@ function Vi(e) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/panels/VariableSettingPanel.js
-var Hi = S([
+var Ui = S([
 	{
 		text: "All Values",
 		value: "all"
@@ -6524,7 +6540,7 @@ var Hi = S([
 		text: "Text / Other",
 		value: "other"
 	}
-]), Ui = S([
+]), Wi = S([
 	{
 		text: "",
 		value: "controls",
@@ -6545,34 +6561,34 @@ var Hi = S([
 		sortable: !1,
 		width: 36
 	}
-]), Wi = {
+]), Gi = {
 	name: "VariableSettingPanel",
-	components: { LockFavoriteControls: sn },
+	components: { LockFavoriteControls: cn },
 	template: "\n<v-card flat class=\"ma-0 pa-0\">\n    <v-data-table\n        v-if=\"tableHeaders\"\n        dense\n        :headers=\"tableHeaders\"\n        :items=\"filteredTableItems\"\n        :search=\"search\"\n        :custom-filter=\"tableItemFilter\"\n        :custom-sort=\"sortRows\"\n        :items-per-page=\"10\">\n        <template v-slot:top>\n            <div class=\"cheat-table-top\">\n                <v-text-field\n                    label=\"Search...\"\n                    solo\n                    v-model=\"search\"\n                    dense\n                    hide-details\n                    @keydown.self.stop\n                    @focus=\"$event.target.select()\">\n                </v-text-field>\n                <v-tooltip bottom>\n                    <span>Reload variables and translations</span>\n                    <template v-slot:activator=\"{ on, attrs }\">\n                        <v-btn\n                            small\n                            text\n                            class=\"cheat-table-top__action\"\n                            aria-label=\"Reload variables and translations\"\n                            v-bind=\"attrs\"\n                            v-on=\"on\"\n                            @click=\"manualRefresh\">\n                            <v-icon small left>mdi-refresh</v-icon>\n                            Reload\n                        </v-btn>\n                    </template>\n                </v-tooltip>\n            </div>\n              <div class=\"d-flex px-3 pt-3 pb-3\">\n                  <v-checkbox\n                      v-model=\"excludeNameless\"\n                      dense\n                      hide-details\n                      label=\"Hide Nameless Variables\">\n                  </v-checkbox>\n                  <v-spacer></v-spacer>\n                  <v-select\n                      v-model=\"valueFilter\"\n                      :items=\"valueFilterOptions\"\n                      dense\n                      hide-details\n                      solo\n                      class=\"cheat-field-filter\"\n                      label=\"Value Filter\">\n                  </v-select>\n                </div>\n        </template>\n        <template\n            v-slot:item.value=\"{ item }\">\n            <v-text-field\n                class=\"d-inline-flex cheat-field-w60\"\n                height=\"10\"\n                hide-details\n                solo\n                v-model=\"item.value\"\n                label=\"Value\"\n                dense\n                @keydown.self.stop\n                @change=\"onItemChange(item)\"\n                @focus=\"$event.target.select()\">\n            </v-text-field>\n        </template>\n        <template\n            v-slot:item.controls=\"{ item }\">\n            <lock-favorite-controls :target=\"{kind:'variable',id:item.id}\" :value=\"item.value\" @change=\"initializeVariables\"/>\n        </template>\n        <template\n            v-slot:item.watch=\"{ item }\">\n            <v-btn\n                x-small\n                icon\n                title=\"Add variable to Watch\"\n                @click=\"addToWatchList(item)\">\n                <v-icon small>mdi-eye-plus</v-icon>\n            </v-btn>\n        </template>\n    </v-data-table>\n</v-card>\n    ",
 	data() {
 		return {
 			search: "",
 			excludeNameless: !1,
 			valueFilter: "all",
-			valueFilterOptions: Hi,
+			valueFilterOptions: Ui,
 			originalVariableNames: [],
 			isInitialized: !1,
-			tableHeaders: Ui,
+			tableHeaders: Wi,
 			tableItems: []
 		};
 	},
 	created() {
-		this.initializeVariables(), Sr(this, () => U.isVariableTranslateEnabled());
+		this.initializeVariables(), Cr(this, () => U.isVariableTranslateEnabled());
 	},
 	beforeDestroy() {
-		Cr(this);
+		wr(this);
 	},
 	computed: { filteredTableItems() {
 		return this.tableItems.filter((e) => this.excludeNameless && !e.hasName ? !1 : this.matchesValueFilter(e.value));
 	} },
 	methods: {
 		sortRows(e, t, n) {
-			return Nn(e, t, n, (e) => ({
+			return Pn(e, t, n, (e) => ({
 				kind: "variable",
 				id: e.id
 			}));
@@ -6596,7 +6612,7 @@ var Hi = S([
 					} catch (e) {
 						console.warn(`Could not read variable ${n}:`, e.message);
 					}
-					return t && e && e.trim() && (i = br(e, t)), {
+					return t && e && e.trim() && (i = xr(e, t)), {
 						id: n,
 						originalName: e || "",
 						displayName: i,
@@ -6609,11 +6625,11 @@ var Hi = S([
 			}
 		},
 		onItemChange(e) {
-			let t = bi(e.value);
+			let t = xi(e.value);
 			$gameVariables.setValue(e.id, t), e.value = $gameVariables.value(e.id);
 		},
 		addToWatchList(e) {
-			ti("variable", e.id);
+			ni("variable", e.id);
 		},
 		matchesValueFilter(e) {
 			let t = typeof e == "number" ? e : typeof e == "string" && e.trim() !== "" ? Number(e) : NaN, n = Number.isFinite(t), r = e == null || e === "" || n && t === 0 || e === !1;
@@ -6628,22 +6644,22 @@ var Hi = S([
 		},
 		async manualRefresh() {
 			var e = this;
-			await Pe(e, () => {
+			await Fe(e, () => {
 				e.isInitialized = !1, e.tableItems = [];
 			});
 		},
 		tableItemFilter(e, t, n) {
-			return t === null || t.trim() === "" ? !0 : (t = t.toLowerCase(), Ne(t, [
+			return t === null || t.trim() === "" ? !0 : (t = t.toLowerCase(), Pe(t, [
 				n.displayName,
 				n.originalName,
 				n.value
 			]));
 		}
 	}
-}, Gi = class {
+}, Ki = class {
 	static show(e) {}
 	static close() {}
-}, Ki = S([
+}, qi = S([
 	{
 		text: "",
 		value: "controls",
@@ -6664,24 +6680,24 @@ var Hi = S([
 		sortable: !1,
 		width: 36
 	}
-]), qi = {
+]), Ji = {
 	name: "SwitchSettingPanel",
-	components: { LockFavoriteControls: sn },
+	components: { LockFavoriteControls: cn },
 	template: "\n<v-card flat class=\"ma-0 pa-0\">\n    <v-data-table\n        v-if=\"tableHeaders\"\n        dense\n        :headers=\"tableHeaders\"\n        :items=\"filteredTableItems\"\n        :search=\"search\"\n        :custom-filter=\"tableItemFilter\"\n        :custom-sort=\"sortRows\"\n        :items-per-page=\"10\">\n        <template v-slot:top>\n            <div class=\"cheat-table-top\">\n                <v-text-field\n                    label=\"Search...\"\n                    solo\n                    v-model=\"search\"\n                    dense\n                    hide-details\n                    @keydown.self.stop\n                    @focus=\"$event.target.select()\">\n                </v-text-field>\n                <v-tooltip bottom>\n                    <span>Reload switches and translations</span>\n                    <template v-slot:activator=\"{ on, attrs }\">\n                        <v-btn\n                            small\n                            text\n                            class=\"cheat-table-top__action\"\n                            aria-label=\"Reload switches and translations\"\n                            v-bind=\"attrs\"\n                            v-on=\"on\"\n                            @click=\"manualRefresh\">\n                            <v-icon small left>mdi-refresh</v-icon>\n                            Reload\n                        </v-btn>\n                    </template>\n                </v-tooltip>\n            </div>\n            <div class=\"d-flex px-3 pt-3 pb-3\">\n                <v-checkbox\n                    v-model=\"excludeNameless\"\n                    dense\n                    hide-details\n                    label=\"Hide Nameless Switches\">\n                </v-checkbox>\n                <v-spacer></v-spacer>\n                <v-tooltip\n                    bottom>\n                    <span>{{ allSwitchOn ? 'Turn off all filtered switches' : 'Turn on all filtered switches' }}</span>\n                    <template v-slot:activator=\"{ on, attrs }\">\n                        <v-btn\n                            color=\"primary\"\n                            v-bind=\"attrs\"\n                            v-on=\"on\"\n                            fab\n                            x-small\n                            @click=\"toggleAllSwitches\">\n                            <v-icon v-text=\"allSwitchIcon\"></v-icon>\n                        </v-btn>\n                    </template>\n                </v-tooltip>\n            </div>\n        </template>\n        <template\n            v-slot:item.value=\"{ item }\">\n            <v-switch\n                v-model=\"item.value\"\n                dense\n                hide-details\n                @click.self.stop\n                @change=\"onItemChange(item)\">\n            </v-switch>\n        </template>\n        <template\n            v-slot:item.controls=\"{ item }\">\n            <lock-favorite-controls :target=\"{kind:'switch',id:item.id}\" :value=\"item.value\" @change=\"initializeVariables\"/>\n        </template>\n        <template\n            v-slot:item.watch=\"{ item }\">\n            <v-btn\n                x-small\n                icon\n                title=\"Add switch to Watch\"\n                @click=\"addToWatchList(item)\">\n                <v-icon small>mdi-eye-plus</v-icon>\n            </v-btn>\n        </template>\n    </v-data-table>\n</v-card>\n    ",
 	data() {
 		return {
 			search: "",
 			excludeNameless: !1,
 			switchNames: [],
-			tableHeaders: Ki,
+			tableHeaders: qi,
 			tableItems: []
 		};
 	},
 	created() {
-		this.initializeVariables(), Sr(this, () => U.isSwitchTranslateEnabled());
+		this.initializeVariables(), Cr(this, () => U.isSwitchTranslateEnabled());
 	},
 	beforeDestroy() {
-		Cr(this);
+		wr(this);
 	},
 	computed: {
 		filteredTableItems() {
@@ -6696,7 +6712,7 @@ var Hi = S([
 	},
 	methods: {
 		sortRows(e, t, n) {
-			return Nn(e, t, n, (e) => ({
+			return Pn(e, t, n, (e) => ({
 				kind: "switch",
 				id: e.id
 			}));
@@ -6725,11 +6741,11 @@ var Hi = S([
 		},
 		getSwitchDisplayName(e, t, n) {
 			let r = U.isSwitchTranslateEnabled();
-			return br(n ? e : `Switch ${t}`, r);
+			return xr(n ? e : `Switch ${t}`, r);
 		},
 		async manualRefresh() {
 			var e = this;
-			await Pe(e, () => {
+			await Fe(e, () => {
 				e.switchNames = [], e.tableItems = [];
 			});
 		},
@@ -6737,10 +6753,10 @@ var Hi = S([
 			$gameSwitches.setValue(e.id, e.value), e.value = $gameSwitches.value(e.id);
 		},
 		addToWatchList(e) {
-			ti("switch", e.id);
+			ni("switch", e.id);
 		},
 		tableItemFilter(e, t, n) {
-			return Ne(t, [
+			return Pe(t, [
 				n.name,
 				n.originalName,
 				n.id
@@ -6748,14 +6764,14 @@ var Hi = S([
 		},
 		toggleAllSwitches() {
 			let e = this;
-			Gi.show({
+			Ki.show({
 				width: 450,
 				message: (this.allSwitchOn ? "Turn off all filtered switches?" : "Turn on all filtered switches?") + "\n(CAUTION: Potential to give fatal errors to save data)",
 				actions: [{
 					icon: "mdi-close",
 					label: "cancel",
 					color: "white",
-					action: Gi.close
+					action: Ki.close
 				}, {
 					icon: this.allSwitchIcon,
 					color: "green",
@@ -6764,17 +6780,17 @@ var Hi = S([
 						let t = !e.allSwitchOn;
 						e.filteredTableItems.forEach((e) => {
 							$gameSwitches.setValue(e.id, t);
-						}), e.initializeVariables(), Gi.close();
+						}), e.initializeVariables(), Ki.close();
 					}
 				}]
 			});
 		}
 	}
-}, Ji = S({ "items-per-page-options": [
+}, Yi = S({ "items-per-page-options": [
 	12,
 	25,
 	50
-] }), Yi = S([
+] }), Xi = S([
 	{
 		text: "Ref",
 		value: "label",
@@ -6795,7 +6811,7 @@ var Hi = S([
 		value: "source",
 		sortable: !1
 	}
-]), Xi = S([
+]), Zi = S([
 	{
 		text: "Name",
 		value: "label"
@@ -6811,7 +6827,7 @@ var Hi = S([
 		sortable: !1,
 		width: 36
 	}
-]), Zi = {
+]), Qi = {
 	name: "WatcherPanel",
 	template: "\n<v-card flat class=\"ma-0 pa-0\">\n    <v-card-subtitle class=\"pa-0 pb-1 font-weight-bold\">\n        Context Watch\n    </v-card-subtitle>\n\n    <v-expansion-panels\n        accordion\n        multiple\n        class=\"mb-2\"\n        v-model=\"openContextPanels\">\n        <v-expansion-panel>\n            <v-expansion-panel-header class=\"py-1 px-3 watcher-panel__header\">\n                Facing Event\n                <span class=\"caption cheat-muted ml-2\">\n                    {{ facingEvent ? facingEvent.label : 'No event in front' }}\n                </span>\n            </v-expansion-panel-header>\n            <v-expansion-panel-content class=\"watcher-compact-panel\">\n                <v-data-table\n                    class=\"watcher-context-table\"\n                    dense\n                    hide-default-footer\n                    :headers=\"contextHeaders\"\n                    :items=\"facingRows\"\n                    :items-per-page=\"-1\"\n                    :no-data-text=\"'No switches or variables detected for the event in front.'\">\n                    <template v-slot:item.label=\"{ item }\">\n                        <div class=\"watcher-cell watcher-name-cell\" :title=\"item.label\">\n                            {{ item.label }}\n                        </div>\n                    </template>\n                    <template v-slot:item.value=\"{ item }\">\n                        <v-switch\n                            v-if=\"item.type === 'switch' || item.type === 'selfSwitch'\"\n                            v-model=\"item.value\"\n                            dense\n                            hide-details\n                            class=\"ma-0 pa-0\"\n                            @change=\"onContextValueChange(item)\">\n                        </v-switch>\n                        <v-text-field\n                            v-else\n                            v-model=\"item.value\"\n                            dense\n                            solo\n                            hide-details\n                            class=\"cheat-field-watcher\"\n                            @keydown.self.stop\n                            @change=\"onContextValueChange(item)\"\n                            @focus=\"$event.target.select()\">\n                        </v-text-field>\n                    </template>\n                    <template v-slot:item.distance=\"{ item }\">\n                        <span class=\"caption\">{{ formatDistanceCell(item.distance) }}</span>\n                    </template>\n                    <template v-slot:item.source=\"{ item }\">\n                        <div class=\"watcher-cell watcher-source-cell\" :title=\"item.source\">\n                            {{ item.source }}\n                        </div>\n                    </template>\n                </v-data-table>\n            </v-expansion-panel-content>\n        </v-expansion-panel>\n\n        <v-expansion-panel>\n            <v-expansion-panel-header class=\"py-1 px-3 watcher-panel__header\">\n                Nearby Map References\n                <span class=\"caption cheat-muted ml-2\">\n                    Map {{ currentMapId }} - {{ mapEventCount }} events - {{ mapRows.length }} refs\n                </span>\n            </v-expansion-panel-header>\n            <v-expansion-panel-content class=\"watcher-compact-panel\">\n                <v-data-table\n                    class=\"watcher-context-table\"\n                    dense\n                    :headers=\"contextHeaders\"\n                    :items=\"mapRows\"\n                    :items-per-page=\"12\"\n                    :footer-props=\"contextFooterProps\"\n                    :no-data-text=\"mapReady ? 'No RPG Maker switch/variable references detected on this map.' : 'Map data is not ready yet.'\">\n                    <template v-slot:item.label=\"{ item }\">\n                        <div class=\"watcher-cell watcher-name-cell\" :title=\"item.label\">\n                            {{ item.label }}\n                        </div>\n                    </template>\n                    <template v-slot:item.value=\"{ item }\">\n                        <v-switch\n                            v-if=\"item.type === 'switch' || item.type === 'selfSwitch'\"\n                            v-model=\"item.value\"\n                            dense\n                            hide-details\n                            class=\"ma-0 pa-0\"\n                            @change=\"onContextValueChange(item)\">\n                        </v-switch>\n                        <v-text-field\n                            v-else\n                            v-model=\"item.value\"\n                            dense\n                            solo\n                            hide-details\n                            class=\"cheat-field-watcher\"\n                            @keydown.self.stop\n                            @change=\"onContextValueChange(item)\"\n                            @focus=\"$event.target.select()\">\n                        </v-text-field>\n                    </template>\n                    <template v-slot:item.distance=\"{ item }\">\n                        <span class=\"caption\">{{ formatDistanceCell(item.distance) }}</span>\n                    </template>\n                    <template v-slot:item.source=\"{ item }\">\n                        <div class=\"watcher-cell watcher-source-cell\" :title=\"item.source\">\n                            {{ item.source }}\n                        </div>\n                    </template>\n                </v-data-table>\n            </v-expansion-panel-content>\n        </v-expansion-panel>\n    </v-expansion-panels>\n\n    <v-row no-gutters align=\"center\" class=\"mb-2\">\n        <v-col>\n            <v-card-subtitle class=\"pa-0 font-weight-bold\">\n                Watch List\n            </v-card-subtitle>\n        </v-col>\n        <v-col cols=\"auto\">\n            <v-checkbox\n                v-model=\"overlayEnabled\"\n                label=\"Overlay\"\n                dense\n                hide-details\n                class=\"ma-0 mr-3\"\n                @change=\"onOverlayEnabledChange\">\n            </v-checkbox>\n        </v-col>\n        <v-col cols=\"auto\">\n            <v-checkbox\n                v-model=\"autoRefresh\"\n                label=\"Live\"\n                dense\n                hide-details\n                class=\"ma-0\"\n                @change=\"onAutoRefreshChange\">\n            </v-checkbox>\n        </v-col>\n        <v-col cols=\"auto\" class=\"ml-2\">\n            <v-btn\n                x-small\n                fab\n                title=\"Refresh watched values\"\n                @click=\"refreshWatchedRows\">\n                <v-icon small>mdi-refresh</v-icon>\n            </v-btn>\n        </v-col>\n    </v-row>\n\n    <v-data-table\n        dense\n        :headers=\"watchHeaders\"\n        :items=\"watchedRows\"\n        :items-per-page=\"8\"\n        :no-data-text=\"'No watched variables or switches yet.'\">\n        <template v-slot:item.value=\"{ item }\">\n            <v-switch\n                v-if=\"item.type === 'switch'\"\n                v-model=\"item.value\"\n                dense\n                hide-details\n                @change=\"onWatchedValueChange(item)\">\n            </v-switch>\n            <v-text-field\n                v-else\n                v-model=\"item.value\"\n                dense\n                solo\n                hide-details\n                class=\"cheat-field-max130\"\n                @keydown.self.stop\n                @change=\"onWatchedValueChange(item)\"\n                @focus=\"$event.target.select()\">\n            </v-text-field>\n        </template>\n        <template v-slot:item.remove=\"{ item }\">\n            <v-btn\n                x-small\n                icon\n                title=\"Remove from watch list\"\n                @click=\"removeTarget(item)\">\n                <v-icon small>mdi-close</v-icon>\n            </v-btn>\n        </template>\n    </v-data-table>\n</v-card>\n    ",
 	data() {
@@ -6828,9 +6844,9 @@ var Hi = S([
 			refreshIntervalId: null,
 			refreshMs: 500,
 			watchedRows: [],
-			contextFooterProps: Ji,
-			contextHeaders: Yi,
-			watchHeaders: Xi
+			contextFooterProps: Yi,
+			contextHeaders: Xi,
+			watchHeaders: Zi
 		};
 	},
 	created() {
@@ -6844,33 +6860,33 @@ var Hi = S([
 	},
 	methods: {
 		initializeVariables() {
-			let e = ri();
+			let e = ii();
 			this.watchedRows = e.watchedRows, this.overlayEnabled = e.overlayEnabled, this.applyContextState(e.context);
 		},
 		refreshWatchedRows() {
-			this.watchedRows = ri().watchedRows;
+			this.watchedRows = ii().watchedRows;
 		},
 		refreshContextRows() {
-			let e = ri();
+			let e = ii();
 			this.applyContextState(e.context);
 		},
 		applyContextState(e) {
 			this.currentMapId = e.currentMapId, this.mapReady = e.mapReady, this.mapEventCount = e.mapEventCount, this.facingEvent = e.facingEvent, this.facingRows = e.facingRows, this.mapRows = e.mapRows;
 		},
 		removeTarget(e) {
-			ni(e.type, e.id), this.refreshWatchedRows();
+			ri(e.type, e.id), this.refreshWatchedRows();
 		},
 		onWatchedValueChange(e) {
-			e.value = pi(e.type, e.id, e.value), this.refreshWatchedRows();
+			e.value = mi(e.type, e.id, e.value), this.refreshWatchedRows();
 		},
 		onContextValueChange(e) {
-			e.value = Si(e, e.value), this.refreshContextRows(), this.refreshWatchedRows();
+			e.value = Ci(e, e.value), this.refreshContextRows(), this.refreshWatchedRows();
 		},
 		formatDistanceCell(e) {
 			return typeof e == "number" && Number.isFinite(e) ? String(e) : "";
 		},
 		onOverlayEnabledChange() {
-			si(this.overlayEnabled);
+			ci(this.overlayEnabled);
 		},
 		onAutoRefreshChange() {
 			this.autoRefresh ? this.startAutoRefresh() : this.stopAutoRefresh();
@@ -6884,7 +6900,7 @@ var Hi = S([
 			this.refreshIntervalId && (clearInterval(this.refreshIntervalId), this.refreshIntervalId = null);
 		}
 	}
-}, Qi = S([
+}, $i = S([
 	{
 		value: "Boss Area",
 		label: "Boss Area",
@@ -6921,7 +6937,7 @@ var Hi = S([
 		icon: "☠️",
 		color: "error"
 	}
-]), $i = S([
+]), ea = S([
 	{
 		text: "Name",
 		value: "name"
@@ -6944,7 +6960,7 @@ var Hi = S([
 		value: "actions",
 		sortable: !1
 	}
-]), ea = {
+]), ta = {
 	name: "SaveRecallPanel",
 	template: "\n<v-card flat class=\"ma-0 pa-0\">\n    <v-card-subtitle class=\"ma-0 pa-0\">Save Location</v-card-subtitle>\n    <span class=\"body-2 cheat-text-success\">Map : {{currentMapName}}</span>\n    <v-text-field\n        ref=\"locationAliasField\"\n        label=\"Location Alias\"\n        solo\n        v-model=\"locationAliasInput\"\n        dense\n        hide-details\n        @keydown.self.stop=\"onLocationAliasKeyDown\"\n        @focus=\"$event.target.select()\">\n        <template v-slot:append-outer>\n            <v-tooltip\n                bottom>\n                <span>Save current location</span>\n                <template v-slot:activator=\"{ on, attrs }\">\n                    <v-btn\n                        class=\"mt-n1\"\n                        color=\"primary\"\n                        x-small\n                        fab\n                        v-on=\"on\"\n                        v-bind=\"attrs\"\n                        @click=\"onAddLocation\">\n                        <v-icon>mdi-plus</v-icon>\n                    </v-btn>\n                </template>\n            </v-tooltip>\n        </template>\n    </v-text-field>\n    <v-expansion-panels>\n    <v-expansion-panel\n        v-for=\"(item,i) in 1\"\n        :key=\"i\"\n      >\n    <v-expansion-panel-header>\n        Flags (optional)\n      </v-expansion-panel-header>\n      <v-expansion-panel-content>\n    <div class=\"mt-2\">\n        <div class=\"cheat-chip-row\">\n            <v-chip\n                v-for=\"preset in presetFlags\"\n                :key=\"preset.value\"\n                :color=\"selectedFlags.includes(preset.value) ? preset.color : undefined\"\n                :outlined=\"!selectedFlags.includes(preset.value)\"\n                x-small\n                label\n                class=\"cursor-pointer\"\n                @click=\"toggleFlag(preset.value)\">\n                {{ preset.icon }} {{ preset.label }}\n            </v-chip>\n        </div>\n        <v-text-field\n            v-model=\"customFlagInput\"\n            label=\"Custom flag (press Enter)\"\n            solo\n            dense\n            hide-details\n            class=\"mt-2\"\n            @keydown.self.stop=\"onCustomFlagKeyDown\"\n            @focus=\"$event.target.select()\">\n            <template v-slot:append>\n                <v-btn icon x-small @click=\"addCustomFlag\" :disabled=\"!customFlagInput.trim()\">\n                    <v-icon small>mdi-plus</v-icon>\n                </v-btn>\n            </template>\n        </v-text-field>\n        <div v-if=\"selectedFlags.length > 0\" class=\"cheat-chip-row mt-1\">\n            <v-chip\n                v-for=\"flag in selectedFlags\"\n                :key=\"flag\"\n                :color=\"getFlagColor(flag)\"\n                x-small\n                label\n                close\n                @click:close=\"removeSelectedFlag(flag)\">\n                {{ getFlagIcon(flag) }} {{ flag }}\n            </v-chip>\n        </div>\n    </div>\n</v-expansion-panel-content>\n    </v-expansion-panel>\n  </v-expansion-panels>\n\n    <v-card-subtitle class=\"ma-0 pa-0 mt-5\">Recall Location</v-card-subtitle>\n    <v-data-table\n        v-if=\"tableHeaders\"\n        class=\"mt-2\"\n        dense\n        :headers=\"tableHeaders\"\n        :items=\"tableItems\"\n        :search=\"search\"\n        :custom-filter=\"tableItemFilter\"\n        :items-per-page=\"10\">\n        <template v-slot:top>\n            <div class=\"cheat-table-top\">\n                <v-text-field\n                    label=\"Search...\"\n                    solo\n                    v-model=\"search\"\n                    dense\n                    hide-details\n                    @keydown.self.stop\n                    @focus=\"$event.target.select()\">\n                </v-text-field>\n                <v-tooltip bottom>\n                    <span>Reload from game data</span>\n                    <template v-slot:activator=\"{ on, attrs }\">\n                        <v-btn\n                            small\n                            text\n                            class=\"cheat-table-top__action\"\n                            aria-label=\"Reload from game data\"\n                            v-bind=\"attrs\"\n                            v-on=\"on\"\n                            @click=\"initializeVariables\">\n                            <v-icon small left>mdi-refresh</v-icon>\n                            Reload\n                        </v-btn>\n                    </template>\n                </v-tooltip>\n            </div>\n        </template>\n        <template\n            v-slot:item.coord=\"{ item }\">\n            {{ item.coord.x }}, {{ item.coord.y }}\n        </template>\n        <template v-slot:item.flags=\"{ item }\">\n            <div class=\"cheat-chip-row cheat-chip-row--tight\">\n                <v-chip\n                    v-for=\"flag in (item.flags || [])\"\n                    :key=\"flag\"\n                    :color=\"getFlagColor(flag)\"\n                    x-small\n                    label>\n                    {{ getFlagIcon(flag) }} {{ flag }}\n                </v-chip>\n                <span v-if=\"!item.flags || item.flags.length === 0\" class=\"cheat-muted caption\">—</span>\n            </div>\n        </template>\n        <template\n            v-slot:item.actions=\"{ item, index }\">\n            \n            <v-tooltip\n                bottom>\n                <span>Teleport</span>\n                <template v-slot:activator=\"{ on, attrs }\">\n                    <v-btn\n                        color=\"success\"\n                        x-small\n                        fab\n                        v-bind=\"attrs\"\n                        v-on=\"on\"\n                        @click=\"teleportLocation(item.mapId, item.coord.x, item.coord.y)\">\n                        <v-icon small>mdi-map-marker</v-icon>\n                    </v-btn>\n                </template>\n            </v-tooltip>\n            \n            \n            <v-tooltip\n                bottom>\n                <span>Delete location</span>\n                <template v-slot:activator=\"{ on, attrs }\">\n                    <v-btn\n                        color=\"error\"\n                        class=\"ml-2\"\n                        x-small\n                        fab\n                        v-bind=\"attrs\"\n                        v-on=\"on\"\n                        @click=\"removeLocation(index)\">\n                        <v-icon small>mdi-delete</v-icon>\n                    </v-btn>\n                </template>\n            </v-tooltip>\n        </template>\n    </v-data-table>\n</v-card>\n    ",
 	data() {
@@ -6955,15 +6971,15 @@ var Hi = S([
 			search: "",
 			locations: [],
 			currentMapName: "",
-			presetFlags: Qi,
-			tableHeaders: $i
+			presetFlags: $i,
+			tableHeaders: ea
 		};
 	},
 	created() {
-		this.initializeVariables(), Sr(this, () => U.isMapTranslateEnabled());
+		this.initializeVariables(), Cr(this, () => U.isMapTranslateEnabled());
 	},
 	beforeDestroy() {
-		Cr(this);
+		wr(this);
 	},
 	computed: {
 		tableItems() {
@@ -6972,7 +6988,7 @@ var Hi = S([
 				let r = $dataMapInfos[t.mapId];
 				return {
 					name: t.name,
-					mapName: r ? br(r.name, e) : "NULL",
+					mapName: r ? xr(r.name, e) : "NULL",
 					mapId: t.mapId,
 					coord: {
 						x: t.x,
@@ -6992,7 +7008,7 @@ var Hi = S([
 		},
 		getMapFullPath(e) {
 			let t = U.isMapTranslateEnabled();
-			return Le($dataMapInfos, e, (e) => br(e, t));
+			return Re($dataMapInfos, e, (e) => xr(e, t));
 		},
 		saveLocations() {
 			g.setItem("cheat.locations", JSON.stringify(this.locations));
@@ -7050,7 +7066,7 @@ var Hi = S([
 			return t ? t.icon : "🏷️";
 		},
 		tableItemFilter(e, t, n) {
-			return Ne(t, [
+			return Pe(t, [
 				n.name,
 				n.mapName,
 				n.coord.x,
@@ -7059,7 +7075,7 @@ var Hi = S([
 			]);
 		}
 	}
-}, ta = {
+}, na = {
 	name: "MapPreview",
 	props: {
 		mapId: Number,
@@ -7116,7 +7132,7 @@ var Hi = S([
 			r.fillStyle = "#ff3344", r.beginPath(), r.arc(s + (l + .5) * a / this.width, c + (u + .5) * o / this.height, 4, 0, Math.PI * 2), r.fill();
 		}
 	}
-}, na = S([
+}, ra = S([
 	{
 		text: "Id",
 		value: "id"
@@ -7133,9 +7149,9 @@ var Hi = S([
 		text: "Actions",
 		value: "actions"
 	}
-]), ra = {
+]), ia = {
 	name: "TeleportPanel",
-	components: { MapPreview: ta },
+	components: { MapPreview: na },
 	template: "\n<v-card flat class=\"ma-0 pa-0\">\n    <v-data-table\n        v-if=\"tableHeaders\"\n        class=\"mt-2\"\n        dense\n        :headers=\"filteredTableHeaders\"\n        :items=\"maps\"\n        :search=\"search\"\n        :custom-filter=\"tableItemFilter\"\n        :items-per-page=\"10\">\n        <template v-slot:top>\n            <v-text-field\n                label=\"Search...\"\n                solo\n                v-model=\"search\"\n                dense\n                hide-details\n                @keydown.self.stop\n                @focus=\"$event.target.select()\">\n            </v-text-field>\n            <div class=\"teleport-coordinates\">\n            <v-checkbox\n                v-model=\"excludeFullPath\"\n                label=\"Hide Full Path Field\">\n          </v-checkbox>\n          <v-text-field\n            v-model=\"inputX\"\n            label=\"X\"\n            type=\"number\"\n            class=\"mr-2 mb-2 cheat-field-w80\"\n            dense\n            hide-details\n            outlined\n            @keydown.self.stop\n            @focus=\"$event.target.select()\">\n          </v-text-field>\n          <v-text-field\n            v-model=\"inputY\"\n            label=\"Y\"\n            type=\"number\"\n            class=\"mr-2 mb-2 cheat-field-w80\"\n            dense\n            hide-details\n            outlined\n            @keydown.self.stop\n            @focus=\"$event.target.select()\">\n        </v-text-field>\n        <v-tooltip bottom>\n            <span>Reload maps and translations</span>\n            <template v-slot:activator=\"{ on, attrs }\">\n                <v-btn\n                    small\n                    text\n                    class=\"cheat-reload teleport-coordinates__field ml-auto mb-2\"\n                    aria-label=\"Reload maps and translations\"\n                    v-bind=\"attrs\"\n                    v-on=\"on\"\n                    @click=\"manualRefresh\">\n                    <v-icon small left>mdi-refresh</v-icon>\n                    Reload\n                </v-btn>\n            </template>\n        </v-tooltip>\n        </div>\n        </template>\n        <template\n            v-slot:item.fullPath=\"{ item }\">\n            {{item.fullPathJoin}}\n        </template>\n        <template\n            v-slot:item.actions=\"{ item, index }\">\n            <div class=\"d-inline-flex\">\n                <v-btn x-small text @click=\"previewMap = { id: item.id, name: item.name || item.fullPathJoin }\">Preview</v-btn>\n                <v-tooltip\n                    bottom>\n                    <span>Teleport to X/Y</span>\n                    <template v-slot:activator=\"{ on, attrs }\">\n                    \n                        <v-btn\n                            color=\"success\"\n                            x-small\n                            fab\n                            v-bind=\"attrs\"\n                            v-on=\"on\"\n                            @click=\"teleportLocation(item.id, Number(inputX), Number(inputY))\">\n                            <v-icon small>mdi-map-marker</v-icon>\n                        </v-btn>\n                    </template>\n                </v-tooltip>\n                <v-tooltip\n                    bottom>\n                    <span>Teleport to Map Center</span>\n                    <template v-slot:activator=\"{ on, attrs }\">\n                        <v-btn\n                            color=\"info\"\n                            x-small\n                            fab\n                            class=\"ml-1\"\n                            v-bind=\"attrs\"\n                            v-on=\"on\"\n                            @click=\"teleportMapCenter(item.id)\">\n                            <v-icon small>mdi-crosshairs-gps</v-icon>\n                        </v-btn>\n                    </template>\n                </v-tooltip>\n            </div>\n        </template>\n    </v-data-table>\n\n    <v-dialog :value=\"!!previewMap\" @input=\"previewMap = null\" max-width=\"560\"><v-card v-if=\"previewMap\"><v-card-title class=\"subtitle-1\">{{ previewMap.name }} #{{ previewMap.id }}</v-card-title><v-card-text><map-preview :map-id=\"previewMap.id\" :x=\"Number(inputX)\" :y=\"Number(inputY)\"/></v-card-text><v-card-actions><v-btn text @click=\"previewMap = null\">Close</v-btn><v-btn text @click=\"teleportLocation(previewMap.id, Number(inputX), Number(inputY)); previewMap = null\">Teleport to X/Y</v-btn><v-btn text @click=\"teleportMapCenter(previewMap.id); previewMap = null\">Teleport to Center</v-btn></v-card-actions></v-card></v-dialog>\n</v-card>\n    ",
 	data() {
 		return {
@@ -7145,14 +7161,14 @@ var Hi = S([
 			search: "",
 			excludeFullPath: !1,
 			maps: [],
-			tableHeaders: na
+			tableHeaders: ra
 		};
 	},
 	created() {
-		this.initializeVariables(), Sr(this, () => U.isMapTranslateEnabled());
+		this.initializeVariables(), Cr(this, () => U.isMapTranslateEnabled());
 	},
 	beforeDestroy() {
-		Cr(this);
+		wr(this);
 	},
 	computed: { filteredTableHeaders() {
 		return this.excludeFullPath ? this.tableHeaders.filter((e) => e.value !== "fullPath") : this.tableHeaders;
@@ -7160,11 +7176,11 @@ var Hi = S([
 	methods: {
 		initializeVariables() {
 			let e = U.isMapTranslateEnabled();
-			this.maps = Ie($dataMapInfos, (t) => br(t, e));
+			this.maps = Le($dataMapInfos, (t) => xr(t, e));
 		},
 		async manualRefresh() {
 			var e = this;
-			await Pe(e, () => {
+			await Fe(e, () => {
 				e.maps = [];
 			});
 		},
@@ -7203,7 +7219,7 @@ var Hi = S([
 			return ("000" + String(e)).slice(-3);
 		},
 		tableItemFilter(e, t, n) {
-			return Ne(t, [
+			return Pe(t, [
 				n.name,
 				n.fullPathJoin,
 				n.id
@@ -7215,19 +7231,19 @@ var Hi = S([
 //#region cheat-engine/www/cheat/js/panels/map/MapLayersState.js
 function W() {
 	let e = F();
-	return e && e.mapLayers ? e.mapLayers.read() : Object.assign({}, Zt);
+	return e && e.mapLayers ? e.mapLayers.read() : Object.assign({}, Qt);
 }
-function ia(e, t) {
+function aa(e, t) {
 	let n = F();
 	n && n.mapLayers && n.mapLayers.write(e, t);
 }
-function aa() {
+function oa() {
 	let e = F();
 	e && e.mapLayers && e.mapLayers.reset();
 }
 //#endregion
 //#region cheat-engine/www/cheat/components/MapLayers.js
-var oa = {
+var sa = {
 	name: "MapLayers",
 	props: { inline: Boolean },
 	data() {
@@ -7291,26 +7307,26 @@ var oa = {
 	},
 	methods: {
 		change(e, t) {
-			ia(e, t), this.layers = W(), this.$emit("change");
+			aa(e, t), this.layers = W(), this.$emit("change");
 		},
 		reset() {
-			aa(), this.layers = W(), this.$emit("change");
+			oa(), this.layers = W(), this.$emit("change");
 		}
 	},
 	template: "<div class=\"map-settings map-layer-settings\"><component :is=\"inline ? 'div' : 'details'\"><summary v-if=\"!inline\">Map layers</summary><div class=\"map-layer-settings__toggles\"><v-switch v-for=\"toggle in toggles\" :key=\"toggle.key\" :input-value=\"layers[toggle.key]\" :label=\"toggle.label\" :data-layer=\"toggle.key\" dense hide-details class=\"my-0\" @change=\"change(toggle.key,$event)\"/></div><v-slider :value=\"layers.markerScale\" label=\"Marker size\" min=\"0.5\" max=\"2\" step=\"0.25\" thumb-label class=\"mt-4\" @change=\"change('markerScale',$event)\"/><v-btn x-small text @click=\"reset\">Reset map layers</v-btn><p class=\"caption mb-0\">Shared with the floating minimap. Categories are active-event hints, not guaranteed loot. Shadows baked into images and plugin lighting cannot be removed here.</p></component></div>"
-}, sa = "minimap.enabled", ca = "minimap.moveMode", la = "minimap.position", ua = "minimap.customX", da = "minimap.customY", fa = "minimap.size", pa = "minimap.zoom", ma = "minimap.mode", ha = "minimap.opacity", ga = "minimap.showEvents", _a = S([
+}, ca = "minimap.enabled", la = "minimap.moveMode", ua = "minimap.position", da = "minimap.customX", fa = "minimap.customY", pa = "minimap.size", ma = "minimap.zoom", ha = "minimap.mode", ga = "minimap.opacity", _a = "minimap.showEvents", va = S([
 	"top-right",
 	"top-left",
 	"bottom-right",
 	"bottom-left",
 	"custom"
-]), va = S(["follow", "full"]), ya = {
+]), ya = S(["follow", "full"]), ba = {
 	storage: g,
 	snapshot: null
-}, ba = /* @__PURE__ */ new WeakMap();
-function xa() {
+}, xa = /* @__PURE__ */ new WeakMap();
+function Sa() {
 	let e = P();
-	if (!e) return ya;
+	if (!e) return ba;
 	try {
 		return e.__cheatMinimapSettings || Object.defineProperty(e, "__cheatMinimapSettings", {
 			value: {
@@ -7320,10 +7336,10 @@ function xa() {
 			configurable: !0
 		}), e.__cheatMinimapSettings;
 	} catch (t) {
-		return ba.has(e) || ba.set(e, {
+		return xa.has(e) || xa.set(e, {
 			storage: g,
 			snapshot: null
-		}), ba.get(e);
+		}), xa.get(e);
 	}
 }
 function G(e, t, n) {
@@ -7342,36 +7358,33 @@ function G(e, t, n) {
 	return r ? String(r) : n;
 }
 function K(e, t) {
-	let n = xa();
+	let n = Sa();
 	n.storage.setItem(e, t), n.snapshot = null;
 }
 function q() {
-	let e = xa();
+	let e = Sa();
 	return e.snapshot || (e.snapshot = {
-		enabled: G(e, sa, !1),
-		moveMode: G(e, ca, !1),
-		position: G(e, la, "top-right"),
-		customX: G(e, ua, 8),
-		customY: G(e, da, 8),
-		size: G(e, fa, 176),
-		zoom: G(e, pa, 1),
-		mode: G(e, ma, "follow"),
-		opacity: G(e, ha, .85),
-		showEvents: G(e, ga, !0)
+		enabled: G(e, ca, !1),
+		moveMode: G(e, la, !1),
+		position: G(e, ua, "top-right"),
+		customX: G(e, da, 8),
+		customY: G(e, fa, 8),
+		size: G(e, pa, 176),
+		zoom: G(e, ma, 1),
+		mode: G(e, ha, "follow"),
+		opacity: G(e, ga, .85),
+		showEvents: G(e, _a, !0)
 	}), Object.assign({}, e.snapshot);
-}
-function Sa(e) {
-	K(sa, e ? "true" : "false");
 }
 function Ca(e) {
 	K(ca, e ? "true" : "false");
 }
-function wa() {
-	var e = !q().enabled;
-	return Sa(e), e;
+function wa(e) {
+	K(la, e ? "true" : "false");
 }
-function Ta(e) {
-	K(la, String(e));
+function Ta() {
+	var e = !q().enabled;
+	return Ca(e), e;
 }
 function Ea(e) {
 	K(ua, String(e));
@@ -7392,20 +7405,23 @@ function ja(e) {
 	K(ha, String(e));
 }
 function Ma(e) {
-	K(ga, e ? "true" : "false");
+	K(ga, String(e));
+}
+function Na(e) {
+	K(_a, e ? "true" : "false");
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/map/MapCharacters.js
-function Na(e, t) {
+function Pa(e, t) {
 	let n = /* @__PURE__ */ new Map(), r, i = /* @__PURE__ */ new Map();
 	function a(t, n) {
 		if (!n.characterName && !n.tileId) return null;
 		let r = t && t.bitmap;
 		if (!r || r.isReady && !r.isReady()) return null;
-		let i = Ft(r);
+		let i = It(r);
 		if (!i) return null;
 		let a = t._frame;
-		return (!a || !a.width || !a.height) && !n.characterName ? null : ((!a || !a.width || !a.height) && (a = Lt({
+		return (!a || !a.width || !a.height) && !n.characterName ? null : ((!a || !a.width || !a.height) && (a = Rt({
 			type: "character",
 			name: n.characterName,
 			index: n.characterIndex,
@@ -7470,25 +7486,25 @@ function Na(e, t) {
 		}
 	};
 }
-function Pa() {
+function Fa() {
 	let e = P();
 	if (!e) return null;
 	if (!e.__cheatMapCharacters) {
 		let t = F();
-		e.__cheatMapCharacters = Na(e, t && t.assets || Gt(e));
+		e.__cheatMapCharacters = Pa(e, t && t.assets || Kt(e));
 	}
 	return e.__cheatMapCharacters;
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/map/MapMarkers.js
-var Fa = {
+var Ia = {
 	npc: "#ffd700",
 	enemy: "#ff8c00",
 	treasure: "#0066ff",
 	event: "#ffd700"
-}, Ia = /* @__PURE__ */ new WeakMap();
-function La(e, t) {
-	let n = e.$dataMap, r = e.$dataCommonEvents, i = e.SceneManager && e.SceneManager._scene, a = t._mapId, o = Ia.get(e);
+}, La = /* @__PURE__ */ new WeakMap();
+function Ra(e, t) {
+	let n = e.$dataMap, r = e.$dataCommonEvents, i = e.SceneManager && e.SceneManager._scene, a = t._mapId, o = La.get(e);
 	return (!o || o.map !== t || o.mapId !== a || o.dataMap !== n || o.commonEvents !== r || o.scene !== i) && (o = {
 		map: t,
 		mapId: a,
@@ -7496,20 +7512,20 @@ function La(e, t) {
 		commonEvents: r,
 		scene: i,
 		pages: /* @__PURE__ */ new WeakMap()
-	}, Ia.set(e, o)), o.pages;
+	}, La.set(e, o)), o.pages;
 }
-function Ra(e, t, n, r) {
-	if (!n || typeof n != "object") return za(e, n, r);
+function za(e, t, n, r) {
+	if (!n || typeof n != "object") return Ba(e, n, r);
 	let i = t.get(n);
 	if (i && i.list === n.list && i.characterName === r) return i.category;
-	let a = za(e, n, r);
+	let a = Ba(e, n, r);
 	return t.set(n, {
 		list: n.list,
 		characterName: r,
 		category: a
 	}), a;
 }
-function za(e, t, n) {
+function Ba(e, t, n) {
 	let r = [t && t.list || []], i = /* @__PURE__ */ new Set(), a = !1, o = 2048;
 	for (let t = 0; t < r.length && o > 0; t++) {
 		let n = r[t];
@@ -7527,14 +7543,14 @@ function za(e, t, n) {
 	}
 	return a ? "treasure" : n ? "npc" : "event";
 }
-function Ba(e) {
+function Va(e) {
 	let t = e && e.$gameMap;
-	if (!t) return e && typeof e == "object" && Ia.delete(e), [];
-	let n = La(e, t);
+	if (!t) return e && typeof e == "object" && La.delete(e), [];
+	let n = Ra(e, t);
 	return (typeof t.events == "function" ? t.events() : t._events || []).reduce((t, r) => {
 		if (!r || r._erased || r._pageIndex === -1) return t;
 		try {
-			let i = Number(r._eventId || r.eventId && r.eventId()) || 0, a = e.$dataMap && e.$dataMap.events && e.$dataMap.events[i], o = typeof r.page == "function" ? r.page() : a && a.pages && a.pages[r._pageIndex || 0], s = o && o.image, c = String(a && a.name || "Event " + i), l = String(typeof r.characterName == "function" ? r.characterName() : r._characterName === void 0 ? s && s.characterName || "" : r._characterName), u = Ra(e, n, o, l), d = Number.isFinite(r._realX) ? r._realX : r.x === void 0 ? r._x : r.x, f = Number.isFinite(r._realY) ? r._realY : r.y === void 0 ? r._y : r.y;
+			let i = Number(r._eventId || r.eventId && r.eventId()) || 0, a = e.$dataMap && e.$dataMap.events && e.$dataMap.events[i], o = typeof r.page == "function" ? r.page() : a && a.pages && a.pages[r._pageIndex || 0], s = o && o.image, c = String(a && a.name || "Event " + i), l = String(typeof r.characterName == "function" ? r.characterName() : r._characterName === void 0 ? s && s.characterName || "" : r._characterName), u = za(e, n, o, l), d = Number.isFinite(r._realX) ? r._realX : r.x === void 0 ? r._x : r.x, f = Number.isFinite(r._realY) ? r._realY : r.y === void 0 ? r._y : r.y;
 			if (!Number.isFinite(d) || !Number.isFinite(f)) return t;
 			t.push({
 				id: i,
@@ -7542,7 +7558,7 @@ function Ba(e) {
 				x: d,
 				y: f,
 				kind: u,
-				color: Fa[u],
+				color: Ia[u],
 				erased: !1,
 				characterName: l,
 				tileId: Number(typeof r.tileId == "function" ? r.tileId() : r._tileId || s && s.tileId) || 0,
@@ -7559,7 +7575,7 @@ function Ba(e) {
 		return t;
 	}, []);
 }
-function Va(e, t) {
+function Ha(e, t) {
 	let n = {
 		npc: "npcs",
 		enemy: "enemies",
@@ -7570,27 +7586,27 @@ function Va(e, t) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/minimap/MinimapRenderer.js
-function Ha() {
-	let e = P();
-	return e ? (e.__cheatMapArtwork || (e.__cheatMapArtwork = Yt(e)), e.__cheatMapArtwork) : null;
-}
 function Ua() {
-	let e = Ha();
+	let e = P();
+	return e ? (e.__cheatMapArtwork || (e.__cheatMapArtwork = Xt(e)), e.__cheatMapArtwork) : null;
+}
+function Wa() {
+	let e = Ua();
 	return e ? e.status() : {
 		stage: "idle",
 		detail: "Game unavailable",
 		cacheKey: ""
 	};
 }
-function Wa() {
-	let e = Ha();
+function Ga() {
+	let e = Ua();
 	return e && e.render(void 0, void 0, W());
 }
-function Ga() {
-	let e = Ha();
+function Ka() {
+	let e = Ua();
 	e && e.clear();
 }
-function Ka() {
+function qa() {
 	let e = {
 		onMap: !1,
 		playerX: 0,
@@ -7602,22 +7618,22 @@ function Ka() {
 		if (!t.Scene_Map || !(t.SceneManager._scene instanceof t.Scene_Map)) return e;
 		e.onMap = !0;
 		let n = t.$gamePlayer;
-		e.playerX = Number.isFinite(n._realX) ? n._realX : n.x, e.playerY = Number.isFinite(n._realY) ? n._realY : n.y, e.direction = typeof n.direction == "function" ? n.direction() : n._direction || 2, e.events = Ba(t);
+		e.playerX = Number.isFinite(n._realX) ? n._realX : n.x, e.playerY = Number.isFinite(n._realY) ? n._realY : n.y, e.direction = typeof n.direction == "function" ? n.direction() : n._direction || 2, e.events = Va(t);
 	} catch (e) {}
 	return e;
 }
 //#endregion
 //#region cheat-engine/www/cheat/panels/MinimapPanel.js
-var qa = {
+var Ja = {
 	name: "MinimapPanel",
 	props: { embedded: Boolean },
-	components: { MapLayers: oa },
+	components: { MapLayers: sa },
 	template: "\n<v-card flat class=\"ma-0 pa-0\">\n    <v-card-subtitle class=\"pa-1\">Realistic Minimap</v-card-subtitle>\n    <map-layers v-if=\"!embedded\"/>\n    <v-row dense class=\"ma-0\">\n        <v-col cols=\"12\"><v-switch v-model=\"settings.moveMode\" label=\"Move minimap (drag handle or arrow keys)\" dense hide-details @change=\"onMoveModeChange\"/><v-btn x-small text @click=\"resetPosition\">Reset position</v-btn><div class=\"caption\">Close the cheat overlay, move the minimap, then press Escape on its handle to finish. Normal mode is click-through.</div></v-col>\n        <v-col cols=\"12\">\n            <v-switch\n                v-model=\"settings.enabled\"\n                label=\"Show minimap\"\n                dense hide-details class=\"my-0\"\n                @change=\"onEnabledChange\"></v-switch>\n        </v-col>\n        <v-col cols=\"12\">\n            <v-switch\n                v-model=\"settings.showEvents\"\n                label=\"Show characters and event markers\"\n                dense hide-details class=\"my-0\"\n                @change=\"onShowEventsChange\"></v-switch>\n        </v-col>\n        <v-col cols=\"12\" md=\"6\">\n            <v-select\n                label=\"Position\"\n                v-model=\"settings.position\"\n                :items=\"positions\"\n                outlined dense hide-details\n                @change=\"onPositionChange\"></v-select>\n        </v-col>\n        <v-col cols=\"12\" md=\"6\">\n            <v-select\n                label=\"Mode\"\n                v-model=\"settings.mode\"\n                :items=\"modes\"\n                outlined dense hide-details\n                @change=\"onModeChange\"></v-select>\n        </v-col>\n        <v-col cols=\"6\" v-if=\"settings.position === 'custom'\">\n            <v-text-field\n                label=\"X (px)\"\n                v-model=\"settings.customX\"\n                outlined dense hide-details\n                @keydown.self.stop\n                @change=\"onCustomXChange\"\n                @focus=\"$event.target.select()\"></v-text-field>\n        </v-col>\n        <v-col cols=\"6\" v-if=\"settings.position === 'custom'\">\n            <v-text-field\n                label=\"Y (px)\"\n                v-model=\"settings.customY\"\n                outlined dense hide-details\n                @keydown.self.stop\n                @change=\"onCustomYChange\"\n                @focus=\"$event.target.select()\"></v-text-field>\n        </v-col>\n        <v-col cols=\"12\">\n            <v-slider\n                v-model=\"settings.size\"\n                label=\"Size\"\n                min=\"96\"\n                max=\"320\"\n                step=\"8\"\n                thumb-label=\"always\"\n                @change=\"onSizeChange\">\n            </v-slider>\n        </v-col>\n        <v-col cols=\"12\">\n            <v-slider\n                v-model=\"settings.zoom\"\n                label=\"Zoom\"\n                min=\"0.5\"\n                max=\"4\"\n                step=\"0.25\"\n                thumb-label=\"always\"\n                @change=\"onZoomChange\">\n                <template v-slot:thumb-label=\"{ value }\">\n                    {{ Math.round(value * 100) }}%\n                </template>\n            </v-slider>\n        </v-col>\n        <v-col cols=\"12\">\n            <v-slider\n                v-model=\"settings.opacity\"\n                label=\"Opacity\"\n                min=\"0.2\"\n                max=\"1.0\"\n                step=\"0.05\"\n                thumb-label=\"always\"\n                @change=\"onOpacityChange\">\n                <template v-slot:thumb-label=\"{ value }\">\n                    {{ Math.round(value * 100) }}%\n                </template>\n            </v-slider>\n        </v-col>\n        <v-col cols=\"12\">\n            <p class=\"caption cheat-muted mb-0\">Follow centers on the directional player arrow. Full fits the map. Use the minimap's cursor button to pan and inspect; normal mode lets clicks reach the game. Toggle anytime with Alt+N.</p>\n            <p class=\"caption mb-0\">Status: {{ statusText }}</p>\n        </v-col>\n    </v-row>\n</v-card>\n    ",
 	data() {
 		return {
 			settings: q(),
-			positions: _a,
-			modes: va,
+			positions: va,
+			modes: ya,
 			statusText: "unknown"
 		};
 	},
@@ -7635,10 +7651,10 @@ var qa = {
 	},
 	methods: {
 		onMoveModeChange() {
-			Ca(this.settings.moveMode);
+			wa(this.settings.moveMode);
 		},
 		resetPosition() {
-			Ta("top-right"), Ea(8), Da(8), Ca(!1), this.initializeVariables();
+			Ea("top-right"), Da(8), Oa(8), wa(!1), this.initializeVariables();
 		},
 		initializeVariables() {
 			this.settings = q(), this.refreshStatus();
@@ -7646,23 +7662,23 @@ var qa = {
 		refreshStatus() {
 			this.settings.moveMode = q().moveMode;
 			try {
-				var e = Ua();
+				var e = Wa();
 				this.statusText = e.stage + (e.detail ? " - " + e.detail : "");
 			} catch (e) {
 				this.statusText = "unavailable";
 			}
 		},
 		onEnabledChange() {
-			Sa(this.settings.enabled), j(this, function() {});
+			Ca(this.settings.enabled), j(this, function() {});
 		},
 		onShowEventsChange() {
-			Ma(this.settings.showEvents), j(this, function() {});
+			Na(this.settings.showEvents), j(this, function() {});
 		},
 		onPositionChange() {
-			Ta(this.settings.position), j(this, function() {});
+			Ea(this.settings.position), j(this, function() {});
 		},
 		onModeChange() {
-			Aa(this.settings.mode), j(this, function() {});
+			ja(this.settings.mode), j(this, function() {});
 		},
 		onCustomXChange() {
 			var e = A(this.settings.customX, {
@@ -7670,7 +7686,7 @@ var qa = {
 				integer: !0,
 				min: 0
 			});
-			this.settings.customX = e, Ea(e);
+			this.settings.customX = e, Da(e);
 		},
 		onCustomYChange() {
 			var e = A(this.settings.customY, {
@@ -7678,7 +7694,7 @@ var qa = {
 				integer: !0,
 				min: 0
 			});
-			this.settings.customY = e, Da(e);
+			this.settings.customY = e, Oa(e);
 		},
 		onSizeChange() {
 			var e = A(this.settings.size, {
@@ -7687,7 +7703,7 @@ var qa = {
 				min: 96,
 				max: 320
 			});
-			this.settings.size = e, Oa(e);
+			this.settings.size = e, ka(e);
 		},
 		onZoomChange() {
 			var e = A(this.settings.zoom, {
@@ -7695,7 +7711,7 @@ var qa = {
 				min: .5,
 				max: 4
 			});
-			this.settings.zoom = e, ka(e);
+			this.settings.zoom = e, Aa(e);
 		},
 		onOpacityChange() {
 			var e = A(this.settings.opacity, {
@@ -7703,12 +7719,12 @@ var qa = {
 				min: .2,
 				max: 1
 			});
-			this.settings.opacity = e, ja(e);
+			this.settings.opacity = e, Ma(e);
 		}
 	}
-}, Ja = (e, t, n) => Math.max(t, Math.min(n, e)), Ya = (e, t) => Number.isFinite(e) ? e : t;
-function Xa(e) {
-	let t = Math.max(1, Ya(e.mapWidth, 1)), n = Math.max(1, Ya(e.mapHeight, 1)), r = Math.max(1, Ya(e.width, 1)), i = Math.max(1, Ya(e.height, 1)), a = Ja(Ya(e.zoom, 1), 1, 64), o = Math.min(r / t, i / n) * a, s = (e, t, n) => n >= t ? t / 2 : Ja(e, n / 2, t - n / 2), c = s(Ya(e.x, t / 2), t, r / o), l = s(Ya(e.y, n / 2), n, i / o);
+}, Ya = (e, t, n) => Math.max(t, Math.min(n, e)), Xa = (e, t) => Number.isFinite(e) ? e : t;
+function Za(e) {
+	let t = Math.max(1, Xa(e.mapWidth, 1)), n = Math.max(1, Xa(e.mapHeight, 1)), r = Math.max(1, Xa(e.width, 1)), i = Math.max(1, Xa(e.height, 1)), a = Ya(Xa(e.zoom, 1), 1, 64), o = Math.min(r / t, i / n) * a, s = (e, t, n) => n >= t ? t / 2 : Ya(e, n / 2, t - n / 2), c = s(Xa(e.x, t / 2), t, r / o), l = s(Xa(e.y, n / 2), n, i / o);
 	return {
 		mapWidth: t,
 		mapHeight: n,
@@ -7722,7 +7738,7 @@ function Xa(e) {
 		oy: i / 2 - l * o
 	};
 }
-function Za(e, t, n) {
+function Qa(e, t, n) {
 	if (t < 0 || n < 0 || t >= e.width || n >= e.height) return null;
 	let r = {
 		x: (t - e.ox) / e.unit,
@@ -7730,28 +7746,28 @@ function Za(e, t, n) {
 	};
 	return r.x >= 0 && r.y >= 0 && r.x < e.mapWidth && r.y < e.mapHeight ? r : null;
 }
-function Qa(e, t, n) {
-	return Xa(Object.assign({}, e, {
+function $a(e, t, n) {
+	return Za(Object.assign({}, e, {
 		x: e.x - t / e.unit,
 		y: e.y - n / e.unit
 	}));
 }
-function $a(e, t, n) {
+function eo(e, t, n) {
 	let r = n || {
 		x: e.width / 2,
 		y: e.height / 2
 	}, i = {
 		x: (r.x - e.ox) / e.unit,
 		y: (r.y - e.oy) / e.unit
-	}, a = Xa(Object.assign({}, e, { zoom: e.zoom * t }));
-	return Xa(Object.assign({}, a, {
+	}, a = Za(Object.assign({}, e, { zoom: e.zoom * t }));
+	return Za(Object.assign({}, a, {
 		x: i.x - (r.x - e.width / 2) / a.unit,
 		y: i.y - (r.y - e.height / 2) / a.unit
 	}));
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/map/MapScene.js
-var eo = S({
+var to = S({
 	npc: {
 		label: "NPC",
 		color: "#38bdf8",
@@ -7773,11 +7789,11 @@ var eo = S({
 		glyph: "?"
 	}
 });
-function to(e, t, n, r, i) {
-	let a = eo[r.kind] || eo.event, o = 8 * i;
+function no(e, t, n, r, i) {
+	let a = to[r.kind] || to.event, o = 8 * i;
 	e.save(), e.translate(t, n), e.beginPath(), e.moveTo(0, o + 5), e.lineTo(-o * .8, o * .6), e.quadraticCurveTo(-o * 1.5, -o, 0, -o), e.quadraticCurveTo(o * 1.5, -o, o * .8, o * .6), e.closePath(), e.fillStyle = a.color, e.strokeStyle = "#0f172a", e.lineWidth = 2, e.fill(), e.stroke(), e.fillStyle = "#0f172a", e.font = "bold " + Math.round(10 * i) + "px sans-serif", e.textAlign = "center", e.textBaseline = "middle", e.fillText(a.glyph, 0, 0), e.restore();
 }
-function no(e, t, n, r, i, a, o) {
+function ro(e, t, n, r, i, a, o) {
 	let s = 9 * i;
 	e.save(), e.translate(t, n);
 	let c = o ? 0 : (Math.sin((a || 0) / 350) + 1) / 2;
@@ -7788,7 +7804,7 @@ function no(e, t, n, r, i, a, o) {
 		8: 0
 	}[r] || 0), e.beginPath(), e.moveTo(0, -s), e.lineTo(s * .72, s * .8), e.lineTo(0, s * .38), e.lineTo(-s * .72, s * .8), e.closePath(), e.fillStyle = "#38bdf8", e.strokeStyle = "#ffffff", e.lineWidth = 2, e.fill(), e.stroke(), e.restore();
 }
-function ro(e) {
+function io(e) {
 	let t = e.ownerDocument.createElement("canvas"), n, r, i = "";
 	function a(a, o) {
 		let s = o.camera, c = o.layers, l = o.game, u = e.getContext("2d");
@@ -7835,16 +7851,16 @@ function ro(e) {
 			n = a, r = l.$dataMap, i = d;
 		}
 		u.clearRect(0, 0, s.width, s.height), u.drawImage(t, 0, 0);
-		let f = c.sprites ? Pa() : null;
+		let f = c.sprites ? Fa() : null;
 		f && f.beginFrame(), (o.markers || []).forEach((e) => {
-			if (!Va(e, c)) return;
+			if (!Ha(e, c)) return;
 			let t = s.ox + (e.x + .5) * s.unit, n = s.oy + (e.y + .5) * s.unit;
 			if (!(t < -40 || n < -64 || t > s.width + 40 || n > s.height + 64) && (f && f.draw(u, e, {
 				unit: s.unit,
 				ox: s.ox,
 				oy: s.oy,
 				scale: c.markerScale
-			}) || to(u, t, n, e, c.markerScale || 1), c.labels)) {
+			}) || no(u, t, n, e, c.markerScale || 1), c.labels)) {
 				let r = (e.name || "Event") + " #" + e.id;
 				u.font = "11px sans-serif", u.textAlign = "left", u.textBaseline = "bottom";
 				let i = Math.min(220, u.measureText(r).width + 10);
@@ -7854,7 +7870,7 @@ function ro(e) {
 		let p = o.selection;
 		p && (u.strokeStyle = "#ffffff", u.lineWidth = 2, u.strokeRect(s.ox + p.x * s.unit, s.oy + p.y * s.unit, s.unit, s.unit));
 		let m = o.player;
-		c.player && m && no(u, s.ox + (m.x + .5) * s.unit, s.oy + (m.y + .5) * s.unit, m.direction, c.markerScale || 1, o.time, o.reducedMotion);
+		c.player && m && ro(u, s.ox + (m.x + .5) * s.unit, s.oy + (m.y + .5) * s.unit, m.direction, c.markerScale || 1, o.time, o.reducedMotion);
 	}
 	return {
 		draw: a,
@@ -7865,7 +7881,7 @@ function ro(e) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/map/MapFrames.js
-function io(e, t) {
+function ao(e, t) {
 	let n = !1, r, i = (a) => {
 		n || (r = e.requestAnimationFrame(i), (!e.document || !e.document.hidden) && t(a));
 	};
@@ -7875,8 +7891,8 @@ function io(e, t) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/map/MapSelection.js
-function ao(e, t, n, r) {
-	let i = t.find((t) => Va(t, n) && Math.abs(t.x + .5 - e.x) <= .65 && Math.abs(t.y + .5 - e.y) <= .65);
+function oo(e, t, n, r) {
+	let i = t.find((t) => Ha(t, n) && Math.abs(t.x + .5 - e.x) <= .65 && Math.abs(t.y + .5 - e.y) <= .65);
 	return {
 		x: Math.floor(i ? i.x : e.x),
 		y: Math.floor(i ? i.y : e.y),
@@ -7886,7 +7902,7 @@ function ao(e, t, n, r) {
 		mapId: r
 	};
 }
-function oo(e, t) {
+function so(e, t) {
 	if (!e || !t || !e.Scene_Map || !(e.SceneManager && e.SceneManager._scene instanceof e.Scene_Map)) return !1;
 	let n = e.$gamePlayer, r = e.$dataMap;
 	if (!n || !r || !e.$gameMap || e.$gameMap.mapId() !== t.mapId) return !1;
@@ -7895,20 +7911,20 @@ function oo(e, t) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/ui/LayoutGeometry.js
-function so(e, t, n, r) {
+function co(e, t, n, r) {
 	let i = Math.max(1, Number(n) || 750), a = Math.max(1, Number(r) || 450);
 	return {
 		width: Math.round(Math.min(i, Math.max(Math.min(320, i), Number(e) || 750))),
 		height: Math.round(Math.min(a, Math.max(Math.min(240, a), Number(t) || 450)))
 	};
 }
-function co(e, t, n, r, i) {
+function lo(e, t, n, r, i) {
 	return {
 		x: Math.round(Math.max(0, Math.min(Math.max(0, r - n), Number(e) || 0))),
 		y: Math.round(Math.max(0, Math.min(Math.max(0, i - n), Number(t) || 0)))
 	};
 }
-function lo(e, t, n) {
+function uo(e, t, n) {
 	if (e.button !== void 0 && e.button !== 0) return () => {};
 	let r = e.currentTarget.ownerDocument, i = r.defaultView, a = e.currentTarget, o = !0, s = e.pointerId, c = (e) => {
 		e.cancelable && e.preventDefault(), e.stopPropagation();
@@ -7935,7 +7951,7 @@ function lo(e, t, n) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/components/InteractiveMap.js
-function uo() {
+function fo() {
 	try {
 		let e = JSON.parse(g.getItem("map.interactiveView") || "null");
 		return {
@@ -7951,11 +7967,11 @@ function uo() {
 		};
 	}
 }
-var fo = {
+var po = {
 	name: "InteractiveMap",
 	components: {
-		MapLayers: oa,
-		MinimapPanel: qa
+		MapLayers: sa,
+		MinimapPanel: Ja
 	},
 	props: {
 		compact: Boolean,
@@ -7965,7 +7981,7 @@ var fo = {
 		}
 	},
 	data() {
-		let e = uo();
+		let e = fo();
 		return {
 			zoom: e.zoom,
 			follow: e.follow,
@@ -7985,7 +8001,7 @@ var fo = {
 			height: 380,
 			playerLabel: "",
 			message: "",
-			markerStyles: eo,
+			markerStyles: to,
 			legend: !1
 		};
 	},
@@ -8001,7 +8017,7 @@ var fo = {
 	},
 	template: "\n<section class=\"interactive-map\" :class=\"{ 'interactive-map--compact': compact, 'interactive-map--locked': !interactionEnabled }\" :style=\"{height: compact ? '100%' : surfaceHeight + 'px'}\"\n @keydown.stop @keyup.stop @mousedown.stop @mouseup.stop @touchstart.stop @touchend.stop @click.stop @contextmenu.prevent.stop>\n  <canvas ref=\"mapCanvas\" class=\"interactive-map__canvas\" :width=\"width\" :height=\"height\" tabindex=\"0\" aria-label=\"Interactive game map. Drag or use arrow keys to pan; plus and minus zoom. Click to inspect a location.\"\n   :style=\"{pointerEvents: interactionEnabled ? 'auto' : 'none'}\" @pointerdown.stop.prevent=\"startPan\" @wheel.stop.prevent=\"wheelZoom\" @click=\"onCanvasClick\" @mousemove=\"onCanvasMouseMove\" @mouseleave=\"hoverInfo = ''\" @keydown.prevent=\"mapKey\"/>\n  <div class=\"interactive-map__heading\"><v-icon small>mdi-map-outline</v-icon><span>{{mapName}}</span><span class=\"interactive-map__live\" v-if=\"onMap\">LIVE</span></div>\n  <div class=\"interactive-map__tools\" role=\"toolbar\" aria-label=\"Map controls\" @pointerdown.stop>\n    <button v-if=\"compact\" type=\"button\" class=\"map-tool\" :class=\"{'is-active': interactionEnabled}\" :aria-pressed=\"String(interactionEnabled)\" aria-label=\"Interact with minimap\" title=\"Enable pan and selection; off lets clicks reach the game\" @click=\"interactionEnabled = !interactionEnabled\"><v-icon small>mdi-cursor-default-outline</v-icon></button>\n    <button type=\"button\" class=\"map-tool\" :class=\"{'is-active': drawer === 'find'}\" aria-label=\"Find map event\" title=\"Find NPC, enemy, item or event\" @click=\"openDrawer('find')\"><v-icon small>mdi-magnify</v-icon></button>\n    <button type=\"button\" class=\"map-tool\" :class=\"{'is-active': drawer === 'layers'}\" aria-label=\"Map layers\" title=\"Layers and markers\" @click=\"openDrawer('layers')\"><v-icon small>mdi-layers-outline</v-icon></button>\n    <button type=\"button\" class=\"map-tool\" :class=\"{'is-active': drawer === 'display'}\" aria-label=\"Map settings\" title=\"Map and minimap settings\" @click=\"openDrawer('display')\"><v-icon small>mdi-tune</v-icon></button>\n  </div>\n  <div class=\"interactive-map__navigation\" role=\"toolbar\" aria-label=\"Map navigation\" @pointerdown.stop>\n    <button type=\"button\" class=\"map-tool\" aria-label=\"Zoom in\" title=\"Zoom in (+)\" @click=\"zoomBy(1.3)\"><v-icon small>mdi-plus</v-icon></button>\n    <button type=\"button\" class=\"map-tool\" aria-label=\"Zoom out\" title=\"Zoom out (-)\" @click=\"zoomBy(1/1.3)\"><v-icon small>mdi-minus</v-icon></button>\n    <span class=\"map-tool__divider\"></span>\n    <button type=\"button\" class=\"map-tool\" :class=\"{'is-active': follow}\" :aria-pressed=\"String(follow)\" aria-label=\"Follow player\" title=\"Follow player (F)\" @click=\"followPlayer\"><v-icon small>mdi-navigation</v-icon></button>\n    <button type=\"button\" class=\"map-tool\" aria-label=\"Fit whole map\" title=\"Fit whole map (0)\" @click=\"fitMap\"><v-icon small>mdi-fit-to-screen-outline</v-icon></button>\n  </div>\n  <aside v-if=\"drawer\" class=\"interactive-map__drawer\" :aria-label=\"drawer === 'layers' ? 'Map layers' : drawer === 'find' ? 'Find on map' : 'Map settings'\" @pointerdown.stop @wheel.stop>\n    <header><strong>{{drawer === 'layers' ? 'Layers & markers' : drawer === 'find' ? 'Find on map' : drawer === 'floating' ? 'Floating minimap settings' : 'Map settings'}}</strong><button type=\"button\" class=\"map-tool\" aria-label=\"Close map settings\" @click=\"drawer = ''\"><v-icon small>mdi-close</v-icon></button></header>\n    <map-layers v-if=\"drawer === 'layers'\" inline @change=\"renderMap\"/>\n    <div v-else-if=\"drawer === 'find'\" class=\"map-settings\">\n      <v-text-field v-model=\"search\" label=\"Name or event ID\" dense outlined hide-details @input=\"updateSearch\"/>\n      <button v-for=\"row in searchRows\" :key=\"row.id\" type=\"button\" class=\"map-result\" @click=\"selectEvent(row)\"><span class=\"map-result__kind\" :style=\"{color: markerStyles[row.kind].color}\">{{markerStyles[row.kind].label}}</span><strong>{{row.name}}</strong><small>#{{row.id}} · {{Math.floor(row.x)}}, {{Math.floor(row.y)}}</small></button>\n      <p v-if=\"!searchRows.length\" class=\"caption\">No visible events match. Hidden layers are excluded.</p>\n    </div>\n    <minimap-panel v-else-if=\"drawer === 'floating'\" embedded/>\n    <div v-else class=\"map-settings\">\n      <v-select v-model=\"renderMode\" :items=\"[{text:'Game artwork',value:'realistic'},{text:'Radar / passability',value:'radar'}]\" label=\"Map display\" outlined dense hide-details @change=\"saveView\"/>\n      <button type=\"button\" class=\"map-settings__link\" @click=\"drawer = 'floating'\" data-feature=\"floating-minimap\"><v-icon small>mdi-picture-in-picture-bottom-right-outline</v-icon> Floating minimap settings <v-icon small>mdi-chevron-right</v-icon></button>\n      <button type=\"button\" class=\"map-settings__link\" @click=\"legend = !legend\"><v-icon small>mdi-map-legend</v-icon> {{legend ? 'Hide' : 'Show'}} marker legend</button>\n      <button type=\"button\" class=\"map-settings__link\" @click=\"refreshArtwork\"><v-icon small>mdi-refresh</v-icon> Refresh artwork</button>\n      <p class=\"caption\">Drag to pan · Scroll to zoom · F to follow · 0 to fit. Click to inspect; use Teleport to move.</p>\n      <p class=\"caption\" role=\"status\">{{renderStatus}}</p>\n    </div>\n  </aside>\n  <div v-if=\"legend && !drawer\" class=\"interactive-map__legend\"><span v-for=\"(style,kind) in markerStyles\" :key=\"kind\"><i :style=\"{background:style.color}\"></i>{{style.label}}</span></div>\n  <div v-if=\"selection && !drawer\" class=\"interactive-map__selection\" @pointerdown.stop>\n    <div><span class=\"map-result__kind\">{{selection.kind === 'location' ? 'Location' : markerStyles[selection.kind].label}}</span><strong>{{selection.name}}</strong><small>X {{selection.x}} · Y {{selection.y}}<template v-if=\"selection.id\"> · #{{selection.id}}</template></small></div>\n    <button type=\"button\" class=\"map-teleport\" @click=\"teleportSelection\" aria-label=\"Teleport to selected location\"><v-icon small>mdi-map-marker</v-icon> Teleport</button>\n    <button type=\"button\" class=\"map-tool\" aria-label=\"Clear map selection\" @click=\"selection = null\"><v-icon small>mdi-close</v-icon></button>\n  </div>\n  <div class=\"interactive-map__status\" aria-live=\"off\"><span>{{onMap ? (hoverInfo || playerLabel) : 'No active map'}}</span><span v-if=\"!compact\">{{Math.round(zoom*100)}}%</span></div>\n  <div v-if=\"message\" class=\"interactive-map__message\" role=\"status\">{{message}}</div>\n</section>",
 	mounted() {
-		this._scene = ro(this.$refs.mapCanvas), this._game = P(), this._reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)"), this._resize = () => this.measure(), window.addEventListener("resize", this._resize), window.addEventListener("cheat-layout-change", this._resize), window.ResizeObserver && (this._observer = new window.ResizeObserver(this._resize), this._observer.observe(this.$el.parentElement)), this.measure(), this.renderMap(), this._stopFrames = io(window, (e) => {
+		this._scene = io(this.$refs.mapCanvas), this._game = P(), this._reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)"), this._resize = () => this.measure(), window.addEventListener("resize", this._resize), window.addEventListener("cheat-layout-change", this._resize), window.ResizeObserver && (this._observer = new window.ResizeObserver(this._resize), this._observer.observe(this.$el.parentElement)), this.measure(), this.renderMap(), this._stopFrames = ao(window, (e) => {
 			this.active && (!this._observer && (!this._measureTime || e - this._measureTime > 250) && (this._measureTime = e, this.measure()), this.renderMap(e));
 		});
 	},
@@ -8029,7 +8045,7 @@ var fo = {
 		},
 		renderMap(e) {
 			if (!this._scene || !this._game || !this.$el.getClientRects().length) return;
-			let t = Ka();
+			let t = qa();
 			if (this._frame = t, !t.onMap) {
 				this.onMap = !1;
 				return;
@@ -8044,7 +8060,7 @@ var fo = {
 				x: t.playerX + .5,
 				y: t.playerY + .5
 			} : this._center;
-			this._camera = Xa({
+			this._camera = Za({
 				mapWidth: r.width,
 				mapHeight: r.height,
 				width: this.width,
@@ -8055,7 +8071,7 @@ var fo = {
 			});
 			let u = W();
 			this._visibleEvents = o && !o.showEvents ? [] : t.events;
-			let d = u.background && this.renderMode === "realistic" ? Wa() : null;
+			let d = u.background && this.renderMode === "realistic" ? Ga() : null;
 			this._scene.draw(d, {
 				game: n,
 				camera: this._camera,
@@ -8070,10 +8086,10 @@ var fo = {
 				selection: this.selection,
 				time: e || 0,
 				reducedMotion: !!(this._reducedMotion && this._reducedMotion.matches)
-			}), (a || !this._metaTime || Date.now() - this._metaTime > 100) && (this._metaTime = Date.now(), this.onMap = !0, this.mapName = String(n.$dataMapInfos && n.$dataMapInfos[i] && n.$dataMapInfos[i].name || "Map " + i), this.playerLabel = "You · X " + Math.floor(t.playerX) + " · Y " + Math.floor(t.playerY), this.renderStatus = u.background ? this.renderMode === "radar" ? "Passability radar" : d ? "Live map artwork" : Ua().detail || "Loading artwork; radar shown" : "Map background hidden", this.message && Date.now() > this._messageUntil && (this.message = ""));
+			}), (a || !this._metaTime || Date.now() - this._metaTime > 100) && (this._metaTime = Date.now(), this.onMap = !0, this.mapName = String(n.$dataMapInfos && n.$dataMapInfos[i] && n.$dataMapInfos[i].name || "Map " + i), this.playerLabel = "You · X " + Math.floor(t.playerX) + " · Y " + Math.floor(t.playerY), this.renderStatus = u.background ? this.renderMode === "radar" ? "Passability radar" : d ? "Live map artwork" : Wa().detail || "Loading artwork; radar shown" : "Map background hidden", this.message && Date.now() > this._messageUntil && (this.message = ""));
 		},
 		refreshArtwork() {
-			Ga(), this._scene && this._scene.invalidate(), this.renderMap();
+			Ka(), this._scene && this._scene.invalidate(), this.renderMap();
 		},
 		openDrawer(e) {
 			this.drawer = this.drawer === e ? "" : e, e === "find" && this.updateSearch();
@@ -8083,7 +8099,7 @@ var fo = {
 		},
 		updateSearch() {
 			let e = this._frame, t = this.search.toLowerCase().trim(), n = W();
-			this.searchRows = e ? (this._visibleEvents || []).filter((e) => Va(e, n) && (!t || (e.name + " #" + e.id).toLowerCase().includes(t))).slice(0, 40).map((e) => Object.assign({}, e, {
+			this.searchRows = e ? (this._visibleEvents || []).filter((e) => Ha(e, n) && (!t || (e.name + " #" + e.id).toLowerCase().includes(t))).slice(0, 40).map((e) => Object.assign({}, e, {
 				mapId: this.currentMapId,
 				mapRevision: this._mapGeneration
 			})) : [];
@@ -8094,14 +8110,14 @@ var fo = {
 				this.searchRows = [];
 				return;
 			}
-			let t = W(), n = Ka(), r = n.onMap && n.events.find((n) => n.id === e.id && Va(n, t));
-			!r || this.compact && !q().showEvents || (this.selection = ao({
+			let t = W(), n = qa(), r = n.onMap && n.events.find((n) => n.id === e.id && Ha(n, t));
+			!r || this.compact && !q().showEvents || (this.selection = oo({
 				x: r.x + .5,
 				y: r.y + .5
 			}, [r], t, this.currentMapId), this.follow = !1, this._center = {
 				x: r.x + .5,
 				y: r.y + .5
-			}, this.compact && (ka(Math.max(2, this._camera ? this._camera.zoom : 1)), Aa("full")), this.zoom = Math.max(this.zoom, 2), this.drawer = "", this.saveView(), this.renderMap());
+			}, this.compact && (Aa(Math.max(2, this._camera ? this._camera.zoom : 1)), ja("full")), this.zoom = Math.max(this.zoom, 2), this.drawer = "", this.saveView(), this.renderMap());
 		},
 		point(e) {
 			let t = this.$refs.mapCanvas.getBoundingClientRect();
@@ -8112,26 +8128,26 @@ var fo = {
 		},
 		onCanvasMouseMove(e) {
 			if (!this._camera) return;
-			let t = this.point(e), n = Za(this._camera, t.x, t.y);
+			let t = this.point(e), n = Qa(this._camera, t.x, t.y);
 			this.hoverInfo = n ? "X " + Math.floor(n.x) + " · Y " + Math.floor(n.y) : "";
 		},
 		onCanvasClick(e) {
 			if (!this.interactionEnabled || !this._camera || Date.now() < this._suppressClickUntil) return;
-			let t = this.point(e), n = Za(this._camera, t.x, t.y);
-			n && (this.selection = ao(n, this._visibleEvents || [], W(), this.currentMapId)), this.drawer = "";
+			let t = this.point(e), n = Qa(this._camera, t.x, t.y);
+			n && (this.selection = oo(n, this._visibleEvents || [], W(), this.currentMapId)), this.drawer = "";
 		},
 		teleportSelection() {
-			let e = oo(this._game, this.selection);
+			let e = so(this._game, this.selection);
 			this.message = e ? "Teleported to X " + this.selection.x + ", Y " + this.selection.y : "Location unavailable; select a location on the current map.", this._messageUntil = Date.now() + 2200, this.renderMap();
 		},
 		startPan(e) {
 			if (!this.interactionEnabled || !this._camera || e.button !== 0) return;
 			this._stopPan && this._stopPan(), this.$refs.mapCanvas.focus();
 			let t = this._camera, n = !1;
-			this._stopPan = lo(e, (e, r) => {
+			this._stopPan = uo(e, (e, r) => {
 				if (Math.abs(e) + Math.abs(r) < 4 && !n) return;
-				!n && this.compact && (Aa("full"), ka(t.zoom)), n = !0, this.follow = !1;
-				let i = Qa(t, e, r);
+				!n && this.compact && (ja("full"), Aa(t.zoom)), n = !0, this.follow = !1;
+				let i = $a(t, e, r);
 				this._center = {
 					x: i.x,
 					y: i.y
@@ -8144,10 +8160,10 @@ var fo = {
 			this.follow = !1, this.zoom = e.zoom, this._center = {
 				x: e.x,
 				y: e.y
-			}, this.compact && (Aa("full"), ka(e.zoom)), this.saveView(), this.renderMap();
+			}, this.compact && (ja("full"), Aa(e.zoom)), this.saveView(), this.renderMap();
 		},
 		zoomBy(e, t) {
-			this._camera && this.applyCamera($a(this._camera, e, t));
+			this._camera && this.applyCamera(eo(this._camera, e, t));
 		},
 		wheelZoom(e) {
 			this.interactionEnabled && this.zoomBy(e.deltaY < 0 ? 1.15 : 1 / 1.15, this.point(e));
@@ -8156,15 +8172,15 @@ var fo = {
 			this.zoom = 1, this.follow = !1, this._camera && (this._center = {
 				x: this._camera.mapWidth / 2,
 				y: this._camera.mapHeight / 2
-			}), this.compact && (Aa("full"), ka(1)), this.saveView(), this.renderMap();
+			}), this.compact && (ja("full"), Aa(1)), this.saveView(), this.renderMap();
 		},
 		followPlayer() {
 			if (this.follow = !0, this.compact) {
 				if (this._camera && q().mode !== "follow") {
 					let e = Math.max(1, this._camera.mapWidth / 35, this._camera.mapHeight / 35);
-					ka(Math.max(1, this._camera.zoom / e));
+					Aa(Math.max(1, this._camera.zoom / e));
 				}
-				Aa("follow");
+				ja("follow");
 			} else this._camera && (this.zoom = Math.max(this.zoom, this._camera.mapWidth / 25, this._camera.mapHeight / 25));
 			this.saveView(), this.renderMap();
 		},
@@ -8174,17 +8190,17 @@ var fo = {
 				"ArrowRight",
 				"ArrowUp",
 				"ArrowDown"
-			].includes(e.key) && this.applyCamera(Qa(this._camera, e.key === "ArrowLeft" ? 40 : e.key === "ArrowRight" ? -40 : 0, e.key === "ArrowUp" ? 40 : e.key === "ArrowDown" ? -40 : 0)));
+			].includes(e.key) && this.applyCamera($a(this._camera, e.key === "ArrowLeft" ? 40 : e.key === "ArrowRight" ? -40 : 0, e.key === "ArrowUp" ? 40 : e.key === "ArrowDown" ? -40 : 0)));
 		}
 	}
-}, po = {
+}, mo = {
 	name: "MapEventPanel",
-	components: { InteractiveMap: fo },
+	components: { InteractiveMap: po },
 	template: "<interactive-map ref=\"view\"/>",
 	methods: { focusFeature(e) {
 		this.$refs.view && this.$refs.view.focusFeature(e);
 	} }
-}, mo = {
+}, ho = {
 	name: "ShortcutPanel",
 	template: "\n<v-text-field\n    class=\"cheat-shortcut-input\"\n    v-model=\"showingText\"\n    :label=\"label\"\n    :solo=\"solo\"\n    :outlined=\"outlined\"\n    :background-color=\"backgroundColor\"\n    dense\n    hide-details\n    @keydown.self.stop.prevent=\"onShortcutInput\"\n    @focus=\"$event.target.select()\">\n    <template v-slot:append>\n        <v-btn \n            v-if=\"deletable\"\n            :disabled=\"shortcut.isEmpty()\"\n            small\n            :style=\"deleteBtnStyle\"\n            icon\n            @click=\"onDeleteClick\">\n            <v-icon small>mdi-close-circle</v-icon>\n        </v-btn>\n    </template>\n</v-text-field>\n    ",
 	data() {
@@ -8242,7 +8258,7 @@ var fo = {
 			t.isCombiningKey() && !this.combiningKeyAlone || (t.equals(this.shortcut) || this.$emit("change", t), this.$emit("input", t));
 		}
 	}
-}, ho = class e {
+}, go = class e {
 	constructor() {
 		this.actionTable = Array(16 * 257);
 	}
@@ -8288,14 +8304,14 @@ var fo = {
 };
 //#endregion
 //#region cheat-engine/www/cheat/js/shortcuts/Tools.js
-function go(e) {
+function _o(e) {
 	let t = {};
-	for (let n in e) typeof e[n] == "object" && e[n] !== null ? t[n] = go(e[n]) : t[n] = e[n];
+	for (let n in e) typeof e[n] == "object" && e[n] !== null ? t[n] = _o(e[n]) : t[n] = e[n];
 	return t;
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/shortcuts/ShortcutConfig.js
-var _o = {
+var vo = {
 	openFeatureFinder: { shortcut: "ctrl p" },
 	openMessageLog: { shortcut: "ctrl h" },
 	toggleCheatModal: { shortcut: "ctrl c" },
@@ -8339,7 +8355,7 @@ var _o = {
 	},
 	openDevTool: { shortcut: "f12" }
 };
-function vo(e, t, n) {
+function yo(e, t, n) {
 	try {
 		e = Number(e);
 	} catch (e) {
@@ -8347,7 +8363,7 @@ function vo(e, t, n) {
 	}
 	return isNaN(e) || !Number.isInteger(e) ? "Value must be a number" : e < t || n < e ? `Value must be between [${t}, ${n}]` : !1;
 }
-var yo = {
+var bo = {
 	openFeatureFinder: {
 		name: "Find a feature",
 		desc: "Search panels, settings and shortcuts",
@@ -8388,7 +8404,7 @@ var yo = {
 		name: "Toggle minimap",
 		desc: "Show/hide the realistic minimap overlay",
 		enterAction(e) {
-			wa();
+			Ta();
 		}
 	},
 	quickSave: {
@@ -8398,7 +8414,7 @@ var yo = {
 			name: "Slot",
 			desc: "Slot for saved",
 			isInvalidValue(e) {
-				return vo(e, 1, DataManager.maxSavefiles());
+				return yo(e, 1, DataManager.maxSavefiles());
 			},
 			convertValue(e) {
 				return Number(e);
@@ -8415,7 +8431,7 @@ var yo = {
 			name: "Slot",
 			desc: "Slot for loaded",
 			isInvalidValue(e) {
-				return vo(e, 1, DataManager.maxSavefiles());
+				return yo(e, 1, DataManager.maxSavefiles());
 			},
 			convertValue(e) {
 				return Number(e);
@@ -8534,17 +8550,17 @@ var yo = {
 			name: "Accelerate game speed",
 			desc: "Accelerate game speed while skipping message",
 			isInvalidValue(e) {
-				return vo(e, 1, 50);
+				return yo(e, 1, 50);
 			},
 			convertValue(e) {
 				return Number(e);
 			}
 		} },
 		enterAction(e) {
-			De.startSkip(e.accelerate);
+			Oe.startSkip(e.accelerate);
 		},
 		leaveAction(e) {
-			De.stopSkip();
+			Oe.stopSkip();
 		}
 	},
 	openDevTool: {
@@ -8554,7 +8570,7 @@ var yo = {
 			n() && e("nw.gui").Window.get().showDevTools();
 		}
 	}
-}, bo = class {
+}, xo = class {
 	constructor(e, t) {
 		this.id = e;
 		for (let e of [
@@ -8585,22 +8601,22 @@ var yo = {
 		};
 	}
 };
-function xo(e) {
-	let t = go(e);
+function So(e) {
+	let t = _o(e);
 	for (let n of Object.keys(e)) t[n].shortcut = N.fromString(e[n].shortcut);
 	return t;
 }
-function So(e) {
-	let t = go(e);
+function Co(e) {
+	let t = _o(e);
 	for (let n of Object.keys(e)) t[n].shortcut = e[n].shortcut.asString();
 	return t;
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/shortcuts/ShortcutMigration.js
-function Co(e, t) {
+function wo(e, t) {
 	let n = !1, r = null, i = new Set(Object.values(e).map((e) => e.shortcut.asString()));
 	for (let a of Object.values(t)) if (!Object.hasOwnProperty.call(e, a.id)) {
-		r || (r = xo(_o));
+		r || (r = So(vo));
 		let t = r[a.id];
 		!t.shortcut.isEmpty() && i.has(t.shortcut.asString()) && (console.warn(`key conflicts while migrating : ${a.name} - ${t.shortcut.asString()}`), t.shortcut = N.createEmpty()), i.add(t.shortcut.asString()), e[a.id] = r[a.id], n = !0;
 	}
@@ -8611,7 +8627,7 @@ function Co(e, t) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/shortcuts/ShortcutStorage.js
-var wo = class {
+var To = class {
 	constructor(e, t) {
 		this.settingsFile = e, this.defaultSettings = t;
 	}
@@ -8646,19 +8662,19 @@ var wo = class {
 			e("fs").unlinkSync(this.settingsFile);
 		} catch (e) {}
 	}
-}, To = class {
+}, Eo = class {
 	constructor() {
 		this.initialize();
 	}
 	initialize() {
-		console.log("__global shortcut initialized"), this.shortcutSettingsFile = `./${i()}/cheat-settings/shortcuts.json`, this.storage = new wo(this.shortcutSettingsFile, _o), this.shortcutSettings = {}, this.readShortcutSettings(), this.shortcutConfig = {}, this.initializeShortcutConfig(), this.migrateShortcutSettings(), this.shortcutMap = new ho(), this.initializeShortcutMap();
+		console.log("__global shortcut initialized"), this.shortcutSettingsFile = `./${i()}/cheat-settings/shortcuts.json`, this.storage = new To(this.shortcutSettingsFile, vo), this.shortcutSettings = {}, this.readShortcutSettings(), this.shortcutConfig = {}, this.initializeShortcutConfig(), this.migrateShortcutSettings(), this.shortcutMap = new go(), this.initializeShortcutMap();
 	}
 	initializeShortcutConfig() {
 		this.shortcutConfig = {};
-		for (let e of Object.keys(yo)) this.shortcutConfig[e] = new bo(e, yo[e]);
+		for (let e of Object.keys(bo)) this.shortcutConfig[e] = new xo(e, bo[e]);
 	}
 	migrateShortcutSettings() {
-		let e = Co(this.shortcutSettings, this.shortcutConfig);
+		let e = wo(this.shortcutSettings, this.shortcutConfig);
 		this.shortcutSettings = e.shortcutSettings, e.migrated && (console.warn("__settings migrated"), this.writeShortcutSettings());
 	}
 	initializeShortcutMap() {
@@ -8683,11 +8699,11 @@ var wo = class {
 		let e = this.readRawShortcutSettings();
 		this.shortcutSettings = {};
 		try {
-			this.shortcutSettings = xo(e);
+			this.shortcutSettings = So(e);
 		} catch (e) {
 			T.warn("Can't parse shortcut settings. Use default settings instead.\n(You can use cheat plugin anyway)", e);
 			try {
-				this.shortcutSettings = xo(_o);
+				this.shortcutSettings = So(vo);
 			} catch (e) {
 				T.error("Can't parse shortcut settings. Cheat plugin will not work properly", e);
 			}
@@ -8697,7 +8713,7 @@ var wo = class {
 		this.storage.writeRawSettings(e);
 	}
 	writeShortcutSettings() {
-		this.writeRawShortcutSettings(So(this.shortcutSettings));
+		this.writeRawShortcutSettings(Co(this.shortcutSettings));
 	}
 	restoreDefaultSettings() {
 		this.storage.restoreDefaults(), this.initialize();
@@ -8732,11 +8748,11 @@ var wo = class {
 		if (i) throw Error(i);
 		this.getSettings(e).param[t] = r.convertValue(n), this.writeShortcutSettings();
 	}
-}, Eo = typeof window < "u" ? window : null, J = Eo && Eo.__cheatOpener && Eo.__cheatOpener.__cheatShortcutManager || new To();
-Eo && (Eo.__cheatShortcutManager = J);
+}, Do = typeof window < "u" ? window : null, J = Do && Do.__cheatOpener && Do.__cheatOpener.__cheatShortcutManager || new Eo();
+Do && (Do.__cheatShortcutManager = J);
 //#endregion
 //#region cheat-engine/www/cheat/js/shortcuts/ShortcutPanelState.js
-function Do(e) {
+function Oo(e) {
 	let t = {};
 	if (!e) return t;
 	for (let n of Object.keys(e)) t[n] = {
@@ -8745,7 +8761,7 @@ function Do(e) {
 	};
 	return t;
 }
-function Oo(e, t, n) {
+function ko(e, t, n) {
 	return {
 		id: e,
 		name: n.name || "",
@@ -8754,15 +8770,15 @@ function Oo(e, t, n) {
 		combiningKeyAlone: !!n.combiningKeyAlone,
 		paramDesc: n.param || {},
 		shortcut: N.fromKey(t.shortcut),
-		param: Do(t.param)
+		param: Oo(t.param)
 	};
 }
-function ko(e, t) {
-	return Object.keys(t).map((n) => Oo(n, e[n], t[n]));
+function Ao(e, t) {
+	return Object.keys(t).map((n) => ko(n, e[n], t[n]));
 }
 //#endregion
 //#region cheat-engine/www/cheat/panels/ShortcutPanel.js
-var Ao = S([
+var jo = S([
 	{
 		text: "Name",
 		value: "name"
@@ -8779,9 +8795,9 @@ var Ao = S([
 		text: "Param",
 		value: "param"
 	}
-]), jo = {
+]), Mo = {
 	name: "ShortcutPanel",
-	components: { KeyInputField: mo },
+	components: { KeyInputField: ho },
 	template: "\n<v-card flat class=\"ma-0 pa-0\">\n    <v-row>\n        <v-col\n            cols=\"12\"\n            md=\"8\">\n            <v-text-field\n                label=\"Search...\"\n                solo\n                v-model=\"search\"\n                dense\n                hide-details\n                @keydown.self.stop\n                @input=\"onSearchChange\"\n                @focus=\"$event.target.select()\">\n            </v-text-field>\n        </v-col>\n        <v-col\n            cols=\"12\"\n            md=\"4\">\n            <key-input-field\n                v-model=\"shortcutSearch\"\n                label=\"Shortcut\"\n                solo\n                dense\n                hide-details\n                combining-key-alone\n                @change=\"onShortcutSearchChange\">\n            </key-input-field>\n        </v-col>\n    </v-row>\n    <v-card-text\n        class=\"pa-0 d-flex justify-space-between align-center\">\n        <v-checkbox\n            class=\"d-inline-flex\"\n            v-model=\"hideDesc\"\n            label=\"Hide Description Field\">\n        </v-checkbox>\n        <v-tooltip\n            bottom>\n            <span>Restore to default settings</span>\n            <template v-slot:activator=\"{ on, attrs }\">\n                <v-btn\n                    color=\"success\"\n                    v-bind=\"attrs\"\n                    v-on=\"on\"\n                    x-small\n                    fab\n                    @click=\"restoreToDefault\">\n                    <v-icon small>mdi-restore</v-icon>\n                </v-btn>\n            </template>\n        </v-tooltip>\n    </v-card-text>\n    <v-data-table\n        class=\"mt-2\"\n        dense\n        single-expand\n        :headers=\"filteredHeaders\"\n        :expanded.sync=\"tableExpanded\"\n        :items=\"filteredShortcuts\"\n        :search=\"search\"\n        :custom-filter=\"tableItemFilter\"\n        :page.sync=\"tablePage\"\n        :items-per-page=\"10\">\n        <template\n            v-slot:item.shortcut=\"{ item }\">\n            <div :data-feature=\"'shortcut-' + item.id\">\n            <key-input-field\n                class=\"cheat-field-w170\"\n                v-model=\"item.shortcut\"\n                :deletable=\"!item.necessary\"\n                label=\"No Shortcut\"\n                solo\n                dense\n                :combining-key-alone=\"item.combiningKeyAlone\"\n                hide-details\n                @change=\"onShortcutChange($event, item)\">\n            </key-input-field>\n            </div>\n        </template>\n        <template\n            v-slot:item.param=\"{ item, index }\">\n            <v-btn\n                v-if=\"Object.keys(item.paramDesc).length > 0\"\n                color=\"secondary\"\n                x-small\n                fab\n                @click=\"changeExpanded(item)\">\n                <v-icon small>mdi-cog</v-icon>\n            </v-btn>\n        </template>\n        <template v-slot:expanded-item=\"{ headers, item }\">\n            <td :colspan=\"headers.length\" class=\"ma-0 pa-0\">\n                <v-card \n                    flat\n                    class=\"ma-0 py-2 px-0\"\n                    v-if=\"Object.keys(item.paramDesc).length > 0\">\n                    <v-card-subtitle\n                        class=\"py-0 mb-1\">\n                        Parameters\n                    </v-card-subtitle>\n                    <v-card-text\n                        class=\"py-0 my-0 mb-1\"\n                        v-for=\"paramKey in Object.keys(item.paramDesc)\"\n                        :key=\"paramKey\">\n                        <v-row\n                            class=\"ma-0 pa-0\">\n                            <v-col\n                                class=\"pa-0\"\n                                cols=\"12\"\n                                md=\"3\">\n                                <v-text-field\n                                    v-model=\"item.param[paramKey].value\"\n                                    outlined\n                                    dense\n                                    hide-details\n                                    @keydown.self.stop\n                                    @change=\"onParameterChange($event, item, paramKey)\"\n                                    :label=\"item.paramDesc[paramKey].name\"\n                                    @focus=\"$event.target.select()\">\n                                </v-text-field>\n                            </v-col>\n                            <v-col\n                                class=\"pa-0 d-inline-flex align-center\"\n                                cols=\"12\"\n                                md=\"9\">\n                                <span class=\"ml-3\">: {{item.paramDesc[paramKey].desc}}</span>\n                            </v-col>\n                        </v-row>\n                    </v-card-text>\n                </v-card>\n            </td>\n        </template>\n    </v-data-table>\n</v-card>\n    ",
 	data() {
 		return {
@@ -8791,7 +8807,7 @@ var Ao = S([
 			hideDesc: !0,
 			search: "",
 			shortcutSearch: N.createEmpty(),
-			tableHeaders: Ao
+			tableHeaders: jo
 		};
 	},
 	created() {
@@ -8839,10 +8855,10 @@ var Ao = S([
 			t.param[n].value = J.getParam(t.id, n);
 		},
 		initializeVariables() {
-			this.shortcuts = ko(J.shortcutSettings, J.shortcutConfig);
+			this.shortcuts = Ao(J.shortcutSettings, J.shortcutConfig);
 		},
 		tableItemFilter(e, t, n) {
-			return Ne(t, [
+			return Pe(t, [
 				n.name,
 				n.desc,
 				n.shortcut.asDisplayString()
@@ -8882,7 +8898,7 @@ function Y(e, t, n) {
 	}
 	return r;
 }
-function Mo() {
+function No() {
 	let e = 0, t = window.$dataSystem;
 	if (!t) return e;
 	if (t.terms && t.terms.basic) {
@@ -8946,7 +8962,7 @@ function Mo() {
 	}
 	return e;
 }
-function No() {
+function Po() {
 	if (!U.isEnabled()) return 0;
 	let e = U.getTargets(), t = 0;
 	if (window.$dataItems && (t += Y(window.$dataItems, "items", e)), window.$dataWeapons && (t += Y(window.$dataWeapons, "weapons", e)), window.$dataArmors && (t += Y(window.$dataArmors, "armors", e)), window.$dataSkills && (t += Y(window.$dataSkills, "skills", e)), window.$dataStates && (t += Y(window.$dataStates, "states", e)), window.$dataClasses && (t += Y(window.$dataClasses, "classes", e)), window.$dataEnemies && (t += Y(window.$dataEnemies, "enemies", e)), window.$dataActors && e.actors && (t += Y(window.$dataActors, "actors", e)), window.$dataMapInfos && e.maps) for (let e of window.$dataMapInfos) {
@@ -8954,7 +8970,7 @@ function No() {
 		let n = V.get(e.name);
 		n && (e._originalName || (e._originalName = e.name), e.name = n.translated, t++);
 	}
-	if (window.$dataSystem && e.system && (t += Mo()), window.$dataSystem) {
+	if (window.$dataSystem && e.system && (t += No()), window.$dataSystem) {
 		if (e.variables && window.$dataSystem.variables) for (let e = 0; e < window.$dataSystem.variables.length; e++) {
 			let n = window.$dataSystem.variables[e];
 			if (n && typeof n == "string" && n.trim()) {
@@ -8983,7 +8999,7 @@ function X(e) {
 		}
 	}
 }
-function Po() {
+function Fo() {
 	if (X(window.$dataItems), X(window.$dataWeapons), X(window.$dataArmors), X(window.$dataSkills), X(window.$dataStates), X(window.$dataClasses), X(window.$dataEnemies), X(window.$dataActors), window.$dataMapInfos) for (let e of window.$dataMapInfos) e && e._originalName && (e.name = e._originalName, delete e._originalName);
 	if (window.$dataSystem) {
 		let e = window.$dataSystem;
@@ -8998,7 +9014,7 @@ function Po() {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/translation/in-game/InGameTranslationLists.js
-function Fo(e, t) {
+function Io(e, t) {
 	if (e) {
 		for (let n of e) if (n.name && typeof n.name == "string" && n.name.trim()) {
 			let e = t.get(n.name);
@@ -9008,12 +9024,12 @@ function Fo(e, t) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/translation/in-game/InGameTranslationText.js
-function Io(e) {
+function Lo(e) {
 	return !e || typeof e != "string" ? e : e.replace(/\\C\[\d+\]/gi, "").replace(/\\I\[\d+\]/gi, "").replace(/\\V\[\d+\]/gi, "").replace(/\\N\[\d+\]/gi, "").replace(/\\P\[\d+\]/gi, "").replace(/\\G/gi, "").replace(/\\{/g, "").replace(/\\}/g, "").replace(/\\!/g, "").replace(/\\\./g, "").replace(/\\\|/g, "").replace(/\\>/g, "").replace(/\\</g, "").replace(/\\\^/g, "").replace(/\x1b[A-Za-z]\[\d+\]/g, "").replace(/\x1b[A-Za-z]/g, "").trim();
 }
-function Lo(e, t) {
+function Ro(e, t) {
 	if (!e || typeof e != "string" || !e.trim()) return e;
-	let n = Io(e), r = t.get(n);
+	let n = Lo(e), r = t.get(n);
 	if (r) return r.translated;
 	let i = t.get(e);
 	return i ? i.translated : e;
@@ -9029,11 +9045,11 @@ var Z = new class {
 	}
 	applyTranslationsToGameData() {
 		if (!U.isEnabled()) return;
-		let e = No();
+		let e = Po();
 		this._dataPatched = !0, console.log(`[InGameTranslator] Patched ${e} game data strings`);
 	}
 	revertGameData() {
-		Po(), this._dataPatched = !1, console.log("[InGameTranslator] Game data reverted to original text");
+		Fo(), this._dataPatched = !1, console.log("[InGameTranslator] Game data reverted to original text");
 	}
 	_hookWindowMessage() {
 		let e = Window_Message.prototype.startMessage;
@@ -9041,7 +9057,7 @@ var Z = new class {
 			let t = $gameMessage;
 			if (U.isEnabled()) {
 				let e = t._texts;
-				for (let t = 0; t < e.length; t++) e[t] && typeof e[t] == "string" && e[t].trim() && (e[t] = Lo(e[t], V));
+				for (let t = 0; t < e.length; t++) e[t] && typeof e[t] == "string" && e[t].trim() && (e[t] = Ro(e[t], V));
 				if (t._speakerName) {
 					let e = V.get(t._speakerName);
 					e && (t._speakerName = e.translated);
@@ -9063,7 +9079,7 @@ var Z = new class {
 	_hookDrawTextEx() {
 		let e = Window_Base.prototype.drawTextEx;
 		Window_Base.prototype.drawTextEx = function(t, n, r, i) {
-			return U.isEnabled() && typeof t == "string" && t.trim() && (t = Lo(t, V)), e.call(this, t, n, r, i);
+			return U.isEnabled() && typeof t == "string" && t.trim() && (t = Ro(t, V)), e.call(this, t, n, r, i);
 		};
 	}
 	_hookDrawItemName() {
@@ -9083,7 +9099,7 @@ var Z = new class {
 	_hookChoiceList() {
 		let e = Window_ChoiceList.prototype.makeCommandList;
 		Window_ChoiceList.prototype.makeCommandList = function() {
-			e.call(this), U.isEnabled() && this._list && Fo(this._list, V);
+			e.call(this), U.isEnabled() && this._list && Io(this._list, V);
 		};
 	}
 	_hookActorEnemyNames() {
@@ -9172,7 +9188,7 @@ var Z = new class {
 			if (e === void 0) return;
 			let n = e.prototype.makeCommandList;
 			n && (e.prototype.makeCommandList = function() {
-				n.call(this), U.isEnabled() && this._list && Fo(this._list, V);
+				n.call(this), U.isEnabled() && this._list && Io(this._list, V);
 			});
 		};
 		try {
@@ -9209,14 +9225,14 @@ var Z = new class {
 	isDataPatched() {
 		return this._dataPatched;
 	}
-}(), Ro = S([{
+}(), zo = S([{
 	name: "GET",
 	value: "get"
 }, {
 	name: "POST",
 	value: "post"
 }]);
-function zo() {
+function Bo() {
 	let e = V.getStats(), t = {
 		totalEntries: e.totalEntries,
 		ageText: "No data"
@@ -9227,8 +9243,8 @@ function zo() {
 	}
 	return t;
 }
-function Bo(e, t) {
-	let n = Number(e), r = Xn[t] || 50;
+function Vo(e, t) {
+	let n = Number(e), r = Zn[t] || 50;
 	return n <= 0 ? {
 		message: "Chunk size must be greater than 0",
 		class: "caption font-weight-bold cheat-text-error"
@@ -9243,8 +9259,8 @@ function Bo(e, t) {
 		class: "caption font-weight-bold cheat-text-success"
 	};
 }
-function Vo() {
-	let e = Object.values(Jn).map((e) => ({
+function Ho() {
+	let e = Object.values(Yn).map((e) => ({
 		id: e.id,
 		name: e.name
 	}));
@@ -9253,23 +9269,23 @@ function Vo() {
 		name: "Custom"
 	}), e;
 }
-function Ho(e) {
+function Uo(e) {
 	return e === "custom";
 }
-function Uo(e) {
-	let t = Jn[e];
+function Wo(e) {
+	let t = Yn[e];
 	return !!(t && t.data && t.data.isLLM);
 }
-function Wo(e) {
-	return Jn[e];
-}
 function Go(e) {
-	return Ho(e) || !Yn[e] ? null : `Recommended chunk size for ${Wo(e).name} : ${Yn[e]}`;
+	return Yn[e];
 }
 function Ko(e) {
+	return Uo(e) || !Xn[e] ? null : `Recommended chunk size for ${Go(e).name} : ${Xn[e]}`;
+}
+function qo(e) {
 	return e === "ezTransWeb" || e === "ezTransServer";
 }
-function qo() {
+function Jo() {
 	let e = U.getEndPointSelection();
 	return {
 		enabled: U.isEnabled(),
@@ -9279,15 +9295,15 @@ function qo() {
 		llmConfig: U.getLLMConfig(),
 		bulkTranslateChunkSize: U.getBulkTranslateChunkSize(),
 		useBatchTranslation: localStorage.getItem("useBatchTranslation") !== "false",
-		bankStats: zo(),
-		chunkSizeWarning: Bo(U.getBulkTranslateChunkSize(), e),
+		bankStats: Bo(),
+		chunkSizeWarning: Vo(U.getBulkTranslateChunkSize(), e),
 		isDataPatched: Z.isDataPatched(),
 		inGamePatchCount: Z.patchCount || 0
 	};
 }
 //#endregion
 //#region cheat-engine/www/cheat/panels/TranslateSettingsPanel.js
-var Jo = {
+var Yo = {
 	name: "TranslateSettingsPanel",
 	template: "\n<v-card flat class=\"ma-0 pa-0\">\n    <v-card-subtitle class=\"pb-0 font-weight-bold\">Usage</v-card-subtitle>\n    <v-card-text class=\"pb-0\">\n        <span\n            v-if=\"selectedDefaultEndPoint\">\n            <a \n                v-if=\"selectedDefaultEndPoint.helpUrl\" \n                :href=\"selectedDefaultEndPoint.helpUrl\" \n                target=\"_blank\">\n                {{selectedDefaultEndPoint.name}}\n            </a>\n            <span v-else>{{selectedDefaultEndPoint.name}}</span>\n            must be running before translation.\n        </span>\n        <span\n            v-if=\"isCustomEndPoint\">\n            Custom translation server must be running before translation.\n        </span>\n    </v-card-text>\n    <v-card-text class=\"py-0\" :class=\"translatorStatusColor\">\n        {{translatorStatusMessage}}\n    </v-card-text>\n    <v-card-subtitle class=\"pb-0 mt-4 font-weight-bold\">Translate</v-card-subtitle>\n    <v-card-text class=\"py-0\">\n        <v-switch\n            v-model=\"enabled\"\n            label=\"Enable\"\n            dense\n            hide-details\n            @click.self.stop\n            @change=\"onChangeEnabled\">\n        </v-switch>\n    </v-card-text>\n    \n    <v-card-subtitle class=\"pb-0 mt-4 font-weight-bold\">End Point</v-card-subtitle>\n    <v-card-text class=\"py-0\">\n        <v-radio-group \n            hide-details\n            v-model=\"endPointSelection\" \n            @change=\"onChangeEndPoint\"\n            :disabled=\"!enabled\">\n            <v-radio\n                v-for=\"item in endPointList\"\n                :key=\"item.id\"\n                :label=\"item.name\"\n                :value=\"item.id\">\n            </v-radio>\n        </v-radio-group>\n    </v-card-text>\n    \n    <v-card-text \n        class=\"py-0 mt-1 mb-0\" \n        v-if=\"selectedDefaultEndPoint && selectedDefaultEndPoint.helpUrl\">\n        <a :href=\"selectedDefaultEndPoint.helpUrl\" target=\"_blank\">How to set up \"{{selectedDefaultEndPoint.name}}\"</a>\n    </v-card-text>\n    \n    <v-card-text \n        class=\"py-0 mt-4 mb-0\"\n        v-if=\"isCustomEndPoint\">\n        <v-row>\n            <v-col\n                cols=\"12\"\n                md=\"3\">\n                <v-select\n                    v-model=\"customEndPointData.method\"\n                    dense\n                    hide-details\n                    :items=\"restApiMethods\"\n                    item-value=\"value\"\n                    item-text=\"name\"\n                    label=\"Method\"\n                    solo\n                    :disabled=\"!enabled\"\n                    @change=\"onChangeCustomEndPointMethod\">\n                    <template v-slot:selection=\"{ item }\">\n                        <span class=\"body-2\">{{item.name}}</span>\n                    </template>\n                </v-select>\n            </v-col>\n            <v-col\n                cols=\"12\"\n                md=\"9\">\n                <v-text-field\n                    class=\"body-2\"\n                    v-model=\"customEndPointData.urlPattern\"\n                    dense\n                    hide-details\n                    label=\"URL Pattern\"\n                    solo\n                    :disabled=\"!enabled\"\n                    @keydown.self.stop\n                    @change=\"onChangeCustomEndPointUrlPattern\">\n                </v-text-field>\n            </v-col>\n        </v-row>\n        \n        <v-textarea\n            class=\"mt-2\"\n            v-model=\"customEndPointData.body\"\n            solo\n            dense\n            hide-details\n            row-height=\"1\"\n            auto-grow\n            label=\"Body\"\n            :disabled=\"!enabled\"\n            @keydown.self.stop\n            @change=\"onChangeCustomEndPointBody\">\n        </v-textarea>\n    </v-card-text>\n    \n    <!-- LLM Configuration Panel -->\n    <v-card-text \n        class=\"py-0 mt-4 mb-0\"\n        v-if=\"isLLMEndPoint\">\n        <v-card-subtitle class=\"pa-0 mb-2 font-weight-bold\">🤖 LLM Configuration</v-card-subtitle>\n        \n        <v-text-field\n            class=\"body-2 mb-2\"\n            v-model=\"llmConfig.model\"\n            dense\n            hide-details\n            label=\"Model Name\"\n            hint=\"e.g. qwen3:8b, gemma3:12b, gpt-4o-mini, gemini-2.0-flash, deepseek-chat\"\n            persistent-hint\n            solo\n            :disabled=\"!enabled\"\n            @keydown.self.stop\n            @change=\"onChangeLLMConfig\">\n        </v-text-field>\n\n        <v-text-field\n            class=\"body-2 mb-2\"\n            v-if=\"selectedDefaultEndPoint && selectedDefaultEndPoint.data.requiresApiKey || llmConfig.apiKey\"\n            v-model=\"llmConfig.apiKey\"\n            dense\n            hide-details\n            label=\"API Key\"\n            type=\"password\"\n            solo\n            :disabled=\"!enabled\"\n            @keydown.self.stop\n            @change=\"onChangeLLMConfig\">\n        </v-text-field>\n\n        <v-text-field\n            class=\"body-2 mb-2\"\n            v-if=\"endPointSelection === 'llmCustom'\"\n            v-model=\"llmConfig.apiUrl\"\n            dense\n            hide-details\n            label=\"API URL (OpenAI-compatible endpoint)\"\n            hint=\"e.g. http://localhost:11434/v1/chat/completions\"\n            persistent-hint\n            solo\n            :disabled=\"!enabled\"\n            @keydown.self.stop\n            @change=\"onChangeLLMConfig\">\n        </v-text-field>\n\n        <v-card-text class=\"pa-0 mt-1 caption cheat-muted\">\n            <strong>Recommended models:</strong> qwen3:8b, gemma3:12b (Ollama) · gpt-4o-mini (OpenAI) · gemini-2.0-flash (Google) · deepseek-chat (DeepSeek)\n        </v-card-text>\n    </v-card-text>\n    \n    \n    <v-card-subtitle class=\"pb-0 mt-4 font-weight-bold\">Bulk translate</v-card-subtitle>\n    <v-card-text class=\"py-0 mt-1\">\n        <v-text-field\n            class=\"body-2\"\n            v-model=\"bulkTranslateChunkSize\"\n            dense\n            hide-details\n            label=\"Chunk size\"\n            solo\n            :disabled=\"!enabled\"\n            @keydown.self.stop\n            @change=\"onChnageBulkTranslateChunkSize\">\n        </v-text-field>\n        <span class=\"caption cheat-muted\">Number of items to combine into single API requests using delimiters.</span><br/>\n        <span class=\"caption cheat-muted\">Higher values = fewer API calls but longer requests.</span><br/>\n        <span v-if=\"recommendChunkSizeDesc\" class=\"caption font-weight-bold cheat-text-success\">{{recommendChunkSizeDesc}}</span><br/>\n        <span v-if=\"chunkSizeWarning.message\" :class=\"chunkSizeWarning.class\">{{chunkSizeWarning.message}}</span>\n\n        <v-switch\n            v-model=\"useBatchTranslation\"\n            label=\"Use Batch Translation (Combine multiple texts per request)\"\n            :disabled=\"!enabled\"\n            dense\n            hide-details\n            class=\"mt-3\"\n            @change=\"onChangeBatchTranslation\">\n        </v-switch>\n        <span class=\"caption cheat-muted\">\n            Batch mode combines multiple texts with delimiters, dramatically reducing API calls.<br/>\n            Example: 200 variables → 4-8 API calls instead of 200 individual calls.<br/>\n            <span v-if=\"isJpToKrEndpoint\" class=\"cheat-text-warning font-weight-bold\">\n                ⚠️ JP→KR endpoints use original method (batch mode disabled for compatibility)\n            </span>\n        </span>\n    </v-card-text>\n\n    \n    <v-card-subtitle class=\"pb-0 mt-4 font-weight-bold\">Targets</v-card-subtitle>\n    <v-card-text class=\"py-0\">\n        <v-switch\n            class=\"mb-1 mt-4\"\n            v-model=\"targets.items\"\n            label=\"Translate Items\"\n            :disabled=\"!enabled\"\n            dense\n            hide-details\n            @click.self.stop\n            @change=\"onChangeTargetsValue\">\n        </v-switch>\n        \n        <v-switch\n            class=\"my-1\"\n            v-model=\"targets.weapons\"\n            label=\"Translate Weapons\"\n            :disabled=\"!enabled\"\n            dense\n            hide-details\n            @click.self.stop\n            @change=\"onChangeTargetsValue\">\n        </v-switch>\n        \n        <v-switch\n            class=\"my-1\"\n            v-model=\"targets.armors\"\n            label=\"Translate Armors\"\n            :disabled=\"!enabled\"\n            dense\n            hide-details\n            @click.self.stop\n            @change=\"onChangeTargetsValue\">\n        </v-switch>\n        \n        <v-switch\n            class=\"mb-1 mt-4\"\n            v-model=\"targets.variables\"\n            label=\"Translate Variables\"\n            :disabled=\"!enabled\"\n            dense\n            hide-details\n            @click.self.stop\n            @change=\"onChangeTargetsValue\">\n        </v-switch>\n        \n        <v-switch\n            v-model=\"targets.switches\"\n            class=\"my-1\"\n            label=\"Translate Switches\"\n            :disabled=\"!enabled\"\n            dense\n            hide-details\n            @click.self.stop\n            @change=\"onChangeTargetsValue\">\n        </v-switch>\n        \n        <v-switch\n            v-model=\"targets.maps\"\n            class=\"my-1\"\n            label=\"Translate Maps\"\n            :disabled=\"!enabled\"\n            dense\n            hide-details\n            @click.self.stop\n            @change=\"onChangeTargetsValue\">\n        </v-switch>\n\n        <v-divider class=\"my-2\"></v-divider>\n\n        <v-switch\n            v-model=\"targets.skills\"\n            class=\"my-1\"\n            label=\"Translate Skills\"\n            :disabled=\"!enabled\"\n            dense\n            hide-details\n            @click.self.stop\n            @change=\"onChangeTargetsValue\">\n        </v-switch>\n\n        <v-switch\n            v-model=\"targets.states\"\n            class=\"my-1\"\n            label=\"Translate States\"\n            :disabled=\"!enabled\"\n            dense\n            hide-details\n            @click.self.stop\n            @change=\"onChangeTargetsValue\">\n        </v-switch>\n\n        <v-switch\n            v-model=\"targets.classes\"\n            class=\"my-1\"\n            label=\"Translate Classes\"\n            :disabled=\"!enabled\"\n            dense\n            hide-details\n            @click.self.stop\n            @change=\"onChangeTargetsValue\">\n        </v-switch>\n\n        <v-switch\n            v-model=\"targets.enemies\"\n            class=\"my-1\"\n            label=\"Translate Enemies\"\n            :disabled=\"!enabled\"\n            dense\n            hide-details\n            @click.self.stop\n            @change=\"onChangeTargetsValue\">\n        </v-switch>\n\n        <v-divider class=\"my-2\"></v-divider>\n        <span class=\"caption font-weight-bold cheat-text-primary\">🌐 Full Game Translation</span>\n\n        <v-switch\n            v-model=\"targets.actors\"\n            class=\"my-1\"\n            label=\"Translate Actors (Names, Nicknames, Profiles)\"\n            :disabled=\"!enabled\"\n            dense\n            hide-details\n            @click.self.stop\n            @change=\"onChangeTargetsValue\">\n        </v-switch>\n\n        <v-switch\n            v-model=\"targets.system\"\n            class=\"my-1\"\n            label=\"Translate System Terms (Menus, Battle Messages, Parameters)\"\n            :disabled=\"!enabled\"\n            dense\n            hide-details\n            @click.self.stop\n            @change=\"onChangeTargetsValue\">\n        </v-switch>\n\n        <v-switch\n            v-model=\"targets.dialogues\"\n            class=\"my-1\"\n            label=\"Translate ALL Dialogues (Event Text, Choices, Common Events)\"\n            :disabled=\"!enabled\"\n            dense\n            hide-details\n            @click.self.stop\n            @change=\"onChangeTargetsValue\">\n        </v-switch>\n        <span class=\"caption cheat-muted\">\n            Scans ALL map files and extracts every dialogue, choice, scroll text,<br/>\n            battle event text, and common event text for translation.\n        </span>\n    </v-card-text>\n\n    <v-card-subtitle class=\"pb-0 mt-4 font-weight-bold\">In-Game Translation Status</v-card-subtitle>\n    <v-card-text class=\"py-0\">\n        <v-row class=\"mt-1\">\n            <v-col cols=\"12\">\n                <v-chip small outlined :color=\"isDataPatched ? 'success' : 'secondary'\" class=\"mr-2\">\n                    <v-icon small left>{{isDataPatched ? 'mdi-check-circle' : 'mdi-close-circle'}}</v-icon>\n                    Game Data: {{isDataPatched ? 'Translated' : 'Original'}}\n                </v-chip>\n                <v-chip small outlined color=\"info\">\n                    <v-icon small left>mdi-translate</v-icon>\n                    {{inGamePatchCount}} strings patched\n                </v-chip>\n            </v-col>\n        </v-row>\n        <v-btn\n            small\n            color=\"success\"\n            class=\"mt-2\"\n            @click=\"reapplyInGameTranslation\"\n            :disabled=\"!enabled || bankStats.totalEntries === 0\">\n            <v-icon small left>mdi-refresh</v-icon>\n            Re-apply Translation to Game Data\n        </v-btn>\n        <v-btn\n            small\n            color=\"warning\"\n            class=\"mt-2 ml-2\"\n            @click=\"revertInGameTranslation\"\n            :disabled=\"!isDataPatched\">\n            <v-icon small left>mdi-undo</v-icon>\n            Revert to Original\n        </v-btn>\n        <br/>\n        <span class=\"caption cheat-muted\">\n            After running \"Start Translation\", the plugin automatically applies<br/>\n            translations to ALL in-game text (menus, dialogues, battles, shops).<br/>\n            Use \"Re-apply\" if the game reloads data. Use \"Revert\" to restore Japanese.\n        </span>\n    </v-card-text>\n\n    <v-card-subtitle class=\"pb-0 mt-4 font-weight-bold\">Translation Bank</v-card-subtitle>\n    <v-card-text class=\"py-0\">\n        <v-row>\n            <v-col cols=\"12\" md=\"6\">\n                <v-chip small outlined color=\"success\" class=\"mr-2\">\n                    <v-icon small left>mdi-database</v-icon>\n                    {{bankStats.totalEntries}} cached\n                </v-chip>\n                <v-chip small outlined color=\"info\">\n                    <v-icon small left>mdi-clock</v-icon>\n                    {{bankStats.ageText}}\n                </v-chip>\n            </v-col>\n            <v-col cols=\"12\" md=\"6\">\n                <v-btn\n                    small\n                    color=\"warning\"\n                    @click=\"clearTranslationBank\"\n                    :disabled=\"!enabled\">\n                    <v-icon small left>mdi-delete</v-icon>\n                    Clear Bank\n                </v-btn>\n                <v-btn\n                    small\n                    color=\"info\"\n                    class=\"ml-2\"\n                    @click=\"exportTranslationBank\"\n                    :disabled=\"!enabled\">\n                    <v-icon small left>mdi-export</v-icon>\n                    Export\n                </v-btn>\n            </v-col>\n        </v-row>\n        <span class=\"caption cheat-muted\">\n            Translation bank stores successful translations for instant reuse.<br/>\n            Cached translations load instantly without API calls.\n        </span>\n\n        <v-divider class=\"my-4\"></v-divider>\n        <div class=\"d-flex align-center mt-2\">\n            <v-btn\n                color=\"success\"\n                class=\"flex-grow-1\"\n                @click=\"startGlobalTranslation\"\n                :disabled=\"!enabled || isTranslatingGlobals\">\n                <v-icon left>mdi-translate</v-icon>\n                Start {{ isTranslatingGlobals ? 'Translating' : 'Translation' }}\n            </v-btn>\n\n            <v-chip\n                v-if=\"isTranslatingGlobals\"\n                small\n                outlined\n                color=\"warning\"\n                class=\"ml-3 px-3 py-4 font-weight-bold cheat-chip--tall\">\n                <v-icon small left>mdi-translate</v-icon>\n                {{globalTranslationText}}... {{Math.round(globalTranslationProgress)}}%\n            </v-chip>\n        </div>\n\n        <v-btn\n            color=\"primary\"\n            class=\"mt-2\"\n            block\n            outlined\n            @click=\"testTranslationEndpoint\"\n            :loading=\"isTestingTranslation\">\n            <v-icon left>mdi-flask</v-icon>\n            Test Translation Connection\n        </v-btn>\n    </v-card-text>\n</v-card>\n    ",
 	data() {
@@ -9298,7 +9314,7 @@ var Jo = {
 			enabled: !1,
 			targets: {},
 			endPointSelection: "",
-			restApiMethods: Ro,
+			restApiMethods: zo,
 			customEndPointData: {},
 			llmConfig: {
 				apiKey: "",
@@ -9342,28 +9358,28 @@ var Jo = {
 			return this.translatorChecking ? "cheat-text-warning" : this.translatorRunning ? "cheat-text-success" : "cheat-text-error";
 		},
 		endPointList() {
-			return Vo();
+			return Ho();
 		},
 		isCustomEndPoint() {
-			return Ho(this.endPointSelection);
-		},
-		isLLMEndPoint() {
 			return Uo(this.endPointSelection);
 		},
-		selectedDefaultEndPoint() {
+		isLLMEndPoint() {
 			return Wo(this.endPointSelection);
 		},
-		recommendChunkSizeDesc() {
+		selectedDefaultEndPoint() {
 			return Go(this.endPointSelection);
 		},
-		isJpToKrEndpoint() {
+		recommendChunkSizeDesc() {
 			return Ko(this.endPointSelection);
+		},
+		isJpToKrEndpoint() {
+			return qo(this.endPointSelection);
 		}
 	},
 	methods: {
 		async initializeVariables() {
 			var e = this;
-			let t = qo();
+			let t = Jo();
 			e.enabled = t.enabled, e.endPointSelection = t.endPointSelection, e.customEndPointData = t.customEndPointData, e.llmConfig = t.llmConfig, e.targets = t.targets, e.bulkTranslateChunkSize = t.bulkTranslateChunkSize, e.useBatchTranslation = t.useBatchTranslation, e.bankStats = t.bankStats, e.chunkSizeWarning = t.chunkSizeWarning, e.isDataPatched = t.isDataPatched, e.inGamePatchCount = t.inGamePatchCount, e.checkTranslatorAvailable();
 		},
 		onChangeEnabled() {
@@ -9376,7 +9392,7 @@ var Jo = {
 			var e = this;
 			let t = Date.now();
 			e.translatorChecking = !0;
-			let n = await vr.isAvailable();
+			let n = await yr.isAvailable();
 			e.translatorStatusChangedTime < t && (e.translatorStatusChangedTime = t, e.translatorChecking = !1, e.translatorRunning = n);
 		},
 		onChangeEndPoint() {
@@ -9395,10 +9411,10 @@ var Jo = {
 			U.setLLMConfig(this.llmConfig);
 		},
 		checkChunkSize() {
-			this.chunkSizeWarning = Bo(this.bulkTranslateChunkSize, this.endPointSelection);
+			this.chunkSizeWarning = Vo(this.bulkTranslateChunkSize, this.endPointSelection);
 		},
 		onChnageBulkTranslateChunkSize() {
-			let e = vo(this.bulkTranslateChunkSize, 1, 2e3);
+			let e = yo(this.bulkTranslateChunkSize, 1, 2e3);
 			if (e) {
 				T.error(e), this.bulkTranslateChunkSize = 500;
 				return;
@@ -9409,7 +9425,7 @@ var Jo = {
 			localStorage.setItem("useBatchTranslation", this.useBatchTranslation.toString()), console.log(`Batch translation ${this.useBatchTranslation ? "enabled" : "disabled"}`);
 		},
 		updateBankStats() {
-			this.bankStats = zo();
+			this.bankStats = Bo();
 		},
 		clearTranslationBank() {
 			confirm("Clear all cached translations? This cannot be undone.") && (V.cache = {}, V.saveCache(), this.updateBankStats(), T.success("Translation bank cleared"));
@@ -9427,7 +9443,7 @@ var Jo = {
 			e.isTestingTranslation = !0;
 			try {
 				T.success("Testing translation... Please wait.");
-				let e = await vr.__translate("テスト");
+				let e = await yr.__translate("テスト");
 				e && e !== "テスト" ? T.success("Success! Translated \"テスト\" to \"" + e + "\"") : T.error("Failed: End point returned original text or empty. Check F8 console.");
 			} catch (e) {
 				T.error("Connection error: " + e.message), console.error("Test Translation Error:", e);
@@ -9437,7 +9453,7 @@ var Jo = {
 		},
 		async startGlobalTranslation() {
 			var e = this;
-			e.enabled && (console.log("Starting global pre-translation module"), await vr.translateAllGlobals(), e.updateBankStats(), e.isDataPatched = Z.isDataPatched());
+			e.enabled && (console.log("Starting global pre-translation module"), await yr.translateAllGlobals(), e.updateBankStats(), e.isDataPatched = Z.isDataPatched());
 		},
 		reapplyInGameTranslation() {
 			Z.applyTranslationsToGameData(), this.isDataPatched = Z.isDataPatched(), T.success("In-game translation re-applied!");
@@ -9446,13 +9462,13 @@ var Jo = {
 			Z.revertGameData(), this.isDataPatched = !1, this.inGamePatchCount = 0, T.success("Game text reverted to original!");
 		}
 	}
-}, Yo = {
+}, Xo = {
 	settingsDir: `./${i()}/cheat-settings`,
 	translateSettings: `./${i()}/cheat-settings/translate.json`,
 	translationBank: `./${i()}/cheat-settings/translation-bank.json`,
 	shortcuts: `./${i()}/cheat-settings/shortcuts.json`
 };
-function Xo() {
+function Zo() {
 	if (!n()) return null;
 	try {
 		let t = e("fs").readFileSync(o(), "utf-8");
@@ -9461,7 +9477,7 @@ function Xo() {
 		return null;
 	}
 }
-function Zo(t) {
+function Qo(t) {
 	if (!n()) return "Browser localStorage";
 	try {
 		return e("path").resolve(t);
@@ -9469,35 +9485,35 @@ function Zo(t) {
 		return t;
 	}
 }
-function Qo(e) {
+function $o(e) {
 	try {
 		return typeof process != "object" || !process || !process.versions ? "Unavailable" : process.versions[e] || "Unavailable";
 	} catch (e) {
 		return "Unavailable";
 	}
 }
-function $o() {
+function es() {
 	try {
 		return typeof process != "object" || !process || !process.execPath ? "Unavailable" : process.execPath;
 	} catch (e) {
 		return "Unavailable";
 	}
 }
-function es() {
+function ts() {
 	try {
 		return typeof process != "object" || !process || typeof process.cwd != "function" ? "Unavailable" : process.cwd();
 	} catch (e) {
 		return "Unavailable";
 	}
 }
-function ts() {
+function ns() {
 	try {
 		return typeof $dataSystem > "u" || !$dataSystem ? "Unavailable" : $dataSystem.gameTitle || "Untitled Game";
 	} catch (e) {
 		return "Unavailable";
 	}
 }
-function ns() {
+function rs() {
 	try {
 		let e = SceneManager._scene;
 		return !e || !e.constructor ? "Unavailable" : e.constructor.name || "Unknown Scene";
@@ -9505,7 +9521,7 @@ function ns() {
 		return "Unavailable";
 	}
 }
-function rs() {
+function is() {
 	try {
 		if (typeof $gameMap > "u" || !$gameMap) return {
 			id: null,
@@ -9532,17 +9548,17 @@ function rs() {
 		};
 	}
 }
-function is() {
+function as() {
 	try {
 		return typeof Utils.isOptionValid == "function" && Utils.isOptionValid("test");
 	} catch (e) {
 		return !1;
 	}
 }
-function as(e) {
-	return e === "custom" ? "Custom" : e && Object.prototype.hasOwnProperty.call(Jn, e) ? Jn[e].name : e || "Unavailable";
+function os(e) {
+	return e === "custom" ? "Custom" : e && Object.prototype.hasOwnProperty.call(Yn, e) ? Yn[e].name : e || "Unavailable";
 }
-function os() {
+function ss() {
 	try {
 		let e = U.getTargets();
 		return Object.keys(e).filter((t) => e[t]);
@@ -9550,44 +9566,44 @@ function os() {
 		return [];
 	}
 }
-function ss() {
+function cs() {
 	try {
 		return String(window.location.pathname || "").toLowerCase().indexOf("window.html") >= 0 ? "Separate Window" : "Overlay";
 	} catch (e) {
 		return "Unknown";
 	}
 }
-function cs() {
-	let e = rs(), t = V.getStats(), c = U.getEndPointSelection(), l = os();
+function ls() {
+	let e = is(), t = V.getStats(), c = U.getEndPointSelection(), l = ss();
 	return {
-		cheatVersion: Xo() || "Unknown",
-		gameTitle: ts(),
+		cheatVersion: Zo() || "Unknown",
+		gameTitle: ns(),
 		engineName: r() ? "MV" : "MZ",
-		viewMode: ss(),
+		viewMode: cs(),
 		runtimeMode: n() ? "NW.js Desktop" : "Browser",
-		currentScene: ns(),
+		currentScene: rs(),
 		currentMapText: e.text,
 		currentMapId: e.id,
 		currentMapName: e.name,
-		isPlaytest: is(),
+		isPlaytest: as(),
 		language: navigator.language || "Unavailable",
 		userAgent: navigator.userAgent || "Unavailable",
-		nwjsVersion: Qo("node-webkit"),
-		chromiumVersion: Qo("chromium"),
-		nodeVersion: Qo("node"),
-		executablePath: $o(),
-		workingDirectory: es(),
+		nwjsVersion: $o("node-webkit"),
+		chromiumVersion: $o("chromium"),
+		nodeVersion: $o("node"),
+		executablePath: es(),
+		workingDirectory: ts(),
 		cheatRootDir: a(),
 		gameRootDir: i(),
 		gameDataDir: s(),
-		cheatVersionPath: Zo(o()),
-		settingsDir: Zo(Yo.settingsDir),
-		translateSettingsPath: Zo(Yo.translateSettings),
-		translationBankPath: Zo(Yo.translationBank),
-		shortcutSettingsPath: Zo(Yo.shortcuts),
+		cheatVersionPath: Qo(o()),
+		settingsDir: Qo(Xo.settingsDir),
+		translateSettingsPath: Qo(Xo.translateSettings),
+		translationBankPath: Qo(Xo.translationBank),
+		shortcutSettingsPath: Qo(Xo.shortcuts),
 		translationEnabled: U.isEnabled(),
 		translationEndpointSelection: c,
-		translationEndpointName: as(c),
+		translationEndpointName: os(c),
 		translationChunkSize: U.getBulkTranslateChunkSize(),
 		translationBankEntries: t.totalEntries,
 		enabledTranslationTargets: l,
@@ -9598,7 +9614,7 @@ function cs() {
 		recentDiagnosticsText: f.getRecentLogText(20)
 	};
 }
-function ls(e) {
+function us(e) {
 	return [
 		"[Cheat]",
 		"Version: " + e.cheatVersion,
@@ -9643,11 +9659,11 @@ function ls(e) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/panels/AboutPanel.js
-var us = {
+var ds = {
 	name: "AboutPanel",
 	template: "\n<v-card flat class=\"cheat-panel about-panel\">\n    <div class=\"cheat-panel__head\">\n        <div>\n            <div class=\"cheat-panel__title\">About</div>\n            <div class=\"cheat-panel__meta\">Runtime and game diagnostics</div>\n        </div>\n        <v-btn small text title=\"Refresh environment info\" aria-label=\"Refresh environment info\" @click=\"initializeVariables\">\n            <v-icon left small>mdi-refresh</v-icon>Refresh\n        </v-btn>\n    </div>\n\n    <v-card-subtitle class=\"pb-0 font-weight-bold\">Overview</v-card-subtitle>\n    <v-card-text class=\"pt-0 pb-2\">\n        <v-chip small outlined color=\"success\" class=\"mr-2 mb-2\">\n            <v-icon small left>mdi-information-outline</v-icon>\n            Cheat {{ info.cheatVersion }}\n        </v-chip>\n        <v-chip small outlined color=\"info\" class=\"mr-2 mb-2\">\n            <v-icon small left>mdi-controller-classic-outline</v-icon>\n            {{ info.engineName }}\n        </v-chip>\n        <v-chip small outlined color=\"primary\" class=\"mr-2 mb-2\">\n            <v-icon small left>mdi-monitor-dashboard</v-icon>\n            {{ info.viewMode }}\n        </v-chip>\n        <v-chip small outlined color=\"accent\" class=\"mb-2\">\n            <v-icon small left>mdi-translate</v-icon>\n            {{ info.translationEndpointName }}\n        </v-chip>\n    </v-card-text>\n\n    <v-card-text class=\"pt-0 pb-2\">\n        <v-btn small color=\"primary\" @click=\"copySummary\">\n            <v-icon small left>mdi-content-copy</v-icon>\n            Copy Summary\n        </v-btn>\n        <v-btn small color=\"secondary\" class=\"ml-2\" @click=\"copyDiagnostics\">\n            <v-icon small left>mdi-file-document-outline</v-icon>\n            Copy Diagnostics\n        </v-btn>\n    </v-card-text>\n\n    <v-card-subtitle class=\"pb-0 font-weight-bold\">Cheat</v-card-subtitle>\n    <v-card-text class=\"pt-0 pb-2\">\n        <v-simple-table dense>\n            <tbody>\n                <tr v-for=\"row in cheatRows\" :key=\"'cheat-' + row.label\">\n                    <td class=\"caption font-weight-bold pr-4 about-panel__cell-label\">{{row.label}}</td>\n                    <td class=\"caption about-panel__cell-value\">{{row.value}}</td>\n                </tr>\n            </tbody>\n        </v-simple-table>\n    </v-card-text>\n\n    <v-card-subtitle class=\"pb-0 font-weight-bold\">Game</v-card-subtitle>\n    <v-card-text class=\"pt-0 pb-2\">\n        <v-simple-table dense>\n            <tbody>\n                <tr v-for=\"row in gameRows\" :key=\"'game-' + row.label\">\n                    <td class=\"caption font-weight-bold pr-4 about-panel__cell-label\">{{row.label}}</td>\n                    <td class=\"caption about-panel__cell-value\">{{row.value}}</td>\n                </tr>\n            </tbody>\n        </v-simple-table>\n    </v-card-text>\n\n    <v-card-subtitle class=\"pb-0 font-weight-bold\">Runtime</v-card-subtitle>\n    <v-card-text class=\"pt-0 pb-2\">\n        <v-simple-table dense>\n            <tbody>\n                <tr v-for=\"row in runtimeRows\" :key=\"'runtime-' + row.label\">\n                    <td class=\"caption font-weight-bold pr-4 about-panel__cell-label\">{{row.label}}</td>\n                    <td class=\"caption about-panel__cell-value\">{{row.value}}</td>\n                </tr>\n            </tbody>\n        </v-simple-table>\n    </v-card-text>\n\n    <v-card-subtitle class=\"pb-0 font-weight-bold\">Translation</v-card-subtitle>\n    <v-card-text class=\"pt-0 pb-2\">\n        <v-simple-table dense>\n            <tbody>\n                <tr v-for=\"row in translationRows\" :key=\"'translation-' + row.label\">\n                    <td class=\"caption font-weight-bold pr-4 about-panel__cell-label\">{{row.label}}</td>\n                    <td class=\"caption about-panel__cell-value\">{{row.value}}</td>\n                </tr>\n            </tbody>\n        </v-simple-table>\n    </v-card-text>\n\n    <v-card-subtitle class=\"pb-0 font-weight-bold\">Diagnostics</v-card-subtitle>\n    <v-card-text class=\"pt-0 pb-2\">\n        <v-simple-table dense>\n            <tbody>\n                <tr v-for=\"row in diagnosticsRows\" :key=\"'diagnostics-' + row.label\">\n                    <td class=\"caption font-weight-bold pr-4 about-panel__cell-label\">{{row.label}}</td>\n                    <td class=\"caption about-panel__cell-value\">{{row.value}}</td>\n                </tr>\n            </tbody>\n        </v-simple-table>\n    </v-card-text>\n\n    <v-card-subtitle class=\"pb-0 font-weight-bold\">Paths</v-card-subtitle>\n    <v-card-text class=\"pt-0 pb-2\">\n        <v-simple-table dense>\n            <tbody>\n                <tr v-for=\"row in pathRows\" :key=\"'path-' + row.label\">\n                    <td class=\"caption font-weight-bold pr-4 about-panel__cell-label\">{{row.label}}</td>\n                    <td class=\"caption about-panel__cell-value\">{{row.value}}</td>\n                </tr>\n            </tbody>\n        </v-simple-table>\n    </v-card-text>\n\n    <v-card-subtitle class=\"pb-0 font-weight-bold\">Summary</v-card-subtitle>\n    <v-card-text class=\"pt-0\">\n        <v-textarea\n            :value=\"summaryText\"\n            readonly\n            auto-grow\n            solo\n            dense\n            hide-details>\n        </v-textarea>\n    </v-card-text>\n\n    <v-card-subtitle class=\"pb-0 font-weight-bold\">Recent Diagnostics</v-card-subtitle>\n    <v-card-text class=\"pt-0\">\n        <v-textarea\n            :value=\"diagnosticsText\"\n            readonly\n            auto-grow\n            solo\n            dense\n            hide-details>\n        </v-textarea>\n    </v-card-text>\n</v-card>\n    ",
 	data() {
-		return { info: cs() };
+		return { info: ls() };
 	},
 	created() {
 		this.initializeVariables();
@@ -9810,7 +9826,7 @@ var us = {
 			];
 		},
 		summaryText() {
-			return ls(this.info);
+			return us(this.info);
 		},
 		diagnosticsText() {
 			return this.info.recentDiagnosticsText || "No diagnostics recorded yet.";
@@ -9818,7 +9834,7 @@ var us = {
 	},
 	methods: {
 		initializeVariables() {
-			this.info = cs();
+			this.info = ls();
 		},
 		copySummary() {
 			this.copyText(this.summaryText, "About summary copied");
@@ -9848,7 +9864,7 @@ var us = {
 			document.body.removeChild(n);
 		}
 	}
-}, ds = class {
+}, fs = class {
 	constructor() {
 		this._commonEvents = /* @__PURE__ */ new Map(), this._mapEvents = /* @__PURE__ */ new Map(), this._battleTroops = /* @__PURE__ */ new Map(), this._loadedMaps = /* @__PURE__ */ new Set(), this._mapInfos = /* @__PURE__ */ new Map(), this._currentMapId = 0;
 	}
@@ -9963,7 +9979,7 @@ var us = {
 			}, r.onerror = () => e(null), r.send();
 		});
 	}
-}, fs = {
+}, ps = {
 	0: "End",
 	101: "Show Text",
 	102: "Show Choices",
@@ -10086,18 +10102,18 @@ var us = {
 	412: "End Branch",
 	413: "End Loop",
 	505: "Movement Route Step"
-}, ps = /* @__PURE__ */ new Set([
+}, ms = /* @__PURE__ */ new Set([
 	401,
 	405,
 	408,
 	505
-]), ms = /* @__PURE__ */ new Set([
+]), hs = /* @__PURE__ */ new Set([
 	411,
 	412,
 	413,
 	404,
 	403
-]), hs = {
+]), gs = {
 	101: "mdi-message-text-outline",
 	102: "mdi-format-list-bulleted",
 	105: "mdi-message-text",
@@ -10145,14 +10161,14 @@ var us = {
 	354: "mdi-home",
 	355: "mdi-code-tags",
 	356: "mdi-puzzle"
-}, gs = "mdi-chevron-right";
-function _s(e) {
-	return hs[e] || gs;
-}
+}, _s = "mdi-chevron-right";
 function vs(e) {
-	return fs[e] || `Command ${e}`;
+	return gs[e] || _s;
 }
-function ys(e, t) {
+function ys(e) {
+	return ps[e] || `Command ${e}`;
+}
+function bs(e, t) {
 	let n = Number(e[0]), r = (e) => t && t.switches && t.switches[e] || `Switch ${e}`, i = (e) => t && t.variables && t.variables[e] || `Variable ${e}`;
 	try {
 		switch (n) {
@@ -10204,12 +10220,12 @@ function ys(e, t) {
 		return `Condition type ${n}`;
 	}
 }
-function bs(e, t) {
+function xs(e, t) {
 	if (!e) return [];
 	let n = [], r = (e) => t && t.switches && t.switches[e] || `Switch ${e}`;
 	return e.switch1Valid && n.push(`Switch [${e.switch1Id}: ${r(e.switch1Id)}] = ON`), e.switch2Valid && n.push(`Switch [${e.switch2Id}: ${r(e.switch2Id)}] = ON`), e.variableValid && n.push(`Variable [${e.variableId}: ${((e) => t && t.variables && t.variables[e] || `Variable ${e}`)(e.variableId)}] >= ${e.variableValue}`), e.selfSwitchValid && n.push(`Self Switch [${e.selfSwitchCh}] = ON`), e.itemValid && n.push(`Item [${e.itemId}] in inventory`), e.actorValid && n.push(`Actor [${e.actorId}] in party`), n;
 }
-function xs(e, t, n) {
+function Ss(e, t, n) {
 	let r = e.parameters || [], i = (e) => n && n.switches && n.switches[e] || `Switch ${e}`, a = (e) => n && n.variables && n.variables[e] || `Variable ${e}`;
 	try {
 		switch (e.code) {
@@ -10281,15 +10297,15 @@ function xs(e, t, n) {
 			case 354: return "Return to Title Screen";
 			case 355: return `Script: ${String(r[0] || "").substring(0, 60)}`;
 			case 356: return `Plugin Command: ${String(r[0] || "").substring(0, 60)}`;
-			default: return vs(e.code);
+			default: return ys(e.code);
 		}
 	} catch (t) {
-		return vs(e.code);
+		return ys(e.code);
 	}
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/event-analyzer/CommandParser.js
-var Ss = class {
+var Cs = class {
 	constructor(e, t, n) {
 		this.commands = Array.isArray(e) ? e : [], this.db = t, this.dataSystem = n, this.i = 0;
 	}
@@ -10310,8 +10326,8 @@ var Ss = class {
 		if (this.i >= this.commands.length) return null;
 		let e = this.commands[this.i];
 		if (!e || e.code === 0) return null;
-		if (ps.has(e.code)) return this.i++, null;
-		if (ms.has(e.code)) return null;
+		if (ms.has(e.code)) return this.i++, null;
+		if (hs.has(e.code)) return null;
 		switch (e.code) {
 			case 111: return this._parseConditionalBranch();
 			case 112: return this._parseLoop();
@@ -10327,7 +10343,7 @@ var Ss = class {
 					commandIndex: t,
 					params: e.parameters || [],
 					indent: e.indent,
-					label: xs(e, this.db, this.dataSystem)
+					label: Ss(e, this.db, this.dataSystem)
 				};
 			}
 		}
@@ -10349,11 +10365,11 @@ var Ss = class {
 			params: i,
 			textLines: a,
 			indent: r.indent,
-			label: xs(o, this.db, this.dataSystem)
+			label: Ss(o, this.db, this.dataSystem)
 		};
 	}
 	_parseConditionalBranch() {
-		let e = this.i, t = this.commands[this.i], n = t.indent, r = ys(t.parameters || [], this.dataSystem);
+		let e = this.i, t = this.commands[this.i], n = t.indent, r = bs(t.parameters || [], this.dataSystem);
 		this.i++;
 		let i = this._parseBlock(n), a = [];
 		return this.i < this.commands.length && this.commands[this.i].code === 411 && this.commands[this.i].indent === n && (this.i++, a = this._parseBlock(n)), this.i < this.commands.length && this.commands[this.i].code === 412 && this.commands[this.i].indent === n && this.i++, {
@@ -10416,7 +10432,7 @@ var Ss = class {
 			indent: n
 		};
 	}
-}, Cs = class {
+}, ws = class {
 	constructor(e, t) {
 		this.db = e, this.dataSystem = t;
 	}
@@ -10468,7 +10484,7 @@ var Ss = class {
 		};
 	}
 	_traceList(e, t, n) {
-		let r = new Ss(e, this.db, this.dataSystem).parse();
+		let r = new Cs(e, this.db, this.dataSystem).parse();
 		return this._resolveNodes(r, t, n);
 	}
 	_resolveNodes(e, t, n) {
@@ -10595,11 +10611,11 @@ var Ss = class {
 		icon: null,
 		color: "secondary"
 	}
-}, ws = [
+}, Ts = [
 	"None",
 	"Autorun",
 	"Parallel"
-], Ts = {
+], Es = {
 	name: "EventAnalyzerPanel",
 	template: "\n<v-card flat class=\"ma-0 pa-0\" color=\"transparent\">\n\n    <!-- ══════════════════════════════════════════════════════\n         ROOT SELECTOR\n    ══════════════════════════════════════════════════════ -->\n    <div class=\"cheat-panel__head\">\n        <div class=\"cheat-panel__title\">Event Sequence Analyzer</div>\n        <v-btn small text title=\"Reload game data\" aria-label=\"Reload game data\" @click=\"reload\">\n            <v-icon left small>mdi-refresh</v-icon>Reload\n        </v-btn>\n    </div>\n\n    <!-- Type picker -->\n    <v-radio-group v-model=\"rootType\" row dense hide-details class=\"ma-1 mt-0\">\n        <v-radio label=\"Common Event\" value=\"common\" color=\"accent\" />\n        <v-radio label=\"Map Event\"    value=\"map\"    color=\"info\" />\n        <v-radio label=\"Battle Event\" value=\"battle\" color=\"error\" />\n    </v-radio-group>\n\n    <!-- ── Common Event selectors ── -->\n    <template v-if=\"rootType === 'common'\">\n        <v-select\n            v-model=\"selectedCeId\"\n            :items=\"availableCommonEvents\"\n            item-text=\"label\"\n            item-value=\"id\"\n            label=\"Common Event\"\n            dense outlined hide-details\n            class=\"ma-1\"\n            @keydown.self.stop />\n    </template>\n\n    <!-- ── Map Event selectors ── -->\n    <template v-if=\"rootType === 'map'\">\n        <v-row class=\"ma-0\" dense>\n            <v-col cols=\"12\" sm=\"6\" class=\"pa-1\">\n                <v-select\n                    v-model=\"selectedMapId\"\n                    :items=\"availableMaps\"\n                    item-text=\"name\"\n                    item-value=\"id\"\n                    label=\"Map\"\n                    dense outlined hide-details\n                    @change=\"onMapChange\"\n                    @keydown.self.stop />\n            </v-col>\n            <v-col cols=\"12\" sm=\"6\" class=\"pa-1\">\n                <v-select\n                    v-model=\"selectedEventId\"\n                    :items=\"availableMapEvents\"\n                    item-value=\"id\"\n                    label=\"Event\"\n                    dense outlined hide-details\n                    no-data-text=\"No events (map not loaded)\"\n                    @change=\"onEventChange\"\n                    @keydown.self.stop>\n                    <template v-slot:item=\"{ item }\">\n                        <span class=\"caption\">#{{ item.id }} {{ item.name || '(Unnamed)' }}</span>\n                    </template>\n                    <template v-slot:selection=\"{ item }\">\n                        <span class=\"caption\">#{{ item.id }} {{ item.name || '(Unnamed)' }}</span>\n                    </template>\n                </v-select>\n            </v-col>\n            <v-col cols=\"12\" sm=\"6\" class=\"pa-1\">\n                <v-select\n                    v-model=\"selectedPageIndex\"\n                    :items=\"mapPageItems\"\n                    item-text=\"label\"\n                    item-value=\"value\"\n                    label=\"Page\"\n                    dense outlined hide-details\n                    no-data-text=\"Select an event first\"\n                    @keydown.self.stop />\n            </v-col>\n        </v-row>\n\n        <!-- Map loading controls -->\n        <div class=\"cheat-chip-row cheat-chip-row--loose ma-1 align-center\">\n            <v-btn\n                x-small color=\"primary\"\n                :disabled=\"!selectedMapId || mapIsLoaded || loadingMaps\"\n                @click=\"loadCurrentMap\">\n                Load This Map\n            </v-btn>\n            <v-btn\n                x-small color=\"primary\"\n                :loading=\"loadingMaps\"\n                :disabled=\"loadingMaps\"\n                @click=\"loadAllMaps\">\n                Load All Maps\n            </v-btn>\n            <span v-if=\"loadingMaps\" class=\"caption cheat-muted\">\n                {{ loadProgress.loaded }}/{{ loadProgress.total }}\n                <template v-if=\"loadProgress.current\"> — {{ loadProgress.current }}</template>\n            </span>\n            <span v-else-if=\"dbVersion > 0\" class=\"caption cheat-muted\">\n                {{ availableMaps.length }} map(s) loaded\n            </span>\n        </div>\n    </template>\n\n    <!-- ── Battle Event selectors ── -->\n    <template v-if=\"rootType === 'battle'\">\n        <v-row class=\"ma-0\" dense>\n            <v-col cols=\"12\" sm=\"7\" class=\"pa-1\">\n                <v-select\n                    v-model=\"selectedTroopId\"\n                    :items=\"availableBattleTroops\"\n                    item-text=\"label\"\n                    item-value=\"id\"\n                    label=\"Troop\"\n                    dense outlined hide-details\n                    @change=\"onTroopChange\"\n                    @keydown.self.stop />\n            </v-col>\n            <v-col cols=\"12\" sm=\"5\" class=\"pa-1\">\n                <v-select\n                    v-model=\"selectedBattlePageIndex\"\n                    :items=\"battlePageItems\"\n                    item-text=\"label\"\n                    item-value=\"value\"\n                    label=\"Page\"\n                    dense outlined hide-details\n                    no-data-text=\"Select a troop first\"\n                    @keydown.self.stop />\n            </v-col>\n        </v-row>\n    </template>\n\n    <!-- Trace button -->\n    <div class=\"ma-1\">\n        <v-btn\n            color=\"accent\" small\n            :disabled=\"!canTrace || tracing\"\n            :loading=\"tracing\"\n            @click=\"trace\">\n            <v-icon left small>mdi-magnify-scan</v-icon>\n            Trace Execution\n        </v-btn>\n        <v-btn\n            v-if=\"treeItems.length > 0\"\n            x-small text class=\"ml-2\"\n            @click=\"expandAll\">\n            <v-icon x-small left>mdi-unfold-more-horizontal</v-icon>Expand All\n        </v-btn>\n        <v-btn\n            v-if=\"treeItems.length > 0\"\n            x-small text\n            @click=\"collapseAll\">\n            <v-icon x-small left>mdi-unfold-less-horizontal</v-icon>Collapse All\n        </v-btn>\n    </div>\n\n    <v-divider class=\"mb-1\" />\n\n    <!-- Error -->\n    <v-alert v-if=\"traceError\" type=\"error\" dense class=\"ma-1 mb-1\">\n        {{ traceError }}\n    </v-alert>\n\n    <!-- ══════════════════════════════════════════════════════\n         TRACE RESULT\n    ══════════════════════════════════════════════════════ -->\n    <template v-if=\"traceTree\">\n\n        <!-- Root header -->\n        <div class=\"event-analyzer__root\">\n            <div class=\"subtitle-2\">{{ traceTree.name }}</div>\n\n            <!-- Common Event trigger -->\n            <div v-if=\"traceTree.eventKind === 'common'\" class=\"caption cheat-muted mt-1\">\n                Trigger: {{ formatTrigger(traceTree.trigger) }}\n                <template v-if=\"traceTree.trigger > 0 && traceTree.switchId\">\n                    &nbsp;|&nbsp; Switch: [{{ traceTree.switchId }}: {{ getSwitchName(traceTree.switchId) }}]\n                </template>\n            </div>\n\n            <!-- Page conditions -->\n            <template v-if=\"pageConditionLines.length > 0\">\n                <div class=\"caption cheat-text-success font-weight-bold mt-1\">Page Conditions:</div>\n                <div\n                    v-for=\"(line, i) in pageConditionLines\"\n                    :key=\"'cond-' + i\"\n                    class=\"caption ml-1\">\n                    ▸ {{ line }}\n                </div>\n            </template>\n            <div v-else-if=\"traceTree.eventKind !== 'common'\" class=\"caption cheat-muted mt-1\">\n                No page conditions.\n            </div>\n        </div>\n\n        <!-- Stats -->\n        <div class=\"caption cheat-muted event-analyzer__stat-row\">\n            {{ nodeCount }} node(s)\n            <template v-if=\"ceRefCount > 0\"> · {{ ceRefCount }} CE reference(s)</template>\n            <template v-if=\"cycleCount > 0\"> · <span class=\"cheat-text-warning font-weight-bold\">{{ cycleCount }} cycle(s)</span></template>\n        </div>\n\n        <!-- Tree -->\n        <v-treeview\n            v-if=\"treeItems.length > 0\"\n            :items=\"treeItems\"\n            :open.sync=\"openItems\"\n            item-key=\"id\"\n            item-text=\"name\"\n            dense\n            class=\"event-analyzer-tree pa-0\">\n\n            <template v-slot:prepend=\"{ item }\">\n                <v-icon\n                    :color=\"item.color\"\n                    small\n                    class=\"mr-1\">\n                    {{ item.icon }}\n                </v-icon>\n            </template>\n\n            <template v-slot:label=\"{ item }\">\n                <div class=\"d-flex align-center\">\n                    <span\n                        :class=\"[\n                            'caption',\n                            item.kind === 'cycle-ref'    ? 'cheat-text-warning font-weight-bold' :\n                            item.kind === 'event-ref'    ? 'cheat-text-info' :\n                            item.kind === 'event-end'    ? 'cheat-muted font-italic' :\n                            item.kind === 'battle-ref'   ? 'cheat-text-primary' :\n                            item.kind === 'branch'       ? 'cheat-text-warning' :\n                            item.kind === 'branch-true'  ? 'cheat-text-success' :\n                            item.kind === 'branch-false' ? 'cheat-text-error' :\n                            item.kind === 'choices'      ? 'cheat-text-accent' :\n                            item.kind === 'loop'         ? 'cheat-text-info' :\n                            ''\n                        ]\">\n                        {{ item.name }}\n                    </span>\n                    \n                    <!-- Run button -->\n                    <v-btn\n                        v-if=\"item.eventKey && item.commandIndex !== undefined\"\n                        x-small text class=\"ml-2 pa-0 cheat-text-success event-analyzer__run\"\n                        @click.stop=\"executeFromNode(item)\">\n                        <v-icon x-small color=\"success\" left>mdi-play</v-icon>\n                        <span class=\"caption\">Run</span>\n                    </v-btn>\n\n                    <!-- Jump-to button for battle refs -->\n                    <v-btn\n                        v-if=\"item.kind === 'battle-ref' && item.troopId\"\n                        x-small text class=\"ml-1 pa-0 event-analyzer__run\"\n                        @click.stop=\"jumpToBattleEvent(item.troopId)\">\n                        <v-icon x-small>mdi-arrow-right-circle-outline</v-icon>\n                        <span class=\"caption\">Jump →</span>\n                    </v-btn>\n                </div>\n            </template>\n\n        </v-treeview>\n\n        <div v-if=\"treeItems.length === 0\" class=\"caption cheat-muted ma-2\">\n            No commands to display in this page.\n        </div>\n    </template>\n\n</v-card>\n  ",
 	data() {
@@ -10627,7 +10643,7 @@ var Ss = class {
 		};
 	},
 	created() {
-		this._treeId = 0, this.db = new ds(), this.db.loadFromGlobals(), this.dbVersion++;
+		this._treeId = 0, this.db = new fs(), this.db.loadFromGlobals(), this.dbVersion++;
 		let e = this.db.getCurrentMapId();
 		e && (this.selectedMapId = e);
 		let t = this.db.getAllCommonEvents();
@@ -10677,7 +10693,7 @@ var Ss = class {
 			return this.rootType === "map" ? this.selectedMapId > 0 && this.selectedEventId > 0 && this.mapIsLoaded : this.rootType === "common" ? this.selectedCeId > 0 : this.rootType === "battle" && this.selectedTroopId > 0;
 		},
 		pageConditionLines() {
-			return !this.traceTree || !this.traceTree.conditions ? [] : bs(this.traceTree.conditions, window.$dataSystem);
+			return !this.traceTree || !this.traceTree.conditions ? [] : xs(this.traceTree.conditions, window.$dataSystem);
 		},
 		nodeCount() {
 			return this._countNodes(this.treeItems);
@@ -10695,7 +10711,7 @@ var Ss = class {
 			if (!(!e.db || !e.canTrace)) {
 				e.tracing = !0, e.traceTree = null, e.traceError = null, e.treeItems = [], e.openItems = [], e._treeId = 0;
 				try {
-					let t = new Cs(e.db, window.$dataSystem), n = null;
+					let t = new ws(e.db, window.$dataSystem), n = null;
 					e.rootType === "map" ? n = t.traceMapEvent(e.selectedMapId, e.selectedEventId, e.selectedPageIndex) : e.rootType === "common" ? n = t.traceCommonEvent(e.selectedCeId) : e.rootType === "battle" && (n = t.traceBattleEvent(e.selectedTroopId, e.selectedBattlePageIndex)), n ? (e.traceTree = n, e.treeItems = e._toTreeItems(n.nodes), e.openItems = e.treeItems.map((e) => e.id)) : e.traceError = "Could not trace — event or page not found. Try loading the map first.";
 				} catch (t) {
 					console.error("[EventAnalyzer] Trace error", t), e.traceError = String(t);
@@ -10799,7 +10815,7 @@ var Ss = class {
 						kind: "command",
 						eventKey: e.eventKey,
 						commandIndex: e.commandIndex,
-						icon: _s(e.code),
+						icon: vs(e.code),
 						color: n.color,
 						children: []
 					};
@@ -10935,20 +10951,20 @@ var Ss = class {
 			return t.switch1Valid && n.push(`S${t.switch1Id}`), t.switch2Valid && n.push(`S${t.switch2Id}`), t.variableValid && n.push(`V${t.variableId}>=${t.variableValue}`), t.selfSwitchValid && n.push(`SS${t.selfSwitchCh}`), n.length > 0 ? ` (${n.join(", ")})` : "";
 		},
 		formatTrigger(e) {
-			return ws[e] || String(e);
+			return Ts[e] || String(e);
 		},
 		getSwitchName(e) {
 			let t = window.$dataSystem;
 			return t && t.switches && t.switches[e] || `Switch ${e}`;
 		}
 	}
-}, Es = "cheatModal.windowOpacity", Ds = ee, Os = S([{
+}, Ds = "cheatModal.windowOpacity", Os = ee, ks = S([{
 	text: "Current",
 	value: "current"
 }, {
 	text: "Legacy",
 	value: "legacy"
-}]), ks = {
+}]), As = {
 	name: "AppearancePanel",
 	template: "\n<v-card flat class=\"cheat-panel\">\n    <div class=\"cheat-panel__head\">\n        <div>\n            <div class=\"cheat-panel__title\">Appearance</div>\n            <div class=\"cheat-panel__meta\">Window size, opacity and color theme</div>\n        </div>\n    </div>\n\n    <section class=\"cheat-section\">\n        <div class=\"cheat-section__title\">Window</div>\n        <div class=\"cheat-grid cheat-grid--two\">\n            <v-text-field\n                v-model=\"overlayWidth\"\n                type=\"number\"\n                label=\"Width (px)\"\n                dense\n                outlined\n                hide-details\n                @keydown.stop\n                @change=\"onLayoutChange\" />\n            <v-text-field\n                v-model=\"overlayHeight\"\n                type=\"number\"\n                label=\"Height (px)\"\n                dense\n                outlined\n                hide-details\n                @keydown.stop\n                @change=\"onLayoutChange\" />\n        </div>\n        <div class=\"cheat-inline cheat-inline--top\">\n            <v-btn small outlined @click=\"resetOverlaySize\">Reset to 750 x 450</v-btn>\n            <span class=\"caption\">Size is clamped to the game window.</span>\n        </div>\n    </section>\n\n    <section class=\"cheat-section\">\n        <div class=\"cheat-slider__head\">\n            <span class=\"cheat-slider__label\">Window opacity</span>\n            <span class=\"cheat-value\">{{ Math.round(windowOpacity * 100) }}%</span>\n        </div>\n        <v-slider\n            data-feature=\"window-opacity\"\n            v-model=\"windowOpacity\"\n            :min=\"0.1\"\n            :max=\"1\"\n            :step=\"0.05\"\n            color=\"primary\"\n            hide-details\n            @change=\"onOpacityChange\" />\n        <div class=\"caption\">The overlay becomes fully opaque while the pointer is over it.</div>\n    </section>\n\n    <section class=\"cheat-section\">\n        <div class=\"cheat-section__title\">Accent color</div>\n        <div class=\"cheat-swatches\" role=\"radiogroup\" aria-label=\"Accent colors\">\n            <button\n                v-for=\"option in colorOptions\"\n                :key=\"option.value\"\n                type=\"button\"\n                role=\"radio\"\n                class=\"cheat-swatch\"\n                :class=\"{ 'is-selected': primaryColor === option.value, 'cheat-swatch--default': option.isDefault }\"\n                :style=\"{ backgroundColor: option.value }\"\n                :aria-label=\"option.text\"\n                :aria-checked=\"primaryColor === option.value ? 'true' : 'false'\"\n                :title=\"option.text\"\n                @click=\"selectColor(option.value)\"><span v-if=\"option.isDefault\">Default</span></button>\n        </div>\n        <div class=\"caption mt-1\">Used for selection, focus rings and primary actions.</div>\n    </section>\n\n    <section class=\"cheat-section\">\n        <div class=\"cheat-section__title\">Theme</div>\n        \n        <div class=\"cheat-grid cheat-grid--toggles\">\n            <v-select\n            v-model=\"themeStyle\"\n            :items=\"themeStyles\"\n            label=\"Color theme\"\n            class=\"mb-2\"\n            dense\n            outlined\n            hide-details\n            @change=\"onStyleChange\" />\n            <v-btn\n                icon\n                dense\n                outlined\n                :title=\"isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'\"\n                :aria-label=\"isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'\"\n                @click=\"toggleTheme\">\n                <v-icon>{{ isDarkMode ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>\n            </v-btn>\n        </div>\n          <v-checkbox\n                  v-model=\"useGameFont\"\n                  label=\"Game font\"\n                  class=\"cheat-checkbox\"\n                  hide-details\n                  dense\n                  @change=\"onLayoutChange\" />\n        <div class=\"caption\">The game font falls back to a readable system font when unavailable.</div>\n    </section>\n</v-card>\n    ",
 	data() {
@@ -10957,12 +10973,12 @@ var Ss = class {
 			useGameFont: v("cheatModal.gameFont", !1),
 			overlayWidth: b("cheatModal.width", 750),
 			overlayHeight: b("cheatModal.height", 450),
-			windowOpacity: b(Es, .9),
-			isDarkMode: v(Ds, !0),
+			windowOpacity: b(Ds, .9),
+			isDarkMode: v(Os, !0),
 			primaryColor: e,
 			colorOptions: _e,
 			themeStyle: w(),
-			themeStyles: Os
+			themeStyles: ks
 		};
 	},
 	mounted() {
@@ -10981,13 +10997,13 @@ var Ss = class {
 			this.primaryColor = e, this.onColorChange();
 		},
 		onOpacityChange(e) {
-			x(Es, e), window.dispatchEvent(new CustomEvent("cheat-appearance-change", { detail: { windowOpacity: e } }));
+			x(Ds, e), window.dispatchEvent(new CustomEvent("cheat-appearance-change", { detail: { windowOpacity: e } }));
 		},
 		toggleTheme() {
 			this.isDarkMode = !this.isDarkMode, this.onThemeChange();
 		},
 		onThemeChange() {
-			y(Ds, this.isDarkMode), this.applyTheme();
+			y(Os, this.isDarkMode), this.applyTheme();
 		},
 		onStyleChange() {
 			g.setItem(ne, this.themeStyle), this.applyTheme();
@@ -11004,7 +11020,7 @@ var Ss = class {
 			e && e !== window && e.dispatchEvent(new e.CustomEvent("cheat-profile-change"));
 		}
 	}
-}, As = {
+}, js = {
 	enemy: [
 		"params",
 		"exp",
@@ -11032,46 +11048,46 @@ var Ss = class {
 		"traits"
 	]
 };
-function js(e) {
+function Ms(e) {
 	return JSON.parse(JSON.stringify(e));
 }
-function Ms(e, t, n, r, i) {
+function Ns(e, t, n, r, i) {
 	if (typeof e != "number" && typeof e != "string" || String(e).trim() === "") throw Error(t + ": enter a number.");
 	let a = Number(e);
 	if (!Number.isFinite(a) || a < n || a > r || i && Math.floor(a) !== a) throw Error(t + ": invalid number or range.");
 	return a;
 }
 function $(e, t, n, r) {
-	return Ms(e, t, n === void 0 ? 0 : n, r === void 0 ? 99999999 : r, !0);
+	return Ns(e, t, n === void 0 ? 0 : n, r === void 0 ? 99999999 : r, !0);
 }
-function Ns(e, t, n) {
+function Ps(e, t, n) {
 	if (!Array.isArray(e) || n !== void 0 && e.length !== n) throw Error(t + ": invalid array shape.");
 	return e;
 }
-function Ps(e, t) {
+function Fs(e, t) {
 	if (!e || typeof e != "object" || Array.isArray(e)) throw Error(t + ": invalid row.");
 	return Object.assign({}, e);
 }
-function Fs(e, t, n, r) {
+function Is(e, t, n, r) {
 	let i = $(e, t, +!r);
 	if (i === 0 && r) return i;
 	if (n && !n.some((e) => e.id === i)) throw Error(t + ": database reference not found.");
 	return i;
 }
-function Is(e, t, n, r) {
-	e.dataId = Fs(e.dataId, "dataId (" + n + ")", t[n], r);
+function Ls(e, t, n, r) {
+	e.dataId = Is(e.dataId, "dataId (" + n + ")", t[n], r);
 }
-function Ls(e, t, n) {
-	return Ns(t, e).map((t, r) => {
-		let i = e + " row " + (r + 1), a = Ps(t, i);
+function Rs(e, t, n) {
+	return Ps(t, e).map((t, r) => {
+		let i = e + " row " + (r + 1), a = Fs(t, i);
 		if (e === "actions") {
-			a.skillId = Fs(a.skillId, i + " skill", n.skills), a.rating = $(a.rating, i + " rating", 1, 9), a.conditionType = $(a.conditionType, i + " condition", 0, 6);
+			a.skillId = Is(a.skillId, i + " skill", n.skills), a.rating = $(a.rating, i + " rating", 1, 9), a.conditionType = $(a.conditionType, i + " condition", 0, 6);
 			let e = a.conditionType === 2 || a.conditionType === 3;
-			if (a.conditionParam1 = Ms(a.conditionParam1, i + " condition lower / first", 0, e ? 1 : 99999999, !e), a.conditionParam2 = Ms(a.conditionParam2, i + " condition upper / interval", 0, e ? 1 : 99999999, !e), e && a.conditionParam1 > a.conditionParam2) throw Error(i + " condition: lower must not exceed upper.");
-			a.conditionType === 4 && (a.conditionParam1 = Fs(a.conditionParam1, i + " condition state", n.states)), a.conditionType === 5 && (a.conditionParam1 = $(a.conditionParam1, i + " condition party level", 1)), a.conditionType === 6 && (a.conditionParam1 = Fs(a.conditionParam1, i + " condition switch", n.switches));
-		} else if (e === "learnings") a.level = $(a.level, i + " level", 1, 1e3), a.skillId = Fs(a.skillId, i + " skill", n.skills);
+			if (a.conditionParam1 = Ns(a.conditionParam1, i + " condition lower / first", 0, e ? 1 : 99999999, !e), a.conditionParam2 = Ns(a.conditionParam2, i + " condition upper / interval", 0, e ? 1 : 99999999, !e), e && a.conditionParam1 > a.conditionParam2) throw Error(i + " condition: lower must not exceed upper.");
+			a.conditionType === 4 && (a.conditionParam1 = Is(a.conditionParam1, i + " condition state", n.states)), a.conditionType === 5 && (a.conditionParam1 = $(a.conditionParam1, i + " condition party level", 1)), a.conditionType === 6 && (a.conditionParam1 = Is(a.conditionParam1, i + " condition switch", n.switches));
+		} else if (e === "learnings") a.level = $(a.level, i + " level", 1, 1e3), a.skillId = Is(a.skillId, i + " skill", n.skills);
 		else if (a.code = $(a.code, i + " code"), a.dataId = $(a.dataId, i + " dataId"), e === "traits") {
-			a.value = Ms(a.value, i + " value", -99999999, 99999999, !1);
+			a.value = Ns(a.value, i + " value", -99999999, 99999999, !1);
 			let e = {
 				11: "elements",
 				13: "states",
@@ -11087,8 +11103,8 @@ function Ls(e, t, n) {
 				53: "equipTypes",
 				54: "equipTypes"
 			};
-			e[a.code] && Is(a, n, e[a.code], !1), [12, 21].indexOf(a.code) >= 0 && (a.dataId = $(a.dataId, i + " parameter", 0, 7)), [22, 23].indexOf(a.code) >= 0 && (a.dataId = $(a.dataId, i + " parameter", 0, 9));
-		} else a.value1 = Ms(a.value1, i + " value1", -99999999, 99999999, !1), a.value2 = Ms(a.value2, i + " value2", -99999999, 99999999, !1), [21, 22].indexOf(a.code) >= 0 && Is(a, n, "states", a.code === 21), a.code === 43 && Is(a, n, "skills", !1), a.code === 44 && Is(a, n, "commonEvents", !1), [
+			e[a.code] && Ls(a, n, e[a.code], !1), [12, 21].indexOf(a.code) >= 0 && (a.dataId = $(a.dataId, i + " parameter", 0, 7)), [22, 23].indexOf(a.code) >= 0 && (a.dataId = $(a.dataId, i + " parameter", 0, 9));
+		} else a.value1 = Ns(a.value1, i + " value1", -99999999, 99999999, !1), a.value2 = Ns(a.value2, i + " value2", -99999999, 99999999, !1), [21, 22].indexOf(a.code) >= 0 && Ls(a, n, "states", a.code === 21), a.code === 43 && Ls(a, n, "skills", !1), a.code === 44 && Ls(a, n, "commonEvents", !1), [
 			31,
 			32,
 			33,
@@ -11098,10 +11114,10 @@ function Ls(e, t, n) {
 		return a;
 	});
 }
-function Rs(e, t, n, r) {
-	if (!As[e]) throw Error("Unsupported database kind.");
+function zs(e, t, n, r) {
+	if (!js[e]) throw Error("Unsupported database kind.");
 	let i = {}, a = r || {};
-	return As[e].forEach((r) => {
+	return js[e].forEach((r) => {
 		if (!Object.prototype.hasOwnProperty.call(n, r) || JSON.stringify(t[r]) === JSON.stringify(n[r])) return;
 		let o = t[r];
 		if ([
@@ -11109,11 +11125,11 @@ function Rs(e, t, n, r) {
 			"effects",
 			"actions",
 			"learnings"
-		].indexOf(r) >= 0) o = Ls(r, o, a);
-		else if (r === "params") o = Ns(o, "params", 8).map((t, r) => e === "class" ? Ns(t, "params curve " + r, n.params[r].length).map((e, t) => $(e, "params " + r + " level " + t)) : $(t, "params " + r));
-		else if (r === "expParams") o = Ns(o, r, 4).map((e, t) => $(e, r + " " + t));
+		].indexOf(r) >= 0) o = Rs(r, o, a);
+		else if (r === "params") o = Ps(o, "params", 8).map((t, r) => e === "class" ? Ps(t, "params curve " + r, n.params[r].length).map((e, t) => $(e, "params " + r + " level " + t)) : $(t, "params " + r));
+		else if (r === "expParams") o = Ps(o, r, 4).map((e, t) => $(e, r + " " + t));
 		else if (r === "damage") {
-			if (o = Ps(o, r), o.type = $(o.type, "damage type", 0, 6), o.elementId = $(o.elementId, "damage element", -1), o.elementId > 0 && (o.elementId = Fs(o.elementId, "damage element", a.elements)), o.variance = $(o.variance, "damage variance", 0, 100), typeof o.formula != "string" || typeof o.critical != "boolean") throw Error("damage formula must be text and critical must be boolean.");
+			if (o = Fs(o, r), o.type = $(o.type, "damage type", 0, 6), o.elementId = $(o.elementId, "damage element", -1), o.elementId > 0 && (o.elementId = Is(o.elementId, "damage element", a.elements)), o.variance = $(o.variance, "damage variance", 0, 100), typeof o.formula != "string" || typeof o.critical != "boolean") throw Error("damage formula must be text and critical must be boolean.");
 		} else {
 			let e = {
 				successRate: [0, 100],
@@ -11128,8 +11144,8 @@ function Rs(e, t, n, r) {
 		JSON.stringify(o) !== JSON.stringify(n[r]) && (i[r] = o);
 	}), i;
 }
-function zs(e, t, n) {
-	if (!As[t]) throw Error("Unsupported database kind.");
+function Bs(e, t, n) {
+	if (!js[t]) throw Error("Unsupported database kind.");
 	let r = e ? e.list("skill") : [];
 	return {
 		kind: t,
@@ -11143,25 +11159,25 @@ function zs(e, t, n) {
 		status: ""
 	};
 }
-function Bs(e, t, n) {
+function Vs(e, t, n) {
 	if (!Number.isInteger(n) || !e.rows.some((e) => e.id === n)) throw Error("Select a valid database record.");
 	let r = t.read(e.kind, n);
 	if (!r) throw Error("Database record is no longer available.");
-	e.selectedId = n, e.original = js(r), e.draft = js(r), e.edited = t.isEdited(e.kind, n), e.error = "", e.status = "";
-}
-function Vs(e, t) {
-	if (!e.draft) throw Error("Select a database record first.");
-	let n = Rs(e.kind, e.draft, e.original, e.references), r = t.apply(e.kind, e.selectedId, n);
-	return e.original = js(r), e.draft = js(r), e.edited = t.isEdited(e.kind, e.selectedId), e.error = "", e.status = "Applied. Save the game to keep these changes.", n;
+	e.selectedId = n, e.original = Ms(r), e.draft = Ms(r), e.edited = t.isEdited(e.kind, n), e.error = "", e.status = "";
 }
 function Hs(e, t) {
-	Bs(e, t, e.selectedId);
+	if (!e.draft) throw Error("Select a database record first.");
+	let n = zs(e.kind, e.draft, e.original, e.references), r = t.apply(e.kind, e.selectedId, n);
+	return e.original = Ms(r), e.draft = Ms(r), e.edited = t.isEdited(e.kind, e.selectedId), e.error = "", e.status = "Applied. Save the game to keep these changes.", n;
 }
 function Us(e, t) {
-	if (!e.selectedId) throw Error("Select a database record first.");
-	t.reset(e.kind, e.selectedId), Bs(e, t, e.selectedId), e.status = "Reset to original. Save the game to keep this reset.";
+	Vs(e, t, e.selectedId);
 }
-function Ws(e) {
+function Ws(e, t) {
+	if (!e.selectedId) throw Error("Select a database record first.");
+	t.reset(e.kind, e.selectedId), Vs(e, t, e.selectedId), e.status = "Reset to original. Save the game to keep this reset.";
+}
+function Gs(e) {
 	let t = {}, n = {
 		skills: "$dataSkills",
 		states: "$dataStates",
@@ -11192,7 +11208,7 @@ function Ws(e) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/components/DatabaseRowsEditor.js
-var Gs = [
+var Ks = [
 	"Always",
 	"Turn (first / interval)",
 	"HP ratio (min / max)",
@@ -11200,7 +11216,7 @@ var Gs = [
 	"Affected by state",
 	"Party level at least",
 	"Switch is ON"
-], Ks = {
+], qs = {
 	name: "DatabaseRowsEditor",
 	props: {
 		value: {
@@ -11269,7 +11285,7 @@ var Gs = [
 				return [
 					n("skillId", "Skill", t("skills")),
 					n("rating", "Rating (1..9)"),
-					n("conditionType", "Condition", Gs.map((e, t) => ({
+					n("conditionType", "Condition", Ks.map((e, t) => ({
 						text: e,
 						value: t
 					}))),
@@ -11277,7 +11293,7 @@ var Gs = [
 					n("conditionParam2", r === 2 || r === 3 ? "Maximum ratio (0..1)" : "Interval / second")
 				];
 			}
-			let r = Number(e.code), i = this.type === "traits" ? yn : bn, a = (this.type === "traits" ? {
+			let r = Number(e.code), i = this.type === "traits" ? bn : xn, a = (this.type === "traits" ? {
 				11: "elements",
 				13: "states",
 				14: "states",
@@ -11311,7 +11327,7 @@ var Gs = [
 };
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/database/EnemyEncounters.js
-function qs(e) {
+function Js(e) {
 	let t = e && e.$dataTroops, n = e && e.$dataEnemies;
 	return !Array.isArray(t) || !n ? [] : t.reduce((e, t, r) => {
 		if (!t || !Array.isArray(t.members)) return e;
@@ -11347,7 +11363,7 @@ function qs(e) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/components/VirtualList.js
-var Js = {
+var Ys = {
 	name: "VirtualList",
 	props: {
 		items: {
@@ -11403,17 +11419,17 @@ var Js = {
 		this.scroll = e.target.scrollTop || 0;
 	} },
 	template: "<div ref=\"scroller\" class=\"cheat-virtual\" :style=\"{ height: height + 'px' }\" @scroll=\"onScroll\">\n    <div class=\"cheat-virtual__spacer\" :style=\"{ height: total + 'px' }\">\n      <div class=\"cheat-virtual__window\" :style=\"{ transform: 'translateY(' + offset + 'px)' }\">\n        <div v-for=\"row in window\" :key=\"row.index\" class=\"cheat-virtual__row\" :style=\"{ height: itemSize + 'px' }\"><slot :item=\"row.item\" :index=\"row.index\"/></div>\n      </div>\n    </div>\n  </div>"
-}, Ys = {
+}, Xs = {
 	name: "DatabaseEditorPanel",
 	components: {
-		DatabaseRowsEditor: Ks,
-		DatabaseTooltip: An,
+		DatabaseRowsEditor: qs,
+		DatabaseTooltip: jn,
 		EncounterBrowser: {
 			name: "EncounterBrowser",
 			components: {
 				GameAsset: L,
-				DatabaseTooltip: An,
-				VirtualList: Js
+				DatabaseTooltip: jn,
+				VirtualList: Ys
 			},
 			data() {
 				return {
@@ -11461,7 +11477,7 @@ var Js = {
 				reload() {
 					this.cancel(), this.error = "";
 					try {
-						this.encounters = Object.freeze(qs(P()));
+						this.encounters = Object.freeze(Js(P()));
 						let e = this.selected || this.encounters[0];
 						this.selectedTroopId = e ? e.troopId : null, this.updateAvailability(), this.refreshMapEvents();
 					} catch (e) {
@@ -11520,7 +11536,7 @@ var Js = {
 				}
 			}
 		},
-		VirtualList: Js
+		VirtualList: Ys
 	},
 	props: { kind: {
 		type: String,
@@ -11676,7 +11692,7 @@ var Js = {
 			try {
 				let e = F();
 				if (!e) throw Error("Game feature runtime is not ready. Reload this panel after the game starts.");
-				this.state = zs(e.database, this.kind, Ws(P())), this.paramNames = Tn(P()).slice(), this.cacheDescriptions(), this.state.rows.length && Bs(this.state, e.database, this.state.rows[0].id), this.refreshMapEvents();
+				this.state = Bs(e.database, this.kind, Gs(P())), this.paramNames = En(P()).slice(), this.cacheDescriptions(), this.state.rows.length && Vs(this.state, e.database, this.state.rows[0].id), this.refreshMapEvents();
 			} catch (e) {
 				this.error = e.message;
 			}
@@ -11689,21 +11705,21 @@ var Js = {
 		},
 		select(e) {
 			try {
-				Bs(this.state, F().database, e), this.level = 1, this.refreshMapEvents();
+				Vs(this.state, F().database, e), this.level = 1, this.refreshMapEvents();
 			} catch (e) {
 				this.error = e.message;
 			}
 		},
 		apply() {
 			try {
-				Vs(this.state, F().database), this.state.rows = Object.freeze(F().database.list(this.kind)), this.cacheDescriptions(), this.error = "";
+				Hs(this.state, F().database), this.state.rows = Object.freeze(F().database.list(this.kind)), this.cacheDescriptions(), this.error = "";
 			} catch (e) {
 				this.error = e.message;
 			}
 		},
 		discard() {
 			try {
-				Hs(this.state, F().database), this.error = "";
+				Us(this.state, F().database), this.error = "";
 			} catch (e) {
 				this.error = e.message;
 			}
@@ -11725,7 +11741,7 @@ var Js = {
 			this.confirmation = "";
 			try {
 				let t = F();
-				if (e === "reset" ? (Us(this.state, t.database), this.state.rows = Object.freeze(t.database.list(this.kind)), this.cacheDescriptions()) : e === "reload" ? this.initialize() : e && e.select ? this.select(e.select) : e && e.mapEvent ? t.battle.startMapEvent(e.mapEvent) : e === "selected-enemy" ? t.battle.startEnemies([this.state.selectedId]) : e === "troop" ? t.battle.startTroop(this.troopId) : e === "roster" ? t.battle.startEnemies(this.roster.slice()) : e === "summon" && t.battle.summon(this.state.selectedId), e === "selected-enemy" || e === "troop" || e === "roster" || e === "summon" || e && e.mapEvent) {
+				if (e === "reset" ? (Ws(this.state, t.database), this.state.rows = Object.freeze(t.database.list(this.kind)), this.cacheDescriptions()) : e === "reload" ? this.initialize() : e && e.select ? this.select(e.select) : e && e.mapEvent ? t.battle.startMapEvent(e.mapEvent) : e === "selected-enemy" ? t.battle.startEnemies([this.state.selectedId]) : e === "troop" ? t.battle.startTroop(this.troopId) : e === "roster" ? t.battle.startEnemies(this.roster.slice()) : e === "summon" && t.battle.summon(this.state.selectedId), e === "selected-enemy" || e === "troop" || e === "roster" || e === "summon" || e && e.mapEvent) {
 					window.dispatchEvent(new CustomEvent("cheat-return-to-game"));
 					let e = P();
 					e !== window && e.dispatchEvent(new e.CustomEvent("cheat-return-to-game")), e.focus && e.focus();
@@ -11749,71 +11765,71 @@ var Js = {
 };
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/history/MessageLogPanelState.js
-function Xs(e) {
+function Zs(e) {
 	let t = F();
 	return t ? t.history.list(e) : [];
 }
-function Zs() {
-	let e = F();
-	return e && e.messageLogPreferences ? e.messageLogPreferences.read() : Object.assign({}, tn);
-}
 function Qs() {
+	let e = F();
+	return e && e.messageLogPreferences ? e.messageLogPreferences.read() : Object.assign({}, nn);
+}
+function $s() {
 	let e = F();
 	return e && e.messageLogPreferences ? e.messageLogPreferences.revision() : 0;
 }
-function $s(e) {
+function ec(e) {
 	let t = F();
 	t && t.messageLogPreferences && t.messageLogPreferences.write(e);
 }
-function ec() {
+function tc() {
 	let e = F();
 	e && e.messageLogPreferences && e.messageLogPreferences.reset();
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/history/MessageLogScroll.js
-var tc = 32, nc = {
+var nc = 32, rc = {
 	scrollTop: 0,
 	followLatest: !0,
 	known: !1
 };
-function rc(e, t = tc) {
+function ic(e, t = nc) {
 	if (!e) return !0;
 	let n = Number(e.scrollTop) || 0, r = Number(e.clientHeight) || 0, i = (Number(e.scrollHeight) || 0) - r;
 	return i <= 0 || i - n <= t;
 }
-function ic(e, t = tc) {
+function ac(e, t = nc) {
 	if (!e) return 0;
 	let n = Number(e.scrollHeight) || 0, r = Number(e.clientHeight) || 0;
 	return Math.max(0, n - r - Math.min(t, 0));
 }
-function ac() {
-	return { ...nc };
+function oc() {
+	return { ...rc };
 }
-function oc(e) {
-	return nc = {
-		...nc,
+function sc(e) {
+	return rc = {
+		...rc,
 		...e,
 		known: !0
-	}, { ...nc };
+	}, { ...rc };
 }
-function sc(e, t = tc) {
-	return oc({
+function cc(e, t = nc) {
+	return sc({
 		scrollTop: Math.max(0, Number(e && e.scrollTop) || 0),
-		followLatest: rc(e, t)
+		followLatest: ic(e, t)
 	});
 }
-function cc(e, t, n = tc) {
-	return !e || !e.known || e.followLatest ? ic(t, n) : Math.max(0, Number(e.scrollTop) || 0);
+function lc(e, t, n = nc) {
+	return !e || !e.known || e.followLatest ? ac(t, n) : Math.max(0, Number(e.scrollTop) || 0);
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/ui/FileTransfer.js
-function lc(e, t, n) {
+function uc(e, t, n) {
 	let r = new Blob([t], { type: n || "text/plain;charset=utf-8" }), i = URL.createObjectURL(r), a = document.createElement("a");
 	a.href = i, a.download = e, document.body.appendChild(a), a.click(), document.body.removeChild(a), setTimeout(() => URL.revokeObjectURL(i), 1e3);
 }
 //#endregion
 //#region cheat-engine/www/cheat/components/MessagePortrait.js
-var uc = {
+var dc = {
 	name: "MessagePortrait",
 	props: {
 		faceName: String,
@@ -11848,7 +11864,7 @@ var uc = {
 	},
 	methods: {
 		openActor() {
-			this.actorId && kn(this.actorId);
+			this.actorId && An(this.actorId);
 		},
 		async draw() {
 			var e = this;
@@ -11867,7 +11883,7 @@ var uc = {
 			!a && e.actorId && r() && (a = await n.assets.paint(e.$refs.face, n.assets.describe("actorSprite", e.actorId), r)), r() && (e.ready = a);
 		}
 	}
-}, dc = {
+}, fc = {
 	name: "MessageTextContent",
 	components: { GameAsset: L },
 	props: { text: String },
@@ -11880,7 +11896,7 @@ var uc = {
 };
 //#endregion
 //#region cheat-engine/www/cheat/js/ui/GameFont.js
-function fc(e, t, n) {
+function pc(e, t, n) {
 	if (!e || !t || !e.classList) return;
 	if (e.classList.toggle("cheat-game-font", !!n), !n) {
 		e.style.removeProperty("--cheat-game-font");
@@ -11910,23 +11926,23 @@ function fc(e, t, n) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/panels/MessageLogPanel.js
-var pc = S([{
+var mc = S([{
 	text: "Game font (default)",
 	value: "game"
 }, {
 	text: "Plugin font (fallback)",
 	value: "plugin"
-}]), mc = S([{
+}]), hc = S([{
 	text: "Default (16 px)",
 	value: "default"
 }, {
 	text: "Custom",
 	value: "custom"
-}]), hc = {
+}]), gc = {
 	name: "MessageLogPanel",
 	components: {
-		MessagePortrait: uc,
-		MessageTextContent: dc,
+		MessagePortrait: dc,
+		MessageTextContent: fc,
 		GameAsset: L
 	},
 	data() {
@@ -11935,9 +11951,9 @@ var pc = S([{
 			rows: [],
 			error: "",
 			confirmClear: !1,
-			preferences: Zs(),
-			fontModes: pc,
-			sizeModes: mc,
+			preferences: Qs(),
+			fontModes: mc,
+			sizeModes: hc,
 			followLatest: !0
 		};
 	},
@@ -11945,7 +11961,7 @@ var pc = S([{
 		this.followLatest = !0, this._pendingScroll = !0, this.refresh();
 	} },
 	mounted() {
-		let e = ac();
+		let e = oc();
 		this.followLatest = e.followLatest, this._lastScrollTop = e.scrollTop, this._applyingScroll = !1, this.applyFontPreference(), this.refresh(), this._timer = setInterval(this.refresh, 1e3);
 	},
 	beforeDestroy() {
@@ -11954,24 +11970,24 @@ var pc = S([{
 	template: "<v-card flat class=\"cheat-panel message-log\">\n    <div class=\"cheat-panel__head message-log__head\">\n      <div class=\"message-log__heading\">\n        <div class=\"cheat-panel__title\">Message Log</div>\n        <div class=\"cheat-panel__meta message-log__meta\" title=\"Latest 1,000 entries in this session. Loading or starting a game clears history.\">Latest 1,000 entries; a new session clears the log.</div>\n      </div>\n      <div class=\"message-log__actions\">\n        <v-btn x-small text title=\"Refresh\" aria-label=\"Refresh log\" @click=\"refresh\"><v-icon small>mdi-refresh</v-icon></v-btn>\n        <v-btn x-small text title=\"Export as text\" aria-label=\"Export log\" @click=\"exportLog\"><v-icon small>mdi-download</v-icon></v-btn>\n        <v-btn x-small text title=\"Clear log\" aria-label=\"Clear log\" @click=\"confirmClear = true\"><v-icon small>mdi-delete-outline</v-icon></v-btn>\n      </div>\n    </div>\n    <div class=\"message-log__toolbar\">\n      <v-text-field v-model=\"search\" class=\"message-log__search\" dense outlined hide-details label=\"Search dialogue, speaker or map\" @keydown.stop/>\n      <v-select v-model=\"preferences.fontMode\" class=\"message-log__select\" :items=\"fontModes\" label=\"Log font\" dense outlined hide-details data-testid=\"message-log-font\" @change=\"savePreferences\"/>\n      <v-select v-model=\"preferences.sizeMode\" class=\"message-log__select\" :items=\"sizeModes\" label=\"Text size\" dense outlined hide-details data-testid=\"message-log-size-mode\" @change=\"savePreferences\"/>\n      <v-text-field v-if=\"preferences.sizeMode === 'custom'\" v-model=\"preferences.fontSize\" class=\"message-log__size\" label=\"Size (px)\" type=\"number\" min=\"12\" max=\"40\" step=\"1\" dense outlined hide-details data-testid=\"message-log-font-size\" @keydown.stop @change=\"savePreferences\"/>\n      <v-btn x-small text class=\"message-log__reset\" title=\"Reset text display\" aria-label=\"Reset text display\" @click=\"resetPreferences\"><v-icon small>mdi-restore</v-icon></v-btn>\n    </div>\n    <v-alert v-if=\"error\" type=\"error\" dense>{{ error }}</v-alert>\n    <div class=\"message-log__history\" ref=\"history\" @scroll=\"onHistoryScroll\">\n      <div v-for=\"row in rows\" :key=\"row.id\" :data-message-id=\"row.id\" class=\"message-log__row\">\n        <message-portrait v-if=\"row.faceName || row.speaker || row.pictureName\" :face-name=\"row.faceName\" :face-index=\"row.faceIndex\" :speaker=\"row.speaker\" :actor-id=\"row.actorId\" :picture-name=\"row.pictureName\"/>\n        <div class=\"message-log__body\">\n          <div class=\"caption cheat-muted\">{{ row.timestamp }} | {{ row.mapName }} #{{ row.mapId }}</div>\n          <div v-if=\"row.type === 'choice'\" class=\"caption cheat-muted\">Chosen response</div>\n          <div class=\"cheat-message-copy message-log__copy\" :style=\"textStyle(row.textStyle)\">\n            <div class=\"font-weight-bold cheat-message-speaker message-log__speaker\" v-if=\"row.speaker\" :aria-label=\"row.speaker\" :title=\"row.speaker\"><game-asset v-if=\"row.speakerIcon && !row.speakerDisplay\" :descriptor=\"{type:'icon',index:row.speakerIcon}\" :size=\"22\" :navigate=\"false\"/><message-text-content :text=\"row.speakerDisplay || row.speaker\"/></div>\n            <div v-else class=\"caption cheat-muted\">{{ row.type === 'message' ? 'Narration / unknown speaker' : row.type }}</div>\n            <message-text-content :text=\"row.text\"/>\n          </div>\n        </div>\n      </div>\n      <p v-if=\"!rows.length\" class=\"pa-2\">No dialogue captured yet, or no search matches.</p>\n    </div>\n    <v-dialog v-model=\"confirmClear\" max-width=\"360\"><v-card><v-card-text class=\"pt-4\">Clear captured dialogue? The game's message is not affected.</v-card-text><v-card-actions><v-btn text @click=\"confirmClear = false\">Cancel</v-btn><v-btn text color=\"error\" @click=\"clearLog\">Clear</v-btn></v-card-actions></v-card></v-dialog>\n  </v-card>",
 	methods: {
 		textStyle(e) {
-			return an(e, this.preferences);
+			return on(e, this.preferences);
 		},
 		applyFontPreference() {
 			if (!this.$el) return;
 			let e = this.preferences.fontMode === "game";
-			fc(this.$el, P(), e), e ? this.$el.style.removeProperty("font-family") : (this.$el.style.fontFamily = en, this.$el.style.setProperty("--cheat-game-font", en));
+			pc(this.$el, P(), e), e ? this.$el.style.removeProperty("font-family") : (this.$el.style.fontFamily = tn, this.$el.style.setProperty("--cheat-game-font", tn));
 		},
 		savePreferences() {
-			$s(this.preferences), this.preferences = Zs(), this._preferenceRevision = Qs(), this.applyFontPreference();
+			ec(this.preferences), this.preferences = Qs(), this._preferenceRevision = $s(), this.applyFontPreference();
 		},
 		resetPreferences() {
-			ec(), this._preferenceRevision = null, this.refresh();
+			tc(), this._preferenceRevision = null, this.refresh();
 		},
 		refresh() {
-			let e = S(Xs(this.search)), t = e.length ? e[e.length - 1].id : null, n = t !== this._newestId;
+			let e = S(Zs(this.search)), t = e.length ? e[e.length - 1].id : null, n = t !== this._newestId;
 			this.rows = e, this._newestId = t;
-			let r = Qs();
-			r !== this._preferenceRevision && (this.preferences = Zs(), this._preferenceRevision = r, this.applyFontPreference()), (n || this._pendingScroll) && this.applyScroll();
+			let r = $s();
+			r !== this._preferenceRevision && (this.preferences = Qs(), this._preferenceRevision = r, this.applyFontPreference()), (n || this._pendingScroll) && this.applyScroll();
 		},
 		historyEl() {
 			return this.$refs.history || null;
@@ -11980,18 +11996,18 @@ var pc = S([{
 			this._pendingScroll = !1, this.$nextTick(() => {
 				let e = this.historyEl();
 				if (!e) return;
-				let t = cc(ac(), e);
-				this._applyingScroll = !0, e.scrollTop = t, this._lastScrollTop = e.scrollTop, this.followLatest = rc(e), this.$nextTick(() => {
+				let t = lc(oc(), e);
+				this._applyingScroll = !0, e.scrollTop = t, this._lastScrollTop = e.scrollTop, this.followLatest = ic(e), this.$nextTick(() => {
 					this._applyingScroll = !1;
 				});
 			});
 		},
 		onHistoryScroll() {
 			let e = this.historyEl();
-			!e || this._applyingScroll || (this._lastScrollTop = e.scrollTop, this.followLatest = rc(e), sc(e));
+			!e || this._applyingScroll || (this._lastScrollTop = e.scrollTop, this.followLatest = ic(e), cc(e));
 		},
 		persistScrollPosition() {
-			oc({
+			sc({
 				scrollTop: Math.max(0, Number(this._lastScrollTop) || 0),
 				followLatest: this.followLatest
 			});
@@ -12003,15 +12019,15 @@ var pc = S([{
 		exportLog() {
 			try {
 				let e = F();
-				e && lc("cheat-dialogue.txt", e.history.exportText());
+				e && uc("cheat-dialogue.txt", e.history.exportText());
 			} catch (e) {
 				this.error = e.message;
 			}
 		}
 	}
-}, gc = {
+}, _c = {
 	name: "LocksPanel",
-	components: { LockFavoriteControls: sn },
+	components: { LockFavoriteControls: cn },
 	data() {
 		return {
 			rows: [],
@@ -12038,7 +12054,7 @@ var pc = S([{
 	template: "<v-card flat class=\"pa-1\"><div class=\"subtitle-1\">Locks & Favorites</div><p class=\"caption cheat-muted\">Stored for this game, across save slots. Not included in portable settings backups. Unlock before loading a save if you do not want its values overridden.</p><v-alert v-if=\"error\" type=\"error\" dense>{{error}}</v-alert>\n    <div v-for=\"row in rows\" :key=\"row.label\" class=\"cheat-row\">\n      <div class=\"cheat-row__main\">\n        <div class=\"body-2\">{{row.label}}</div>\n        <div class=\"caption cheat-muted\">{{row.locked ? ('Locked: ' + display(row.value)) : 'Favorite'}} <span v-if=\"!row.enabled\">- Disabled: {{row.reason}}</span><span v-else-if=\"row.locked && !row.active\">- Waiting for active game</span></div>\n      </div>\n      <lock-favorite-controls :target=\"row.target\" :value=\"row.value\" @change=\"refresh\"/>\n      <v-btn icon x-small title=\"Remove lock and favorite\" @click=\"remove(row)\"><v-icon small>mdi-delete</v-icon></v-btn>\n    </div><p v-if=\"!rows.length\" class=\"caption cheat-muted\">Use the star and lock buttons next to editable values.</p>\n    <v-divider class=\"my-3\"/><div data-feature=\"timer\" class=\"subtitle-2\">Game Timer</div><div class=\"caption cheat-muted mb-2\">Current: {{Math.ceil(timer.frames / 60)}} seconds, {{timer.working ? 'running' : 'stopped'}}</div><v-row dense><v-col cols=\"6\"><v-text-field v-model.number=\"seconds\" type=\"number\" min=\"0\" label=\"Seconds\" dense outlined hide-details @keydown.stop/></v-col><v-col cols=\"6\"><v-checkbox v-model=\"working\" label=\"Running\" dense hide-details class=\"mt-1\"/></v-col></v-row><v-btn small text @click=\"setTimer\">Set Timer</v-btn><lock-favorite-controls :target=\"{kind:'timer'}\" :value=\"timer\" @change=\"refresh\"/>\n    <v-divider class=\"my-3\"/><div class=\"subtitle-2\">Status Effect Lock</div><v-row dense><v-col cols=\"6\"><v-select v-model=\"actorId\" :items=\"actors\" item-text=\"name\" item-value=\"id\" label=\"Actor\" dense outlined hide-details/></v-col><v-col cols=\"6\"><v-select v-model=\"stateId\" :items=\"states\" item-text=\"name\" item-value=\"id\" label=\"Status\" dense outlined hide-details/></v-col></v-row><v-checkbox v-model=\"statePresent\" dense hide-details label=\"Keep present (unchecked: keep absent)\"/><lock-favorite-controls v-if=\"actorId && stateId\" :target=\"{kind:'state',actorId:actorId,id:stateId}\" :value=\"statePresent\" @change=\"refresh\"/>\n  </v-card>",
 	methods: {
 		refresh() {
-			this.rows = jn();
+			this.rows = Mn();
 			let e = P();
 			if (!e) return;
 			let t = e.$gameTimer;
@@ -12075,13 +12091,13 @@ var pc = S([{
 };
 //#endregion
 //#region cheat-engine/www/cheat/js/panels/options/GameOptionsPanelState.js
-function _c() {
+function vc() {
 	let e = F();
 	return e ? e.options.list() : [];
 }
 //#endregion
 //#region cheat-engine/www/cheat/panels/GameOptionsPanel.js
-var vc = {
+var yc = {
 	name: "GameOptionsPanel",
 	data() {
 		return {
@@ -12099,7 +12115,7 @@ var vc = {
 	template: "<v-card flat class=\"pa-1\"><div class=\"d-flex align-center subtitle-1\">Game Options<v-spacer/><v-btn text x-small @click=\"refresh\">Reload</v-btn></div><p class=\"caption\">Game-specific controls appear first when safe to discover. Only options changed here are added to your portable backup.</p><v-alert v-if=\"error\" dense type=\"error\">{{error}}</v-alert><v-alert v-if=\"status\" dense type=\"info\">{{status}}</v-alert>\n    <div v-for=\"row in rows\" :key=\"row.symbol\" :data-feature=\"anchor(row.symbol)\" class=\"cheat-game-option\" :class=\"{ 'cheat-game-option--boolean': row.type === 'boolean' }\"><div class=\"d-flex align-center\"><v-checkbox v-if=\"row.type==='boolean'\" :input-value=\"row.value\" :label=\"row.label + (row.custom ? ' (game)' : '')\" :disabled=\"!row.supported\" dense hide-details class=\"mt-0\" @change=\"set(row,$event)\"/><v-text-field v-else-if=\"row.type==='number'\" :value=\"row.value\" :label=\"row.label + (row.custom ? ' (game)' : '')\" type=\"number\" :min=\"row.min\" :max=\"row.max\" :step=\"row.step\" :disabled=\"!row.supported\" dense outlined hide-details @keydown.stop @change=\"set(row,Number($event))\"/><span v-else class=\"body-2\">{{row.label}}</span><v-btn v-if=\"row.included\" text x-small title=\"Keep current value, exclude it from future backups\" @click=\"exclude(row)\">Exclude from Backup</v-btn></div><div v-if=\"!row.supported\" class=\"caption cheat-muted\">{{row.reason}}</div></div>\n    <v-divider class=\"my-3\"/><div data-feature=\"settings-profile\" class=\"subtitle-2\">Portable Settings Backup</div><p class=\"caption\">Includes changed game options, supported appearance preferences and shortcut bindings. Excludes locks, favorites, dialogue and database edits. Installer recovery backups are separate.</p>\n    <v-btn small class=\"mr-1\" @click=\"exportProfile\">Export File</v-btn><v-btn small text @click=\"$refs.file.click()\">Open File</v-btn><input ref=\"file\" type=\"file\" accept=\".json,application/json\" class=\"d-none\" @change=\"readFile\"/>\n    <v-textarea v-model=\"profileText\" label=\"Settings JSON (paste or open a file)\" rows=\"4\" outlined dense class=\"mt-2\" hide-details @keydown.stop/><v-btn small class=\"mt-2\" :disabled=\"!profileText.trim()\" @click=\"previewImport\">Preview Import</v-btn>\n    <v-dialog v-model=\"confirmImport\" max-width=\"480\"><v-card><v-card-title class=\"subtitle-1\">Restore Settings?</v-card-title><v-card-text v-if=\"preview\" class=\"cheat-dialog-scroll\"><div v-for=\"(row,i) in preview.changes\" :key=\"'c'+i\">{{row.label}}: {{row.value}}</div><div v-for=\"(row,i) in preview.ignored\" :key=\"'i'+i\" class=\"cheat-text-warning\">Skipped {{row.symbol}}: {{row.reason}}</div><p class=\"caption cheat-muted mt-2\">Unlisted game settings are left unchanged.</p></v-card-text><v-card-actions><v-btn text @click=\"confirmImport=false\">Cancel</v-btn><v-btn text color=\"primary\" @click=\"importProfile\">Apply</v-btn></v-card-actions></v-card></v-dialog>\n  </v-card>",
 	methods: {
 		refresh() {
-			this.rows = _c();
+			this.rows = vc();
 		},
 		anchor(e) {
 			return e === "alwaysDash" ? "always-dash" : e === "commandRemember" ? "command-remember" : /Volume$/.test(e) ? "volume" : e;
@@ -12116,7 +12132,7 @@ var vc = {
 		},
 		exportProfile() {
 			try {
-				this.profileText = F().options.exportProfile(), lc("cheat-settings-profile.json", this.profileText, "application/json");
+				this.profileText = F().options.exportProfile(), uc("cheat-settings-profile.json", this.profileText, "application/json");
 			} catch (e) {
 				this.error = e.message;
 			}
@@ -12151,7 +12167,7 @@ var vc = {
 			}
 		}
 	}
-}, yc = [
+}, bc = [
 	[
 		"general",
 		"General",
@@ -12275,7 +12291,7 @@ var vc = {
 		"Game Options",
 		"game-options-panel"
 	]
-], bc = [
+], xc = [
 	[
 		"floating-minimap",
 		"Floating Minimap",
@@ -12367,14 +12383,14 @@ var vc = {
 		"freeze time countdown"
 	]
 ];
-function xc(e) {
+function Sc(e) {
 	return Object.assign({}, e);
 }
-function Sc(e) {
+function Cc(e) {
 	return String(e || "").toLowerCase().replace(/\+/g, " ").replace(/\s+/g, " ").trim();
 }
-function Cc(e, t) {
-	let n = yc.map((e) => ({
+function wc(e, t) {
+	let n = bc.map((e) => ({
 		id: e[0],
 		label: e[1],
 		panel: e[2],
@@ -12383,7 +12399,7 @@ function Cc(e, t) {
 		description: "Open " + e[1],
 		keywords: e[0] === "map-events" ? "map events npc characters realistic minimap" : ""
 	}));
-	return bc.forEach((e) => n.push({
+	return xc.forEach((e) => n.push({
 		id: e[0],
 		label: e[1],
 		panel: e[2],
@@ -12403,10 +12419,10 @@ function Cc(e, t) {
 		});
 	}), n;
 }
-function wc(e, t, n) {
-	let r = Sc(e), i = r.split(" ").filter(Boolean), a = n === void 0 ? 20 : Math.max(0, Math.min(50, Number(n) || 0));
-	return (t || Cc()).map((e, t) => {
-		let n = Sc(e.label), a = Sc([
+function Tc(e, t, n) {
+	let r = Cc(e), i = r.split(" ").filter(Boolean), a = n === void 0 ? 20 : Math.max(0, Math.min(50, Number(n) || 0));
+	return (t || wc()).map((e, t) => {
+		let n = Cc(e.label), a = Cc([
 			e.label,
 			e.keywords,
 			e.description,
@@ -12415,14 +12431,14 @@ function wc(e, t, n) {
 		return {
 			row: e,
 			index: t,
-			rank: r ? n === r ? 0 : n.indexOf(r) === 0 ? 1 : Sc(e.keywords).includes(r) || Sc(e.shortcut) === r ? 2 : 3 : 0,
+			rank: r ? n === r ? 0 : n.indexOf(r) === 0 ? 1 : Cc(e.keywords).includes(r) || Cc(e.shortcut) === r ? 2 : 3 : 0,
 			match: i.every((e) => a.includes(e))
 		};
-	}).filter((e) => e.match).sort((e, t) => e.rank - t.rank || e.index - t.index).slice(0, a).map((e) => xc(e.row));
+	}).filter((e) => e.match).sort((e, t) => e.rank - t.rank || e.index - t.index).slice(0, a).map((e) => Sc(e.row));
 }
 //#endregion
 //#region cheat-engine/www/cheat/components/FeatureFinder.js
-var Tc = {
+var Ec = {
 	name: "FeatureFinder",
 	props: {
 		value: Boolean,
@@ -12439,7 +12455,7 @@ var Tc = {
 	},
 	computed: {
 		results() {
-			return wc(this.search, this.catalog);
+			return Tc(this.search, this.catalog);
 		},
 		resultSummary() {
 			let e = this.results.length;
@@ -12479,7 +12495,7 @@ var Tc = {
 			].includes(e.key) && (e.preventDefault(), e.stopPropagation(), e.key === "Escape" ? this.$emit("input", !1) : e.key === "Enter" ? this.choose(this.results[this.selectedIndex]) : this.results.length && (this.selectedIndex = (this.selectedIndex + (e.key === "ArrowUp" ? -1 : 1) + this.results.length) % this.results.length));
 		}
 	}
-}, Ec = {
+}, Dc = {
 	name: "OverlayResize",
 	props: {
 		width: Number,
@@ -12496,7 +12512,7 @@ var Tc = {
 				width: t,
 				height: n
 			};
-			this._stop = lo(e, (e, i) => {
+			this._stop = uo(e, (e, i) => {
 				r = {
 					width: t + e,
 					height: n + i
@@ -12516,7 +12532,7 @@ var Tc = {
 			}));
 		}
 	}
-}, Dc = Object.freeze([
+}, Oc = Object.freeze([
 	{
 		label: "Play",
 		items: Object.freeze([
@@ -12665,7 +12681,7 @@ var Tc = {
 		}])
 	}
 ]);
-function Oc(e) {
+function kc(e) {
 	let t = S(e), n = {}, r = /* @__PURE__ */ new Map(), i = /* @__PURE__ */ new Map();
 	function a(e, t, o) {
 		if (Array.isArray(e)) for (let n of e) a(n, t, o);
@@ -12697,7 +12713,7 @@ function Oc(e) {
 		}
 	});
 }
-function kc(e, t = []) {
+function Ac(e, t = []) {
 	let n = {
 		navTreeModel: void 0,
 		openGroups: [...t]
@@ -12757,8 +12773,8 @@ function kc(e, t = []) {
 		}
 	};
 }
-function Ac(e, t = []) {
-	let n = Oc(e), r = kc(n, t);
+function jc(e, t = []) {
+	let n = kc(e), r = Ac(n, t);
 	return {
 		model: n,
 		state: r,
@@ -12781,14 +12797,14 @@ function Ac(e, t = []) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/ui/PanelRegistryModule.js
-var jc = Object.freeze({
+var Mc = Object.freeze({
 	"enemy-editor-panel": "enemy",
 	"skill-editor-panel": "skill",
 	"class-editor-panel": "class"
 });
-function Mc(e, t = {}) {
+function Nc(e, t = {}) {
 	let n = Object.freeze({
-		...jc,
+		...Mc,
 		...t
 	}), r = Object.freeze({ ...e });
 	return Object.freeze({
@@ -12805,7 +12821,7 @@ function Mc(e, t = {}) {
 			return e || "general-panel";
 		},
 		register(e, t, i) {
-			return Mc({
+			return Nc({
 				...r,
 				[e]: t
 			}, i ? {
@@ -12827,7 +12843,7 @@ function Mc(e, t = {}) {
 		}
 	});
 }
-function Nc(e, t) {
+function Pc(e, t) {
 	let n = { currentComponentName: t || "general-panel" }, r = /* @__PURE__ */ new Set();
 	function i() {
 		for (let e of r) e(n);
@@ -12863,8 +12879,8 @@ function Nc(e, t) {
 		getAll: () => e.getAll()
 	};
 }
-function Pc(e, t, n) {
-	let r = Mc(e, n), i = Nc(r, t);
+function Fc(e, t, n) {
+	let r = Nc(e, n), i = Pc(r, t);
 	return {
 		registry: r,
 		state: i,
@@ -12882,8 +12898,8 @@ function Pc(e, t, n) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/ui/ProfileSyncModule.js
-var Fc = "cheatModal.sidebarVisible", Ic = "cheatModal.windowOpacity", Lc = "cheatModal.themePrimaryColor", Rc = "cheatModal.gameFont", zc = "cheatModal.themeDarkMode", Bc = "#3f51b5";
-function Vc(e, t) {
+var Ic = "cheatModal.sidebarVisible", Lc = "cheatModal.windowOpacity", Rc = "cheatModal.themePrimaryColor", zc = "cheatModal.gameFont", Bc = "cheatModal.themeDarkMode", Vc = "#3f51b5";
+function Hc(e, t) {
 	let n = t || (typeof window < "u" ? window.Vue : null);
 	if (!n || typeof n.observable != "function") return e;
 	try {
@@ -12892,19 +12908,19 @@ function Vc(e, t) {
 		return e;
 	}
 }
-function Hc(e, t, n = {}) {
-	let { isWindow: r = !1, vue: i } = n, a = Vc({
-		windowOpacity: b(Ic, .9),
-		isSidebarVisible: v(Fc, !0),
+function Uc(e, t, n = {}) {
+	let { isWindow: r = !1, vue: i } = n, a = Hc({
+		windowOpacity: b(Lc, .9),
+		isSidebarVisible: v(Ic, !0),
 		primaryColor: null,
-		darkMode: v(zc, !0),
-		gameFont: v(Rc, !1)
+		darkMode: v(Bc, !0),
+		gameFont: v(zc, !1)
 	}, i), o = /* @__PURE__ */ new Set(), s = !1;
 	function c() {
 		for (let e of o) e(a);
 	}
 	function l() {
-		let e = g.getItem(Lc), t = typeof e == "string" && /^#[0-9a-f]{6}$/i.test(e) ? e : Bc;
+		let e = g.getItem(Rc), t = typeof e == "string" && /^#[0-9a-f]{6}$/i.test(e) ? e : Vc;
 		return a.primaryColor = t, t;
 	}
 	function u(n) {
@@ -12926,12 +12942,12 @@ function Hc(e, t, n = {}) {
 	}
 	function f() {
 		let n = w();
-		me(e, t.closest(".v-application") || t, n), a.windowOpacity = b(Ic, .9), a.isSidebarVisible = v(Fc, !0), a.darkMode = v(zc, !0), a.gameFont = v(Rc, !1), e.theme.dark = a.darkMode, u(l()), c();
+		me(e, t.closest(".v-application") || t, n), a.windowOpacity = b(Lc, .9), a.isSidebarVisible = v(Ic, !0), a.darkMode = v(Bc, !0), a.gameFont = v(zc, !1), e.theme.dark = a.darkMode, u(l()), c();
 	}
 	function p() {
-		a.gameFont = v(Rc, !1);
+		a.gameFont = v(zc, !1);
 		let e = P();
-		e && fc(t, e, a.gameFont), c();
+		e && pc(t, e, a.gameFont), c();
 	}
 	function m(e) {
 		let t = e && e.detail;
@@ -12960,25 +12976,25 @@ function Hc(e, t, n = {}) {
 		e && e !== window && x(e), s = !1;
 	}
 	function ee() {
-		return a.isSidebarVisible = !a.isSidebarVisible, y(Fc, a.isSidebarVisible), c(), a.isSidebarVisible;
+		return a.isSidebarVisible = !a.isSidebarVisible, y(Ic, a.isSidebarVisible), c(), a.isSidebarVisible;
 	}
 	function te(e) {
 		a.windowOpacity = Math.max(0, Math.min(1, e)), c();
 	}
 	function ne(e) {
-		typeof e == "string" && /^#[0-9a-f]{6}$/i.test(e) && (a.primaryColor = e, g.setItem(Lc, e), u(e), c());
+		typeof e == "string" && /^#[0-9a-f]{6}$/i.test(e) && (a.primaryColor = e, g.setItem(Rc, e), u(e), c());
 	}
 	function re(t) {
 		a.darkMode = !!t, e.theme.dark = a.darkMode, u(a.primaryColor || l()), c();
 	}
 	function ie(e) {
-		a.gameFont = !!e, y(Rc, a.gameFont);
+		a.gameFont = !!e, y(zc, a.gameFont);
 		let n = P();
-		n && fc(t, n, a.gameFont), c();
+		n && pc(t, n, a.gameFont), c();
 	}
 	l(), u(a.primaryColor);
 	let ae = P();
-	return ae && fc(t, ae, a.gameFont), S(), f(), {
+	return ae && pc(t, ae, a.gameFont), S(), f(), {
 		get windowOpacity() {
 			return r ? 1 : a.windowOpacity;
 		},
@@ -13015,34 +13031,34 @@ function Hc(e, t, n = {}) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/CheatModal.js
-var Uc = {
+var Wc = {
 	name: "CheatModal",
 	components: {
-		GeneralPanel: cn,
-		ActorSettingPanel: Pn,
-		HealthSettingPanel: Vn,
-		StatsSettingPanel: qn,
-		ItemSettingPanel: Gr,
-		WeaponSettingPanel: qr,
-		ArmorSettingPanel: Yr,
-		VariableSettingPanel: Wi,
-		SwitchSettingPanel: qi,
-		WatcherPanel: Zi,
-		SaveRecallPanel: ea,
-		MapEventPanel: po,
-		MinimapPanel: qa,
-		TeleportPanel: ra,
-		ShortcutPanel: jo,
-		TranslateSettingsPanel: Jo,
-		AboutPanel: us,
-		EventAnalyzerPanel: Ts,
-		AppearancePanel: ks,
-		DatabaseEditorPanel: Ys,
-		MessageLogPanel: hc,
-		LocksPanel: gc,
-		GameOptionsPanel: vc,
-		FeatureFinder: Tc,
-		OverlayResize: Ec
+		GeneralPanel: ln,
+		ActorSettingPanel: Fn,
+		HealthSettingPanel: Hn,
+		StatsSettingPanel: Jn,
+		ItemSettingPanel: Kr,
+		WeaponSettingPanel: Jr,
+		ArmorSettingPanel: Xr,
+		VariableSettingPanel: Gi,
+		SwitchSettingPanel: Ji,
+		WatcherPanel: Qi,
+		SaveRecallPanel: ta,
+		MapEventPanel: mo,
+		MinimapPanel: Ja,
+		TeleportPanel: ia,
+		ShortcutPanel: Mo,
+		TranslateSettingsPanel: Yo,
+		AboutPanel: ds,
+		EventAnalyzerPanel: Es,
+		AppearancePanel: As,
+		DatabaseEditorPanel: Xs,
+		MessageLogPanel: gc,
+		LocksPanel: _c,
+		GameOptionsPanel: yc,
+		FeatureFinder: Ec,
+		OverlayResize: Dc
 	},
 	template: "\n<v-card\n    :dark=\"$vuetify.theme.dark\"\n    class=\"cheat-shell z-index-cheat-0\"\n    :class=\"{ 'cheat-shell--window': isWindow }\"\n    :style=\"{ position: 'fixed', top: 0, left: 0, opacity: effectiveOpacity, transition: 'opacity 0.2s' }\"\n    :width=\"isWindow ? '100vw' : overlaySize.width\"\n    :height=\"isWindow ? '100vh' : overlaySize.height\"\n    role=\"dialog\"\n    aria-label=\"Cheat engine\"\n    @mouseenter=\"isHovered = true\"\n    @mouseleave=\"isHovered = false\"\n>\n    <header class=\"cheat-shell__bar\">\n        <button\n            type=\"button\"\n            class=\"cheat-icon-button\"\n            :title=\"isSidebarVisible ? 'Hide sidebar' : 'Show sidebar'\"\n            :aria-label=\"isSidebarVisible ? 'Hide sidebar' : 'Show sidebar'\"\n            :aria-expanded=\"isSidebarVisible ? 'true' : 'false'\"\n            @click=\"toggleSidebar\">\n            <v-icon small>{{ isSidebarVisible ? 'mdi-menu-open' : 'mdi-menu' }}</v-icon>\n        </button>\n        <div class=\"cheat-shell__titles\">\n            <div class=\"cheat-shell__title\">{{ navigation.getActiveLabel() }}</div>\n            <div class=\"cheat-shell__subtitle\">{{ navigation.getActiveGroupLabel() || 'Cheat engine' }}</div>\n        </div>\n        <span class=\"cheat-shell__spacer\"></span>\n        <button\n            type=\"button\"\n            class=\"cheat-bar__action\"\n            title=\"Find a feature\"\n            aria-label=\"Find a feature\"\n            @click=\"openFinder\">\n            <v-icon small>mdi-magnify</v-icon>\n            <span>Find</span>\n            <kbd v-if=\"finderShortcut\" class=\"ml-2\">{{ finderShortcut }}</kbd>\n        </button>\n    </header>\n    <div class=\"cheat-body\">\n        <nav v-if=\"isSidebarVisible\" class=\"cheat-nav\" aria-label=\"Cheat panels\">\n            <div v-for=\"group in navigation.getNavGroups()\" :key=\"group.label\" class=\"cheat-nav__group\">\n                <div class=\"cheat-nav__heading\">{{ group.label }}</div>\n                <template v-for=\"item in group.items\">\n                    <button\n                        v-if=\"!item.children\"\n                        :key=\"item.component\"\n                        type=\"button\"\n                        class=\"cheat-nav__item\"\n                        :class=\"{ 'is-active': navigation.isNavItemActive(item) }\"\n                        :aria-current=\"navigation.isNavItemActive(item) ? 'page' : null\"\n                        @click=\"selectNavItem(item)\">\n                        <v-icon small>{{ item.icon }}</v-icon>\n                        <span>{{ item.name }}</span>\n                    </button>\n                    <div v-else :key=\"item.name\" class=\"cheat-nav__subgroup\">\n                        <button\n                            type=\"button\"\n                            class=\"cheat-nav__item cheat-nav__parent\"\n                            :aria-expanded=\"navigation.isGroupOpen(item) ? 'true' : 'false'\"\n                            @click=\"navigation.toggleGroup(item)\">\n                            <v-icon small>{{ item.icon }}</v-icon>\n                            <span>{{ item.name }}</span>\n                            <v-icon small class=\"cheat-nav__chevron\">mdi-chevron-down</v-icon>\n                        </button>\n                        <div v-show=\"navigation.isGroupOpen(item)\" class=\"cheat-nav__children\">\n                            <button\n                                v-for=\"child in item.children\"\n                                :key=\"child.component\"\n                                type=\"button\"\n                                class=\"cheat-nav__item\"\n                                :class=\"{ 'is-active': navigation.isNavItemActive(child) }\"\n                                :aria-current=\"navigation.isNavItemActive(child) ? 'page' : null\"\n                                @click=\"selectNavItem(child)\">\n                                <v-icon small>{{ child.icon }}</v-icon>\n                                <span>{{ child.name }}</span>\n                            </button>\n                        </div>\n                    </div>\n                </template>\n            </div>\n        </nav>\n        <main class=\"cheat-content\">\n            <component\n                ref=\"panel\"\n                :is=\"panelRegistry.getActiveComponent()\"\n                :key=\"panelRegistry.getActiveKey()\"\n                v-bind=\"panelRegistry.getActiveProps()\"\n            ></component>\n        </main>\n    </div>\n    <feature-finder v-model=\"finderOpen\" :catalog=\"featureCatalog\" @navigate=\"navigateFeature\"></feature-finder>\n    <overlay-resize v-if=\"!isWindow\" :width=\"overlaySize.width\" :height=\"overlaySize.height\" @resize=\"resizeOverlay\"/>\n</v-card>\n    ",
 	model: {
@@ -13078,7 +13094,7 @@ var Uc = {
 	} },
 	computed: {
 		overlaySize() {
-			return so(this.overlayWidth, this.overlayHeight, this.viewportWidth, this.viewportHeight);
+			return co(this.overlayWidth, this.overlayHeight, this.viewportWidth, this.viewportHeight);
 		},
 		effectiveOpacity() {
 			return this.profile ? this.profile.getEffectiveOpacity(this.isHovered) : this.isWindow || this.isHovered ? 1 : .9;
@@ -13096,40 +13112,40 @@ var Uc = {
 		}
 	},
 	created() {
-		this.navigation = Ac(Dc, ["Items", "Settings"]);
+		this.navigation = jc(Oc, ["Items", "Settings"]);
 		let e = {
-			GeneralPanel: cn,
-			ActorSettingPanel: Pn,
-			HealthSettingPanel: Vn,
-			StatsSettingPanel: qn,
-			ItemSettingPanel: Gr,
-			WeaponSettingPanel: qr,
-			ArmorSettingPanel: Yr,
-			VariableSettingPanel: Wi,
-			SwitchSettingPanel: qi,
-			WatcherPanel: Zi,
-			SaveRecallPanel: ea,
-			MapEventPanel: po,
-			MinimapPanel: qa,
-			TeleportPanel: ra,
-			ShortcutPanel: jo,
-			TranslateSettingsPanel: Jo,
-			AboutPanel: us,
-			EventAnalyzerPanel: Ts,
-			AppearancePanel: ks,
-			DatabaseEditorPanel: Ys,
-			MessageLogPanel: hc,
-			LocksPanel: gc,
-			GameOptionsPanel: vc
+			GeneralPanel: ln,
+			ActorSettingPanel: Fn,
+			HealthSettingPanel: Hn,
+			StatsSettingPanel: Jn,
+			ItemSettingPanel: Kr,
+			WeaponSettingPanel: Jr,
+			ArmorSettingPanel: Xr,
+			VariableSettingPanel: Gi,
+			SwitchSettingPanel: Ji,
+			WatcherPanel: Qi,
+			SaveRecallPanel: ta,
+			MapEventPanel: mo,
+			MinimapPanel: Ja,
+			TeleportPanel: ia,
+			ShortcutPanel: Mo,
+			TranslateSettingsPanel: Yo,
+			AboutPanel: ds,
+			EventAnalyzerPanel: Es,
+			AppearancePanel: As,
+			DatabaseEditorPanel: Xs,
+			MessageLogPanel: gc,
+			LocksPanel: _c,
+			GameOptionsPanel: yc
 		};
-		this.panelRegistry = Pc(e, this.currentComponentName, {}), this._unsubNavigation = this.navigation.onChange(() => {
+		this.panelRegistry = Fc(e, this.currentComponentName, {}), this._unsubNavigation = this.navigation.onChange(() => {
 			this.$forceUpdate();
 		}), this._unsubPanelRegistry = this.panelRegistry.onChange(() => {
 			this.$forceUpdate();
 		});
 	},
 	mounted() {
-		this.profile = Hc(this.$vuetify, this.$el, { isWindow: this.isWindow }), this._unsubProfile = this.profile.onChange(() => {
+		this.profile = Uc(this.$vuetify, this.$el, { isWindow: this.isWindow }), this._unsubProfile = this.profile.onChange(() => {
 			this.$forceUpdate();
 		}), this._layoutChanged = () => {
 			this.overlayWidth = b("cheatModal.width", 750), this.overlayHeight = b("cheatModal.height", 450);
@@ -13150,11 +13166,11 @@ var Uc = {
 	},
 	methods: {
 		resizeOverlay(e) {
-			let t = so(e.width, e.height, window.innerWidth, window.innerHeight);
+			let t = co(e.width, e.height, window.innerWidth, window.innerHeight);
 			this.overlayWidth = t.width, this.overlayHeight = t.height, e.commit && (g.setItem("cheatModal.width", t.width), g.setItem("cheatModal.height", t.height));
 		},
 		openFinder() {
-			this.featureCatalog = S(Cc(J.shortcutSettings, J.shortcutConfig)), this.finderOpen = !0;
+			this.featureCatalog = S(wc(J.shortcutSettings, J.shortcutConfig)), this.finderOpen = !0;
 		},
 		selectNavItem(e) {
 			!e || !e.component || (this.navigation.select(e), this.panelRegistry.setComponent(e.component), this.$emit("change", e.component));
@@ -13176,7 +13192,7 @@ var Uc = {
 			this.profile.toggleSidebar();
 		}
 	}
-}, Wc = {
+}, Gc = {
 	name: "AlertSnackbar",
 	template: "\n<v-snackbar\n    app\n    top\n    left\n    v-model=\"showSnackbar\"\n    :timeout=\"timeout\"\n    :class=\"['z-index-cheat-1', 'cheat-snackbar', 'cheat-snackbar--' + level]\">\n    <span \n        v-for=\"(line, idx) in text\"\n        :key=\"idx\"\n        class=\"font-weight-bold caption d-block\">\n        {{ line }}\n    </span>\n    <template v-slot:action=\"{ attrs }\">\n    <v-btn\n        x-small\n        class=\"cheat-snackbar__close\"\n        icon\n        v-bind=\"attrs\"\n        @click=\"showSnackbar = false\">\n        <v-icon small>mdi-close</v-icon>\n    </v-btn>\n    </template>\n</v-snackbar>\n    ",
 	data() {
@@ -13216,7 +13232,7 @@ var Uc = {
 	methods: { show(e) {
 		this.showSnackbar = !1, this.text = e.text.split("\n"), this.timeout = e.timeout, e.level && (this.level = e.level), this.showSnackbar = !0;
 	} }
-}, Gc = {
+}, Kc = {
 	name: "ConfirmDialog",
 	template: "\n  <v-dialog v-model=\"showDialog\" v-if=\"options\" :width=\"options.width\">\n    <v-card\n        class=\"pt-4\">\n      <v-card-text\n        class=\"subtitle-1\">\n        <template v-for=\"(msg, idx) in messageArray\">\n          <span :key=\"idx\">{{msg}}</span>\n          <br :key=\"-idx - 1\"/>\n        </template>\n      </v-card-text>\n\n      <v-card-actions>\n        <v-spacer></v-spacer>\n        <v-btn\n          v-for=\"(action, idx) in options.actions\"\n          :key=\"idx\"\n          text\n          class=\"font-weight-bold\"\n          :color=\"action.color\"\n          @click=\"action.action\">\n          <v-icon\n            v-if=\"!action.iconRight\"\n            class=\"mr-1\">\n            {{action.icon}}\n          </v-icon>\n          <span>{{action.label}}</span>\n          <v-icon\n            v-if=\"action.iconRight\"\n            class=\"ml-1\">\n            {{action.icon}}\n          </v-icon>\n        </v-btn>\n      </v-card-actions>\n    </v-card>\n  </v-dialog>\n  ",
 	data: () => ({
@@ -13224,7 +13240,7 @@ var Uc = {
 		options: void 0
 	}),
 	mounted() {
-		Gi.show = this.show, Gi.close = this.close;
+		Ki.show = this.show, Ki.close = this.close;
 	},
 	computed: { messageArray() {
 		return this.options ? this.options.message.split("\n") : [];
@@ -13257,7 +13273,7 @@ var Uc = {
 			}
 		}
 	}
-}, Kc = {
+}, qc = {
 	name: "WatcherOverlay",
 	props: { hideWhileModal: {
 		type: Boolean,
@@ -13284,11 +13300,11 @@ var Uc = {
 		this.refreshIntervalId && (clearInterval(this.refreshIntervalId), this.refreshIntervalId = null);
 	},
 	methods: { refreshRows() {
-		this.overlayEnabled = oi(), this.rows = ai();
+		this.overlayEnabled = si(), this.rows = oi();
 	} }
-}, qc = {
+}, Jc = {
 	name: "MinimapOverlay",
-	components: { InteractiveMap: fo },
+	components: { InteractiveMap: po },
 	template: "\n<div v-show=\"visible\" :style=\"canvasStyle\" @pointerdown.stop.prevent @mousedown.stop.prevent @mouseup.stop.prevent @touchstart.stop.prevent @touchend.stop.prevent @click.stop @contextmenu.stop.prevent>\n<interactive-map ref=\"view\" compact :active=\"visible\" @tools-open=\"configuring = $event; tick()\"/>\n<button v-if=\"moveMode\" type=\"button\" class=\"minimap-move-handle\" aria-label=\"Move minimap; arrow keys move, Escape finishes\" title=\"Drag to move. Arrow keys move, Escape finishes.\" @pointerdown=\"startMove\" @mousedown.stop.prevent @touchstart.stop @click.stop @keydown=\"moveKey\">Move minimap · Esc to finish</button>\n</div>\n    ",
 	data() {
 		return {
@@ -13301,7 +13317,7 @@ var Uc = {
 		};
 	},
 	mounted() {
-		this.tick(), this._stopFrames = io(window, () => this.tick());
+		this.tick(), this._stopFrames = ao(window, () => this.tick());
 	},
 	beforeDestroy() {
 		this._stopDrag && this._stopDrag(), this._stopFrames && this._stopFrames();
@@ -13313,18 +13329,18 @@ var Uc = {
 			this._dragPosition = {
 				x: t.left,
 				y: t.top
-			}, this._stopDrag = lo(e, (e, n) => {
-				this._dragPosition = co(t.left + e, t.top + n, this.canvasSize, window.innerWidth, window.innerHeight), this.canvasStyle = this.positionStyle(q());
+			}, this._stopDrag = uo(e, (e, n) => {
+				this._dragPosition = lo(t.left + e, t.top + n, this.canvasSize, window.innerWidth, window.innerHeight), this.canvasStyle = this.positionStyle(q());
 			}, () => {
 				this.savePosition(this._dragPosition), this._dragPosition = null;
 			});
 		},
 		savePosition(e) {
-			e && (Ta("custom"), Ea(e.x), Da(e.y), this.tick());
+			e && (Ea("custom"), Da(e.x), Oa(e.y), this.tick());
 		},
 		moveKey(e) {
 			if (e.stopPropagation(), e.key === "Escape") {
-				e.preventDefault(), e.stopPropagation(), Ca(!1), this.tick();
+				e.preventDefault(), e.stopPropagation(), wa(!1), this.tick();
 				return;
 			}
 			if (![
@@ -13335,12 +13351,12 @@ var Uc = {
 			].includes(e.key)) return;
 			e.preventDefault(), e.stopPropagation();
 			let t = this.$el.getBoundingClientRect();
-			this.savePosition(co(t.left + (e.key === "ArrowRight" ? 8 : e.key === "ArrowLeft" ? -8 : 0), t.top + (e.key === "ArrowDown" ? 8 : e.key === "ArrowUp" ? -8 : 0), this.canvasSize, window.innerWidth, window.innerHeight));
+			this.savePosition(lo(t.left + (e.key === "ArrowRight" ? 8 : e.key === "ArrowLeft" ? -8 : 0), t.top + (e.key === "ArrowDown" ? 8 : e.key === "ArrowUp" ? -8 : 0), this.canvasSize, window.innerWidth, window.innerHeight));
 		},
 		positionStyle(e) {
 			let t = this.canvasSize;
 			var n = "position: fixed; z-index: 8; pointer-events: " + (this.moveMode ? "auto" : "none") + "; border: 1px solid rgba(255,255,255,0.18); border-radius: 6px; opacity: " + e.opacity + ";", r = "width: " + t + "px; height: " + t + "px;", i = e.position || "top-right";
-			let a = i === "custom" ? e.customX : i.indexOf("left") >= 0 ? 8 : window.innerWidth - t - 8, o = i === "custom" ? e.customY : i.indexOf("bottom") >= 0 ? window.innerHeight - t - 8 : 8, s = this._dragPosition || co(a, o, t, window.innerWidth, window.innerHeight);
+			let a = i === "custom" ? e.customX : i.indexOf("left") >= 0 ? 8 : window.innerWidth - t - 8, o = i === "custom" ? e.customY : i.indexOf("bottom") >= 0 ? window.innerHeight - t - 8 : 8, s = this._dragPosition || lo(a, o, t, window.innerWidth, window.innerHeight);
 			return n + r + "left:" + s.x + "px;top:" + s.y + "px;";
 		},
 		tick() {
@@ -13369,7 +13385,7 @@ var Uc = {
 		reportStatus() {
 			var e = null;
 			try {
-				e = Ua();
+				e = Wa();
 			} catch (e) {
 				return;
 			}
@@ -13384,7 +13400,7 @@ var Uc = {
 };
 //#endregion
 //#region cheat-engine/www/cheat/init/customize_functions.js
-function Jc(e) {
+function Yc(e) {
 	let t = TouchInput;
 	if (r()) {
 		t._onWheel = function() {
@@ -13413,7 +13429,7 @@ function Jc(e) {
 			n.call(this, t);
 		};
 	}
-	De.initialize(), Z.initialize(), on(window, { shortcuts: {
+	Oe.initialize(), Z.initialize(), sn(window, { shortcuts: {
 		read() {
 			let e = {};
 			for (let t of Object.keys(J.shortcutSettings)) e[t] = J.getShortcut(t).asString();
@@ -13427,8 +13443,32 @@ function Jc(e) {
 	} });
 }
 //#endregion
+//#region cheat-engine/www/cheat/js/runtime/CheatVersion.js
+function Xc(e) {
+	return (e === "MV" ? "www" : ".") + "/cheat-version-description.json";
+}
+function Zc(e, t) {
+	let n = (e) => String(e == null ? "" : e).trim().replace(/^v/i, "").split("."), r = n(e), i = n(t), a = Math.max(r.length, i.length);
+	for (let e = 0; e < a; e += 1) {
+		let t = parseInt(r[e] || "0", 10), n = parseInt(i[e] || "0", 10), a = Number.isFinite(t) ? t : 0, o = Number.isFinite(n) ? n : 0;
+		if (a < o) return -1;
+		if (a > o) return 1;
+	}
+	return 0;
+}
+function Qc(e) {
+	let t = e || {}, n = t.fileSystem;
+	if (!n || typeof n.readFileSync != "function") return null;
+	try {
+		let e = JSON.parse(n.readFileSync(Xc(t.rpgMakerName), "utf-8")), r = e && e.version;
+		return typeof r == "string" && r ? r : null;
+	} catch (e) {
+		return null;
+	}
+}
+//#endregion
 //#region cheat-engine/www/cheat/js/ui/FeatureShortcuts.js
-function Yc(e, t, n) {
+function $c(e, t, n) {
 	if (e.target && e.target.closest && e.target.closest(".cheat-shortcut-input")) return !1;
 	let r = N.fromEvent(e);
 	for (let i of ["openFeatureFinder", "openMessageLog"]) {
@@ -13439,14 +13479,14 @@ function Yc(e, t, n) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/MainComponent.js
-var Xc = {
+var el = {
 	name: "MainComponent",
 	components: {
-		CheatModal: Uc,
-		AlertSnackbar: Wc,
-		ConfirmDialog: Gc,
-		WatcherOverlay: Kc,
-		MinimapOverlay: qc
+		CheatModal: Wc,
+		AlertSnackbar: Gc,
+		ConfirmDialog: Kc,
+		WatcherOverlay: qc,
+		MinimapOverlay: Jc
 	},
 	template: "\n<div \n    class=\"pa-2\"\n    ref=\"rootDiv\">\n    <v-fade-transition leave-absolute>\n        <cheat-modal\n            id=\"cheat-modal\"\n            v-model=\"currentComponentName\"\n            v-if=\"show\"\n            >\n        </cheat-modal>\n    </v-fade-transition>\n    <alert-snackbar></alert-snackbar>\n    <confirm-dialog></confirm-dialog>\n    <watcher-overlay :hide-while-modal=\"show\"></watcher-overlay>\n    <minimap-overlay></minimap-overlay>\n</div>",
 	style: "\n    #cheat-modal: {\n        opacity: 0.7;\n    }\n    ",
@@ -13458,7 +13498,7 @@ var Xc = {
 		};
 	},
 	created() {
-		Jc(this), f.log("info", "overlay", "MainComponent created");
+		Yc(this), f.log("info", "overlay", "MainComponent created");
 		try {
 			window.GeneralCheat = E;
 		} catch (e) {}
@@ -13483,7 +13523,7 @@ var Xc = {
 	} },
 	methods: {
 		onFeatureKeyDown(e) {
-			Yc(e, J, {
+			$c(e, J, {
 				openFeatureFinder: () => E.openFeatureFinder(),
 				openMessageLog: () => this.openCheatModal("message-log-panel")
 			});
@@ -13568,15 +13608,17 @@ var Xc = {
 		async checkVersion() {
 			var e = this;
 			if (Utils.isNwjs()) try {
-				let t = (await axios.get("https://api.github.com/repos/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases/latest")).data, n = e.getCurrentCheatVersion();
-				if (!n) return;
-				n < t.tag_name && T.warn(`New cheat version has been released : ${n} → ${t.tag_name}`, null, 3e3);
+				let t = (await axios.get("https://api.github.com/repos/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases/latest")).data, n = e.getCurrentCheatVersion(), r = t && t.tag_name;
+				if (!n || !r) return;
+				Zc(n, r) < 0 && T.warn(`New cheat version has been released : ${n} → ${r}`, null, 3e3);
 			} catch (e) {}
 		},
 		getCurrentCheatVersion() {
 			try {
-				let t = Utils.RPGMAKER_NAME === "MV" ? "www" : ".";
-				return JSON.parse(e("fs").readFileSync(t + "/cheat-version-description.json", "utf-8")).version;
+				return Qc({
+					fileSystem: e("fs"),
+					rpgMakerName: Utils.RPGMAKER_NAME
+				});
 			} catch (e) {
 				return null;
 			}
@@ -13585,7 +13627,7 @@ var Xc = {
 };
 //#endregion
 //#region cheat-engine/www/cheat/init/setup.js
-function Zc() {
+function tl() {
 	try {
 		if (typeof window < "u") {
 			window.__cheatStarted = !0, window.__cheatBoot && (window.__cheatBoot.started = !0, window.__cheatBoot.phase = "started");
@@ -13597,7 +13639,7 @@ function Zc() {
 		typeof console < "u" && console.log && console.log("[Cheat] cheat UI started");
 	} catch (e) {}
 }
-function Qc(e) {
+function nl(e) {
 	var t = "cheat UI failed to mount";
 	try {
 		t = e && (e.stack || e.message) || String(e);
@@ -13611,11 +13653,12 @@ function Qc(e) {
 }
 p("overlay");
 try {
-	new Vue({
-		vuetify: new Vuetify({ theme: ge() }),
-		components: { MainComponent: Xc }
-	}).$mount("#app"), Zc();
+	ve({
+		Vue,
+		Vuetify,
+		components: { MainComponent: el }
+	}).$mount("#app"), tl();
 } catch (e) {
-	throw Qc(e), e;
+	throw nl(e), e;
 }
 //#endregion
