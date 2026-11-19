@@ -1,4 +1,5 @@
 import {
+  applyPanelSnapshot,
   coercePanelNumber,
   matchesPanelSearch,
 } from "../js/panels/PanelGameState.js";
@@ -268,13 +269,10 @@ export default {
 
   methods: {
     initializeVariables() {
-      const state = readItemTableTabState(
-        this.headers,
-        this.items,
-        this.asTableData,
+      applyPanelSnapshot(
+        this,
+        readItemTableTabState(this.headers, this.items, this.asTableData),
       );
-      this.tableHeaders = state.tableHeaders;
-      this.tableItems = state.tableItems;
     },
 
     onItemChange(item, newValue) {

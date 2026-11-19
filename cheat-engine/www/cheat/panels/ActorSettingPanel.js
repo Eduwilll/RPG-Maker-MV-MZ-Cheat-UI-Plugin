@@ -1,5 +1,6 @@
 import { GeneralCheat } from "../js/cheats/GeneralCheat.js";
 import {
+  applyPanelSnapshot,
   coercePanelNumber,
   runPanelMutation,
 } from "../js/panels/PanelGameState.js";
@@ -362,11 +363,7 @@ export default {
     initializeVariables() {
       var keepSelected = this.selectedActorId;
       var state = readActorPanelState();
-      this.paramNames = state.paramNames;
-      this.actors = state.actors;
-      this.classes = state.classes;
-      this.allSkills = state.allSkills;
-      this.allStates = state.allStates;
+      applyPanelSnapshot(this, state);
       if (this.actors.length > 0) {
         var stillExists = false;
         for (var i = 0; i < this.actors.length; i++) {

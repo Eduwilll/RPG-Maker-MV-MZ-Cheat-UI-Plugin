@@ -3,6 +3,7 @@ import GameAsset from "../components/GameAsset.js";
 import PartyRecruitment from "../components/PartyRecruitment.js";
 import { requestActorNavigation } from "../js/ui/RecordNavigation.js";
 import {
+  applyPanelSnapshot,
   coercePanelNumber,
   findPartyActorById,
   runPanelMutation,
@@ -176,9 +177,7 @@ export default {
       requestActorNavigation(id);
     },
     initializeVariables() {
-      const state = readStatsSettingPanelState();
-      this.paramNames = state.paramNames;
-      this.actors = state.actors;
+      applyPanelSnapshot(this, readStatsSettingPanelState());
     },
 
     startNameEdit(actor, actorIdx) {

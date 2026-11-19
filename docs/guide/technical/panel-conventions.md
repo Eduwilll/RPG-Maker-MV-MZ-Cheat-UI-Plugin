@@ -76,6 +76,55 @@ Current helper:
 
 Use it when the panel already follows the `initializeVariables()` refresh pattern and the write should be immediately reflected back into panel state.
 
+## Panel state modules
+
+Panel state lives under `cheat-engine/www/cheat/js/panels/`, one folder per
+feature area, and is made of **pure read functions**:
+
+```js
+// js/panels/general/GeneralPanelState.js
+export function readGeneralPanelState() {
+  return { gameReady, noClip, gold, moveSpeed, ... };
+}
+```
+
+They hold no state and have no lifecycle. The panel owns the state, in `data()`,
+and rebuilds it by reading a snapshot:
+
+```js
+initializeVariables() {
+  applyPanelSnapshot(this, readGeneralPanelState());
+}
+```
+
+`applyPanelSnapshot(target, snapshot)` (in `PanelGameState.js`) copies each key
+of the snapshot onto the panel and skips values that did not change. That last
+part matters for panels that poll: `GeneralPanel` re-reads every 500 ms and
+`LocksPanel` every 1000 ms, and an identical poll should not dirty the panel.
+
+Rules for this layer:
+
+- A state module reads the game and returns a plain snapshot. It must not import
+  Vue, hold module-level mutable state, or cache game objects.
+- The panel copies the snapshot with `applyPanelSnapshot`; do not hand-write the
+  field-by-field assignment block.
+- Snapshot keys are the panel's reactive fields. Panel-only state (drafts,
+  timers, transient flags) stays out of the snapshot and is left untouched by the
+  copy.
+
+### Why not a composable
+
+Vue 2.7 supports `setup()` and `reactive()`, so a `usePanelState()` composable
+is technically possible. It is not the chosen pattern because the helper layer
+above already covers the duplication that actually existed (the copy block), the
+state modules are pure functions with nothing to own, and moving panel state from
+`data()` into a composable would take it away from the Vue devtools and the
+existing component tests that read `component.data()`.
+
+If a future panel needs cross-panel reactive state that is not game-derived,
+that is the moment to add a composable — for game-derived panel state, use the
+snapshot + `applyPanelSnapshot` pattern.
+
 ## Current exemplar panels
 
 The current first-pass examples are:

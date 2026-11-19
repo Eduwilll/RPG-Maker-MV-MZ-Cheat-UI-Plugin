@@ -1,6 +1,7 @@
 import HealthSettingTab from "./HealthSettingTab.js";
 import { BattleCheat } from "../js/cheats/BattleCheat.js";
 import {
+  applyPanelSnapshot,
   coercePanelNumber,
   runPanelMutation,
 } from "../js/panels/PanelGameState.js";
@@ -123,11 +124,7 @@ export default {
 
   methods: {
     initializeVariables() {
-      const state = readHealthSettingPanelState();
-      this.enemy = state.enemy;
-      this.party = state.party;
-      this.oneHitKill = state.oneHitKill;
-      this.disableRandomEncounter = state.disableRandomEncounter;
+      applyPanelSnapshot(this, readHealthSettingPanelState());
     },
 
     recoverAllEnemy() {

@@ -2,6 +2,7 @@ import { GeneralCheat } from "../js/cheats/GeneralCheat.js";
 import { SceneCheat } from "../js/cheats/SceneCheat.js";
 import { GameSpeedCheat, SpeedCheat } from "../js/cheats/SpeedCheat.js";
 import {
+  applyPanelSnapshot,
   coercePanelNumber,
   runPanelMutation,
 } from "../js/panels/PanelGameState.js";
@@ -275,21 +276,7 @@ export default {
 
   methods: {
     initializeVariables() {
-      const state = readGeneralPanelState();
-
-      this.gameReady = state.gameReady;
-      this.noClip = state.noClip;
-      this.speed = state.moveSpeed;
-      this.fixSpeed = state.fixSpeed;
-      this.gold = state.gold;
-
-      this.forceSave = state.forceSave;
-      this.mouseMove = state.mouseMove;
-      this.mouseTeleport = state.mouseTeleport;
-
-      this.gameSpeed = state.gameSpeed;
-      this.applyAllForGameSpeed = state.applyAllForGameSpeed;
-      this.applyBattleForGameSpeed = state.applyBattleForGameSpeed;
+      applyPanelSnapshot(this, readGeneralPanelState());
     },
 
     runGameMutation(mutate) {

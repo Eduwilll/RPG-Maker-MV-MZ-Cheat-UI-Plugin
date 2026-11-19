@@ -91,6 +91,38 @@ export function coercePanelNumber(value, options = {}) {
 }
 
 /**
+ * Copy a panel state snapshot onto a reactive panel instance.
+ *
+ * Panels rebuild their local state by reading a snapshot from the game and
+ * assigning it field by field, which is the most repeated block in the panel
+ * layer. This does that copy in one call and skips assignments whose value did
+ * not change, so a poll that produced identical data does not dirty the panel.
+ *
+ * Only keys present in the snapshot are touched; the panel's own extra state
+ * (drafts, timers, flags) is left alone. `undefined` values are skipped so a
+ * half-built snapshot cannot blank a field the panel already has.
+ *
+ * @template T
+ * @param {T} target panel instance (or any object) that receives the values
+ * @param {Record<string, any>} snapshot values read from the game
+ * @returns {number} how many fields actually changed
+ */
+export function applyPanelSnapshot(target, snapshot) {
+  if (!target || !snapshot) return 0;
+
+  let changed = 0;
+  for (const key of Object.keys(snapshot)) {
+    const next = snapshot[key];
+    if (next === undefined) continue;
+    if (target[key] !== next) {
+      target[key] = next;
+      changed += 1;
+    }
+  }
+  return changed;
+}
+
+/**
  * @param {{ initializeVariables?: () => any }} panel
  * @param {() => any} mutate
  * @returns {any}

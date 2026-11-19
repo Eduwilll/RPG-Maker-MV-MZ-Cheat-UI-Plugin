@@ -19,6 +19,7 @@ import {
   readTranslationBankStats,
   TRANSLATE_SETTINGS_REST_API_METHODS,
 } from "../js/panels/translation-settings/TranslateSettingsPanelState.js";
+import { applyPanelSnapshot } from "../js/panels/PanelGameState.js";
 
 export default {
   name: "TranslateSettingsPanel",
@@ -631,19 +632,7 @@ export default {
 
   methods: {
     async initializeVariables() {
-      const state = readTranslateSettingsPanelState();
-
-      this.enabled = state.enabled;
-      this.endPointSelection = state.endPointSelection;
-      this.customEndPointData = state.customEndPointData;
-      this.llmConfig = state.llmConfig;
-      this.targets = state.targets;
-      this.bulkTranslateChunkSize = state.bulkTranslateChunkSize;
-      this.useBatchTranslation = state.useBatchTranslation;
-      this.bankStats = state.bankStats;
-      this.chunkSizeWarning = state.chunkSizeWarning;
-      this.isDataPatched = state.isDataPatched;
-      this.inGamePatchCount = state.inGamePatchCount;
+      applyPanelSnapshot(this, readTranslateSettingsPanelState());
       this.checkTranslatorAvailable();
     },
 
