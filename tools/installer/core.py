@@ -98,6 +98,7 @@ def validate_source_root(source_root):
         os.path.join("cheat", "CheatModal.js"),
         os.path.join("cheat", "MainComponent.js"),
         os.path.join("cheat", "js", "window-init.js"),
+        os.path.join("cheat", "js", "window-init.bundle.js"),
         os.path.join("_cheat_initialize", "mv", "js", "main.js"),
         os.path.join("_cheat_initialize", "mz", "js", "main.js"),
     ]
@@ -113,6 +114,7 @@ def validate_installed_layout(target):
             os.path.join("cheat", "init", "setup.bundle.js"),
             os.path.join("cheat", "CheatModal.js"),
             os.path.join("cheat", "MainComponent.js"),
+            os.path.join("cheat", "js", "window-init.bundle.js"),
             os.path.join("js", "main.js"),
             "cheat-version-description.json",
         ],

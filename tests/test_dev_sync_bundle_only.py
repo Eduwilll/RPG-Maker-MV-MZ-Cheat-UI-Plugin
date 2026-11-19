@@ -41,6 +41,7 @@ class BundleOnlySyncTests(unittest.TestCase):
             "MainComponent.js",
             "window.html",
             "js/window-init.js",
+            "js/window-init.bundle.js",
             "js/runtime/FeatureRuntime.js",
             "panels/GeneralPanel.js",
             "libs/vue.js",
@@ -92,13 +93,14 @@ class BundleOnlySyncTests(unittest.TestCase):
         self.assertFalse((target_cheat / "MainComponent.js").exists())
         self.assertFalse((target_cheat / "panels/GeneralPanel.js").exists())
         self.assertFalse((target_cheat / "js/runtime/FeatureRuntime.js").exists())
+        self.assertFalse((target_cheat / "js/window-init.js").exists())
 
-        # Kept: bundle, bootstrap, hook, pop-out, vendored libs/css.
+        # Kept: bundles, bootstrap, hook, pop-out page, vendored libs/css.
         self.assertTrue((target_cheat / "init/setup.bundle.js").exists())
         self.assertTrue((target_cheat / "init/import.js").exists())
         self.assertTrue((target_cheat / "init/customize_functions.js").exists())
         self.assertTrue((target_cheat / "window.html").exists())
-        self.assertTrue((target_cheat / "js/window-init.js").exists())
+        self.assertTrue((target_cheat / "js/window-init.bundle.js").exists())
         self.assertTrue((target_cheat / "libs/vue.js").exists())
         self.assertTrue((target_cheat / "css/main.css").exists())
 

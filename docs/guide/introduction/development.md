@@ -60,8 +60,9 @@ This launches an installed Chromium/Edge in an isolated headless profile and ser
 local fixtures over loopback. On other installations, set `CHEAT_TEST_BROWSER` to
 the browser executable. It exercises rendered Vue panels plus the real pop-out
 bootstrap in a separate browser realm, without changing any game installation or
-save. It also boots the committed `cheat/init/setup.bundle.js` in an iframe, so the
-file that actually ships is covered. The temporary browser profile is removed when
+save. It also boots the committed `cheat/init/setup.bundle.js` in an iframe and the
+committed `cheat/js/window-init.bundle.js` in the pop-out fixture, so the files that
+actually ship are covered. The temporary browser profile is removed when
 unlocked. A sandbox may require permission to launch the browser process.
 
 These checks complement, but do not replace, manual MV/MZ NW.js testing, particularly
@@ -177,7 +178,7 @@ Use this when you need to validate behavior inside an actual RPG Maker MV or MZ 
 
 ### Bundle-only mode (test the shipped bundle)
 
-Default dev-sync **junctions** the source `cheat/` folder, so the game sees every source module plus `setup.bundle.js`. To test the game with only the generated bundle available, add `--bundle-only`:
+Default dev-sync **junctions** the source `cheat/` folder, so the game sees every source module plus both generated bundles. To test the game with only the generated bundles available, add `--bundle-only`:
 
 ::: code-group
 ```sh [.py]
@@ -186,7 +187,7 @@ Default dev-sync **junctions** the source `cheat/` folder, so the game sees ever
 ```
 :::
 
-In this mode the `cheat/` tree is **copied** instead of linked, keeping only `init/setup.bundle.js`, `init/import.js`, `init/customize_functions.js`, `window.html`, `js/window-init.js`, and the `libs/`/`css/` assets. All other source modules (`CheatModal.js`, `MainComponent.js`, `js/*.js`, `panels/*.js`, and `init/setup.js`) are excluded. The target still loads the separate vendored files the bundle imports (`cheat/libs/vue.js`, `cheat/libs/vuetify.js`, Vuetify CSS, the MDI subset and Roboto) plus `cheat/init/setup.bundle.js`; the difference is that the ~150 plugin **source modules** (`cheat/js/*.js`, `cheat/panels/*.js`, etc.) are no longer present, so the only plugin code the game can execute is the bundle. "Bundle-only" means no source modules, not a single file. The sync validates that `setup.bundle.js` is present. Because the target is a copy (not a live link), rebuild and re-sync after every runtime change:
+In this mode the `cheat/` tree is **copied** instead of linked, keeping only `init/setup.bundle.js`, `init/import.js`, `init/customize_functions.js`, `window.html`, `js/window-init.bundle.js`, and the `libs/`/`css/` assets. All source modules (`CheatModal.js`, `MainComponent.js`, `js/*.js` including `js/window-init.js`, `panels/*.js`, and `init/setup.js`) are excluded. The target still loads the separate vendored files the bundles import (`cheat/libs/vue.js`, `cheat/libs/vuetify.js`, Vuetify CSS, the MDI subset and Roboto) plus the two bundles; the difference is that the ~150 plugin **source modules** are no longer present, so the only plugin code the game can execute is the generated bundles. "Bundle-only" means no source modules, not a single file. The sync validates that both bundles are present. Because the target is a copy (not a live link), rebuild and re-sync after every runtime change:
 
 ::: code-group
 ```sh [pnpm]
@@ -229,7 +230,7 @@ Use this when you want to confirm that a game still has the expected cheat boots
 4. Save changes.
 5. Press <kbd>F5</kbd> inside the game to reload.
 
-Games load `cheat/init/setup.bundle.js`, not `setup.js`, so a source edit without the rebuild appears to do nothing. The unit suite fails when the committed bundle is stale.
+Games load the generated bundles (`cheat/init/setup.bundle.js` for the overlay, `cheat/js/window-init.bundle.js` for the pop-out), not their source entries, so a source edit without the rebuild appears to do nothing. The unit suite fails when a committed bundle is stale.
 
 ## Where to make changes
 

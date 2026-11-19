@@ -22,16 +22,16 @@ from core import GameTarget, GameType, ensure_mz_html_bootstraps
 
 EPHEMERAL_RUNTIME_DIRS = ['cheat-settings']
 
-# Bundle-only mode ships the generated overlay bundle plus everything it needs at
+# Bundle-only mode ships the generated bundles plus everything they need at
 # runtime that is not a source module: the bootstrap (import.js), the RPG Maker
-# customization hook (customize_functions.js), the pop-out (window.html +
-# js/window-init.js, still source-loaded in this phase), and the vendored libs,
-# CSS and fonts. Every other .js under cheat/ is a source module that the bundle
-# inlines, so it must not be copied into a bundle-only target.
+# customization hook (customize_functions.js), the pop-out page (window.html +
+# js/window-init.bundle.js), and the vendored libs, CSS and fonts. Every other
+# .js under cheat/ is a source module that the bundles inline, so it must not be
+# copied into a bundle-only target.
 BUNDLE_ONLY_KEEP_TOPLEVEL = {'window.html'}
 BUNDLE_ONLY_KEEP_INIT = {'import.js', 'customize_functions.js', 'setup.bundle.js'}
 BUNDLE_ONLY_KEEP_DIRS = {'libs', 'css'}
-BUNDLE_ONLY_KEEP_JS_FILES = {'window-init.js'}
+BUNDLE_ONLY_KEEP_JS_FILES = {'window-init.bundle.js'}
 
 
 def quote_cmd_arg(value):
@@ -42,10 +42,11 @@ def copy_bundle_only_tree(src, dest):
     """Copy cheat/ into a bundle-only target.
 
     Keeps the bootstrap (init/import.js), the customization hook
-    (init/customize_functions.js), the generated bundle (init/setup.bundle.js),
-    the source-loaded pop-out (window.html + js/window-init.js), and the vendored
-    libs/css/fonts. Every other .js is a source module inlined into the bundle,
-    so it is excluded; the game can only execute setup.bundle.js for plugin code.
+    (init/customize_functions.js), the generated overlay bundle
+    (init/setup.bundle.js), the pop-out page with its generated bundle
+    (window.html + js/window-init.bundle.js), and the vendored libs/css/fonts.
+    Every other .js is a source module inlined into a bundle, so it is excluded;
+    the game can only execute the generated bundles for plugin code.
     """
     copied = 0
     for root, dirs, files in os.walk(src):
@@ -60,7 +61,7 @@ def copy_bundle_only_tree(src, dest):
                 if d in BUNDLE_ONLY_KEEP_DIRS or d in ("init", "js")
             ]
         elif parts == ["js"]:
-            dirs[:] = []  # only window-init.js is kept, directly under js/
+            dirs[:] = []  # only window-init.bundle.js is kept, directly under js/
         else:
             dirs[:] = [
                 d for d in dirs
@@ -126,6 +127,7 @@ def validate_dev_sync_install(paths, require_source_entry=True):
     required = [
         os.path.join('cheat', 'init', 'import.js'),
         os.path.join('cheat', 'init', 'setup.bundle.js'),
+        os.path.join('cheat', 'js', 'window-init.bundle.js'),
         os.path.join('js', 'main.js'),
         'cheat-version-description.json',
     ]

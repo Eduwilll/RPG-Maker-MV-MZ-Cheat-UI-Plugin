@@ -42,7 +42,7 @@ def archive_source(path, engine):
     if named_engine and named_engine.group(1).upper() != engine:
         raise ValueError(f"This game needs the {engine} package, not {named_engine.group(1).upper()}.")
     prefix = "www/" if engine == "MV" else ""
-    required = ["cheat/init/import.js", "cheat/init/setup.js", "cheat/init/setup.bundle.js", "cheat/CheatModal.js", "cheat/MainComponent.js", "js/main.js", "cheat-version-description.json"]
+    required = ["cheat/init/import.js", "cheat/init/setup.js", "cheat/init/setup.bundle.js", "cheat/js/window-init.bundle.js", "cheat/CheatModal.js", "cheat/MainComponent.js", "js/main.js", "cheat-version-description.json"]
     try:
         with tarfile.open(path, "r:*") as archive:
             members = {}

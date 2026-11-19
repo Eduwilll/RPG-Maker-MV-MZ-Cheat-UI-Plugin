@@ -13,6 +13,8 @@ When the plugin is installed into a game, the startup path is:
 5. `MainComponent` initializes RPG Maker customizations, registers keyboard listeners, and exposes helper actions.
 6. `CheatModal` renders the active panel tree.
 
+Opening the separate cheat window starts from `cheat/window.html` instead. It loads the generated `cheat/js/window-init.bundle.js`, which bridges the game globals and then mounts the same `CheatModal` in its own Vue app.
+
 ## UI flow
 
 The top-level UI is intentionally simple:

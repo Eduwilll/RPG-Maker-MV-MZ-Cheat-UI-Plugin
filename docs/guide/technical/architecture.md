@@ -30,12 +30,13 @@ The plugin does not run as a normal RPG Maker plugin entry in `plugins.js`. Inst
 - Those templates load `cheat/init/import.js` before the standard RPG Maker scripts.
 - `cheat/init/import.js` creates the app root, injects CSS and libraries, and then loads the prebuilt `cheat/init/setup.bundle.js`.
 - The bundle mounts the Vue app and renders `MainComponent`. It is generated from `cheat/init/setup.js` and its imports by `pnpm run build:cheat`.
+- The separate cheat window follows the same rule: `window.html` loads the generated `js/window-init.bundle.js`, which is built from `js/window-init.js`.
 
 This is the reason installation requires replacing the game's original `main.js`.
 
 ## UI model
 
-The UI sources are plain JavaScript modules, not single-file Vue components. The overlay entry is shipped as one generated bundle, so edit the source modules and rebuild; never edit `cheat/init/setup.bundle.js` directly.
+The UI sources are plain JavaScript modules, not single-file Vue components. Both cheat surfaces ship generated bundles, so edit the source modules and rebuild; never edit `cheat/init/setup.bundle.js` or `cheat/js/window-init.bundle.js` directly.
 
 - `MainComponent.js` is the top-level controller.
 - `CheatModal.js` defines the left navigation tree and panel container.
@@ -43,7 +44,7 @@ The UI sources are plain JavaScript modules, not single-file Vue components. The
 - shared panel conventions now live under `cheat/js/panels/` for reusable panel-safe state shaping and translation display helpers.
 - feature-specific panel support modules can live under subfolders there, such as `cheat/js/panels/about/` for the About panel state reader.
 - The UI listens for global key events so the overlay can be opened while gameplay is running.
-- In NW.js, the UI can also open as a separate window using `window.html` plus `window-init.js`.
+- In NW.js, the UI can also open as a separate window using `window.html` plus the generated `window-init.bundle.js` (built from `window-init.js`).
 
 Because the game and the UI share the same process, panel code can read and write RPG Maker globals directly.
 

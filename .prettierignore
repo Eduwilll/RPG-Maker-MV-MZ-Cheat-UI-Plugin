@@ -38,5 +38,5 @@ cheat-engine/www/cheat/libs/vuetify.js
 cheat-engine/www/cheat/libs/roboto.css
 cheat-engine/www/cheat/libs/mdi
 cheat-engine/www/cheat/libs/fonts
-cheat-engine/www/cheat/init/*.bundle.js
+cheat-engine/www/cheat/**/*.bundle.js
 

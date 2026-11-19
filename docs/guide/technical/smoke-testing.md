@@ -21,7 +21,7 @@ That currently runs:
 
 Use this after changes to shared helpers, bootstrap files, translation code, or panel conventions.
 
-If the unit suite reports that the bundle is stale, run `pnpm run build:cheat` and commit the regenerated `setup.bundle.js` with its manifest.
+If the unit suite reports that the bundles are stale, run `pnpm run build:cheat` and commit the regenerated `setup.bundle.js` and `window-init.bundle.js` with their manifest.
 
 ## Runtime smoke checklist
 

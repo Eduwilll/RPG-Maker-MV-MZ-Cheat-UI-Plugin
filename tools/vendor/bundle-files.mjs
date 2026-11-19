@@ -10,6 +10,12 @@ export const ROOT = path.resolve(
 export const CHEAT_ROOT = path.join(ROOT, "cheat-engine", "www", "cheat");
 export const BUNDLE_ENTRY = path.join(CHEAT_ROOT, "init", "setup.js");
 export const BUNDLE_PATH = path.join(CHEAT_ROOT, "init", "setup.bundle.js");
+export const WINDOW_BUNDLE_ENTRY = path.join(CHEAT_ROOT, "js", "window-init.js");
+export const WINDOW_BUNDLE_PATH = path.join(
+  CHEAT_ROOT,
+  "js",
+  "window-init.bundle.js",
+);
 export const MANIFEST_PATH = path.join(
   CHEAT_ROOT,
   "init",

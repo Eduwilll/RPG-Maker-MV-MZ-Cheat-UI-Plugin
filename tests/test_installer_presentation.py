@@ -40,6 +40,7 @@ class PreflightTests(unittest.TestCase):
                 "cheat/init/import.js": "// bootstrap",
                 "cheat/init/setup.js": "// setup",
                 "cheat/init/setup.bundle.js": "// bundled setup",
+                "cheat/js/window-init.bundle.js": "// bundled pop-out",
                 "cheat/CheatModal.js": "// UI",
                 "cheat/MainComponent.js": "// UI",
                 "js/main.js": "// cheat/init/import.js",
@@ -108,7 +109,7 @@ class PreflightTests(unittest.TestCase):
 
     def test_developer_source_is_supported_only_when_explicitly_available(self):
         source = self.root / "source"
-        for name in ["cheat/init/import.js", "cheat/init/setup.js", "cheat/init/setup.bundle.js", "cheat/CheatModal.js", "cheat/MainComponent.js", "cheat/js/window-init.js", "_cheat_initialize/mv/js/main.js", "_cheat_initialize/mz/js/main.js"]:
+        for name in ["cheat/init/import.js", "cheat/init/setup.js", "cheat/init/setup.bundle.js", "cheat/CheatModal.js", "cheat/MainComponent.js", "cheat/js/window-init.js", "cheat/js/window-init.bundle.js", "_cheat_initialize/mv/js/main.js", "_cheat_initialize/mz/js/main.js"]:
             path = source / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text("// cheat/init/import.js")

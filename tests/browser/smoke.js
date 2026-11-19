@@ -1133,6 +1133,24 @@ async function run() {
     }
   }
   assert(!!popupRoot, "Actual window-init mounts in a separate browser realm");
+  const popupScripts = frame.contentWindow.performance
+    .getEntriesByType("resource")
+    .map((entry) => entry.name)
+    .filter((name) => /\.js(\?|$)/.test(name))
+    .map((name) => new URL(name).pathname);
+  const popupSourceModules = popupScripts.filter(
+    (name) =>
+      name.includes("/cheat/") &&
+      !name.includes("/cheat/libs/") &&
+      !name.endsWith("/cheat/js/window-init.bundle.js"),
+  );
+  assert(
+    popupScripts.some((name) =>
+      name.endsWith("/cheat/js/window-init.bundle.js"),
+    ) && popupSourceModules.length === 0,
+    "Pop-out smoke loads the bundle instead of source modules: " +
+      popupSourceModules.join(", "),
+  );
   const popupApp = frame.contentDocument.querySelector(".v-application");
   assert(
     popupApp.getAttribute("data-cheat-theme") === "legacy" &&

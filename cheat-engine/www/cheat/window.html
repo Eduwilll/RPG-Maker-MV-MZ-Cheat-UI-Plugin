@@ -105,9 +105,9 @@
           function (event) {
             var src =
               (event && event.target && event.target.src) || "";
-            if (src.indexOf("window-init.js") !== -1) {
+            if (src.indexOf("window-init") !== -1) {
               showBootError(
-                "Failed to load js/window-init.js. Reinstall the cheat files."
+                "Failed to load js/window-init.bundle.js. Reinstall the cheat files."
               );
             }
           },
@@ -130,7 +130,7 @@
       })();
     </script>
 
-    <!-- Bridge script -->
-    <script type="module" src="./js/window-init.js"></script>
+    <!-- Bridge script: the generated bundle built from js/window-init.js -->
+    <script type="module" src="./js/window-init.bundle.js"></script>
   </body>
 </html>

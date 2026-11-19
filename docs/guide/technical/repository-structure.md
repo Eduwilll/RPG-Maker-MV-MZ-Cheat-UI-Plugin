@@ -23,7 +23,7 @@ Most contributor work happens under `cheat-engine/www/`.
 | --- | --- |
 | `cheat-engine/www/cheat/` | Main cheat UI app |
 | `cheat-engine/www/cheat/panels/` | Individual UI panels and panel-specific logic |
-| `cheat-engine/www/cheat/js/` | Shared helpers, storage, shortcuts, translation, alerts, and runtime glue |
+| `cheat-engine/www/cheat/js/` | Shared helpers, storage, shortcuts, translation, alerts, runtime glue, and the generated `window-init.bundle.js` |
 | `cheat-engine/www/cheat/js/cheats/` | Cheat action modules split by domain such as scene actions and battle actions |
 | `cheat-engine/www/cheat/js/panels/` | Shared panel-safe state, search, refresh, and translation display helpers |
 | `cheat-engine/www/cheat/js/panels/about/` | Feature-specific support modules for the About panel |
@@ -33,7 +33,7 @@ Most contributor work happens under `cheat-engine/www/`.
 | `cheat-engine/www/cheat/js/runtime/` | Home of shared runtime and MV/MZ environment helpers |
 | `cheat-engine/www/cheat/js/storage/` | Home of shared persistence helpers |
 | `cheat-engine/www/cheat/js/ui/` | Small UI-facing services that bridge components and panel actions |
-| `cheat-engine/www/cheat/init/` | App bootstrapping, the generated `setup.bundle.js`, its manifest, and RPG Maker customization hooks |
+| `cheat-engine/www/cheat/init/` | App bootstrapping, the generated `setup.bundle.js` and `bundle-manifest.json`, and RPG Maker customization hooks |
 | `cheat-engine/www/cheat/components/` | Shared Vue UI components such as dialogs and snackbars |
 | `cheat-engine/www/cheat/libs/` | Vendored production libraries (Vue, Vuetify, axios), Vuetify CSS, MDI icon subset and Roboto fonts |
 | `cheat-engine/www/_cheat_initialize/` | Engine-specific bootstrap templates merged into release packages |
@@ -84,7 +84,7 @@ Most contributor work happens under `cheat-engine/www/`.
 The packaging flow works by starting from `cheat-engine/www/` and then merging engine-specific files from `_cheat_initialize/`.
 
 - `deploy/main.py` builds one archive for MV and one for MZ.
-- Packaging requires the committed `cheat/init/setup.bundle.js`; run `pnpm run build:cheat` after runtime changes.
+- Packaging requires the committed bundles (`cheat/init/setup.bundle.js` and `cheat/js/window-init.bundle.js`); run `pnpm run build:cheat` after runtime changes.
 - The release artifacts are written to `output/`.
 - The installer instructions in the docs mirror that package structure.
 
