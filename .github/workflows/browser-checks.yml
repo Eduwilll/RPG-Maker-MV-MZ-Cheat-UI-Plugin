@@ -33,6 +33,7 @@ jobs:
       - name: Browser runner failure-path tests
         run: pnpm run test:browser-runner
       - name: Browser regression checks
+        if: ${{ !cancelled() }}
         run: pnpm run test:browser
       - name: Standalone preview checks
         if: ${{ !cancelled() }}

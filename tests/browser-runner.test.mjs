@@ -154,7 +154,9 @@ test("a stuck renderer cannot prevent failure reporting and process cleanup", as
     execFile(
       process.execPath,
       ["--input-type=module", "-e", code],
-      { timeout: 15000, windowsHide: true },
+      // Allow cold Node/browser startup on hosted Windows runners. The
+      // renderer and diagnostic deadlines inside the runner remain short.
+      { timeout: 60000, windowsHide: true },
       (error, stdout, stderr) => resolve({ error, stdout, stderr }),
     );
   });

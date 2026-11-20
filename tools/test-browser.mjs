@@ -75,17 +75,26 @@ export async function runBrowserChecks({
   const logs = [];
   const pageErrors = [];
   const report = { status: "fail", entry, checks: [], errors: [] };
+  async function checkpoint(phase) {
+    report.phase = phase;
+    await fs.writeFile(
+      path.join(artifactDir, "progress.json"),
+      JSON.stringify(report, null, 2),
+    );
+  }
   let browserServer, browser, context, page;
   try {
     await new Promise((resolve, reject) => {
       server.once("error", reject);
       server.listen(0, "127.0.0.1", resolve);
     });
+    await checkpoint("launch");
     browserServer = await chromium.launchServer({
       headless: true,
       executablePath,
       host: "127.0.0.1",
     });
+    await checkpoint("connect");
     browser = await chromium.connect(browserServer.wsEndpoint(), {
       timeout: 30000,
     });
@@ -110,9 +119,11 @@ export async function runBrowserChecks({
       entry,
       "http://127.0.0.1:" + server.address().port + "/",
     ).href;
+    await checkpoint("navigate");
     await page.goto(url, { waitUntil: "load", timeout });
     // Use real time and an explicit completion signal. Virtual-time DOM dumps
     // can race iframe focus, animation frames and Vuetify's lazy menus.
+    await checkpoint("suite");
     await page.waitForFunction(
       () => {
         const node = document.getElementById("smoke-results");
@@ -173,6 +184,7 @@ export async function runBrowserChecks({
         ],
       ]) {
         try {
+          await checkpoint("capture-" + name);
           await bounded(save, diagnosticTimeout, name + " capture");
         } catch (error) {
           logs.push({ type: "artifact-error", name, text: String(error) });
@@ -181,6 +193,7 @@ export async function runBrowserChecks({
     }
     if (context) {
       try {
+        await checkpoint("capture-trace");
         await bounded(
           () =>
             context.tracing.stop(
@@ -201,6 +214,7 @@ export async function runBrowserChecks({
     }
     try {
       if (browserServer) {
+        await checkpoint("shutdown");
         await bounded(
           () => browserServer.close(),
           diagnosticTimeout,
@@ -213,12 +227,16 @@ export async function runBrowserChecks({
       logs.push({ type: "cleanup-error", text: String(error) });
       // A renderer stuck in synchronous JavaScript can also block graceful
       // shutdown. Kill only this runner's owned browser process as a fallback.
-      if (browserServer) await browserServer.kill();
+      if (browserServer) {
+        await checkpoint("force-stop");
+        await browserServer.kill();
+      }
     } finally {
       server.closeAllConnections();
       await new Promise((resolve) => server.close(resolve));
     }
     report.durationMs = Date.now() - started;
+    await checkpoint("complete");
     await fs.writeFile(
       path.join(artifactDir, "console.json"),
       JSON.stringify(logs, null, 2),
