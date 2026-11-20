@@ -75,13 +75,20 @@ export async function runBrowserChecks({
   const logs = [];
   const pageErrors = [];
   const report = { status: "fail", entry, checks: [], errors: [] };
-  let browser, context, page;
+  let browserServer, browser, context, page;
   try {
     await new Promise((resolve, reject) => {
       server.once("error", reject);
       server.listen(0, "127.0.0.1", resolve);
     });
-    browser = await chromium.launch({ headless: true, executablePath });
+    browserServer = await chromium.launchServer({
+      headless: true,
+      executablePath,
+      host: "127.0.0.1",
+    });
+    browser = await chromium.connect(browserServer.wsEndpoint(), {
+      timeout: 30000,
+    });
     report.browser = browser.version();
     context = await browser.newContext({
       viewport: { width: 1280, height: 800 },
@@ -193,10 +200,20 @@ export async function runBrowserChecks({
       }
     }
     try {
-      if (browser) await browser.close();
+      if (browserServer) {
+        await bounded(
+          () => browserServer.close(),
+          diagnosticTimeout,
+          "Browser shutdown",
+        );
+      }
     } catch (error) {
       report.status = "fail";
       report.error = report.error || "Browser cleanup failed: " + String(error);
+      logs.push({ type: "cleanup-error", text: String(error) });
+      // A renderer stuck in synchronous JavaScript can also block graceful
+      // shutdown. Kill only this runner's owned browser process as a fallback.
+      if (browserServer) await browserServer.kill();
     } finally {
       server.closeAllConnections();
       await new Promise((resolve) => server.close(resolve));
