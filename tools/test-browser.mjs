@@ -120,22 +120,36 @@ export async function runBrowserChecks({
       "http://127.0.0.1:" + server.address().port + "/",
     ).href;
     await checkpoint("navigate");
-    await page.goto(url, { waitUntil: "load", timeout });
+    await bounded(
+      () => page.goto(url, { waitUntil: "load", timeout }),
+      timeout,
+      "Page navigation",
+    );
     // Use real time and an explicit completion signal. Virtual-time DOM dumps
     // can race iframe focus, animation frames and Vuetify's lazy menus.
     await checkpoint("suite");
-    await page.waitForFunction(
-      () => {
-        const node = document.getElementById("smoke-results");
-        return node && ["pass", "fail"].includes(node.dataset.status);
-      },
-      null,
-      { timeout },
+    await bounded(
+      () =>
+        page.waitForFunction(
+          () => {
+            const node = document.getElementById("smoke-results");
+            return node && ["pass", "fail"].includes(node.dataset.status);
+          },
+          null,
+          { timeout },
+        ),
+      timeout,
+      "Browser suite timeout",
     );
-    const result = await page.locator("#smoke-results").evaluate((node) => ({
-      status: node.dataset.status,
-      text: node.textContent,
-    }));
+    const result = await bounded(
+      () =>
+        page.locator("#smoke-results").evaluate((node) => ({
+          status: node.dataset.status,
+          text: node.textContent,
+        })),
+      diagnosticTimeout,
+      "Result read",
+    );
     let payload;
     try {
       payload = JSON.parse(result.text);
