@@ -1451,6 +1451,10 @@ async function run() {
   );
   popupLayers.reset();
   popupMap.renderMap();
+  // Status metadata refreshes at 100 ms intervals, independently of drawing.
+  for (let n = 0; n < 50 && popupMap.renderStatus !== "Live map artwork"; n++) {
+    await tick();
+  }
   const popupTilePixel = mapPixel(popupMap, 0.5, 0.5);
   assert(
     popupMap.renderStatus === "Live map artwork" && popupTilePixel[1] === 153,
