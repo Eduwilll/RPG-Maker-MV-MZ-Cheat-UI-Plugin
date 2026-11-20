@@ -56,6 +56,47 @@ function click(text, doc = document) {
   if (!button) throw new Error("Missing button: " + text);
   button.click();
 }
+async function chooseMenuOption(label, text, view) {
+  const doc = view.document;
+  const fieldLabel = Array.from(doc.querySelectorAll("label")).find(
+    (node) => node.textContent.trim() === label,
+  );
+  assert(!!fieldLabel, label + " select is present");
+  doc.getElementById(fieldLabel.htmlFor).click();
+  let menu, option;
+  for (let attempt = 0; attempt < 100; attempt++) {
+    await view.Vue.nextTick();
+    menu = Array.from(
+      doc.querySelectorAll(".v-menu__content.menuable__content__active"),
+    ).find((node) => view.getComputedStyle(node).display !== "none");
+    option =
+      menu &&
+      Array.from(menu.querySelectorAll(".v-list-item")).find(
+        (node) => node.textContent.trim() === text,
+      );
+    if (option) break;
+    await tick();
+  }
+  assert(!!option, label + " opens its options with a click");
+  let hit = null;
+  // Wait for Vuetify's slide transition before testing the final hit target.
+  for (let attempt = 0; attempt < 30; attempt++) {
+    const rect = option.getBoundingClientRect();
+    hit = doc.elementFromPoint(
+      rect.left + rect.width / 2,
+      rect.top + rect.height / 2,
+    );
+    if (menu.contains(hit) && view.getComputedStyle(menu).transform === "none")
+      break;
+    await tick();
+  }
+  assert(
+    !!hit && menu.contains(hit),
+    label + " menu is above the cheat shell and receives mouse events",
+  );
+  option.click();
+  await tick();
+}
 async function run() {
   installBrowserFixture(window);
   const runtime = initializeFeatureRuntime(window);
@@ -433,6 +474,15 @@ async function run() {
       !descendants(descendants(mapPanel, "MinimapPanel"), "MapLayers"),
     "Combined map settings reuse the existing minimap component without duplicating layer controls",
   );
+  mapPanel.$el.querySelector('[aria-label="Map settings"]').click();
+  await tick();
+  await chooseMenuOption("Map display", "Radar / passability", window);
+  assert(
+    mapPanel.renderMode === "radar",
+    "Map display changes by mouse in the styled overlay",
+  );
+  mapPanel.renderMode = "realistic";
+  mapPanel.saveView();
   mapPanel.drawer = "";
   mapPanel.fitMap();
   // Vue 2.7 flushes the render watcher a tick later than 2.6, so the camera is
@@ -1348,6 +1398,19 @@ async function run() {
       !descendants(popupMap, "MapLayers"),
     "Separate-window Map page also includes the combined minimap controls",
   );
+  popupMap.$el.querySelector('[aria-label="Map settings"]').click();
+  await tick();
+  await chooseMenuOption(
+    "Map display",
+    "Radar / passability",
+    frame.contentWindow,
+  );
+  assert(
+    popupMap.renderMode === "radar",
+    "Separate-window Map display changes by mouse",
+  );
+  popupMap.renderMode = "realistic";
+  popupMap.saveView();
   popupMap.drawer = "";
   popupMap.fitMap();
   await tick();

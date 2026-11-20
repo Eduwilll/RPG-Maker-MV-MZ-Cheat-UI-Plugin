@@ -2521,7 +2521,9 @@ body {
 .z-index-cheat-0 {
   z-index: 1001 !important;
 }
-.z-index-cheat-1 {
+/* Vuetify detaches dropdowns beside the fixed shell, outside its stacking context. */
+.z-index-cheat-1,
+.v-application .v-menu__content {
   z-index: 1010 !important;
 }
 
