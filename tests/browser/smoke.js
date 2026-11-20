@@ -62,7 +62,10 @@ async function chooseMenuOption(label, text, view) {
     (node) => node.textContent.trim() === label,
   );
   assert(!!fieldLabel, label + " select is present");
-  doc.getElementById(fieldLabel.htmlFor).click();
+  const field = doc.getElementById(fieldLabel.htmlFor);
+  field.scrollIntoView({ block: "nearest" });
+  field.focus();
+  field.click();
   let menu, option;
   for (let attempt = 0; attempt < 100; attempt++) {
     await view.Vue.nextTick();

@@ -20,6 +20,7 @@
 - [Refactor] **Panel State Snapshot Merge**: Merged panel state snapshots through a single helper (`applyPanelSnapshot` in `PanelGameState.js`), reducing boilerplate and duplicate field copies across panels.
 
 ### Fixes & Quality
+- [Fix] **Browser Regression CI**: Local and Windows CI checks now use the same pinned Chromium browser and wait for explicit suite completion instead of a fixed virtual-time DOM dump. Browser checks also run before releases on pull requests and `main`, and failures retain reports, screenshots and traces for troubleshooting.
 - [Fix] **Version Comparison**: Update check compared dotted versions as strings (`"1.8.0" < "v1.9.0"` always true). `CheatVersion.js` now compares numeric segments and ignores the release tag's `v` prefix.
 - [Feat] **Stale-Bundle Guard**: A committed manifest records bundle and source hashes; `pnpm run test:unit` fails when runtime code changed without rebuilding shipped bundles.
 - [Fix] **Locks & Favorites Icon**: Sidebar entry used a non-existent `mdi-lock-star` glyph, rendering blank; now uses a shipped icon.

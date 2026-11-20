@@ -178,6 +178,7 @@ py -3 start-preview.py --port 8081 --no-browser
 Optional regression checks:
 
 ```powershell
+pnpm run test:browser:install
 pnpm run test:preview
 py -3 -B -m unittest discover -s tests -p test_start_preview.py
 ```

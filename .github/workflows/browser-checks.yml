@@ -1,0 +1,47 @@
+name: Browser checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  browser:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 12.21.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install locked browser tooling
+        run: pnpm install --frozen-lockfile
+      - name: Install pinned Chromium headless shell
+        run: pnpm run test:browser:install
+      - name: Browser runner failure-path tests
+        run: pnpm run test:browser-runner
+      - name: Browser regression checks
+        run: pnpm run test:browser
+      - name: Standalone preview checks
+        if: ${{ !cancelled() }}
+        run: pnpm run test:preview
+      - name: Upload browser diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: tmp/browser-smoke/
+          if-no-files-found: warn
+          retention-days: 7

@@ -53,17 +53,29 @@ Phase 1 uses a lightweight TypeScript configuration for JavaScript projects:
 ### Automated UI smoke tests
 
 ```sh
+pnpm run test:browser:install
+pnpm run test:browser-runner
 pnpm run test:browser
+pnpm run test:preview
 ```
 
-This launches an installed Chromium/Edge in an isolated headless profile and serves
-local fixtures over loopback. On other installations, set `CHEAT_TEST_BROWSER` to
-the browser executable. It exercises rendered Vue panels plus the real pop-out
+Install the test browser once after installing dependencies, and again when
+Playwright is upgraded. These checks use the Chromium headless shell pinned by
+the locked Playwright version, in an isolated browser context, and serve local
+fixtures over loopback. They wait for the suite's completion signal instead of
+dumping the DOM after a fixed virtual-time budget. `CHEAT_TEST_BROWSER` remains an
+optional executable override for troubleshooting, but CI uses the pinned browser.
+The suite exercises rendered Vue panels plus the real pop-out
 bootstrap in a separate browser realm, without changing any game installation or
 save. It also boots the committed `cheat/init/setup.bundle.js` in an iframe and the
 committed `cheat/js/window-init.bundle.js` in the pop-out fixture, so the files that
-actually ship are covered. The temporary browser profile is removed when
-unlocked. A sandbox may require permission to launch the browser process.
+actually ship are covered. Browser processes are closed after each run.
+
+Failures save a result report and console log under `tmp/browser-smoke/`, plus
+HTML, a screenshot and `trace.zip` when a page was opened. Inspect a trace with
+`pnpm exec playwright show-trace <path-to-trace.zip>`. The Windows browser workflow
+runs on pull requests and pushes to `main`; releases reuse that same workflow.
+Failed GitHub runs upload these files as a `browser-diagnostics` artifact.
 
 These checks complement, but do not replace, manual MV/MZ NW.js testing, particularly
 for third-party battle systems, filesystem persistence, and game-specific options.
