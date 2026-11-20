@@ -39,8 +39,20 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 - **[Full Engine Reference](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/features)**
 - **[Keyboard Shortcuts](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/features/shortcuts)**
 
-### Latest Release: v1.9.3
+### Latest Release: v1.9.4
 - Windows installer ZIP with `RPGMakerCheatInstaller.exe`
+- **Bundled Startup**: Overlay and pop-out window now load single minified bundles (`setup.bundle.js`, `window-init.bundle.js`) instead of ~150 module requests; `pnpm run build:cheat` regenerates from source
+- **Vue 2.7.16**: Upgraded vendored runtime from Vue 2.6.14 to 2.7.16 (last 2.x), drop-in Options API compatible
+- **Offline-First**: Vuetify CSS, Material Design Icons (134 icons, ~16 KB), and Roboto font bundled locally under `cheat/libs` — no Google Fonts or jsDelivr dependency
+- **Production Builds**: Vue/Vuetify ship as minified production builds, removing ~1.4 MB and dev-mode warnings
+- **Event Analyzer Fixes**: Corrected 4 parsing bugs (infinite loop, 21% page truncation, 5% battle page loss, branch stall); 34 new unit tests + full test-game sweep (67,434 pages)
+- **Testable Architecture**: Bootstrap seams extracted (`RpgMakerGlobals.js`, `CheatApp.js`, `CheatVersion.js`); feature runtime injected via `this.cheatRuntime` instead of `window.__cheatFeatures`; panel state helpers unit-testable
+- **Panel Snapshot Optimization**: `applyPanelSnapshot()` helper merges state in one call, skipping unchanged values; adopted by General, Health, Stats, Inventory, Actor, Translation panels
+- **Version Comparison Fix**: Numeric segment comparison ignores `v` prefix, preventing false update warnings
+- **Stale-Bundle Guard**: Manifest records bundle/source hashes; unit tests fail if runtime changed without rebuild
+- **Locks & Favorites Icon**: Fixed blank sidebar icon (was `mdi-lock-star`, now uses shipped icon)
+- **Map Dropdown Z-Index**: Dropdowns stay above cheat overlay
+- **Architecture Regression Fixes**: Corrected regressions from recent refactor
 - **Message Log**: Automatically follows new dialogue while preserving reading position when scrolled up
 - **Teleport Fixed**: TeleportPanel properly registered in CheatModal shell
 - **MV Compatibility**: Settings and logs correctly kept inside `www/` folder for RPG Maker MV
@@ -104,7 +116,7 @@ Check out our [Documentation](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-U
 ## 🛠️ Installation
 
 ### Step 1: Download
-Recommended: download `RPGMakerCheatInstaller-v1.9.3-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
+Recommended: download `RPGMakerCheatInstaller-v1.9.4-windows.zip` from the [Releases](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases) page, extract it, run `RPGMakerCheatInstaller.exe`, select your game folder, and click **Install**.
 
 Manual install is still available: download the latest `-core.tar.gz` package for your engine from the same Releases page.
 
@@ -190,7 +202,7 @@ Link your development folder to a test game. Any saved changes in your IDE are i
 Generate the MV/MZ manual cheat packages from the repository root:
 
 ```powershell
-py -3 deploy\main.py --version 1.9.3
+py -3 deploy\main.py --version 1.9.4
 ```
 
 This creates:
@@ -203,13 +215,13 @@ output\rpg-mz-cheat-1.9.1-core.tar.gz
 After generating the manual packages, build the Windows installer ZIP:
 
 ```powershell
-py -3 tools\installer\build_windows.py --version 1.9.3
+py -3 tools\installer\build_windows.py --version 1.9.4
 ```
 
 This creates:
 
 ```text
-output\RPGMakerCheatInstaller-v1.9.3-windows.zip
+output\RPGMakerCheatInstaller-v1.9.4-windows.zip
 ```
 
 ### 4. Automated Formatting (Prettier & Husky)

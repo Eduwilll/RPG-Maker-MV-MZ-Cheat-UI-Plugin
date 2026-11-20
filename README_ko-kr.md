@@ -2,7 +2,19 @@
 
 RPG Maker MV/MZ 게임을 위한 강력한 GUI 기반 치트 툴이며, **실시간 기계 번역** 기능을 지원합니다.
 
-### 최신 릴리스: v1.9.3
+### 최신 릴리스: v1.9.4
+- **번들 시작**: 오버레이와 팝아웃 창이 이제 단일 번들(`setup.bundle.js`, `window-init.bundle.js`)을 로드합니다(약 150개 모듈 요청 → 1개); `pnpm run build:cheat`로 소스에서 재생성
+- **Vue 2.7.16**: 벤더 런타임을 Vue 2.6.14에서 2.7.16(마지막 2.x)으로 업그레이드, Options API 드롭인 호환
+- **오프라인 우선**: Vuetify CSS, Material Design Icons(134개, ~16 KB), Roboto 폰트를 `cheat/libs`에 로컬 번들 — Google Fonts/jsDelivr 의존성 없음
+- **프로덕션 빌드**: Vue/Vuetify가 축소된 프로덕션 빌드로 제공, ~1.4 MB 및 개발 모드 경고 제거
+- **이벤트 분석기 수정**: 파싱 버그 4개 수정(무한 루프, 21% 페이지 잘림, 5% 배틀 페이지 손실, 분기 정지); 34개 새 단위 테스트 + 테스트 게임 전체 스윕(67,434 페이지)
+- **테스트 가능 아키텍처**: 부트스트랩 심 추출(`RpgMakerGlobals.js`, `CheatApp.js`, `CheatVersion.js`); 기능 런타임을 `this.cheatRuntime`으로 주입(`window.__cheatFeatures` 대신); 패널 상태 헬퍼 단위 테스트 가능
+- **패널 스냅샷 최적화**: `applyPanelSnapshot()` 헬퍼로 상태를 한 번에 병합, 변경 없는 값 건너뜀; General, Health, Stats, Inventory, Actor, Translation 패널에 적용
+- **버전 비교 수정**: 숫자 세그먼트 비교로 `v` 접두사 무시, 거짓 업데이트 경고 방지
+- **스테일 번들 가드**: 매니페스트가 번들/소스 해시 기록; 런타임 변경 후 미빌드시 단위 테스트 실패
+- **Locks & Favorites 아이콘**: 빈 사이드바 아이콘 수정(`mdi-lock-star` → 제공된 아이콘)
+- **맵 드롭다운 Z-인덱스**: 드롭다운이 치트 오버레이 위에 유지됨
+- **아키텍처 회귀 수정**: 최근 리팩토링의 회귀 수정
 - **메시지 로그**: 새로운 대화가 자동으로 따라가며, 위로 스크롤했을 때 읽던 위치가 유지됩니다.
 - **텔레포트 수정**: TeleportPanel이 CheatModal 셸에 올바르게 등록되어 텔레포트 기능이 복구되었습니다.
 - **MV 호환성**: RPG Maker MV의 설정과 로그가 `www/` 폴더 안에 올바르게 유지됩니다.
@@ -142,16 +154,21 @@ docker-compose up -d
 - **Map Event Panel**: [Justype](https://github.com/Justype/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 - **Maintained & Enhanced by**: [Eduwilll](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 
-Latest Release: v1.9.3
+Latest Release: v1.9.4
 
-### v1.9.3 주요 변경 사항
-- **메시지 로그**: 새로운 대화가 자동으로 따라가며, 위로 스크롤했을 때 읽던 위치가 유지됩니다.
-- **텔레포트 수정**: TeleportPanel이 CheatModal 셸에 올바르게 등록되어 텔레포트 기능이 복구되었습니다.
-- **MV 호환성**: RPG Maker MV의 설정과 로그가 `www/` 폴더 안에 올바르게 유지됩니다.
-- **내부 리팩토링**: GeneralCheat가 이동(노클립), 갓 모드, 영속성 모듈로 분리되고, CheatModal 셸이 NavigationModule, PanelRegistryModule, ProfileSyncModule로 심화되었습니다.
-- **프로필 및 사이드바**: 반응형 프로필 상태, 널 안전성 수정, ProfileSyncModule 초기화 수정.
-- **데이터베이스 패널**: 전체 트룹 아트워크 합성, 대용량 데이터셋을 위한 윈도우 렌더링, 아트워크 및 테마 수정.
-- **성능**: 정적 패널 설정 고정, 데드 코드 제거.
+### v1.9.4 주요 변경 사항
+- **번들 시작**: 오버레이와 팝아웃 창이 이제 단일 번들(`setup.bundle.js`, `window-init.bundle.js`)을 로드합니다(약 150개 모듈 요청 → 1개); `pnpm run build:cheat`로 소스에서 재생성
+- **Vue 2.7.16**: 벤더 런타임을 Vue 2.6.14에서 2.7.16(마지막 2.x)으로 업그레이드, Options API 드롭인 호환
+- **오프라인 우선**: Vuetify CSS, Material Design Icons(134개, ~16 KB), Roboto 폰트를 `cheat/libs`에 로컬 번들 — Google Fonts/jsDelivr 의존성 없음
+- **프로덕션 빌드**: Vue/Vuetify가 축소된 프로덕션 빌드로 제공, ~1.4 MB 및 개발 모드 경고 제거
+- **이벤트 분석기 수정**: 파싱 버그 4개 수정(무한 루프, 21% 페이지 잘림, 5% 배틀 페이지 손실, 분기 정지); 34개 새 단위 테스트 + 테스트 게임 전체 스윕(67,434 페이지)
+- **테스트 가능 아키텍처**: 부트스트랩 심 추출(`RpgMakerGlobals.js`, `CheatApp.js`, `CheatVersion.js`); 기능 런타임을 `this.cheatRuntime`으로 주입(`window.__cheatFeatures` 대신); 패널 상태 헬퍼 단위 테스트 가능
+- **패널 스냅샷 최적화**: `applyPanelSnapshot()` 헬퍼로 상태를 한 번에 병합, 변경 없는 값 건너뜀; General, Health, Stats, Inventory, Actor, Translation 패널에 적용
+- **버전 비교 수정**: 숫자 세그먼트 비교로 `v` 접두사 무시, 거짓 업데이트 경고 방지
+- **스테일 번들 가드**: 매니페스트가 번들/소스 해시 기록; 런타임 변경 후 미빌드시 단위 테스트 실패
+- **Locks & Favorites 아이콘**: 빈 사이드바 아이콘 수정(`mdi-lock-star` → 제공된 아이콘)
+- **맵 드롭다운 Z-인덱스**: 드롭다운이 치트 오버레이 위에 유지됨
+- **아키텍처 회귀 수정**: 최근 리팩토링의 회귀 수정
 
 ---
 

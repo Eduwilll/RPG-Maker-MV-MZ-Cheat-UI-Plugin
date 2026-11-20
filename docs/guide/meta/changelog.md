@@ -1,24 +1,34 @@
 # Changelog
 
-## Unreleased
+## v1.9.4 - Latest
 
 ### Performance & Offline
-
 - [Feat] **Bundled Overlay Startup**: The overlay entry now ships as `cheat/init/setup.bundle.js`, replacing roughly 150 source-module requests with one minified script for the plugin code itself. Vue, Vuetify, CSS and fonts remain separate cached files, and `pnpm run build:cheat` regenerates the bundle from the editable source modules.
 - [Feat] **Bundled Pop-out Startup**: The separate cheat window now loads `cheat/js/window-init.bundle.js` instead of fetching every source module after it bridges the game globals. Both bundles are built by the same command and covered by the same manifest.
 - [Feat] **Vue 2.7**: The vendored runtime moved from Vue 2.6.14 to 2.7.16, the last 2.x release. The app keeps the Options API, so this is a drop-in upgrade that unblocks `setup()`-based work later. Vue 2.7 keeps `id` attributes on the rendered root, so the pop-out now reveals itself with a `cheat-window-ready` class instead of an inline `display` style on a mount node that no longer exists after the upgrade.
 - [Feat] **Panel Snapshot Helper**: Panels rebuilt their local state with a hand-written field-by-field copy from a game snapshot. `applyPanelSnapshot(panel, snapshot)` in `PanelGameState.js` does that copy in one call and skips values that did not change, so polling panels (`GeneralPanel` every 500 ms, `LocksPanel` every second) no longer rewrite identical fields. Adopted by general, health, stats, inventory table, actor and translation settings.
-- [Fix] **Event Analyzer Parsing**: The event analyzer mis-parsed four cases and now handles them correctly: a stray top-level block-end froze the panel (infinite loop); a code 0 at a deeper indent ended the event early, truncating 21% of the pages in the bundled test games; Battle Processing (301) blocks with their 601/602/603/604 outcome sections were flattened, losing 5% of pages; and a block-end indented deeper than its branch stalled the enclosing block. Covered by 34 new unit tests plus a sweep that parses all 67,434 pages in the test games.
-- [Feat] **Testable Bootstrap Seams**: The pop-out global list and its live `Object.defineProperty` bridge moved to `js/runtime/RpgMakerGlobals.js`, the shared Vue root to `js/ui/CheatApp.js`, and the packaged-version read to `js/runtime/CheatVersion.js`. `import.js` stays a classic script, so boot order is unchanged.
-- [Feat] **Feature Runtime Injection**: Panels and components now read the feature runtime from `this.cheatRuntime` (injected by `CheatApp`) instead of reaching through `window.__cheatFeatures`. `js/panels/**/*State.js` take the runtime as a parameter, and `getFeatureRuntime` accepts an explicit one, so panel state helpers can be unit-tested with a fake instead of a fake window. The locator stays as the fallback for the preview and pop-out.
-- [Fix] **Version Comparison**: The update check compared dotted versions as strings, so `"1.8.0" < "v1.9.0"` was always true. `CheatVersion.js` compares numeric segments and ignores the release tag's `v` prefix, so a current install no longer warns about its own release.
-- [Feat] **Stale-Bundle Guard**: A committed manifest records the bundle and source hashes, so `pnpm run test:unit` fails when runtime code changed without rebuilding the shipped bundles.
 - [Feat] **Vendored Production Libraries**: Vue and Vuetify ship as minified production builds instead of development builds, removing about 1.4 MB of JavaScript and the development-mode startup warnings.
 - [Feat] **Offline Skins and Fonts**: Vuetify CSS, Material Design Icons and Roboto are bundled under `cheat/libs` and loaded locally, so the cheat UI no longer depends on Google Fonts or jsDelivr.
 - [Feat] **Icon Subset**: The MDI stylesheet and font are generated from the icons the UI actually uses (134 icons), shrinking roughly 700 KB of icon assets to about 16 KB.
-- [Fix] **Locks & Favorites Icon**: The sidebar entry used a non-existent `mdi-lock-star` glyph, so it rendered blank; it now uses a shipped icon.
 
-## v1.9.3 - Latest
+### Event Analyzer
+- [Fix] **Event Analyzer Parsing**: Corrected four parsing bugs: stray top-level block-end causing infinite loop; code 0 at deeper indent truncating 21% of pages; Battle Processing (301) blocks with 601/602/603/604 outcome sections flattened, losing 5% of pages; block-end indented deeper than its branch stalling the enclosing block. Covered by 34 new unit tests plus a sweep parsing all 67,434 pages in test games.
+
+### Architecture & Testability
+- [Feat] **Testable Bootstrap Seams**: Pop-out global list and its live `Object.defineProperty` bridge moved to `js/runtime/RpgMakerGlobals.js`, shared Vue root to `js/ui/CheatApp.js`, and packaged-version read to `js/runtime/CheatVersion.js`. `import.js` stays a classic script, so boot order is unchanged.
+- [Feat] **Feature Runtime Injection**: Panels and components now read the feature runtime from `this.cheatRuntime` (injected by `CheatApp`) instead of reaching through `window.__cheatFeatures`. `js/panels/**/*State.js` take the runtime as a parameter, and `getFeatureRuntime` accepts an explicit one, so panel state helpers can be unit-tested with a fake instead of a fake window. The locator stays as the fallback for the preview and pop-out.
+- [Refactor] **Panel State Snapshot Merge**: Merged panel state snapshots through a single helper (`applyPanelSnapshot` in `PanelGameState.js`), reducing boilerplate and duplicate field copies across panels.
+
+### Fixes & Quality
+- [Fix] **Version Comparison**: Update check compared dotted versions as strings (`"1.8.0" < "v1.9.0"` always true). `CheatVersion.js` now compares numeric segments and ignores the release tag's `v` prefix.
+- [Feat] **Stale-Bundle Guard**: A committed manifest records bundle and source hashes; `pnpm run test:unit` fails when runtime code changed without rebuilding shipped bundles.
+- [Fix] **Locks & Favorites Icon**: Sidebar entry used a non-existent `mdi-lock-star` glyph, rendering blank; now uses a shipped icon.
+- [Fix] **Map Dropdowns Z-Index**: Map dropdowns now stay above the cheat overlay.
+- [Fix] **Architecture Refactor Regressions**: Corrected regressions from the recent architecture refactor.
+
+---
+
+## v1.9.3
 
 ### Message Log
 - [Feat] **Follow New Dialogue**: Message Log now automatically follows newly captured dialogue while preserving your reading position when you scroll up.
