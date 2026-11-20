@@ -35,7 +35,9 @@ The enemy panel also starts existing troops or temporary custom rosters and can
 summon reinforcements during safe battle phases. Starting an encounter is blocked
 while another battle, map event, message, or transfer is active. Unsupported battle
 renderers show a reason instead of forcing a mutation. Third-party battle systems
-still require testing in the actual game.
+still require testing in the actual game. See
+[Plugin Compatibility](/guide/plugins/compatibility) for tested plugin families
+and known limits.
 
 ## Detailed cards
 
@@ -59,6 +61,8 @@ settings profiles. Missing targets are disabled with diagnostics and remain remo
 
 ## Message log
 
+![Message Log panel](../../public/images/message-log-panel.png)
+
 Press **Ctrl+H** to read and search the latest 1,000 captured dialogue entries,
 including speaker/map metadata where available. Refresh, Export and Clear sit in
 the panel header; search, log font, text size and reset share one compact toolbar.
@@ -76,9 +80,9 @@ disabled plugin options remain read-only; if discovery fails, standard options
 still work. Only values changed here are included in the options portion of a
 [portable settings backup](/guide/features/sharing-settings).
 
-## General tab
+## General panel
 
-![General Panel](../../public/images/general-panel.png)
+![General panel](../../public/images/overlay-general.png)
 
 Utility controls that affect the running game immediately.
 
@@ -90,7 +94,7 @@ Utility controls that affect the running game immediately.
 | Debug Menu | Opens the built-in RPG Maker debug menu |
 | Pop Out Window | Moves the cheat UI into a separate standalone window in NW.js |
 
-## Stats tab
+## Stats panel
 
 ![Stats Panel](../../public/images/stats-setting-panel.png)
 
@@ -103,7 +107,7 @@ Change live party values without opening built-in game menus.
 | Movement speed | Walk and run speed behavior |
 | Level | Actor level adjustments |
 
-## Items tab
+## Items panel
 
 ![Items Panel](../../public/images/item-setting-panel.png)
 
@@ -111,13 +115,13 @@ Change live party values without opening built-in game menus.
 - Add or remove items, weapons, and armors.
 - Set quantities directly instead of editing through event commands.
 
-## Variables tab
+## Variables panel
 
 ![Variables Panel](../../public/images/variable-setting-panel.png)
 
 Read and update game variables by name or ID. This is useful for event flags, progression values, and debugging route-specific behavior.
 
-## Switches tab
+## Switches panel
 
 ![Switches Panel](../../public/images/switch-setting-panel.png)
 
@@ -135,6 +139,8 @@ Toggle boolean game switches in real time. Search helps when games have hundreds
 | No Clip | Lets the player move through blocked terrain |
 
 ### Map / Minimap
+
+![Map and minimap panel](../../public/images/map-minimap-panel.png)
 
 The **Map / Minimap** page and floating minimap use the same interactive map.
 Controls sit on the artwork: drag to pan, scroll or use **+ / -** to zoom,
@@ -235,6 +241,8 @@ original dialogue windows, and applies to newly captured messages in the session
 
 ### Enemy Browser And Fight Actions
 
+![Enemies panel with troop artwork](../../public/images/enemies-panel.png)
+
 Enemies opens with **Troops** and **Enemies** tabs. **Troops** groups heads,
 limbs and other members under their authored database troop, including initially
 hidden members. Troop variants stay separate. The representative artwork prefers
@@ -260,7 +268,7 @@ Matching uses active pages, resolvable troop commands and common-event reference
 not names or sprite guesses. Script-only battles may not be identifiable. Both
 actions require an idle, stable map session and recheck availability on confirmation.
 
-![Battle Panel](../../public/images/health-setting-panel.png)
+![Battle Panel](../../public/images/hp-mp-battle-panel.png)
 
 | Feature | What it does |
 | --- | --- |
@@ -275,6 +283,8 @@ actions require an idle, stable map session and recheck availability on confirma
 
 ## Game Artwork And Actor Management
 
+![Actors panel with party roster and detailed actor editor](../../public/images/actors-panel.png)
+
 Game icons appear beside items, weapons, armor, skills and status effects. Actor
 portraits/sprites appear in actor lists, Stats/Level and health tables. Click a
 known actor portrait to open that actor's detailed editor. Unknown NPC portraits
@@ -288,19 +298,51 @@ beside its actor tabs, listing each recruitable actor with a portrait and a
 confirmation prompt; the recruited actor is selected when they are in the visible
 battle roster. **Party / Skills / Status** opens the same actor's detailed editor.
 
+## Appearance, themes and transparency
+
+![Appearance panel with window size, opacity, accent colors and theme controls](../../public/images/appearance-panel.png)
+
 Under Appearance, **Use game font in cheat UI** optionally uses the game's fonts
 without changing the game itself. It is off by default and retains a readable
 fallback. The same panel holds the window opacity slider (90% by default, fully
 opaque while hovered), the dark/light switch and the accent color swatches used
 for selections and primary actions. **Color theme** offers **Current** (the slate
-design) and **Legacy** (the older charcoal-gray Material colors shown in the
-screenshots), keeping the compact layout in both. Dark/light mode and accent
-color remain independent; the labeled **Default** swatch restores the released
-blue. Saved colors are honored. Panel actions, status text, chips, snackbars and
-focus rings follow the active theme, and focus rings brighten or darken the chosen
-accent so they stay visible on both palettes. The color-theme choice persists, is
-included in settings export/import, and synchronizes with the separate cheat
-window.
+design) and **Legacy** (the older charcoal-gray Material colors), keeping the
+compact layout in both. Dark/light mode and accent color remain independent; the
+labeled **Default** swatch restores the released blue. Saved colors are honored.
+Panel actions, status text, chips, snackbars and focus rings follow the active
+theme, and focus rings brighten or darken the chosen accent so they stay visible
+on both palettes. The color-theme choice persists, is included in settings
+export/import, and synchronizes with the separate cheat window.
+
+<div class="shot-grid">
+  <figure class="shot-card">
+    <img src="../../public/images/theme-light.png" alt="Cheat UI with the light color theme">
+    <figcaption>Light mode keeps the same compact layout</figcaption>
+  </figure>
+  <figure class="shot-card">
+    <img src="../../public/images/theme-legacy-dark.png" alt="Cheat UI with the legacy charcoal theme">
+    <figcaption>Legacy charcoal palette</figcaption>
+  </figure>
+  <figure class="shot-card">
+    <img src="../../public/images/overlay-opacity-25.png" alt="Cheat overlay at 25 percent opacity">
+    <figcaption>25% opacity — the game stays readable underneath</figcaption>
+  </figure>
+  <figure class="shot-card">
+    <img src="../../public/images/overlay-opacity-75.png" alt="Cheat overlay at 75 percent opacity">
+    <figcaption>75% opacity — a middle ground for busy maps</figcaption>
+  </figure>
+</div>
+
+## About and diagnostics
+
+![About panel with runtime and game diagnostics](../../public/images/about-panel.png)
+
+**Settings > About** summarizes the cheat version, view mode, runtime, game title,
+engine, current scene and map, playtest state, language, NW.js and Chromium
+versions. **Copy Summary** and **Copy Diagnostics** put the same details on the
+clipboard for a bug report. The About panel is also the quickest way to confirm
+that a FOSSIL game loaded the MZ build.
 
 ## Destination Previews And Layout
 
@@ -327,7 +369,7 @@ opening settings temporarily enlarges the map without changing its saved size.
 - Speed changes can apply globally or only in battle, depending on the selected setting.
 - Encounter controls let you disable random encounters or force one immediately.
 
-## Shortcuts tab
+## Shortcuts panel
 
 Bind custom key combinations for common actions such as:
 
@@ -340,7 +382,7 @@ Bind custom key combinations for common actions such as:
 
 See [Shortcuts](/guide/features/shortcuts) for the full shortcut workflow.
 
-## Translate tab
+## Translate panel
 
 ![Translate Panel](../../public/images/translate-settings-panel.png)
 

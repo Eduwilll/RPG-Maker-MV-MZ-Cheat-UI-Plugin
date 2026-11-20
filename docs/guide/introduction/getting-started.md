@@ -42,6 +42,10 @@ Use the installation guide that matches the game you want to patch:
   </a>
 </div>
 
+If the game uses FOSSIL or a large plugin suite, read
+[Plugin Compatibility](/guide/plugins/compatibility) before installing. It lists
+the tested plugin families, the manual FOSSIL entry-point steps and known limits.
+
 ## First launch checklist
 
 After copying the plugin files into the correct location:
@@ -53,26 +57,23 @@ After copying the plugin files into the correct location:
 
 If the UI does not appear, continue to [Troubleshooting](/guide/troubleshooting/troubleshooting).
 
-## What opens first
+## What you can open
 
-Once the overlay is visible, you can move through the main panels right away:
+Once the overlay is visible, these sidebar groups are available:
 
-| Area | Use it for |
+| Group | Panels |
 | --- | --- |
-| General | Utility toggles, debug access, save helpers, and pop-out window mode |
-| Stats | Party HP, MP, gold, speed, and related core values |
-| Items | Items, weapons, and armors |
-| Variables / Switches | Editing game logic values in real time |
-| Map / Teleport | Position tools, no-clip, saved locations, and fast movement |
-| Battle | Battle outcome controls and health or TP shortcuts |
-| Translation | Endpoint setup, targets, and batch translation |
-| Shortcuts | Rebinding actions to custom key combinations |
+| Play | General, HP/MP/Battle, Stats/Level, Actors, Items, Variables, Switches, Enemies, Skills, Classes |
+| World | Map / Minimap, Teleport, Save Locations, Message Log, Event Analyzer, Watch |
+| Tools | Shortcuts, Locks & Favorites |
+| System | Settings: Game Options, Appearance, Translate, About |
 
 ## Recommended next pages
 
 - [Installer](/guide/installation/installer)
 - [Install on RPG Maker MV](/guide/installation/install-mv)
 - [Install on RPG Maker MZ](/guide/installation/install-mz)
+- [Plugin Compatibility](/guide/plugins/compatibility)
 - [Feature Reference](/guide/features/features)
 - [Shortcuts](/guide/features/shortcuts)
 - [Translation Usage](/guide/translation/translation-usage)

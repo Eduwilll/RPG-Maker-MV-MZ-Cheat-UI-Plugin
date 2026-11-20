@@ -151,6 +151,57 @@
   color: #c2f3df;
 }
 
+.shot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 2rem;
+}
+
+.shot-card {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(16, 59, 93, 0.1);
+  border-radius: 18px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.96),
+    rgba(245, 250, 248, 0.98)
+  );
+  box-shadow: 0 16px 28px rgba(16, 59, 93, 0.06);
+}
+
+.shot-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.shot-card figcaption {
+  padding: 0.7rem 0.95rem;
+  border-top: 1px solid rgba(16, 59, 93, 0.08);
+  color: var(--vp-c-text-2);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.dark .shot-card {
+  border-color: rgba(148, 163, 184, 0.14);
+  background: linear-gradient(
+    180deg,
+    rgba(30, 41, 59, 0.92),
+    rgba(19, 29, 41, 0.98)
+  );
+}
+
+.dark .shot-card figcaption {
+  border-top-color: rgba(148, 163, 184, 0.14);
+}
+
 .vp-doc h2 {
   margin-top: 2rem;
   letter-spacing: -0.02em;
@@ -169,6 +220,10 @@
 
 @media (max-width: 768px) {
   .doc-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .shot-grid {
     grid-template-columns: 1fr;
   }
 

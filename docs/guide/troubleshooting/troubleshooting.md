@@ -22,15 +22,15 @@ If updating NW.js doesn't help, the game may be fundamentally incompatible. Try 
 
 Double-check you used the right install guide for your engine version.
 
-**Check 4 — FOSSIL game boots without the cheat**: Games using the FOSSIL plugin don't boot from `js/main.js`. FOSSIL loads `index.html`, then regenerates `FOSSILindex.html` (replacing `main.js` with `plugins/FOSSIL.js`) and redirects the game to it — so a `js/main.js`-only install never runs. Symptoms: no `[Cheat]` lines in the DevTools console, no `cheat-settings/` folder, no red warning banner.
+**Check 4 — FOSSIL game boots without the cheat**: Games using the FOSSIL plugin don't boot from `js/main.js`. FOSSIL loads `index.html`, then regenerates `FOSSILindex.html` (replacing `js/main.js` with `js/plugins/FOSSIL.js`) and redirects the game to it — so a `js/main.js`-only install never runs. Symptoms: no `[Cheat]` lines in the DevTools console, no `cheat-settings/` folder, no red warning banner.
 
-**Fix:** The installer patches `index.html` (which FOSSIL copies into `FOSSILindex.html`) and any existing `FOSSILindex.html` automatically — re-run it. For manual installs, add this line to both `index.html` and `FOSSILindex.html`, right before the existing `<script>` tag:
+**Fix:** The installer patches `index.html` (which FOSSIL copies into `FOSSILindex.html`) and any existing `FOSSILindex.html` automatically — re-run it. For manual installs, add this line to both files, immediately before the script that starts the game:
 
 ```html
 <script type="text/javascript" src="cheat/init/import.js"></script>
 ```
 
-Note: if you delete `FOSSILindex.html`, FOSSIL recreates it from `index.html` on next launch, so keep the tag in `index.html`.
+In `index.html` it goes above `js/main.js`; in `FOSSILindex.html` it goes above `js/plugins/FOSSIL.js`. Note: if you delete `FOSSILindex.html`, FOSSIL recreates it from `index.html` on next launch, so keep the tag in `index.html`. See [Plugin Compatibility & Manual Install](/guide/plugins/compatibility#fossil-games-mz) for the full walkthrough.
 
 ---
 

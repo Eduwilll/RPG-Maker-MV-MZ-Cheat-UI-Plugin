@@ -22,8 +22,7 @@ The plugin replaces `main.js`. Before copying anything, make a backup:
 ```
 
 ## Step 4 — Copy plugin files
-
-Copy the extracted `js/` and `cheat/` folders into `{game directory}/www/`, overwriting existing files when prompted.
+Copy the contents of the extracted `www/` folder into `{game directory}/www/`, overwriting existing files when prompted.
 
 Your final structure should look like this:
 
@@ -41,6 +40,16 @@ Your final structure should look like this:
     img/
     ...
 ```
+
+## Step 4b — Plugins and FOSSIL
+
+MV games load plugins through `www/js/plugins.js`. The replacement `main.js` loads
+the cheat before the game boots, so normal MV plugins need no extra HTML edit and
+their order is preserved.
+
+FOSSIL is an MZ interoperability layer; MV games do not use it. Check
+[Plugin Compatibility & Manual Install](/guide/plugins/compatibility) for tested
+plugin families, known limits, and the MZ FOSSIL steps.
 
 ## Step 5 — Launch and verify
 

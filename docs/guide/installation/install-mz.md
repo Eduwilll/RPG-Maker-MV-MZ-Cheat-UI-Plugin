@@ -44,17 +44,26 @@ MZ: copy into `{game}/` (root)
 Getting this wrong is the most common install mistake.
 :::
 
-## Step 4b — FOSSIL games (if applicable)
+## Step 4b — FOSSIL games (MZ only)
 
-If the game uses the FOSSIL plugin (it has a `FOSSILindex.html` file, or FOSSIL appears first in the plugin list), the game boots from `FOSSILindex.html` instead of `js/main.js` — a `main.js`-only install will silently do nothing (no cheat UI, no `cheat-settings/` folder).
+FOSSIL lets MV plugins run on MZ and boots the game through `FOSSILindex.html`
+instead of `js/main.js`. A `main.js`-only install silently does nothing: no cheat
+UI, no `cheat-settings/` folder.
 
-The installer handles this automatically. For manual installs, add this line to **both** `index.html` and `FOSSILindex.html`, right before the existing `<script>` tag:
+The installer patches `index.html` and any existing `FOSSILindex.html`
+automatically. For manual installs, add this line to **both** files, immediately
+before the script that starts the game:
 
 ```html
 <script type="text/javascript" src="cheat/init/import.js"></script>
 ```
 
-FOSSIL regenerates `FOSSILindex.html` from `index.html` on boot, so the tag in `index.html` keeps working even if `FOSSILindex.html` is deleted.
+In `index.html` it goes above `js/main.js`; in `FOSSILindex.html` it goes above
+`js/plugins/FOSSIL.js`. FOSSIL regenerates `FOSSILindex.html` from `index.html` on
+boot, so keep the tag in `index.html` even if you delete `FOSSILindex.html`.
+
+See [Plugin Compatibility & Manual Install](/guide/plugins/compatibility#fossil-games-mz)
+for the full walkthrough and tested plugin families.
 
 ## Step 5 — Launch and verify
 

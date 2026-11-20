@@ -38,7 +38,10 @@ export default defineConfig({
     ["meta", { property: "og:type", content: "website" }],
     [
       "meta",
-      { property: "og:image", content: `${repoBase}images/general-panel.png` },
+      {
+        property: "og:image",
+        content: `${repoBase}images/overlay-general.png`,
+      },
     ],
     [
       "link",
@@ -72,6 +75,7 @@ export default defineConfig({
       { text: "Home", link: "/" },
       { text: "Install", link: "/guide/introduction/getting-started" },
       { text: "Features", link: "/guide/features/features" },
+      { text: "Plugins", link: "/guide/plugins/compatibility" },
       { text: "Translation", link: "/guide/translation/translation-usage" },
       { text: "Development", link: "/guide/introduction/development" },
       { text: "v1.9.4", link: "/guide/meta/changelog" },
@@ -124,6 +128,15 @@ export default defineConfig({
             link: "/guide/installation/install-mz",
           },
           { text: "Update NW.js", link: "/guide/installation/update-nwjs" },
+        ],
+      },
+      {
+        text: "Plugins",
+        items: [
+          {
+            text: "Compatibility & Manual Install",
+            link: "/guide/plugins/compatibility",
+          },
         ],
       },
       {
