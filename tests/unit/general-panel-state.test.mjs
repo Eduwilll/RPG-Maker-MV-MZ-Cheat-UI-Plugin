@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { loadVue } from "../helpers/vue.mjs";
 
 async function withEngine(values, run) {
   const globals = {
@@ -101,4 +102,83 @@ test("gameplay mutations are guarded if the session disappears before a click is
     assert.equal(panel.gameReady, false);
     assert.equal(panel.gold, 0);
   });
+});
+
+test("General speed initializes and follows movement-speed events on the control field", async () => {
+  const events = new EventTarget();
+  const player = {
+    _through: false,
+    _moveSpeed: 6,
+    moveSpeed() {
+      return this._moveSpeed;
+    },
+  };
+  await withEngine(
+    { window: events, $gamePlayer: player, $gameParty: { _gold: 0 } },
+    async () => {
+      const { default: component } =
+        await import("../../cheat-engine/www/cheat/panels/GeneralPanel.js");
+      const Vue = loadVue();
+      const panel = new Vue(component);
+      component.mounted.call(panel);
+      try {
+        assert.equal(panel.speed, 6);
+        player._moveSpeed = 7;
+        events.dispatchEvent(new Event("cheat-move-speed-change"));
+        await Vue.nextTick();
+        assert.equal(panel.speed, 7);
+        assert.equal(Object.hasOwn(panel, "moveSpeed"), false);
+      } finally {
+        panel.$destroy();
+      }
+    },
+  );
+});
+
+test("fixing movement speed applies and saves the current speed, not the initial zero", async () => {
+  const values = new Map();
+  const player = {
+    _moveSpeed: 5.5,
+    moveSpeed() {
+      return this._moveSpeed;
+    },
+    setMoveSpeed(value) {
+      this._moveSpeed = value;
+    },
+  };
+  await withEngine(
+    {
+      window: new EventTarget(),
+      $gamePlayer: player,
+      $gameParty: { _gold: 0 },
+      CustomEvent: class extends Event {},
+      localStorage: {
+        getItem: (key) => values.get(key) || null,
+        setItem: (key, value) => values.set(key, value),
+      },
+    },
+    async () => {
+      const { SpeedCheat } =
+        await import("../../cheat-engine/www/cheat/js/cheats/SpeedCheat.js");
+      const previousFixedSpeed = SpeedCheat.fixedSpeed;
+      const { default: component } =
+        await import("../../cheat-engine/www/cheat/panels/GeneralPanel.js");
+      const Vue = loadVue();
+      const panel = new Vue(component);
+      try {
+        panel.fixSpeed = true;
+        panel.onSpeedChange();
+        assert.equal(player.moveSpeed(), 5.5);
+        assert.equal(SpeedCheat.fixedSpeed, 5.5);
+        const saved = [...values.entries()].find(([key]) =>
+          key.endsWith("/speed.json:data"),
+        );
+        assert.ok(saved, "the movement speed setting is written");
+        assert.deepEqual(JSON.parse(saved[1]), { speed: 5.5, fixed: true });
+      } finally {
+        SpeedCheat.fixedSpeed = previousFixedSpeed;
+        panel.$destroy();
+      }
+    },
+  );
 });

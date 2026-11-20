@@ -14,18 +14,30 @@ import { createVuetifyTheme } from "./CheatTheme.js";
 /**
  * Build the `provide` object for the feature runtime.
  *
- * Vue 2 resolves `provide` when each component instance is created, and a
- * function-style provider is called at that moment. That matters here because
- * the runtime does not exist when `createCheatApp` runs: `MainComponent`'s
- * `created()` hook installs it through `customizeRPGMakerFunctions`. A lazy
- * provider lets the first panel that mounts resolve the live object instead of
- * a stale `null`.
+ * The root exists before MainComponent installs the runtime. Vue 2.7 preserves
+ * provider property descriptors, so a getter lets descendants resolve it when
+ * they inject it, without observing live game objects or providing it again at
+ * every component. Explicit root/subtree providers can still override it.
  *
  * @param {() => any} resolveRuntime
+ * @param {Record<string, any> | ((this: any) => Record<string, any>)} [extraProvide]
  * @returns {() => Record<string, any>}
  */
-export function createFeatureRuntimeProvide(resolveRuntime) {
-  return () => ({ cheatRuntime: resolveRuntime() });
+export function createFeatureRuntimeProvide(resolveRuntime, extraProvide) {
+  return function () {
+    const provided = {
+      ...(typeof extraProvide === "function"
+        ? extraProvide.call(this)
+        : extraProvide),
+    };
+    if (!Object.prototype.hasOwnProperty.call(provided, "cheatRuntime")) {
+      Object.defineProperty(provided, "cheatRuntime", {
+        enumerable: true,
+        get: resolveRuntime,
+      });
+    }
+    return provided;
+  };
 }
 
 /**
@@ -35,12 +47,8 @@ export function createFeatureRuntimeProvide(resolveRuntime) {
  * builds for their side effects while the pop-out reads them from the host
  * page. Tests pass plain constructors.
  *
- * `provide` injects the feature runtime. It is registered as a mixin on the
- * Vue constructor, so every component created from it can read
- * `this.cheatRuntime` without declaring anything and without the panels being
- * re-registered globally. That is the Vue 2 equivalent of a root `provide`:
- * options merging starts at the root, but a mixin reaches components nested
- * inside `CheatModal`'s panel registry.
+ * The runtime is provided only at this root. Consumers declare `inject`, and
+ * independent roots sharing the same Vue constructor remain isolated.
  *
  * @param {object} settings
  * @param {any} settings.Vue Vue constructor from the host page
@@ -57,15 +65,23 @@ export function createCheatApp(settings) {
   const components = settings.components || {};
   const options = settings.options || {};
 
-  if (typeof settings.resolveRuntime === "function") {
-    Vue.mixin({
-      provide: createFeatureRuntimeProvide(settings.resolveRuntime),
-    });
-  }
-
-  return new Vue({
+  /** @type {Record<string, any>} */
+  const appOptions = {
     ...options,
     vuetify: new Vuetify({ theme: createVuetifyTheme() }),
     components: { ...components, ...(options.components || {}) },
-  });
+  };
+  if (typeof settings.resolveRuntime === "function") {
+    appOptions.beforeCreate = [].concat(
+      options.beforeCreate || [],
+      function () {
+        // Wrap after Vue merges mixins: its provide merge eagerly reads getters.
+        this.$options.provide = createFeatureRuntimeProvide(
+          settings.resolveRuntime,
+          this.$options.provide,
+        );
+      },
+    );
+  }
+  return new Vue(appOptions);
 }

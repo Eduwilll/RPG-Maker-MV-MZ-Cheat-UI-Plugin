@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { DEFAULT_PRIMARY_COLOR } from "../../cheat-engine/www/cheat/js/ui/CheatTheme.js";
 import { KEY_VALUE_STORAGE } from "../../cheat-engine/www/cheat/js/storage/KeyValueStorage.js";
 import {
   createProfileSyncModule,
@@ -132,3 +133,25 @@ test("hover opacity reads the live window opacity value", (t) => {
   profile.setWindowOpacity(0.8);
   assert.equal(profile.getEffectiveOpacity(false), 0.8);
 });
+
+for (const saved of [undefined, "invalid", "#EC4899"]) {
+  test(`profile accent uses the shared default unless a valid saved color exists (${saved})`, (t) => {
+    stubWindow(t);
+    storage(
+      t,
+      saved === undefined ? [] : [["cheatModal.themePrimaryColor", saved]],
+    );
+    const vuetify = fakeVuetify();
+    const profile = createProfileSyncModule(vuetify, fakeRoot(), {
+      vue: fakeVue(),
+    });
+    try {
+      const expected = saved === "#EC4899" ? saved : DEFAULT_PRIMARY_COLOR;
+      assert.equal(profile.primaryColor, expected);
+      assert.equal(vuetify.theme.themes.dark.primary, expected);
+      assert.equal(vuetify.theme.themes.light.primary, expected);
+    } finally {
+      profile.destroy();
+    }
+  });
+}

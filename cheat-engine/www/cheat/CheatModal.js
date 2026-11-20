@@ -320,14 +320,16 @@ export default {
     window.addEventListener("cheat-navigate-actor", this._navigateActor);
 
     // Initialize panel selection
-    let navItem = this.navigation.getItem(this.currentComponentName);
+    let componentName = this.currentComponentName;
+    let navItem = this.navigation.getItem(componentName);
 
     if (!navItem) {
       navItem = this.navigation.getDefaultItem();
-      this.$emit("change", navItem.component);
+      componentName = navItem.component;
+      this.$emit("change", componentName);
     }
     this.navigation.select(navItem);
-    this.panelRegistry.setComponent(navItem.component);
+    this.panelRegistry.setComponent(componentName);
 
     // Apply initial theme
     this.profile.syncProfile();

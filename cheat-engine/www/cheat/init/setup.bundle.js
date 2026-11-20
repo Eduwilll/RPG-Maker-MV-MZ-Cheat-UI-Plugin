@@ -463,19 +463,27 @@ var _e = S([
 ]);
 //#endregion
 //#region cheat-engine/www/cheat/js/ui/CheatApp.js
-function ve(e) {
-	return () => ({ cheatRuntime: e() });
+function ve(e, t) {
+	return function() {
+		let n = { ...typeof t == "function" ? t.call(this) : t };
+		return Object.prototype.hasOwnProperty.call(n, "cheatRuntime") || Object.defineProperty(n, "cheatRuntime", {
+			enumerable: !0,
+			get: e
+		}), n;
+	};
 }
 function ye(e) {
-	let t = e.Vue, n = e.Vuetify, r = e.components || {}, i = e.options || {};
-	return typeof e.resolveRuntime == "function" && t.mixin({ provide: ve(e.resolveRuntime) }), new t({
+	let t = e.Vue, n = e.Vuetify, r = e.components || {}, i = e.options || {}, a = {
 		...i,
 		vuetify: new n({ theme: ge() }),
 		components: {
 			...r,
 			...i.components || {}
 		}
-	});
+	};
+	return typeof e.resolveRuntime == "function" && (a.beforeCreate = [].concat(i.beforeCreate || [], function() {
+		this.$options.provide = ve(e.resolveRuntime, this.$options.provide);
+	})), new t(a);
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/DatabaseOverrides.js
@@ -3606,7 +3614,11 @@ var un = {
 	},
 	methods: {
 		initializeVariables() {
-			en(this, ln());
+			let { moveSpeed: e, ...t } = ln();
+			en(this, {
+				...t,
+				speed: e
+			});
 		},
 		runGameMutation(e) {
 			if (!cn()) {
@@ -12985,8 +12997,8 @@ function Lc(e, t, n) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/ui/ProfileSyncModule.js
-var Rc = "cheatModal.sidebarVisible", zc = "cheatModal.windowOpacity", Bc = "cheatModal.themePrimaryColor", Vc = "cheatModal.gameFont", Hc = "cheatModal.themeDarkMode", Uc = "#3f51b5";
-function Wc(e, t) {
+var Rc = "cheatModal.sidebarVisible", zc = "cheatModal.windowOpacity", Bc = "cheatModal.themePrimaryColor", Vc = "cheatModal.gameFont", Hc = "cheatModal.themeDarkMode";
+function Uc(e, t) {
 	let n = t || (typeof window < "u" ? window.Vue : null);
 	if (!n || typeof n.observable != "function") return e;
 	try {
@@ -12995,8 +13007,8 @@ function Wc(e, t) {
 		return e;
 	}
 }
-function Gc(e, t, n = {}) {
-	let { isWindow: r = !1, vue: i } = n, a = Wc({
+function Wc(e, t, n = {}) {
+	let { isWindow: r = !1, vue: i } = n, a = Uc({
 		windowOpacity: b(zc, .9),
 		isSidebarVisible: v(Rc, !0),
 		primaryColor: null,
@@ -13007,7 +13019,7 @@ function Gc(e, t, n = {}) {
 		for (let e of o) e(a);
 	}
 	function l() {
-		let e = g.getItem(Bc), t = typeof e == "string" && /^#[0-9a-f]{6}$/i.test(e) ? e : Uc;
+		let e = g.getItem(Bc), t = typeof e == "string" && /^#[0-9a-f]{6}$/i.test(e) ? e : C;
 		return a.primaryColor = t, t;
 	}
 	function u(n) {
@@ -13057,31 +13069,31 @@ function Gc(e, t, n = {}) {
 		let e = D();
 		e && e !== window && _(e);
 	}
-	function C() {
+	function ee() {
 		x(window);
 		let e = D();
 		e && e !== window && x(e), s = !1;
 	}
-	function ee() {
+	function te() {
 		return a.isSidebarVisible = !a.isSidebarVisible, y(Rc, a.isSidebarVisible), c(), a.isSidebarVisible;
 	}
-	function te(e) {
+	function ne(e) {
 		a.windowOpacity = Math.max(0, Math.min(1, e)), c();
 	}
-	function ne(e) {
+	function re(e) {
 		typeof e == "string" && /^#[0-9a-f]{6}$/i.test(e) && (a.primaryColor = e, g.setItem(Bc, e), u(e), c());
 	}
-	function re(t) {
+	function ie(t) {
 		a.darkMode = !!t, e.theme.dark = a.darkMode, u(a.primaryColor || l()), c();
 	}
-	function ie(e) {
+	function ae(e) {
 		a.gameFont = !!e, y(Vc, a.gameFont);
 		let n = D();
 		n && hc(t, n, a.gameFont), c();
 	}
 	l(), u(a.primaryColor);
-	let ae = D();
-	return ae && hc(t, ae, a.gameFont), S(), f(), {
+	let oe = D();
+	return oe && hc(t, oe, a.gameFont), S(), f(), {
 		get windowOpacity() {
 			return r ? 1 : a.windowOpacity;
 		},
@@ -13103,14 +13115,14 @@ function Gc(e, t, n = {}) {
 		getEffectiveOpacity(e) {
 			return r || e ? 1 : a.windowOpacity;
 		},
-		toggleSidebar: ee,
-		setWindowOpacity: te,
-		setPrimaryColor: ne,
-		setDarkMode: re,
-		setGameFont: ie,
+		toggleSidebar: te,
+		setWindowOpacity: ne,
+		setPrimaryColor: re,
+		setDarkMode: ie,
+		setGameFont: ae,
 		syncProfile: f,
 		applyTheme: u,
-		destroy: C,
+		destroy: ee,
 		onChange(e) {
 			return o.add(e), () => o.delete(e);
 		}
@@ -13118,7 +13130,7 @@ function Gc(e, t, n = {}) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/CheatModal.js
-var Kc = {
+var Gc = {
 	name: "CheatModal",
 	components: {
 		GeneralPanel: dn,
@@ -13232,7 +13244,7 @@ var Kc = {
 		});
 	},
 	mounted() {
-		this.profile = Gc(this.$vuetify, this.$el, { isWindow: this.isWindow }), this._unsubProfile = this.profile.onChange(() => {
+		this.profile = Wc(this.$vuetify, this.$el, { isWindow: this.isWindow }), this._unsubProfile = this.profile.onChange(() => {
 			this.$forceUpdate();
 		}), this._layoutChanged = () => {
 			this.overlayWidth = b("cheatModal.width", 750), this.overlayHeight = b("cheatModal.height", 450);
@@ -13245,8 +13257,8 @@ var Kc = {
 				e && e.selectActor && e.selectActor(t);
 			}));
 		}, window.addEventListener("cheat-navigate-actor", this._navigateActor);
-		let e = this.navigation.getItem(this.currentComponentName);
-		e || (e = this.navigation.getDefaultItem(), this.$emit("change", e.component)), this.navigation.select(e), this.panelRegistry.setComponent(e.component), this.profile.syncProfile();
+		let e = this.currentComponentName, t = this.navigation.getItem(e);
+		t || (t = this.navigation.getDefaultItem(), e = t.component, this.$emit("change", e)), this.navigation.select(t), this.panelRegistry.setComponent(e), this.profile.syncProfile();
 	},
 	beforeDestroy() {
 		window.removeEventListener("cheat-layout-change", this._layoutChanged), window.removeEventListener("resize", this._viewportChanged), window.removeEventListener("cheat-navigate-actor", this._navigateActor), window.removeEventListener("cheat-open-finder", this._openFinder), this._unsubNavigation && this._unsubNavigation(), this._unsubPanelRegistry && this._unsubPanelRegistry(), this._unsubProfile && this._unsubProfile(), this.profile.destroy();
@@ -13279,7 +13291,7 @@ var Kc = {
 			this.profile.toggleSidebar();
 		}
 	}
-}, qc = {
+}, Kc = {
 	name: "AlertSnackbar",
 	template: "\n<v-snackbar\n    app\n    top\n    left\n    v-model=\"showSnackbar\"\n    :timeout=\"timeout\"\n    :class=\"['z-index-cheat-1', 'cheat-snackbar', 'cheat-snackbar--' + level]\">\n    <span \n        v-for=\"(line, idx) in text\"\n        :key=\"idx\"\n        class=\"font-weight-bold caption d-block\">\n        {{ line }}\n    </span>\n    <template v-slot:action=\"{ attrs }\">\n    <v-btn\n        x-small\n        class=\"cheat-snackbar__close\"\n        icon\n        v-bind=\"attrs\"\n        @click=\"showSnackbar = false\">\n        <v-icon small>mdi-close</v-icon>\n    </v-btn>\n    </template>\n</v-snackbar>\n    ",
 	data() {
@@ -13319,7 +13331,7 @@ var Kc = {
 	methods: { show(e) {
 		this.showSnackbar = !1, this.text = e.text.split("\n"), this.timeout = e.timeout, e.level && (this.level = e.level), this.showSnackbar = !0;
 	} }
-}, Jc = {
+}, qc = {
 	name: "ConfirmDialog",
 	template: "\n  <v-dialog v-model=\"showDialog\" v-if=\"options\" :width=\"options.width\">\n    <v-card\n        class=\"pt-4\">\n      <v-card-text\n        class=\"subtitle-1\">\n        <template v-for=\"(msg, idx) in messageArray\">\n          <span :key=\"idx\">{{msg}}</span>\n          <br :key=\"-idx - 1\"/>\n        </template>\n      </v-card-text>\n\n      <v-card-actions>\n        <v-spacer></v-spacer>\n        <v-btn\n          v-for=\"(action, idx) in options.actions\"\n          :key=\"idx\"\n          text\n          class=\"font-weight-bold\"\n          :color=\"action.color\"\n          @click=\"action.action\">\n          <v-icon\n            v-if=\"!action.iconRight\"\n            class=\"mr-1\">\n            {{action.icon}}\n          </v-icon>\n          <span>{{action.label}}</span>\n          <v-icon\n            v-if=\"action.iconRight\"\n            class=\"ml-1\">\n            {{action.icon}}\n          </v-icon>\n        </v-btn>\n      </v-card-actions>\n    </v-card>\n  </v-dialog>\n  ",
 	data: () => ({
@@ -13360,7 +13372,7 @@ var Kc = {
 			}
 		}
 	}
-}, Yc = {
+}, Jc = {
 	name: "WatcherOverlay",
 	props: { hideWhileModal: {
 		type: Boolean,
@@ -13389,7 +13401,7 @@ var Kc = {
 	methods: { refreshRows() {
 		this.overlayEnabled = li(), this.rows = ci();
 	} }
-}, Xc = {
+}, Yc = {
 	name: "MinimapOverlay",
 	components: { InteractiveMap: ho },
 	template: "\n<div v-show=\"visible\" :style=\"canvasStyle\" @pointerdown.stop.prevent @mousedown.stop.prevent @mouseup.stop.prevent @touchstart.stop.prevent @touchend.stop.prevent @click.stop @contextmenu.stop.prevent>\n<interactive-map ref=\"view\" compact :active=\"visible\" @tools-open=\"configuring = $event; tick()\"/>\n<button v-if=\"moveMode\" type=\"button\" class=\"minimap-move-handle\" aria-label=\"Move minimap; arrow keys move, Escape finishes\" title=\"Drag to move. Arrow keys move, Escape finishes.\" @pointerdown=\"startMove\" @mousedown.stop.prevent @touchstart.stop @click.stop @keydown=\"moveKey\">Move minimap · Esc to finish</button>\n</div>\n    ",
@@ -13487,7 +13499,7 @@ var Kc = {
 };
 //#endregion
 //#region cheat-engine/www/cheat/init/customize_functions.js
-function Zc(e) {
+function Xc(e) {
 	let t = TouchInput;
 	if (r()) {
 		t._onWheel = function() {
@@ -13531,10 +13543,10 @@ function Zc(e) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/runtime/CheatVersion.js
-function Qc(e) {
+function Zc(e) {
 	return (e === "MV" ? "www" : ".") + "/cheat-version-description.json";
 }
-function $c(e, t) {
+function Qc(e, t) {
 	let n = (e) => String(e == null ? "" : e).trim().replace(/^v/i, "").split("."), r = n(e), i = n(t), a = Math.max(r.length, i.length);
 	for (let e = 0; e < a; e += 1) {
 		let t = parseInt(r[e] || "0", 10), n = parseInt(i[e] || "0", 10), a = Number.isFinite(t) ? t : 0, o = Number.isFinite(n) ? n : 0;
@@ -13543,11 +13555,11 @@ function $c(e, t) {
 	}
 	return 0;
 }
-function el(e) {
+function $c(e) {
 	let t = e || {}, n = t.fileSystem;
 	if (!n || typeof n.readFileSync != "function") return null;
 	try {
-		let e = JSON.parse(n.readFileSync(Qc(t.rpgMakerName), "utf-8")), r = e && e.version;
+		let e = JSON.parse(n.readFileSync(Zc(t.rpgMakerName), "utf-8")), r = e && e.version;
 		return typeof r == "string" && r ? r : null;
 	} catch (e) {
 		return null;
@@ -13555,7 +13567,7 @@ function el(e) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/js/ui/FeatureShortcuts.js
-function tl(e, t, n) {
+function el(e, t, n) {
 	if (e.target && e.target.closest && e.target.closest(".cheat-shortcut-input")) return !1;
 	let r = E.fromEvent(e);
 	for (let i of ["openFeatureFinder", "openMessageLog"]) {
@@ -13566,14 +13578,14 @@ function tl(e, t, n) {
 }
 //#endregion
 //#region cheat-engine/www/cheat/MainComponent.js
-var nl = {
+var tl = {
 	name: "MainComponent",
 	components: {
-		CheatModal: Kc,
-		AlertSnackbar: qc,
-		ConfirmDialog: Jc,
-		WatcherOverlay: Yc,
-		MinimapOverlay: Xc
+		CheatModal: Gc,
+		AlertSnackbar: Kc,
+		ConfirmDialog: qc,
+		WatcherOverlay: Jc,
+		MinimapOverlay: Yc
 	},
 	template: "\n<div \n    class=\"pa-2\"\n    ref=\"rootDiv\">\n    <v-fade-transition leave-absolute>\n        <cheat-modal\n            id=\"cheat-modal\"\n            v-model=\"currentComponentName\"\n            v-if=\"show\"\n            >\n        </cheat-modal>\n    </v-fade-transition>\n    <alert-snackbar></alert-snackbar>\n    <confirm-dialog></confirm-dialog>\n    <watcher-overlay :hide-while-modal=\"show\"></watcher-overlay>\n    <minimap-overlay></minimap-overlay>\n</div>",
 	style: "\n    #cheat-modal: {\n        opacity: 0.7;\n    }\n    ",
@@ -13585,7 +13597,7 @@ var nl = {
 		};
 	},
 	created() {
-		Zc(this), f.log("info", "overlay", "MainComponent created");
+		Xc(this), f.log("info", "overlay", "MainComponent created");
 		try {
 			window.GeneralCheat = A;
 		} catch (e) {}
@@ -13610,7 +13622,7 @@ var nl = {
 	} },
 	methods: {
 		onFeatureKeyDown(e) {
-			tl(e, J, {
+			el(e, J, {
 				openFeatureFinder: () => A.openFeatureFinder(),
 				openMessageLog: () => this.openCheatModal("message-log-panel")
 			});
@@ -13697,12 +13709,12 @@ var nl = {
 			if (Utils.isNwjs()) try {
 				let t = (await axios.get("https://api.github.com/repos/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases/latest")).data, n = e.getCurrentCheatVersion(), r = t && t.tag_name;
 				if (!n || !r) return;
-				$c(n, r) < 0 && k.warn(`New cheat version has been released : ${n} → ${r}`, null, 3e3);
+				Qc(n, r) < 0 && k.warn(`New cheat version has been released : ${n} → ${r}`, null, 3e3);
 			} catch (e) {}
 		},
 		getCurrentCheatVersion() {
 			try {
-				return el({
+				return $c({
 					fileSystem: e("fs"),
 					rpgMakerName: Utils.RPGMAKER_NAME
 				});
@@ -13714,7 +13726,7 @@ var nl = {
 };
 //#endregion
 //#region cheat-engine/www/cheat/init/setup.js
-function rl() {
+function nl() {
 	try {
 		if (typeof window < "u") {
 			window.__cheatStarted = !0, window.__cheatBoot && (window.__cheatBoot.started = !0, window.__cheatBoot.phase = "started");
@@ -13726,7 +13738,7 @@ function rl() {
 		typeof console < "u" && console.log && console.log("[Cheat] cheat UI started");
 	} catch (e) {}
 }
-function il(e) {
+function rl(e) {
 	var t = "cheat UI failed to mount";
 	try {
 		t = e && (e.stack || e.message) || String(e);
@@ -13743,10 +13755,10 @@ try {
 	ye({
 		Vue,
 		Vuetify,
-		components: { MainComponent: nl },
+		components: { MainComponent: tl },
 		resolveRuntime: () => O()
-	}).$mount("#app"), rl();
+	}).$mount("#app"), nl();
 } catch (e) {
-	throw il(e), e;
+	throw rl(e), e;
 }
 //#endregion

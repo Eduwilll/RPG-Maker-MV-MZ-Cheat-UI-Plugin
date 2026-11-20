@@ -276,7 +276,8 @@ export default {
 
   methods: {
     initializeVariables() {
-      applyPanelSnapshot(this, readGeneralPanelState());
+      const { moveSpeed, ...state } = readGeneralPanelState();
+      applyPanelSnapshot(this, { ...state, speed: moveSpeed });
     },
 
     runGameMutation(mutate) {

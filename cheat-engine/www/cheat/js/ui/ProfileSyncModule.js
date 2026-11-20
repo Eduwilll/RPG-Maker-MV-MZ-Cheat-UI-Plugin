@@ -8,6 +8,7 @@
  */
 
 import {
+  DEFAULT_PRIMARY_COLOR,
   accentFocusColor,
   applyThemeStyle,
   readThemeStyle,
@@ -26,7 +27,6 @@ const WINDOW_OPACITY_SETTING = "cheatModal.windowOpacity";
 const THEME_PRIMARY_COLOR = "cheatModal.themePrimaryColor";
 const GAME_FONT_SETTING = "cheatModal.gameFont";
 const DARK_MODE_SETTING = "cheatModal.themeDarkMode";
-const DEFAULT_PRIMARY_COLOR = "#3f51b5";
 
 /**
  * Make the profile state observable by Vue 2 so template computed properties
