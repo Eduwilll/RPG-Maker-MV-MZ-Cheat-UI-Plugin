@@ -148,7 +148,7 @@ rerun Online installation, or switch to Offline. Never edit cached scripts.
 CLI Online installation requires the matching archive and an explicit edition:
 
 ```powershell
-py -3 tools\installer\cli.py install --game-path "C:\Games\MyGame" --archive "output\rpg-mv-cheat-1.9.4-online-core.tar.gz" --edition online
+py -3 tools\installer\cli.py install --game-path "C:\Games\MyGame" --archive "output\rpg-mv-cheat-1.10.0-online-core.tar.gz" --edition online
 ```
 
 An optional version override changes only the version label, not the edition.
@@ -161,7 +161,7 @@ Build MV/MZ release archives first:
 ```powershell
 pnpm run build:compact
 pnpm run check:dependency-sources
-py -3 deploy\main.py --version 1.9.4
+py -3 deploy\main.py --version 1.10.0
 ```
 
 Install PyInstaller dependencies:
@@ -173,13 +173,13 @@ py -3 -m pip install pyinstaller pillow
 Build the portable Windows installer ZIP:
 
 ```powershell
-py -3 tools\installer\build_windows.py --version 1.9.4
+py -3 tools\installer\build_windows.py --version 1.10.0
 ```
 
 The output is:
 
 ```text
-output/RPGMakerCheatInstaller-v1.9.4-windows.zip
+output/RPGMakerCheatInstaller-v1.10.0-windows.zip
 ```
 
 The ZIP includes the EXE and all four MV/MZ Offline/Online archives. Keep them

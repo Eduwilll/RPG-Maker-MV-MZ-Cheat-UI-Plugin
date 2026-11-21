@@ -144,10 +144,15 @@ HIME, Victor Engine, Olivia, CGMZ, Eli and PKD.
 
 ### Automatic (recommended)
 
-Download `RPGMakerCheatInstaller-v1.9.4-windows.zip` from the
+Download `RPGMakerCheatInstaller-v1.10.0-windows.zip` from the
 [Releases page](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases),
 extract it, run `RPGMakerCheatInstaller.exe`, select your game folder and click
 **Install**.
+
+Choose **Offline** for a self-contained installation, or **Online (cached)**
+to download verified dependencies once and reuse them across games. Online
+works offline after its cache is prepared; copying it to another computer
+may require another download.
 
 The installer detects MV or MZ, backs up the original files, copies the cheat and
 patches the correct entry point. MZ games that use FOSSIL are handled
@@ -158,7 +163,7 @@ automatically.
 Download the latest `-core.tar.gz` package for your engine from the
 [Releases page](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/releases)
 and extract it. Copy the archive's `www/` contents into `{game}/www/` for MV, or
-its `js/` and `cheat/` folders into the game root for MZ.
+its `js/`, `cheat/` and `cheat-version-description.json` into the game root for MZ.
 
 | Engine | Copy to | Back up / replace |
 | --- | --- | --- |
@@ -191,26 +196,20 @@ the upper-right corner and becomes fully opaque while hovered.
 The full matrix, manual FOSSIL walkthrough and known limitations live in the
 [plugin compatibility guide](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/plugins/compatibility).
 
-## 📦 Latest Release: v1.9.4
+## 📦 Latest Release: v1.10.0
 
-- **Bundled startup** — overlay and pop-out load single minified bundles
-  (`setup.bundle.js`, `window-init.bundle.js`) instead of roughly 150 module
-  requests; `pnpm run build:cheat` regenerates them from source.
-- **Vue 2.7.16** — upgraded from Vue 2.6.14, the last 2.x release, with the
-  Options API kept intact.
-- **Offline-first assets** — Vuetify CSS, Material Design Icons (134 icons) and
-  Roboto are bundled under `cheat/libs`; no Google Fonts or jsDelivr dependency.
-- **Production libraries** — Vue and Vuetify ship minified, removing about 1.4 MB
-  and development-mode warnings.
-- **Event Analyzer fixes** — corrected four parsing bugs (infinite loop, 21% page
-  truncation, 5% battle page loss, branch stall), with 34 new unit tests and a
-  full test-game sweep.
-- **Compact UI** — grouped navigation, denser controls, improved Find and compact
-  Teleport coordinates.
-- **Message Log** — follows new dialogue while preserving your reading position
-  when you scroll back.
-- **FOSSIL and plugin support** — installer patches MZ HTML entry points; dialogue
-  and composite artwork handling improved for Yanfly/FOSSIL-style games.
+- **Two installer editions:** Offline includes everything; Online downloads and
+  verifies dependencies once, then works from a shared local cache.
+- **Compact releases:** one main JavaScript bundle and one stylesheet, with small
+  startup, metadata and license files. No editable panel source tree is installed.
+- **Safe preparation:** Online verifies its cache before replacing game files or
+  resetting preferences. Existing backups, restore and uninstall are preserved.
+- **Save-safe startup:** game save hooks do not wait for UI downloads, including
+  games where MZ creates its save manager later.
+- **Sidebar scrolling fixed:** late-loaded overlays no longer let the game's
+  wheel handler block navigation scrolling.
+- **Broader validation:** both editions are checked on MV/MZ, including actual
+  mouse-wheel interaction, cache failures, and isolated native NW.js startup.
 
 See the [full changelog](https://eduwilll.github.io/RPG-Maker-MV-MZ-Cheat-UI-Plugin/guide/meta/changelog)
 for every fix and previous release.
@@ -300,7 +299,7 @@ Link the repository to a test game so saved changes appear on `F5`.
 pnpm run build:cheat
 pnpm run build:compact
 pnpm run check:dependency-sources
-py -3 deploy\main.py --version 1.9.4
+py -3 deploy\main.py --version 1.10.0
 ```
 
 This creates four archives in `output`: MV/MZ `-core.tar.gz` packages are
@@ -316,17 +315,17 @@ kept on uninstall. Copying Online to another computer may require a download.
 Then build the Windows installer:
 
 ```powershell
-py -3 tools\installer\build_windows.py --version 1.9.4
+py -3 tools\installer\build_windows.py --version 1.10.0
 ```
 
-This creates `output\RPGMakerCheatInstaller-v1.9.4-windows.zip`.
+This creates `output\RPGMakerCheatInstaller-v1.10.0-windows.zip`.
 The ZIP includes all four archives. Select Offline or Online in the installer;
 the complete installer download is not smaller just because Online is available.
 
 To install a specific Online archive from the command line:
 
 ```powershell
-py -3 tools\installer\cli.py install --game-path "C:\Games\MyGame" --archive "output\rpg-mv-cheat-1.9.4-online-core.tar.gz" --edition online
+py -3 tools\installer\cli.py install --game-path "C:\Games\MyGame" --archive "output\rpg-mv-cheat-1.10.0-online-core.tar.gz" --edition online
 ```
 
 ### Verification

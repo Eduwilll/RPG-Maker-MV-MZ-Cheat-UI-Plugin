@@ -2,7 +2,14 @@
 
 RPG Maker MV/MZ 게임을 위한 강력한 GUI 기반 치트 툴이며, **실시간 기계 번역** 기능을 지원합니다.
 
-### 최신 릴리스: v1.9.4
+### 최신 릴리스: v1.10.0
+- **설치 에디션 선택**: Offline은 모든 파일을 포함하며, Online (cached)은 검증된 의존성을 한 번 다운로드한 뒤 공유 로컬 캐시로 오프라인 실행됩니다.
+- **컴팩트 배포**: `cheat-bundle.js`, `cheat-bundle.css`와 작은 시작 파일, 메타데이터 및 라이선스 파일을 설치합니다.
+- **안전한 설치 준비**: Online 캐시를 먼저 검증하므로 다운로드 실패 시 기존 플러그인과 설정이 유지됩니다. 백업, 복원 및 제거 기능도 유지됩니다.
+- **저장 데이터 보호**: UI 다운로드를 기다리지 않고 저장 훅을 설치하며, MZ에서 저장 관리자가 늦게 생성되는 경우도 처리합니다.
+- **사이드바 스크롤 수정**: 늦게 로드된 치트 UI의 마우스 휠 입력이 게임에 차단되지 않도록 수정했습니다.
+
+#### 기존 주요 기능
 - **번들 시작**: 오버레이와 팝아웃 창이 이제 단일 번들(`setup.bundle.js`, `window-init.bundle.js`)을 로드합니다(약 150개 모듈 요청 → 1개); `pnpm run build:cheat`로 소스에서 재생성
 - **Vue 2.7.16**: 벤더 런타임을 Vue 2.6.14에서 2.7.16(마지막 2.x)으로 업그레이드, Options API 드롭인 호환
 - **오프라인 우선**: Vuetify CSS, Material Design Icons(134개, ~16 KB), Roboto 폰트를 `cheat/libs`에 로컬 번들 — Google Fonts/jsDelivr 의존성 없음
@@ -154,7 +161,12 @@ docker-compose up -d
 - **Map Event Panel**: [Justype](https://github.com/Justype/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 - **Maintained & Enhanced by**: [Eduwilll](https://github.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin)
 
-Latest Release: v1.9.4
+Latest Release: v1.10.0
+
+### v1.10.0 주요 변경 사항
+- 설치 프로그램에서 Offline 또는 Online (cached)을 선택할 수 있습니다. MV/MZ용 네 가지 패키지가 제공됩니다.
+- Online 의존성은 고정된 소스와 SHA-256 검증을 사용하며, 공유 캐시는 게임 제거 후에도 다른 게임을 위해 유지됩니다.
+- 다운로드 중 저장 데이터 보호, 이전 MV 런타임의 HTTPS 호환성, 팝아웃 시작 및 사이드바 휠 스크롤을 개선했습니다.
 
 ### v1.9.4 주요 변경 사항
 - **번들 시작**: 오버레이와 팝아웃 창이 이제 단일 번들(`setup.bundle.js`, `window-init.bundle.js`)을 로드합니다(약 150개 모듈 요청 → 1개); `pnpm run build:cheat`로 소스에서 재생성

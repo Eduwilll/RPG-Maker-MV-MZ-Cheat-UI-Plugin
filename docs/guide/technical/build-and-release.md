@@ -132,17 +132,17 @@ Release archives are created with the Python script in `deploy/main.py`.
 pnpm run build:cheat
 pnpm run build:compact
 pnpm run check:dependency-sources
-py -3 deploy\main.py --version 1.9.4
-py -3 tools\installer\build_windows.py --version 1.9.4
+py -3 deploy\main.py --version 1.10.0
+py -3 tools\installer\build_windows.py --version 1.10.0
 ```
 :::
 
 Packaging creates four archives in `output/`:
 
-- `rpg-mv-cheat-1.9.4-core.tar.gz` (Offline)
-- `rpg-mz-cheat-1.9.4-core.tar.gz` (Offline)
-- `rpg-mv-cheat-1.9.4-online-core.tar.gz` (Online)
-- `rpg-mz-cheat-1.9.4-online-core.tar.gz` (Online)
+- `rpg-mv-cheat-1.10.0-core.tar.gz` (Offline)
+- `rpg-mz-cheat-1.10.0-core.tar.gz` (Offline)
+- `rpg-mv-cheat-1.10.0-online-core.tar.gz` (Online)
+- `rpg-mz-cheat-1.10.0-online-core.tar.gz` (Online)
 
 The Windows ZIP contains the EXE and all four archives. It is the complete
 offline-capable distribution, not a reduced Online-only installer download.

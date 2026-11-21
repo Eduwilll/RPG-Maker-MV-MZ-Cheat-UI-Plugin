@@ -1,6 +1,25 @@
 # Changelog
 
-## v1.9.4 - Latest
+## v1.10.0 - Latest
+
+### Offline and Online Editions
+- [Feat] **Installer Edition Choice**: Choose Offline or Online (cached), with automatic MV/MZ package detection. Offline is the default and includes all dependencies; Online downloads verified dependencies once and then works offline.
+- [Feat] **Compact Release Files**: Both editions use `cheat-bundle.js` and `cheat-bundle.css`, with small startup, metadata and license files instead of the editable source tree. Overlay and separate-window modes share the same runtime code.
+- [Feat] **Verified Shared Cache**: Online dependencies use immutable download sources, exact sizes and SHA-256 checks. The per-user cache is reused across games and updates, repairs missing or damaged files, and is kept on uninstall.
+- [Feat] **Four Engine Packages**: Releases include Offline and Online archives for both MV and MZ. The Windows installer ZIP includes all four packages; existing legacy archives, backups, restore and uninstall remain supported.
+
+### Startup and Scrolling Fixes
+- [Fix] **Save Safety During Startup**: Save hooks install independently of UI downloads, including when MZ defines its save manager later. Existing database edits survive loading and saving before the UI is ready.
+- [Fix] **Late-Loaded Sidebar Scrolling**: Mouse-wheel input inside the cheat no longer reaches the game's previously bound wheel handler, restoring sidebar scrolling without changing wheel input outside the cheat.
+- [Fix] **Native Startup Readiness**: Wait for local styles and game scripts before mounting, preserve delayed game-window linking, and use the HTTPS API supported by older MV Node runtimes.
+
+### Validation and Build Tools
+- [Test] **Edition Regression Coverage**: Added shared-cache integrity and concurrency tests, installer preparation-failure checks, real mouse-wheel tests for both editions on MV/MZ, and isolated native NW.js checks. Packaging preserves unrelated test diagnostics.
+- [Docs] **Build and Installation Guides**: Updated commands, edition behavior, shared-cache recovery, package layouts and dependency license notices.
+
+---
+
+## v1.9.4
 
 ### Performance & Offline
 - [Feat] **Bundled Overlay Startup**: The overlay entry now ships as `cheat/init/setup.bundle.js`, replacing roughly 150 source-module requests with one minified script for the plugin code itself. Vue, Vuetify, CSS and fonts remain separate cached files, and `pnpm run build:cheat` regenerates the bundle from the editable source modules.

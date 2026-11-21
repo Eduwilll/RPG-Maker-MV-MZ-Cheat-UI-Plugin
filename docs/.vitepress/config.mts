@@ -78,7 +78,7 @@ export default defineConfig({
       { text: "Plugins", link: "/guide/plugins/compatibility" },
       { text: "Translation", link: "/guide/translation/translation-usage" },
       { text: "Development", link: "/guide/introduction/development" },
-      { text: "v1.9.4", link: "/guide/meta/changelog" },
+      { text: "v1.10.0", link: "/guide/meta/changelog" },
       {
         text: "More",
         items: [
