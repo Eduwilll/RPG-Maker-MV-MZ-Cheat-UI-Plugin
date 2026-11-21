@@ -30,6 +30,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Install pinned Chromium headless shell
         run: pnpm run test:browser:install
+      - name: Build compact editions
+        run: pnpm run build:compact
       - name: Browser runner failure-path tests
         run: pnpm run test:browser-runner
       - name: Browser regression checks
@@ -38,6 +40,9 @@ jobs:
       - name: Standalone preview checks
         if: ${{ !cancelled() }}
         run: pnpm run test:preview
+      - name: Compact Offline and Online checks (external network blocked)
+        if: ${{ !cancelled() }}
+        run: pnpm run test:compact
       - name: Upload browser diagnostics
         if: failure()
         uses: actions/upload-artifact@v4

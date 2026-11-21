@@ -133,14 +133,35 @@ Restore a specific backup manually:
 
 The GUI lists detected backups for manual restore, but uninstall does not use the selected backup. Uninstall only uses the `original-game` backup so it does not accidentally restore an older plugin version. Use Restore Old Plugin when you intentionally want a `plugin-version` rollback.
 
-## Next step
+## Offline and Online editions
+
+The normal install screen includes an edition choice. **Offline** is the default:
+it includes all dependencies and is portable. **Online (cached)** prepares a
+verified shared dependency cache before changing game files. After that it works
+offline. Copying it to another computer may require a download again.
+
+Windows cache: `%LOCALAPPDATA%\RPGMakerCheatUI\dependencies`. It is not game
+settings, is not included in game backups, and is kept when uninstalling a game.
+If repair fails after the cache was removed or damaged, reconnect and restart,
+rerun Online installation, or switch to Offline. Never edit cached scripts.
+
+CLI Online installation requires the matching archive and an explicit edition:
+
+```powershell
+py -3 tools\installer\cli.py install --game-path "C:\Games\MyGame" --archive "output\rpg-mv-cheat-1.9.4-online-core.tar.gz" --edition online
+```
+
+An optional version override changes only the version label, not the edition.
+Legacy packages remain installable as legacy/local; they are not Online packages.
 
 ## Build the Windows installer ZIP
 
 Build MV/MZ release archives first:
 
 ```powershell
-py -3 deploy\main.py --version 1.3.1
+pnpm run build:compact
+pnpm run check:dependency-sources
+py -3 deploy\main.py --version 1.9.4
 ```
 
 Install PyInstaller dependencies:
@@ -152,13 +173,15 @@ py -3 -m pip install pyinstaller pillow
 Build the portable Windows installer ZIP:
 
 ```powershell
-py -3 tools\installer\build_windows.py --version 1.3.1
+py -3 tools\installer\build_windows.py --version 1.9.4
 ```
 
 The output is:
 
 ```text
-output/RPGMakerCheatInstaller-v1.3.1-windows.zip
+output/RPGMakerCheatInstaller-v1.9.4-windows.zip
 ```
 
+The ZIP includes the EXE and all four MV/MZ Offline/Online archives. Keep them
+beside the EXE; the installer chooses by engine and selected edition.
 The GitHub release workflow builds this ZIP automatically for version tags.

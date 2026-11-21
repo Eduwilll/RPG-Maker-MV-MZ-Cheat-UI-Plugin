@@ -62,22 +62,26 @@ function reportCheatStartFailure(error) {
   }
 }
 
-initializeCheatDiagnostics("overlay");
+export function startOverlay() {
+  initializeCheatDiagnostics("overlay");
 
-// Match the old version's dark look by default (pop-out + preview use dark:true).
-// Saved Appearance settings win when present; fresh installs fall back to dark.
-// initialize vue
-try {
-  createCheatApp({
-    Vue,
-    Vuetify,
-    components: { MainComponent },
-    // MainComponent's created() hook builds the runtime, so resolve lazily:
-    // the first panel that mounts reads the installed object.
-    resolveRuntime: () => getFeatureRuntime(),
-  }).$mount("#app");
-  markCheatStarted();
-} catch (e) {
-  reportCheatStartFailure(e);
-  throw e;
+  // Match the old version's dark look by default (pop-out + preview use dark:true).
+  // Saved Appearance settings win when present; fresh installs fall back to dark.
+  // initialize vue
+  try {
+    createCheatApp({
+      Vue,
+      Vuetify,
+      components: { MainComponent },
+      // MainComponent's created() hook builds the runtime, so resolve lazily:
+      // the first panel that mounts reads the installed object.
+      resolveRuntime: () => getFeatureRuntime(),
+    }).$mount("#app");
+    markCheatStarted();
+  } catch (e) {
+    reportCheatStartFailure(e);
+    throw e;
+  }
 }
+
+if (!window.__cheatCompactMode) startOverlay();

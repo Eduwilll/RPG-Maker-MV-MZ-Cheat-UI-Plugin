@@ -1,4 +1,4 @@
-import { createDatabaseOverrides } from "./DatabaseOverrides.js";
+import { ensureSaveRuntime } from "./EarlySaveRuntime.js";
 import { createBattleActions } from "./BattleActions.js";
 import { createMessageHistory } from "./MessageHistory.js";
 import { createValueLocks } from "./ValueLocks.js";
@@ -59,7 +59,7 @@ export function initializeFeatureRuntime(game, dependencies) {
     assets: createGameAssets(game, deps.assetLoader),
     actors: createActorActions(game),
     previews: createMapPreviews(game),
-    database: createDatabaseOverrides(game),
+    database: ensureSaveRuntime(game),
     battle: createBattleActions(game),
     history: createMessageHistory(game),
     locks: createValueLocks(

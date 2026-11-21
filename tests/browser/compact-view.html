@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Compact game fixture</title>
+  </head>
+  <body>
+    <script src="/preview/rpg-mocks.js"></script>
+    <script type="module">
+      import { installBrowserFixture } from "/preview/feature-mocks.js";
+      installBrowserFixture(window);
+      // RPG Maker binds this method during game boot, before delayed UI loading.
+      // Reassigning TouchInput._onWheel afterward cannot replace that listener.
+      TouchInput._events = { wheelX: 0, wheelY: 0 };
+      TouchInput._newState = { wheelX: 0, wheelY: 0 };
+      TouchInput._onWheel = function (event) {
+        const state = Utils.RPGMAKER_NAME === "MV" ? this._events : this._newState;
+        state.wheelX += event.deltaX;
+        state.wheelY += event.deltaY;
+        event.preventDefault();
+      };
+      document.addEventListener("wheel", TouchInput._onWheel.bind(TouchInput), { passive: false });
+      for (const name of ["Window_Base", "Window_ScrollText", "Window_BattleLog", "Window_ChoiceList", "Game_Enemy"]) {
+        window[name] = function () {};
+        for (const method of ["drawText", "drawTextEx", "drawItemName", "startMessage", "scrollSpeed", "messageSpeed", "makeCommandList", "addText", "name"]) {
+          window[name].prototype[method] = function () { return 1; };
+        }
+      }
+      const edition = new URLSearchParams(location.search).get("edition") || "offline";
+      window.__cheatBrowserDependencies = async (manifest) => {
+        const assets = Object.create(null);
+        await Promise.all(manifest.assets.map(async (asset) => {
+          const response = await fetch("/cheat-engine/www/cheat/libs/" + asset.path);
+          const raw = new Uint8Array(await response.arrayBuffer());
+          assets[asset.path] = asset.kind === "font" ? raw :
+            new TextEncoder().encode(new TextDecoder().decode(raw).replace(/\r\n/g, "\n"));
+        }));
+        return assets;
+      };
+      const script = document.createElement("script");
+      script.src = "/output/runtime/" + edition + "/cheat/init/import.js";
+      document.body.appendChild(script);
+    </script>
+  </body>
+</html>

@@ -297,11 +297,21 @@ Link the repository to a test game so saved changes appear on `F5`.
 ### Build releases
 
 ```powershell
+pnpm run build:cheat
+pnpm run build:compact
+pnpm run check:dependency-sources
 py -3 deploy\main.py --version 1.9.4
 ```
 
-This creates `output\rpg-mv-cheat-1.9.4-core.tar.gz` and
-`output\rpg-mz-cheat-1.9.4-core.tar.gz`.
+This creates four archives in `output`: MV/MZ `-core.tar.gz` packages are
+**Offline**; MV/MZ `-online-core.tar.gz` packages are **Online (cached)**.
+Both use `cheat-bundle.js` and `cheat-bundle.css`, with small startup, metadata
+and license files instead of shipping the editable source tree.
+
+Offline includes all dependencies and is portable. Online downloads verified,
+release-pinned dependencies once, then works offline. Its Windows cache is
+`%LOCALAPPDATA%\RPGMakerCheatUI\dependencies`; it is shared across games and
+kept on uninstall. Copying Online to another computer may require a download.
 
 Then build the Windows installer:
 
@@ -310,16 +320,27 @@ py -3 tools\installer\build_windows.py --version 1.9.4
 ```
 
 This creates `output\RPGMakerCheatInstaller-v1.9.4-windows.zip`.
+The ZIP includes all four archives. Select Offline or Online in the installer;
+the complete installer download is not smaller just because Online is available.
+
+To install a specific Online archive from the command line:
+
+```powershell
+py -3 tools\installer\cli.py install --game-path "C:\Games\MyGame" --archive "output\rpg-mv-cheat-1.9.4-online-core.tar.gz" --edition online
+```
 
 ### Verification
 
 ```powershell
 pnpm run check:repo
+pnpm run test:compact
 ```
 
 That runs unit tests, type checking, the MV compatibility scan and the docs
 build. Browser smoke tests (`pnpm run test:browser`) cover rendered panels, the
-pop-out bootstrap and the committed bundles. Manual MV/MZ testing is still the
+pop-out bootstrap and the committed development bundles. `test:compact` checks
+both compact editions with external network blocked (build them first).
+Manual MV/MZ testing is still the
 final check for third-party battle systems and game-specific behavior.
 
 ### Formatting

@@ -25,9 +25,13 @@ def build_release_notes(changelog, tag, package_version):
         f"Download `RPGMakerCheatInstaller-v{version}-windows.zip`, extract it, "
         "run `RPGMakerCheatInstaller.exe`, and select your MV/MZ game folder. "
         "Keep the bundled archives beside the EXE. Close the game before installing.\n\n"
+        "Choose **Offline** (everything included) or **Online (cached)** "
+        "(downloads verified dependencies once, then works offline).\n\n"
         "Manual packages:\n"
-        f"- `rpg-mv-cheat-{version}-core.tar.gz` for RPG Maker MV.\n"
-        f"- `rpg-mz-cheat-{version}-core.tar.gz` for RPG Maker MZ.\n"
+        f"- `rpg-mv-cheat-{version}-core.tar.gz` for RPG Maker MV, Offline.\n"
+        f"- `rpg-mz-cheat-{version}-core.tar.gz` for RPG Maker MZ, Offline.\n"
+        f"- `rpg-mv-cheat-{version}-online-core.tar.gz` for RPG Maker MV, Online.\n"
+        f"- `rpg-mz-cheat-{version}-online-core.tar.gz` for RPG Maker MZ, Online.\n"
     )
 
 

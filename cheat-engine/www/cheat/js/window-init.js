@@ -23,12 +23,12 @@ function showError(msg, err) {
   }
 }
 
-window.onerror = function (msg, url, lineNo, columnNo, error) {
-  showError("Global Script Error: " + msg, error);
-  return false;
-};
+export async function startSeparateWindow() {
+  window.onerror = function (msg, url, lineNo, columnNo, error) {
+    showError("Global Script Error: " + msg, error);
+    return false;
+  };
 
-async function init() {
   const status = document.getElementById("status-text");
 
   // nw.Window.open does not reliably set window.opener, so the game window
@@ -139,6 +139,7 @@ async function init() {
 }
 
 // Start initialization
-init().catch((err) => {
-  console.error("Critical Init Error:", err);
-});
+if (!window.__cheatCompactMode)
+  startSeparateWindow().catch((err) => {
+    console.error("Critical Init Error:", err);
+  });

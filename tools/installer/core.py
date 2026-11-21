@@ -7,6 +7,13 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 
+if __package__:
+    from .dependency_cache import prepare_dependencies
+    from .package_layout import inspect_archive, read_package_metadata
+else:
+    from dependency_cache import prepare_dependencies
+    from package_layout import inspect_archive, read_package_metadata
+
 
 EPHEMERAL_RUNTIME_DIRS = {"cheat-settings"}
 BACKUP_DIR_NAME = "cheat-installer-backups"
@@ -91,6 +98,9 @@ def get_project_root():
 
 
 def validate_source_root(source_root):
+    if os.path.isfile(os.path.join(source_root, "runtime-layout.json")):
+        read_package_metadata(source_root, source=True)
+        return
     required_paths = [
         os.path.join("cheat", "init", "import.js"),
         os.path.join("cheat", "init", "setup.js"),
@@ -106,20 +116,7 @@ def validate_source_root(source_root):
 
 
 def validate_installed_layout(target):
-    validate_required_paths(
-        target.root_path,
-        [
-            os.path.join("cheat", "init", "import.js"),
-            os.path.join("cheat", "init", "setup.js"),
-            os.path.join("cheat", "init", "setup.bundle.js"),
-            os.path.join("cheat", "CheatModal.js"),
-            os.path.join("cheat", "MainComponent.js"),
-            os.path.join("cheat", "js", "window-init.bundle.js"),
-            os.path.join("js", "main.js"),
-            "cheat-version-description.json",
-        ],
-        "Installed cheat",
-    )
+    read_package_metadata(target.root_path, engine=target.game_type.value)
 
     with open(target.main_js_path, "r", encoding="utf-8") as rf:
         main_js = rf.read()
@@ -158,14 +155,18 @@ def validate_required_paths(root_dir, relative_paths, label):
 def get_status(game_path):
     target = detect_game(game_path)
     version = None
+    edition = None
     installed = os.path.exists(target.cheat_path) and os.path.exists(target.version_path)
 
     if os.path.exists(target.version_path):
         try:
             with open(target.version_path, "r", encoding="utf-8") as rf:
-                version = json.load(rf).get("version")
-        except (OSError, ValueError):
+                description = json.load(rf)
+                version = description.get("version")
+                edition = description.get("edition", "legacy") if description.get("layout") == "compact" else "legacy"
+        except (OSError, ValueError, AttributeError):
             version = "unreadable"
+            edition = "unknown"
 
     return {
         "game_path": target.game_path,
@@ -173,6 +174,7 @@ def get_status(game_path):
         "game_type": target.game_type.value,
         "installed": installed,
         "version": version,
+        "edition": edition,
         "settings_path": target.settings_path,
         "backup_root": target.backup_root,
         "original_backup": find_original_backup(target),
@@ -186,14 +188,23 @@ def install_from_source(
     version=None,
     clean_settings=False,
     logger=None,
+    edition="offline",
+    cache_root=None,
 ):
     project_root = get_project_root()
+    if source_root is None and edition == "online":
+        source_root = os.path.join(project_root, "output", "runtime", edition)
     source_root = os.path.abspath(source_root or os.path.join(project_root, "cheat-engine", "www"))
     version = normalize_version_string(version or read_package_version(project_root))
     target = detect_game(game_path)
 
     log(logger, f"Detected {target.game_type.value} game at {target.game_path}")
     validate_source_root(source_root)
+    metadata = read_package_metadata(source_root, engine=target.game_type.value, edition=edition, source=True)
+    compact = metadata["layout"] == "compact"
+    if compact and metadata["edition"] == "online":
+        with open(os.path.join(source_root, "cheat", "dependencies.json"), encoding="utf-8") as stream:
+            prepare_dependencies(json.load(stream), cache_root=cache_root, log=logger)
     affected_paths = get_source_install_paths(source_root, clean_settings=clean_settings)
     if target.game_type == GameType.MZ:
         affected_paths.append(INDEX_HTML_NAME)
@@ -208,12 +219,14 @@ def install_from_source(
     log(logger, "Copying cheat UI files")
     replace_directory(os.path.join(source_root, "cheat"), target.cheat_path)
     log(logger, "Installing engine bootstrap")
-    install_main_js_from_source(source_root, target)
+    install_main_js_from_source(os.path.join(project_root, "cheat-engine", "www") if compact else source_root, target)
     if target.game_type == GameType.MZ:
         log(logger, "Patching HTML entry points (FOSSIL-safe)")
         ensure_mz_html_bootstraps(target, logger=logger)
-    copy_extra_source_files(source_root, target.root_path)
-    write_version_file(target.version_path, version)
+    if not compact:
+        copy_extra_source_files(source_root, target.root_path)
+    installed_metadata = dict(metadata, engine=target.game_type.value) if compact else {}
+    write_version_file(target.version_path, version, metadata=installed_metadata)
     validate_installed_layout(target)
     log(logger, f"Install complete: {version}")
 
@@ -234,12 +247,15 @@ def install_from_archive(
     version=None,
     clean_settings=False,
     logger=None,
+    edition="offline",
+    cache_root=None,
 ):
     target = detect_game(game_path)
     archive_path = os.path.abspath(archive_path)
 
     if not tarfile.is_tarfile(archive_path):
         raise RuntimeError(f"Unsupported archive: {archive_path}")
+    metadata = inspect_archive(archive_path, target.game_type.value, edition)
 
     log(logger, f"Detected {target.game_type.value} game at {target.game_path}")
 
@@ -249,6 +265,10 @@ def install_from_archive(
             safe_extract_archive(archive, temp_dir)
 
         package_root = find_archive_package_root(temp_dir, target.game_type)
+        read_package_metadata(package_root, engine=target.game_type.value, edition=edition)
+        if metadata["edition"] == "online":
+            with open(os.path.join(package_root, "cheat", "dependencies.json"), encoding="utf-8") as stream:
+                prepare_dependencies(json.load(stream), cache_root=cache_root, log=logger)
         affected_paths = get_archive_install_paths(
             package_root,
             clean_settings=clean_settings,
@@ -638,7 +658,7 @@ def get_source_install_paths(source_root, clean_settings=False):
     paths = ["cheat", os.path.join("js", "main.js"), "cheat-version-description.json"]
 
     for name in os.listdir(source_root):
-        if name in {"cheat", "js", "_cheat_initialize"} or name in EPHEMERAL_RUNTIME_DIRS:
+        if name in {"cheat", "js", "_cheat_initialize", "runtime-layout.json"} or name in EPHEMERAL_RUNTIME_DIRS:
             continue
         paths.append(name)
 
@@ -810,9 +830,17 @@ def is_safe_archive_member_path(target_dir, member_name):
     return member_path == target_dir or member_path.startswith(target_dir + os.sep)
 
 
-def write_version_file(version_path, version):
+def write_version_file(version_path, version, metadata=None):
+    if metadata is None:
+        try:
+            with open(version_path, encoding="utf-8") as stream:
+                metadata = json.load(stream)
+        except (OSError, ValueError):
+            metadata = {}
+    metadata = dict(metadata) if isinstance(metadata, dict) else {}
+    metadata["version"] = normalize_version_string(version)
     with open(version_path, "w", encoding="utf-8") as wf:
-        json.dump({"version": normalize_version_string(version)}, wf, indent=2)
+        json.dump(metadata, wf, indent=2)
 
 
 def normalize_installed_version_file(version_path):

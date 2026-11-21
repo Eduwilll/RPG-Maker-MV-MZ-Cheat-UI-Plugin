@@ -4,6 +4,13 @@ from enum import Enum
 import zipfile
 import argparse
 import json
+from pathlib import Path
+import sys
+import tempfile
+
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from tools.installer.package_layout import COMPACT_FILES, read_package_metadata
 
 EPHEMERAL_RUNTIME_DIRS = ['cheat-settings']
 
@@ -145,46 +152,50 @@ def create_cheat_version_file(version, paths):
         json.dump(data, wf, indent=2)
 
 
+def build_release_packages(version, *, project_root=None, runtime_root=None, output_dir=None):
+    root = Path(project_root or Path(__file__).resolve().parents[1])
+    runtime_root = Path(runtime_root or root / 'output' / 'runtime')
+    output_dir = Path(output_dir or root / 'output')
+    output_dir.mkdir(parents=True, exist_ok=True)
+    layouts = {}
+    # Validate both variants before generating any new archive.
+    for edition in ('offline', 'online'):
+        source = runtime_root / edition
+        if not (source / 'runtime-layout.json').is_file():
+            raise FileNotFoundError(f'Build compact output first: pnpm run build:compact ({source})')
+        layouts[edition] = read_package_metadata(source, edition=edition, source=True)
+    outputs = []
+    for edition, metadata in layouts.items():
+        for engine in ('mv', 'mz'):
+            # Cleanup owns this unique directory only; browser diagnostics share tmp/.
+            with tempfile.TemporaryDirectory(prefix='.package-', dir=output_dir) as staging:
+                stage = Path(staging)
+                payload = stage / 'www' if engine == 'mv' else stage / 'payload'
+                for relative in COMPACT_FILES:
+                    destination = payload / relative
+                    destination.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(runtime_root / edition / relative, destination)
+                for name in ('DEPENDENCIES.md', 'LICENSES.txt'):
+                    source = runtime_root / edition / 'cheat' / name
+                    if source.is_file():
+                        shutil.copy2(source, payload / 'cheat' / name)
+                (payload / 'js').mkdir(exist_ok=True)
+                shutil.copy2(root / 'cheat-engine' / 'www' / '_cheat_initialize' / engine / 'js' / 'main.js', payload / 'js' / 'main.js')
+                description = dict(metadata, version=version, engine=engine.upper())
+                (payload / 'cheat-version-description.json').write_text(json.dumps(description, indent=2), encoding='utf-8')
+                read_package_metadata(payload, engine=engine.upper(), edition=edition)
+                suffix = '-online' if edition == 'online' else ''
+                name = output_dir / f'rpg-{engine}-cheat-{version}{suffix}-core'
+                archive = shutil.make_archive(str(name), 'gztar', stage if engine == 'mv' else payload, 'www' if engine == 'mv' else '.')
+                outputs.append(archive)
+                print(f'Created {archive}')
+    return outputs
+
+
 if __name__ == '__main__':
-    # parse args
     parser = argparse.ArgumentParser(description='RPG Maker MV/MZ cheat deploy maker')
     parser.add_argument('--version', required=True, type=str, help='version of deployment')
+    parser.add_argument('--runtime-root', default=None, help='Prebuilt compact output (default: output/runtime)')
+    parser.add_argument('--output-dir', default=None, help='Archive destination (default: output)')
     args = parser.parse_args()
-
-    paths = Paths()
-    validate_source_layout(paths.origin)
-
-    for game_type in GameTypes:
-        # copy js sources to temp directory
-        shutil.copytree(paths.origin.root_dir, paths.temp.root_dir)
-
-        for runtime_dir in EPHEMERAL_RUNTIME_DIRS:
-            shutil.rmtree(
-                os.path.join(paths.temp.root_dir, runtime_dir),
-                ignore_errors=True,
-            )
-
-        # merge cheat sources
-        merge_directory(
-            os.path.join(paths.temp.get_initialize_path(game_type), os.path.basename(paths.temp.get_cheat_source_path())),
-            paths.temp.get_cheat_source_path())
-
-        # copy js
-        merge_directory(
-            os.path.join(paths.temp.get_initialize_path(game_type), os.path.basename(paths.temp.get_js_source_path())),
-            paths.temp.get_js_source_path())
-
-        # remove initialize path
-        shutil.rmtree(paths.temp.get_initialize_path(), ignore_errors=True)
-
-        # compress to zip file
-        shutil.rmtree(os.path.join(paths.temp.root_dir, '.idea'), ignore_errors=True)
-        create_cheat_version_file(args.version, paths)
-        validate_packaged_layout(paths.temp)
-        if game_type == GameTypes.MV:
-            shutil.make_archive(paths.get_output_file_path(game_type, args.version), 'gztar', paths.temp_root_path, 'www')
-        else:
-            shutil.make_archive(paths.get_output_file_path(game_type, args.version), 'gztar', paths.temp.root_dir)
-
-        # remove temp directory
-        shutil.rmtree(paths.temp_root_path)
+    build_release_packages(args.version, runtime_root=args.runtime_root, output_dir=args.output_dir)

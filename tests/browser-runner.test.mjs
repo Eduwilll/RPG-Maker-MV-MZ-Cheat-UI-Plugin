@@ -47,6 +47,39 @@ test("browser runner waits for async completion instead of dumping the initial D
   assert.deepEqual(result.checks, ["async check"]);
 });
 
+test("offline verification blocks and reports external network requests", async (t) => {
+  const options = await fixture(
+    t,
+    `<pre id="smoke-results" data-status="running"></pre>
+    <script>fetch('https://example.invalid/dependency.js').catch(function(){}).then(function(){
+      var node=document.getElementById('smoke-results');
+      node.textContent=JSON.stringify({checks:['finished offline test'],errors:[]});node.dataset.status='pass';
+    });</script>`,
+  );
+  const result = await runBrowserChecks({ ...options, blockExternal: true });
+  assert.equal(result.status, "fail");
+  assert.match(result.error, /External network/);
+  assert.equal(result.externalRequests.length, 1);
+});
+
+test("failed post-render interactions fail the report and retain diagnostics", async (t) => {
+  const options = await fixture(
+    t,
+    '<pre id="smoke-results" data-status="pass">{"checks":["rendered"],"errors":[]}</pre>',
+  );
+  const result = await runBrowserChecks({
+    ...options,
+    afterChecks: async () => {
+      throw new Error("wheel scrolling blocked");
+    },
+  });
+  assert.equal(result.status, "fail");
+  assert.match(result.error, /wheel scrolling blocked/);
+  assert.ok(
+    (await fs.stat(path.join(options.artifactDir, "screenshot.png"))).size > 0,
+  );
+});
+
 test("a failed browser assertion retains its error and diagnostic artifacts", async (t) => {
   const options = await fixture(
     t,

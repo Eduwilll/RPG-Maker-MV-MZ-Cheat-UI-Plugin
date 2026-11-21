@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "id": "cda58b86c4958f66b00f6babd9e5ef6e59210bd41d5ce0f9c67214919b199f78",
+  "assets": [
+    {
+      "path": "vue.js",
+      "kind": "script",
+      "size": 5,
+      "sha256": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
+      "urls": [
+        "https://cdn.jsdelivr.net/gh/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/cheat-engine/www/cheat/libs/vue.js",
+        "https://raw.githubusercontent.com/Eduwilll/RPG-Maker-MV-MZ-Cheat-UI-Plugin/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/cheat-engine/www/cheat/libs/vue.js"
+      ]
+    }
+  ]
+}

@@ -160,11 +160,15 @@ After that, editing the source updates the game-linked folder immediately, and p
 
 Release packaging is handled by `deploy/main.py`:
 
-1. Copy `cheat-engine/www/` to a temp folder.
-2. Merge the correct MV or MZ initialization files.
-3. Remove `_cheat_initialize/` from the packaged output.
-4. Write `cheat-version-description.json`.
-5. Produce `tar.gz` archives under `output/`.
+1. Run `pnpm run build:compact` to generate Offline/Online compact outputs.
+2. Validate those outputs and their dependency manifests.
+3. Add the correct MV or MZ initialization files to a minimal staging payload.
+4. Write version, edition, engine and dependency identity metadata.
+5. Produce four `tar.gz` archives under `output/`.
+
+Compact startup installs save hooks before preparing dependencies, then evaluates
+one deferred UI graph. Online uses a verified shared per-user cache; Offline
+embeds dependencies. See [Build and Release](/guide/technical/build-and-release).
 
 GitHub Actions uses the same script when a version tag is pushed.
 

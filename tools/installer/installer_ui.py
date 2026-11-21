@@ -77,6 +77,7 @@ class InstallerApp(tk.Tk):
         self.game_path = tk.StringVar(self)
         self.archive_path = tk.StringVar(self)
         self.version = tk.StringVar(self)
+        self.edition = tk.StringVar(self, value="offline")
         self.clean_settings = tk.BooleanVar(self, value=False)
         self.selected_backup = tk.StringVar(self)
         self.game_title = tk.StringVar(self, value="No game selected")
@@ -91,6 +92,7 @@ class InstallerApp(tk.Tk):
         self.create_widgets()
         self.game_path.trace_add("write", self._inputs_changed)
         self.archive_path.trace_add("write", self._inputs_changed)
+        self.edition.trace_add("write", self._inputs_changed)
         self.version.trace_add("write", lambda *_: self._update_package_text())
         self.protocol("WM_DELETE_WINDOW", self.on_close)
         self.bind("<Control-o>", lambda _event: self.browse_game())
@@ -172,6 +174,12 @@ class InstallerApp(tk.Tk):
         self._create_notice(content)
         self.install_page = ttk.Frame(content)
         self.install_page.pack(fill="x")
+        edition_row = ttk.Frame(self.install_page)
+        edition_row.pack(fill="x", pady=(0, 8))
+        ttk.Label(edition_row, text="Edition").pack(side="left", padx=(0, 12))
+        self._track(ttk.Radiobutton(edition_row, text="Offline", variable=self.edition, value="offline")).pack(side="left")
+        self._track(ttk.Radiobutton(edition_row, text="Online (cached)", variable=self.edition, value="online")).pack(side="left", padx=(12, 0))
+        help_button(edition_row, "Offline includes everything and is portable. Online downloads verified dependencies once into a shared cache on this computer, then works offline. The cache is kept when a game is uninstalled.").pack(side="left", padx=(8, 0))
         self._create_review(self.install_page)
         self._create_advanced(self.install_page)
         self.manage_page = ttk.Frame(content)
@@ -412,7 +420,7 @@ class InstallerApp(tk.Tk):
         self._start_job("inspect", lambda: (revision, inspect_game(game_path, **options)))
 
     def _inspection_options(self):
-        return {"archive_path": self.archive_path.get().strip(), "search_dirs": tuple(self.search_dirs), "source_root": self.source_root, "source_version": self.source_version}
+        return {"archive_path": self.archive_path.get().strip(), "search_dirs": tuple(self.search_dirs), "source_root": self.source_root, "source_version": self.source_version, "edition": self.edition.get()}
 
     def _start_job(self, operation, work):
         if not self.runner.start(operation, work):
@@ -452,9 +460,9 @@ class InstallerApp(tk.Tk):
             return
         options = self._inspection_options()
         if source.kind == "archive":
-            action = lambda: install_from_archive(game_path, source.path, version=version, clean_settings=reset, logger=self.runner.log)
+            action = lambda: install_from_archive(game_path, source.path, version=version, clean_settings=reset, logger=self.runner.log, edition=options["edition"])
         else:
-            action = lambda: install_from_source(game_path, source.path, version=version or source.version, clean_settings=reset, logger=self.runner.log)
+            action = lambda: install_from_source(game_path, source.path, version=version or source.version, clean_settings=reset, logger=self.runner.log, edition=options["edition"])
         self._start_job("install", lambda: self._operation(action, game_path, options))
 
     def run_restore(self):
@@ -485,7 +493,7 @@ class InstallerApp(tk.Tk):
         status = inspection.status
         self.game_title.set(inspection.title)
         self.engine_text.set(f"RPG Maker {status['game_type']}")
-        self.installed_text.set(str(status["version"] or "Version unknown") if status["installed"] else "Not installed")
+        self.installed_text.set((str(status["version"] or "Version unknown") + " - " + str(status.get("edition") or "legacy").title()) if status["installed"] else "Not installed")
         self.install_button.configure(text="Update / reinstall" if status["installed"] else "Install plugin")
         self._update_package_text()
         self.populate_backups(status.get("backups") or [])
@@ -503,7 +511,8 @@ class InstallerApp(tk.Tk):
         source = self.inspection.source
         version = self.version.get().strip() or source.version
         version = version if version.lower().startswith("v") else "v" + version
-        self.package_text.set(f"{version[:100]} - " + ("local development source" if source.kind == "source" else "matching release package found"))
+        edition_name = "Legacy local" if source.edition == "legacy" else source.edition.title() + (" (cached)" if source.edition == "online" else "")
+        self.package_text.set(f"{version[:100]} - {edition_name} - " + ("local development source" if source.kind == "source" else "matching release package found"))
 
     def _complete(self, operation, data):
         if operation == "inspect":
@@ -547,7 +556,7 @@ class InstallerApp(tk.Tk):
             if kind == "log":
                 self._append_log(data)
                 if self.runner.busy:
-                    for marker, phase in [("backup", "Protecting game and plugin files..."), ("Copying", "Copying plugin files..."), ("bootstrap", "Setting up game startup..."), ("Extracting", "Opening release package..."), ("Restoring", "Restoring backed-up files...")]:
+                    for marker, phase in [("Downloading dependency", "Preparing verified Online dependencies..."), ("backup", "Protecting game and plugin files..."), ("Copying", "Copying plugin files..."), ("bootstrap", "Setting up game startup..."), ("Extracting", "Opening release package..."), ("Restoring", "Restoring backed-up files...")]:
                         if marker in data:
                             self.status_text.set(phase)
                             break

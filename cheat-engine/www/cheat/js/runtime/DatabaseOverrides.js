@@ -349,8 +349,15 @@ export function createDatabaseOverrides(game) {
 
   function install() {
     if (installed || !game.DataManager) return;
-    installed = true;
     const manager = game.DataManager;
+    // MZ defines the manager before assigning its methods in the same script.
+    if (
+      !["makeSaveContents", "extractSaveContents", "setupNewGame"].every(
+        (name) => typeof manager[name] === "function",
+      )
+    )
+      return;
+    installed = true;
     const make = manager.makeSaveContents;
     if (typeof make === "function")
       manager.makeSaveContents = function () {

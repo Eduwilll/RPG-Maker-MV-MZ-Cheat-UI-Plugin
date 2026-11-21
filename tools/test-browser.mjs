@@ -67,6 +67,8 @@ export async function runBrowserChecks({
   executablePath = process.env.CHEAT_TEST_BROWSER,
   timeout = 90000,
   diagnosticTimeout = 5000,
+  blockExternal = false,
+  afterChecks,
 } = {}) {
   root = path.resolve(root);
   await fs.mkdir(artifactDir, { recursive: true });
@@ -75,6 +77,7 @@ export async function runBrowserChecks({
   const logs = [];
   const pageErrors = [];
   const report = { status: "fail", entry, checks: [], errors: [] };
+  if (blockExternal) report.externalRequests = [];
   async function checkpoint(phase) {
     report.phase = phase;
     await fs.writeFile(
@@ -102,6 +105,19 @@ export async function runBrowserChecks({
     context = await browser.newContext({
       viewport: { width: 1280, height: 800 },
     });
+    if (blockExternal) {
+      await context.route("**/*", (route) => {
+        const url = new URL(route.request().url());
+        if (
+          /^https?:$/.test(url.protocol) &&
+          !["127.0.0.1", "localhost", "[::1]"].includes(url.hostname)
+        ) {
+          report.externalRequests.push(url.href);
+          return route.abort("blockedbyclient");
+        }
+        return route.continue();
+      });
+    }
     await context.tracing.start({ screenshots: true, snapshots: true });
     page = await context.newPage();
     page.on("console", (message) =>
@@ -168,10 +184,27 @@ export async function runBrowserChecks({
     }
     report.checks = payload.checks;
     report.errors = [...(payload.errors || []), ...pageErrors];
+    if (blockExternal && report.externalRequests.length)
+      throw new Error(
+        "External network requests were attempted: " +
+          report.externalRequests.join(", "),
+      );
     if (result.status !== "pass" || payload.error || report.errors.length) {
       throw new Error(
         payload.error || report.errors.join("; ") || "Browser checks failed",
       );
+    }
+    if (afterChecks) {
+      await bounded(
+        () => afterChecks({ page, checks: report.checks }),
+        timeout,
+        "Browser interaction checks",
+      );
+      if (pageErrors.length) throw new Error(pageErrors.join("; "));
+      if (blockExternal && report.externalRequests.length)
+        throw new Error(
+          "External network requests were attempted during interaction checks",
+        );
     }
     report.status = "pass";
   } catch (error) {

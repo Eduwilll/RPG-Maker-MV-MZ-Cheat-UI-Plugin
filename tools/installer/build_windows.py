@@ -108,21 +108,23 @@ def read_package_version(project_root):
 def ensure_release_archives(output_dir, version):
     missing = []
     for game_key in ("mv", "mz"):
-        path = get_release_archive_path(output_dir, game_key, version)
-        if not os.path.exists(path):
-            missing.append(path)
+        for edition in ("offline", "online"):
+            path = get_release_archive_path(output_dir, game_key, version, edition)
+            if not os.path.exists(path):
+                missing.append(path)
 
     if missing:
         missing_text = "\n".join([f"  - {path}" for path in missing])
         raise FileNotFoundError(
             "Build release packages before building the installer ZIP:\n"
             f"{missing_text}\n\n"
-            f"Example: py -3 deploy\\main.py --version {version}"
+            f"Example: pnpm run build:compact, then py -3 deploy\\main.py --version {version}"
         )
 
 
-def get_release_archive_path(output_dir, game_key, version):
-    return os.path.join(output_dir, f"rpg-{game_key}-cheat-{version}-core.tar.gz")
+def get_release_archive_path(output_dir, game_key, version, edition="offline"):
+    suffix = "-online" if edition == "online" else ""
+    return os.path.join(output_dir, f"rpg-{game_key}-cheat-{version}{suffix}-core.tar.gz")
 
 
 def run_pyinstaller(project_root, dist_dir, work_dir, spec_dir):
@@ -229,8 +231,9 @@ def create_package(project_root, output_dir, package_dir, version):
     shutil.copy2(exe_path, os.path.join(package_dir, f"{INSTALLER_NAME}.exe"))
 
     for game_key in ("mv", "mz"):
-        archive_path = get_release_archive_path(output_dir, game_key, version)
-        shutil.copy2(archive_path, os.path.join(package_dir, os.path.basename(archive_path)))
+        for edition in ("offline", "online"):
+            archive_path = get_release_archive_path(output_dir, game_key, version, edition)
+            shutil.copy2(archive_path, os.path.join(package_dir, os.path.basename(archive_path)))
 
     write_readme(package_dir, version)
 
@@ -244,12 +247,15 @@ def write_readme(package_dir, version):
             "How to install:\n"
             "1. Run RPGMakerCheatInstaller.exe.\n"
             "2. Select your RPG Maker MV or MZ game folder.\n"
+            "   Choose Offline (everything included) or Online (download and cache once).\n"
             "3. Review the detected game and package, then close the game.\n"
             "4. Click Install plugin (or Update / reinstall) and confirm.\n"
             "5. Wait for the completion message, then open the game normally.\n"
             "\n"
-            "Keep the MV/MZ .tar.gz files beside the EXE. The installer auto-selects\n"
-            "the correct package based on the selected game engine.\n"
+            "Keep all four MV/MZ .tar.gz files beside the EXE. The installer selects\n"
+            "the matching engine and edition. Offline is portable and needs no network.\n"
+            "Online needs internet on first install, then starts from a verified shared\n"
+            "per-user cache. Uninstall keeps that cache for other games.\n"
             "\n"
             "Uninstall restores the original-game backup when available. If no original\n"
             "backup exists, it disables the cheat loader while keeping the game bootable.\n"

@@ -47,6 +47,15 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Runtime, type, MV and documentation checks
         run: pnpm run check:repo
+      - name: Build compact Offline and Online payloads
+        run: pnpm run build:compact
+      - name: Verify immutable Online dependency sources
+        run: pnpm run check:dependency-sources
+      - uses: actions/upload-artifact@v4
+        with:
+          name: compact-runtime
+          path: output/runtime/
+          if-no-files-found: error
       - name: Release metadata tests
         run: python -B -m unittest discover -s tests -p test_release_notes.py
       - uses: actions/upload-artifact@v4
@@ -66,6 +75,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.14'
+      - uses: actions/download-artifact@v4
+        with:
+          name: compact-runtime
+          path: output/runtime
       - name: Build release packages
         run: python deploy/main.py --version "$RELEASE_VERSION"
       - uses: actions/upload-artifact@v4
@@ -75,6 +88,8 @@ jobs:
           path: |
             output/rpg-mv-cheat-${{ env.RELEASE_VERSION }}-core.tar.gz
             output/rpg-mz-cheat-${{ env.RELEASE_VERSION }}-core.tar.gz
+            output/rpg-mv-cheat-${{ env.RELEASE_VERSION }}-online-core.tar.gz
+            output/rpg-mz-cheat-${{ env.RELEASE_VERSION }}-online-core.tar.gz
 
   build-windows-installer:
     runs-on: windows-latest
@@ -137,4 +152,6 @@ jobs:
           files: |
             output/rpg-mv-cheat-${{ env.RELEASE_VERSION }}-core.tar.gz
             output/rpg-mz-cheat-${{ env.RELEASE_VERSION }}-core.tar.gz
+            output/rpg-mv-cheat-${{ env.RELEASE_VERSION }}-online-core.tar.gz
+            output/rpg-mz-cheat-${{ env.RELEASE_VERSION }}-online-core.tar.gz
             output/RPGMakerCheatInstaller-v${{ env.RELEASE_VERSION }}-windows.zip

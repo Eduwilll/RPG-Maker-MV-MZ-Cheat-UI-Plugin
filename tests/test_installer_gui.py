@@ -76,6 +76,17 @@ class InstallerWindowTests(unittest.TestCase):
         self.assertFalse(self.app.clean_settings.get())
         self.assertFalse(self.app.review_card.winfo_manager())
         self.assertFalse(self.app.about_button.instate(["disabled"]))
+        self.assertEqual(self.app.edition.get(), "offline")
+
+    def test_edition_change_invalidates_preflight_without_hiding_maintenance(self):
+        self.inspect()
+        self.app.edition.set("online")
+        self.assertIsNone(self.app.inspection)
+        self.assertTrue(self.app.install_button.instate(["disabled"]))
+        self.app.run_status()
+        self.wait_idle()
+        self.assertIsNone(self.app.inspection.source)
+        self.assertIn("Online", self.app.inspection.package_error)
 
     def test_about_view_credits_every_project_and_opens_links(self):
         self.app.show_view("about")

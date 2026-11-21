@@ -77,6 +77,7 @@ export default {
     aria-label="Cheat engine"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
+    @wheel.stop
 >
     <header class="cheat-shell__bar">
         <button

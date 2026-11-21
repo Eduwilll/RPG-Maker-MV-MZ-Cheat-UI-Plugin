@@ -81,10 +81,13 @@ Most contributor work happens under `cheat-engine/www/`.
 
 ## Packaging and installation files
 
-The packaging flow works by starting from `cheat-engine/www/` and then merging engine-specific files from `_cheat_initialize/`.
+Release packaging consumes `output/runtime/<edition>/` from
+`tools/vendor/build-compact.mjs`, then adds engine bootstrap files from
+`_cheat_initialize/`. Editable source remains under `cheat-engine/www/`.
 
-- `deploy/main.py` builds one archive for MV and one for MZ.
-- Packaging requires the committed bundles (`cheat/init/setup.bundle.js` and `cheat/js/window-init.bundle.js`); run `pnpm run build:cheat` after runtime changes.
+- `deploy/main.py` builds four archives: MV/MZ Offline and MV/MZ Online.
+- Packaging requires `pnpm run build:compact` output. Keep running
+  `pnpm run build:cheat` after runtime changes for source/dev-sync compatibility.
 - The release artifacts are written to `output/`.
 - The installer instructions in the docs mirror that package structure.
 

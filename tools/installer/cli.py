@@ -21,6 +21,7 @@ def main():
         help="Path to a packaged rpg-mv-cheat or rpg-mz-cheat .tar.gz archive.",
     )
     install_parser.add_argument("--version", help="Version to write into cheat-version-description.json")
+    install_parser.add_argument("--edition", choices=("offline", "online"), default="offline", help="Offline includes dependencies; Online downloads and caches them once.")
     install_parser.add_argument(
         "--clean-settings",
         action="store_true",
@@ -49,6 +50,7 @@ def main():
                 args.archive,
                 version=args.version,
                 clean_settings=args.clean_settings,
+                edition=args.edition,
             )
         else:
             result = install_from_source(
@@ -56,6 +58,7 @@ def main():
                 source_root=args.source_root,
                 version=args.version,
                 clean_settings=args.clean_settings,
+                edition=args.edition,
             )
 
         target = result["target"]

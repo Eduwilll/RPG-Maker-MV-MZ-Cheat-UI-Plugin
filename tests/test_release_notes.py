@@ -13,6 +13,8 @@ class ReleaseNotesTests(unittest.TestCase):
         self.assertIn("RPGMakerCheatInstaller-v1.9.0-windows.zip", notes)
         self.assertIn("rpg-mv-cheat-1.9.0-core.tar.gz", notes)
         self.assertIn("rpg-mz-cheat-1.9.0-core.tar.gz", notes)
+        self.assertIn("rpg-mv-cheat-1.9.0-online-core.tar.gz", notes)
+        self.assertIn("rpg-mz-cheat-1.9.0-online-core.tar.gz", notes)
 
     def test_rejects_missing_empty_or_mismatched_release(self):
         for changelog, tag, package in [

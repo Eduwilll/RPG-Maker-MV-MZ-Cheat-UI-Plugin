@@ -1,15 +1,17 @@
 # Vendored UI libraries
 
-Everything in this folder ships with the plugin and is loaded directly by the
-RPG Maker NW.js runtime. Nothing is requested from a CDN at runtime, so the
-cheat UI works offline and never waits for Google Fonts or jsDelivr.
+These are the canonical dependency inputs. Development installs load these
+files directly. Compact Offline embeds them into its JS/CSS output; compact
+Online downloads the same verified bytes once into a shared per-user cache.
+Both editions work without a connection once their dependencies are available.
+See `LICENSES.txt` for the complete third-party notices.
 
 | File                          | Upstream                            | Version  |
 | ----------------------------- | ----------------------------------- | -------- |
-| `vue.js`                      | `vue@2` `dist/vue.min.js`           | 2.6.14   |
+| `vue.js`                      | `vue@2` `dist/vue.min.js`           | 2.7.16   |
 | `vuetify.js`                  | `vuetify@2` `dist/vuetify.min.js`   | 2.6.3    |
 | `vuetify.min.css`             | `vuetify@2` `dist/vuetify.min.css`  | 2.6.3    |
-| `axios.min.js`                | `axios` (pre-existing)              | bundled  |
+| `axios.min.js`                | `axios` (pre-existing)              | 0.26.1   |
 | `mdi/materialdesignicons.min.css` | `@mdi/font@6` (subset)          | 6.9.96   |
 | `mdi/fonts/materialdesignicons-webfont.woff2` | `@mdi/font@6` (subset) | 6.9.96 |
 | `roboto.css` + `fonts/*`      | `@fontsource/roboto@5` (latin, latin-ext) | 5.3.0 |
@@ -45,7 +47,7 @@ which is what Vuetify's default font stack (`Roboto, sans-serif`) does anyway.
 
 ```bash
 curl -L -o cheat-engine/www/cheat/libs/vue.js \
-  https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js
+  https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.min.js
 curl -L -o cheat-engine/www/cheat/libs/vuetify.js \
   https://cdn.jsdelivr.net/npm/vuetify@2.6.3/dist/vuetify.min.js
 curl -L -o cheat-engine/www/cheat/libs/vuetify.min.css \
