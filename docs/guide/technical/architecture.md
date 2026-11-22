@@ -149,6 +149,21 @@ separate bounded artwork canvas. Its renderer accepts an explicit map context;
 it never swaps `$dataMap` or runs game-map setup. Views keep map/Bitmap/canvas
 references in non-reactive instance fields, not Vue data.
 
+`SavedLocationState` owns saved-point normalization, stable IDs and legacy entry
+compatibility. Teleport, Save Locations and InteractiveMap use the same persisted
+`cheat.locations` collection. `LocationPins` shares tag symbols between live maps
+and destination previews; `PreviewGeometry` maps canvas clicks to bounded tiles.
+Destination previews share `MapCamera` for fit/pan/zoom and keep canvas coordinates
+separate from CSS dimensions. Their bounded artwork renderer requests up to native
+48px tile detail; the live minimap retains its 16px default and existing memory cap.
+`EventExplorerState` reads plain event identities and distances for the finder,
+without rescanning every map command for each finder refresh. Reference extraction
+runs for the selected event when its values are inspected.
+`MapActors` exposes party identities without inferring actors from event graphics.
+`RecordNavigation` carries event/map identifiers between panels and reopens the
+overlay when navigation starts from the floating minimap. Event inspection and
+explicit command execution remain separate actions.
+
 `LayoutGeometry` provides viewport clamps and a teardown-safe pointer lifecycle.
 Overlay resizing and explicit minimap Move mode share it. Settings writes happen
 at gesture completion, while normal minimap mode retains click-through behavior.

@@ -28,6 +28,13 @@ Older saves without overrides work normally. Uninstalling the cheat leaves saves
 loadable, but overridden database behavior requires the cheat to be installed.
 Class level-up rule edits do not retroactively learn or forget actor skills.
 
+Search names or IDs in the left-hand list, then edit the selected record on the
+right. Skills separate **Costs & targeting**, **Damage**, and **Effects**;
+classes separate **Parameters**, **Progression**, and **Traits**. Enemy records
+separate parameters, actions/traits, and battle tools. Switching sections keeps
+your draft. The action bar shows **Unapplied changes** until you apply or discard
+them; **Original values** contains the confirmed reset action.
+
 Damage formulas are RPG Maker JavaScript. They are stored as text, not evaluated
 as a preview; invalid formulas can fail when the game uses the skill.
 
@@ -161,6 +168,37 @@ or turned off. Live positions update with animation frames rather than a slow
 polling interval, with settings, classification and artwork cached separately.
 These interactions also work in the separate cheat window.
 
+The selection card also offers **Analyze** for map events, **Open actor** for
+the player and visible party followers, and **Save point** for any selected tile.
+Actor links use the game's party identity, not guesses from an NPC name or sprite.
+The controlled character keeps its directional arrow without an extra actor badge.
+NPC and enemy event selections also offer **Actors...**, a searchable list of all
+actor records, including non-party characters. Explicit actor IDs supplied by the
+game open that actor directly; otherwise you choose the matching record. Selecting
+one opens its editor without changing the event or recruiting the character.
+An analyzed event and a visible party member can also link back to the map.
+Saved points have tag-specific pins for shops, bosses, checkpoints, NPCs, farming
+and danger, with a generic marker for custom tags. **Layers & markers > Saved
+points** hides or shows them on the full map and floating minimap.
+
+### Event Analyzer and Watch
+
+**Event Analyzer** separates finding an event from inspecting it. Use **Facing**
+for the object in front of you, **Nearby** for events ordered by distance, or
+**Browse** for map, common and battle events. A facing event opens automatically
+when available. Select another event in the left list to inspect it on the right;
+other maps load on demand without entering them.
+
+The inspector has **Details**, **Switches & variables** and **Commands** views.
+Details explains the trigger, page and conditions. Switches & variables exposes
+editable live values, including map self switches; map-event references cover
+all pages, not only the active page. Commands is a read-only execution tree by
+default. To run commands, expand **Advanced: run game commands**, enable its Run
+actions and confirm the action. Commands from another map cannot run until the
+player travels there. Bulk map preloading is under **Browse > Data tools**.
+**Watch** now contains only the saved watch list and its overlay/live controls;
+add watched values from Variables and Switches as before.
+
 **Map settings** includes display options and **Floating minimap settings** for
 size, opacity, placement and mode. Search for Floating Minimap to jump there.
 The older `minimap-panel` route still works for existing links.
@@ -243,13 +281,15 @@ original dialogue windows, and applies to newly captured messages in the session
 
 ![Enemies panel with troop artwork](../../public/images/enemies-panel.png)
 
-Enemies opens with **Troops** and **Enemies** tabs. **Troops** groups heads,
+Enemies opens with **Troops** and **Enemy records** views. **Troops** groups heads,
 limbs and other members under their authored database troop, including initially
 hidden members. Troop variants stay separate. The representative artwork prefers
 the enemy's head over torso and limbs, so cards stay recognizable; the name is a
 display aid, not an invented parent pointer. **Start Troop** launches the original
 troop with its placements and battle-event pages; confirm the story-side-effect
-warning first. **Enemies** retains the per-record editor.
+warning first. **Enemy records** retains the per-record editor. Within a troop,
+**Members** shows its composition and **Map events** contains matching original
+event actions, separate from the standalone **Start Troop** action.
 
 The Enemies editor uses game battler artwork and available descriptions. Hover or
 focus an enemy label to see parameters, actions, traits, base EXP/gold and base drop
@@ -297,6 +337,11 @@ party member is blocked. Stats/Level also offers a **+ Add party member** menu
 beside its actor tabs, listing each recruitable actor with a portrait and a
 confirmation prompt; the recruited actor is selected when they are in the visible
 battle roster. **Party / Skills / Status** opens the same actor's detailed editor.
+
+In **Actors**, search by name or ID and choose **All** or **Party** to filter the
+roster. **Overview** contains identity, progression, and vitals; **Parameters**,
+**Skills**, and **Status** keep their editing tools in focused sections. Actor
+edits apply immediately, unlike database drafts. Save the game to keep them.
 
 ## Appearance, themes and transparency
 
@@ -346,15 +391,30 @@ that a FOSSIL game loaded the MZ build.
 
 ## Destination Previews And Layout
 
-Each Teleport row has a **Preview** action showing destination artwork, dimensions
-and the requested X/Y marker. Opening a preview does not enter the map or execute
-its events; only the explicit teleport buttons transfer the player. Missing files
-show an error. Plugin-specific dynamic visuals may not appear in a static preview.
+Select a map from Teleport's searchable list, choose a tile in the preview, then
+press **Teleport here**. Drag to pan, scroll or use the zoom buttons, **Fit** to
+see the whole map, and **Focus destination** to find the selected tile again.
+Arrow keys fine-tune X/Y. **Map center** only selects the center; it does not move
+the player until you press Teleport. **Save point** opens a separate naming/tag
+form without crowding the preview. On smaller windows the map stacks below a
+shorter list. Destination artwork retains native tile detail where memory allows,
+without increasing the live minimap's normal rendering cost.
+
+**Save Locations** previews the selected saved point on its map, including its
+stored coordinates and other saved pins on that map. You can save your current
+position or choose another tile in the preview. Choosing another tile creates
+an unsaved draft, leaving the original saved place unchanged. Saved places can
+be copied or deleted with confirmation. Existing locations remain available.
+Previewing never enters the map or executes events; only explicit
+teleport actions transfer the player. Missing files show an error, and
+plugin-specific dynamic visuals may not appear in static destination artwork.
 
 Resize the embedded cheat with its bottom-right handle, or focus the handle and
 use arrow keys. Appearance also provides numeric overlay size fields and a reset
 button. Size is saved and clamped to the available viewport. The separate native
-window remains resizable and remembers its size.
+window remains resizable and remembers its size. Both modes default to
+**880 x 660** unless a custom size was previously saved; smaller screens clamp
+the overlay to the available space. Appearance's reset restores the new default.
 
 In Minimap, enable **Move minimap**, close the cheat overlay and drag its handle.
 Arrow keys also move it; Escape on the handle ends Move mode. Position is saved
