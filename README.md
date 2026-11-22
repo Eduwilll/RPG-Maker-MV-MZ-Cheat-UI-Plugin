@@ -45,6 +45,15 @@ HIME, Victor Engine, Olivia, CGMZ, Eli and PKD.
 
 ![Cheat UI General panel](docs/public/images/overlay-general.png)
 
+## Latest: v1.11.0
+
+- Connected map, actor and Event Analyzer navigation, with tagged saved-point pins.
+- Interactive Teleport and Save Locations previews with pan, zoom and tile selection.
+- Focused actor, enemy, skill and class inspectors; direct skill Learn/Forget actions.
+- Optional skill-switch review with event evidence and individually confirmed changes.
+  Related flags are not guaranteed prerequisites; learning never enables them automatically.
+- An 880 x 660 default window in both overlay and separate-window modes.
+
 ## ✨ Highlights
 
 - **Compact overlay** — grouped sidebar sections, dense controls, Find (`Ctrl+P`),
@@ -109,18 +118,19 @@ HIME, Victor Engine, Olivia, CGMZ, Eli and PKD.
 
 - **Map / Minimap**: live tile artwork, pan, zoom, follow, fit, search and layer
   controls; separate radar/passability view when needed.
-- **Teleport**: manual coordinates, map-center warp, click-to-teleport and saved
-  locations with preset or custom flags.
-- **Watcher**: live variables, switches and nearby event references, with an
-  optional compact overlay.
-- **Event Analyzer**: Common, Map and Battle event sequences with branch
-  visualization and command tracing.
+- **Teleport**: interactive destination previews, manual coordinates, map-center
+  selection and saved locations with preset or custom flags; transfer is explicit.
+- **Watcher**: saved variable/switch targets with an optional compact overlay.
+- **Event Analyzer**: Facing, Nearby and Browse finders for Map, Common and Battle
+  events, with focused details, live references and read-only command tracing.
 
 ### Database editors
 
 - Structured editors for enemies, troops, skills, classes, actors and items.
 - Locks & Favorites for inventory, gold, variables, switches, timers and states.
 - Detailed cards, searchable lists and windowed rendering for large databases.
+- Direct skill learning and optional switch evidence review, without automatic
+  global flag changes. Unknown plugin-script dependencies may not be detectable.
 - Edits apply to the running game and are never written back to `data/*.json`.
 
 ### Dialogue and translation

@@ -1,6 +1,27 @@
 # Changelog
 
-## v1.10.0 - Latest
+## v1.11.0 - Latest
+
+### Connected Map and Event Workflows
+- [Feat] **Interactive Destination Previews**: Teleport and Save Locations now pair searchable lists with sharper map previews, pan/zoom, tile selection, compact coordinates and explicit teleport actions. Selecting Map center does not transfer the player until confirmed with Teleport.
+- [Feat] **Shared Saved Points**: Save tagged points from the map or destination preview, see their distinct pins, preview or copy saved locations, and delete with confirmation. Existing saved locations remain compatible.
+- [Feat] **Focused Event Analyzer**: Find Facing, Nearby or Browse events, then inspect Details, Switches & variables or Commands. Nearby map references move out of Watch; command execution stays behind explicit advanced controls and confirmations.
+- [Feat] **Connected Actor and Event Navigation**: Jump between map selections, actor records and Event Analyzer. The controlled actor keeps its arrow without a duplicate badge; a searchable actor picker supports events without an explicit actor association.
+- [Feat] **880 x 660 Default Window**: Overlay and separate-window modes share the larger default while respecting saved sizes and smaller screens.
+
+### Actor, Enemy, Skill and Class Panels
+- [Feat] **Compact Record Inspectors**: Searchable lists and focused sections replace long mixed forms. Database drafts show unapplied changes and retain edits when switching sections; initialization failures have a visible Retry action.
+- [Feat] **Direct Skill Learning**: Search skills by name or ID, filter All, Available or Learned, and use Learn or Forget directly. Learning preserves list position without requiring a second dropdown.
+- [Feat] **Skill Switch Review**: Review native event links and conservative name matches, current switch values and source evidence. An optional cancellable all-map scan never enters maps or runs their events. Broader learning-path conditions stay secondary to close name matches.
+- [Fix] **Safe Global Switch Changes**: Learning and scanning never activate switches automatically. Individual edits require confirmation and reject changed values or loaded sessions. Related flags are not guaranteed prerequisites; plugin scripts may not be traceable.
+
+### Compatibility and Validation
+- [Test] **Connected Workflow Coverage**: Added native event-command, branch-isolation, evidence-priority, scan-cancellation, stale-confirmation and direct skill-action regressions in overlay and separate-window modes. Verified compact Offline/Online packages and isolated MV/MZ runtimes.
+- [Docs] **Updated Feature Guides**: Documented map previews, saved points, event inspection, record sections and safe skill-switch review.
+
+---
+
+## v1.10.0
 
 ### Offline and Online Editions
 - [Feat] **Installer Edition Choice**: Choose Offline or Online (cached), with automatic MV/MZ package detection. Offline is the default and includes all dependencies; Online downloads verified dependencies once and then works offline.
