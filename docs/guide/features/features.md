@@ -343,6 +343,26 @@ roster. **Overview** contains identity, progression, and vitals; **Parameters**,
 **Skills**, and **Status** keep their editing tools in focused sections. Actor
 edits apply immediately, unlike database drafts. Save the game to keep them.
 
+In **Skills**, type a name or ID to see matching rows immediately. **All**,
+**Available**, and **Learned** filter the list. Use each row's **Learn** or
+**Forget** action directly; no separate dropdown is required.
+
+**Review switches** looks for native event links and skill-name matches. It
+shows current ON/OFF values, evidence, and whether a match is verified only by
+name or linked by event commands. This is not a guaranteed activation recipe:
+events may check for OFF, change a flag temporarily, or use plugin scripts that
+cannot be traced statically. **Scan all maps** extends the current-map/common-
+event scan without entering maps or running commands. It can be stopped, and
+unreadable maps or safety limits are reported.
+Closest name matches appear first; **Show other event conditions** reveals
+additional learning-path flags, which may control actor selection or story logic
+rather than the skill itself.
+
+Learning a skill never automatically enables switches. Individual switch changes
+require confirmation because they are global and may affect story progress or
+other actors. If the value or loaded session changes before confirmation, review
+it again. Save a backup first.
+
 ## Appearance, themes and transparency
 
 ![Appearance panel with window size, opacity, accent colors and theme controls](../../public/images/appearance-panel.png)

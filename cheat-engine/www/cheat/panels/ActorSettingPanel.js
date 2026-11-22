@@ -17,6 +17,7 @@ import LockFavoriteControls from "../components/LockFavoriteControls.js";
 import { favoriteSort } from "../js/panels/locks/LockPanelState.js";
 import GameAsset from "../components/GameAsset.js";
 import VirtualList from "../components/VirtualList.js";
+import ActorSkillsEditor from "../components/ActorSkillsEditor.js";
 import { getFeatureRuntime } from "../js/runtime/FeatureRuntime.js";
 import { getGameWindow } from "../js/runtime/FeatureRuntime.js";
 import { readMapActors } from "../js/panels/map/MapActors.js";
@@ -25,7 +26,13 @@ import { requestMapNavigation } from "../js/ui/RecordNavigation.js";
 export default {
   name: "ActorSettingPanel",
   inject: { cheatRuntime: { default: null } },
-  components: { DatabaseTooltip, LockFavoriteControls, GameAsset, VirtualList },
+  components: {
+    DatabaseTooltip,
+    LockFavoriteControls,
+    GameAsset,
+    VirtualList,
+    ActorSkillsEditor,
+  },
 
   template: `
 <v-card flat class="ma-0 pa-0">
@@ -160,38 +167,7 @@ export default {
 
             </section>
             <section v-show="detailView === 'skills'" aria-label="Actor skills">
-            <h4 class="record-section-title">Learned skills · {{ detail.learnedSkills.length }}</h4>
-            <div class="cheat-chip-row">
-                <v-chip
-                    v-for="skill in detail.learnedSkills"
-                    :key="skill.id"
-                    x-small label close
-                    @click:close="onForgetSkill(skill.id)">
-                    <database-tooltip kind="skill" :record-id="skill.id" :label="skill.name"/>
-                </v-chip>
-                <span v-if="detail.learnedSkills.length === 0" class="caption cheat-muted">No skills learned</span>
-            </div>
-            <v-row dense class="ma-0 mt-1">
-                <v-col cols="12">
-                    <v-text-field
-                        label="Search skills"
-                        v-model="skillSearch"
-                        outlined dense hide-details
-                        @keydown.self.stop></v-text-field>
-                </v-col>
-                <v-col cols="12">
-                    <v-select
-                        label="Learn skill"
-                        v-model="skillToLearn"
-                        :items="filteredLearnableSkills"
-                        item-text="name"
-                        item-value="id"
-                        outlined dense hide-details></v-select>
-                </v-col>
-                <v-col cols="12">
-                    <v-btn x-small color="primary" :disabled="!skillToLearn" @click="onLearnSkill">Learn</v-btn>
-                </v-col>
-            </v-row>
+            <actor-skills-editor :actor-id="detail.id" :skills="allSkills" :learned="detail.learnedSkills" @learn="onLearnSkill" @forget="onForgetSkill"/>
 
             </section>
             <section v-show="detailView === 'status'" aria-label="Actor status effects">
@@ -250,8 +226,6 @@ export default {
       allStates: [],
       selectedActorId: null,
       detail: null,
-      skillSearch: "",
-      skillToLearn: null,
       stateToAdd: null,
       partyConfirmation: false,
       clearStatesConfirmation: false,
@@ -347,37 +321,6 @@ export default {
       }
       return groups;
     },
-    filteredLearnableSkills() {
-      var search = String(this.skillSearch || "")
-        .trim()
-        .toLowerCase();
-      var learnedIds = {};
-      if (this.detail && this.detail.learnedSkills) {
-        for (var i = 0; i < this.detail.learnedSkills.length; i++) {
-          learnedIds[this.detail.learnedSkills[i].id] = true;
-        }
-      }
-      var result = [];
-      for (var n = 0; n < this.allSkills.length; n++) {
-        var skill = this.allSkills[n];
-        if (learnedIds[skill.id]) {
-          continue;
-        }
-        if (
-          search &&
-          String(skill.name || "")
-            .toLowerCase()
-            .indexOf(search) === -1
-        ) {
-          continue;
-        }
-        result.push(skill);
-        if (result.length >= 200) {
-          break;
-        }
-      }
-      return result;
-    },
   },
 
   created() {
@@ -426,13 +369,11 @@ export default {
         this.selectedActorId = null;
         this.detail = null;
       }
-      this.skillToLearn = null;
     },
 
     selectActor(actorId) {
       this.selectedActorId = actorId;
       this.detail = readActorDetail(actorId);
-      this.skillToLearn = null;
       this.stateToAdd = null;
     },
 
@@ -609,8 +550,8 @@ export default {
       );
     },
 
-    onLearnSkill() {
-      var skillId = Number(this.skillToLearn);
+    onLearnSkill(value) {
+      var skillId = Number(value);
       if (!skillId) {
         return;
       }

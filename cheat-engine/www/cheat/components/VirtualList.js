@@ -12,6 +12,7 @@ export default {
     itemSize: { type: Number, default: 48 },
     height: { type: Number, default: 330 },
     overscan: { type: Number, default: 5 },
+    preserveScroll: { type: Boolean, default: false },
   },
   data() {
     return { scroll: 0 };
@@ -43,8 +44,17 @@ export default {
   },
   watch: {
     items() {
-      this.scroll = 0;
-      if (this.$refs.scroller) this.$refs.scroller.scrollTop = 0;
+      const scroller = this.$refs.scroller;
+      this.scroll = this.preserveScroll
+        ? Math.min(
+            this.scroll,
+            Math.max(
+              0,
+              this.total - ((scroller && scroller.clientHeight) || this.height),
+            ),
+          )
+        : 0;
+      if (scroller) scroller.scrollTop = this.scroll;
     },
   },
   methods: {

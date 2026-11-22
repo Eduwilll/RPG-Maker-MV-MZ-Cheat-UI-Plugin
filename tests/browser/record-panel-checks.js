@@ -83,6 +83,134 @@ export async function recordPanelChecks({
   nameInput.blur();
   await tick();
 
+  await switchView(actor, "Skills");
+  const game = view.__cheatOpener || view;
+  const skillCount = game.$dataSkills.length,
+    switchCount = game.$dataSystem.switches.length;
+  const skillId = skillCount,
+    switchId = switchCount;
+  game.$dataSkills.push({ id: skillId, name: "Mind read test", effects: [] });
+  game.$dataSystem.switches.push("SKILL_mind_read_test");
+  actor.initializeVariables();
+  await tick();
+  const picker = find(root, "ActorSkillsEditor");
+  picker.search = "Mind read test";
+  await tick();
+  assert(
+    picker.rows.length === 1 && !picker.$el.querySelector(".v-select"),
+    label + ": skill results are visible without opening a dropdown",
+  );
+  await switchView(picker, "Learn");
+  assert(
+    actor.detail.learnedSkills.some((skill) => skill.id === skillId) &&
+      !game.$gameSwitches.value(switchId),
+    label + ": direct Learn adds skill without activating global switches",
+  );
+  await switchView(picker, "Review switches");
+  const review = find(root, "SkillSwitchInspector");
+  assert(
+    review.rows.some((row) => row.id === switchId && row.link === "name"),
+    label + ": switch review separates name candidates from event evidence",
+  );
+  review.reviewChange(review.rows.find((row) => row.id === switchId));
+  await tick();
+  assert(
+    !game.$gameSwitches.value(switchId) && !!review.pending,
+    label + ": global switch changes wait for confirmation",
+  );
+  review.pending = null;
+  review.reviewChange(review.rows.find((row) => row.id === switchId));
+  game.$gameSwitches.setValue(switchId, true);
+  review.applyChange();
+  await tick();
+  assert(
+    !!review.error && game.$gameSwitches.value(switchId),
+    label + ": stale switch confirmation is rejected",
+  );
+  review.reviewChange(review.rows.find((row) => row.id === switchId));
+  review.applyChange();
+  await tick();
+  assert(
+    !review.error && !game.$gameSwitches.value(switchId),
+    label + ": explicit reviewed switch change writes into game realm",
+  );
+  review.reviewChange(review.rows.find((row) => row.id === switchId));
+  const oldSwitches = game.$gameSwitches;
+  try {
+    game.$gameSwitches = {
+      _data: oldSwitches._data.slice(),
+      value: (id) => !!oldSwitches._data[id],
+      setValue: () => {
+        throw Error("Must not write into a replacement session");
+      },
+    };
+    review.applyChange();
+    assert(
+      review.error.indexOf("session changed") >= 0,
+      label + ": switch confirmation cannot cross a loaded game session",
+    );
+  } finally {
+    game.$gameSwitches = oldSwitches;
+  }
+  review.refresh();
+  const runtime = game.__cheatFeatures,
+    originalLoader = runtime.previews.load,
+    originalMaps = game.$dataMapInfos;
+  try {
+    game.$dataMapInfos = [null, { id: 1, name: "Test map" }];
+    let release;
+    runtime.previews.load = () =>
+      new Promise((resolve) => {
+        release = resolve;
+      });
+    const scanning = review.scanAllMaps();
+    review.cancelScan();
+    release({
+      events: [
+        null,
+        {
+          id: 99,
+          pages: [
+            { list: [{ code: 121, parameters: [switchId, switchId, 0] }] },
+          ],
+        },
+      ],
+    });
+    await scanning;
+    assert(
+      !review.scanning &&
+        review.rows.find((row) => row.id === switchId).references === 0,
+      label + ": cancelled map scan cannot apply stale results",
+    );
+    runtime.previews.load = async () => {
+      throw Error("Unreadable map");
+    };
+    await review.scanAllMaps();
+    assert(
+      review.finished && review.failed === 1,
+      label + ": unreadable maps are reported without breaking switch review",
+    );
+  } finally {
+    runtime.previews.load = originalLoader;
+    game.$dataMapInfos = originalMaps;
+  }
+  await switchView(picker, "Forget");
+  assert(
+    !actor.detail.learnedSkills.some((skill) => skill.id === skillId),
+    label + ": direct Forget removes only the selected skill",
+  );
+  picker.search = "";
+  await switchView(picker, "Learned");
+  assert(
+    picker.rows.every((skill) => picker.learnedIds.has(skill.id)),
+    label + ": learned filter only shows acquired skills",
+  );
+  picker.inspectedId = null;
+  game.$dataSkills.length = skillCount;
+  game.$dataSystem.switches.length = switchCount;
+  actor.initializeVariables();
+  await tick();
+
   for (const [panelId, section] of [
     ["skill-editor-panel", "Damage"],
     ["class-editor-panel", "Progression"],

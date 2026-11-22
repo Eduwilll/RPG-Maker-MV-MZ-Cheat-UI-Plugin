@@ -74,3 +74,21 @@ test("virtual list resets its scroll position when the items change", async () =
   vm.onScroll({ target: {} });
   assert.equal(vm.scroll, 0, "a missing scrollTop never yields NaN");
 });
+
+test("skill lists can preserve scroll across learning and clamp after removal", async () => {
+  const definition = await component(),
+    scroller = { scrollTop: 480, clientHeight: 200 };
+  const vm = mount(definition, {
+    items: Array.from({ length: 40 }),
+    scroll: 480,
+    preserveScroll: true,
+    $refs: { scroller },
+  });
+  definition.watch.items.call(vm);
+  assert.equal(vm.scroll, 480);
+  assert.equal(scroller.scrollTop, 480);
+  vm.items = Array.from({ length: 5 });
+  definition.watch.items.call(vm);
+  assert.equal(vm.scroll, 40);
+  assert.equal(scroller.scrollTop, 40);
+});

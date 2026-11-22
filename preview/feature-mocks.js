@@ -39,7 +39,16 @@ export function installBrowserFixture(game) {
     return this._profile || "";
   };
   actorPrototype.skills = function () {
-    return [game.$dataSkills[1]];
+    return (this._skills || [1])
+      .map((id) => game.$dataSkills[id])
+      .filter(Boolean);
+  };
+  actorPrototype.learnSkill = function (id) {
+    if (!this._skills) this._skills = [1];
+    if (this._skills.indexOf(id) < 0) this._skills.push(id);
+  };
+  actorPrototype.forgetSkill = function (id) {
+    this._skills = (this._skills || [1]).filter((value) => value !== id);
   };
   actorPrototype.states = function () {
     return (this._states || [])
