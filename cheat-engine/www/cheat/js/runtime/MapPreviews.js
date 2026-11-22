@@ -2,8 +2,10 @@ import { createMapArtwork } from "../panels/minimap/MapArtwork.js";
 import { loadOptionalBitmap } from "./GameAssets.js";
 export function createMapPreviews(game) {
   const cache = new Map();
-  const artwork = createMapArtwork(game, (name) =>
-    loadOptionalBitmap(game, { type: "tileset", name }),
+  const artwork = createMapArtwork(
+    game,
+    (name) => loadOptionalBitmap(game, { type: "tileset", name }),
+    { maxTileSize: 48 },
   );
   async function load(id) {
     if (!Number.isInteger(id) || id < 1 || id > 999999)
@@ -54,5 +56,9 @@ export function createMapPreviews(game) {
     load,
     render: (data, id) => artwork.render(data, id),
     status: artwork.status,
+    clear(id) {
+      cache.delete(id);
+      artwork.clear();
+    },
   };
 }

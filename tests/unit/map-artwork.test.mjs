@@ -62,6 +62,17 @@ function fixture(mz) {
   return { game, calls, bitmap };
 }
 
+test("destination artwork can retain native tile detail without changing the live minimap default", async () => {
+  const { createMapArtwork } =
+    await import("../../cheat-engine/www/cheat/js/panels/minimap/MapArtwork.js");
+  const { game } = fixture(false);
+  assert.equal(createMapArtwork(game).render().width, 32);
+  assert.equal(
+    createMapArtwork(game, null, { maxTileSize: 48 }).render().width,
+    96,
+  );
+});
+
 for (const mz of [false, true]) {
   test(
     (mz ? "MZ" : "MV") +

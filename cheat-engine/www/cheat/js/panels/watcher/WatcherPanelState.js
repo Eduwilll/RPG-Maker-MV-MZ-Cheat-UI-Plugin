@@ -410,9 +410,13 @@ function buildEventReferenceRows(gameEvent, source) {
  * @param {string} source
  * @param {number | null} [distance]
  */
-function buildDataEventReferenceRows(dataEvent, source, distance = null) {
+export function buildDataEventReferenceRows(
+  dataEvent,
+  source,
+  distance = null,
+  mapId = getCurrentMapId(),
+) {
   const rows = [];
-  const mapId = getCurrentMapId();
   const eventId = dataEvent.id;
   const eventName = dataEvent.name || `Event ${eventId}`;
   const sourceText = formatEventSource(source, eventName, distance);
@@ -425,6 +429,10 @@ function buildDataEventReferenceRows(dataEvent, source, distance = null) {
     }
   }
 
+  rows.forEach((row) => {
+    row.mapId = mapId;
+    row.eventId = eventId;
+  });
   return dedupeRows(rows);
 }
 

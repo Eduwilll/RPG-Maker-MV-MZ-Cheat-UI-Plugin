@@ -16,50 +16,39 @@ import DatabaseTooltip from "../components/DatabaseTooltip.js";
 import LockFavoriteControls from "../components/LockFavoriteControls.js";
 import { favoriteSort } from "../js/panels/locks/LockPanelState.js";
 import GameAsset from "../components/GameAsset.js";
+import VirtualList from "../components/VirtualList.js";
 import { getFeatureRuntime } from "../js/runtime/FeatureRuntime.js";
+import { getGameWindow } from "../js/runtime/FeatureRuntime.js";
+import { readMapActors } from "../js/panels/map/MapActors.js";
+import { requestMapNavigation } from "../js/ui/RecordNavigation.js";
 
 export default {
   name: "ActorSettingPanel",
   inject: { cheatRuntime: { default: null } },
-  components: { DatabaseTooltip, LockFavoriteControls, GameAsset },
+  components: { DatabaseTooltip, LockFavoriteControls, GameAsset, VirtualList },
 
   template: `
 <v-card flat class="ma-0 pa-0">
-    <v-row class="ma-0" dense>
-        <v-col cols="12" sm="4" class="pa-1">
-            <v-card-subtitle class="pa-1">Actors ({{ actors.length }})</v-card-subtitle>
-            <v-list dense class="cheat-list-scroll cheat-list-scroll--actors">
-                <template v-for="group in groupedActors">
-                    <v-subheader :key="'h-' + group.key" class="pa-1">{{ group.label }}</v-subheader>
-                    <v-list-item
-                        v-for="actor in group.items"
-                        :key="actor.id"
-                        :input-value="actor.id === selectedActorId"
-                        @click="selectActor(actor.id)">
-                        <game-asset kind="actor" :record-id="actor.id" :label="actor.name" :size="40" :navigate="false" class="mr-2"/>
-                        <v-list-item-content>
-                            <v-list-item-title>{{ actor.name }} <span class="caption cheat-muted">Lv{{ actor.level }}</span></v-list-item-title>
-                            <v-list-item-subtitle>{{ actor.className }}<span v-if="actor.nickname"> · {{ actor.nickname }}</span></v-list-item-subtitle>
-                        </v-list-item-content>
-                        <v-list-item-action v-if="actor.isLeader">
-                            <v-icon x-small color="warning">mdi-crown</v-icon>
-                        </v-list-item-action>
-                        <v-list-item-action v-else-if="actor.isBattleMember">
-                            <v-icon x-small color="success">mdi-sword-cross</v-icon>
-                        </v-list-item-action>
-                        <v-list-item-action v-else-if="actor.isInParty">
-                            <v-icon x-small color="info">mdi-account</v-icon>
-                        </v-list-item-action>
-                    </v-list-item>
-                </template>
-            </v-list>
-            <v-btn small block class="mt-2" @click="initializeVariables">
-                <v-icon x-small left>mdi-refresh</v-icon> Reload
-            </v-btn>
-        </v-col>
-        <v-col cols="12" sm="8" class="pa-1" v-if="detail">
-            <v-card-subtitle class="pa-1">Identity — {{ detail.name }}</v-card-subtitle>
-            <div class="pa-1"><v-btn x-small :color="selectedInParty ? 'warning' : 'primary'" @click="partyConfirmation = true">{{ selectedInParty ? 'Remove from Party' : 'Add to Party' }}</v-btn><span class="caption cheat-muted ml-2">{{ selectedInParty ? 'Current party member' : 'Not in party' }}</span></div>
+    <section class="record-workspace">
+        <aside class="record-finder" aria-label="Actor roster">
+            <div class="workspace-rail-heading"><strong>Actors</strong><span>{{ actorRows.length }} / {{ actors.length }}</span><button type="button" class="workspace-icon" title="Reload actors" aria-label="Reload actors" @click="initializeVariables"><v-icon small>mdi-refresh</v-icon></button></div>
+            <v-text-field v-model="actorSearch" label="Search actors or ID" dense outlined hide-details clearable prepend-inner-icon="mdi-magnify" @keydown.stop/>
+            <div class="workspace-segments mt-2" role="group" aria-label="Actor filter"><button type="button" :class="{'is-selected': actorFilter === 'all'}" :aria-pressed="actorFilter === 'all'" @click="actorFilter = 'all'">All</button><button type="button" :class="{'is-selected': actorFilter === 'party'}" :aria-pressed="actorFilter === 'party'" @click="actorFilter = 'party'">Party</button></div>
+            <virtual-list v-if="actorRows.length" :items="actorRows" :height="Math.min(350, actorRows.length * 68)" :item-size="68">
+              <template v-slot="{item: actor}"><button type="button" class="workspace-choice record-choice" :class="{'is-selected': actor.id === selectedActorId}" :aria-pressed="actor.id === selectedActorId" @click="selectActor(actor.id)">
+                <game-asset kind="actor" :record-id="actor.id" :label="actor.name" :size="34" :navigate="false"/>
+                <span class="record-choice__body"><strong>{{ actor.name }}</strong><small>#{{ actor.id }} · Lv{{ actor.level }} · {{ actor.className }}</small><small>{{ actor.isLeader ? 'Controlled' : actor.isInParty ? 'Party member' : 'Not in party' }}</small></span>
+              </button></template>
+            </virtual-list>
+            <p v-else class="workspace-empty">{{ actors.length ? 'No matching actors. Try another name or ID.' : 'Load a game to see actors.' }}</p>
+        </aside>
+        <div class="record-inspector" v-if="detail">
+            <header class="record-heading"><game-asset kind="actor" :record-id="detail.id" :label="detail.name" :size="52" :navigate="false"/><div class="record-heading__body"><h3>{{ detail.name }}</h3><small>Actor #{{ detail.id }} · {{ selectedInParty ? 'Party member' : 'Not in party' }}</small></div></header>
+            <div class="record-actions"><v-btn small :color="selectedInParty ? undefined : 'primary'" @click="partyConfirmation = true">{{ selectedInParty ? 'Remove from Party' : 'Add to Party' }}</v-btn><v-btn v-if="selectedMapActor" small text @click="showOnMap"><v-icon small left>mdi-map-marker</v-icon>Show on map</v-btn></div>
+            <p class="workspace-hint">Changes apply immediately. Save the game to keep them.</p>
+            <div class="inspector-views" role="group" aria-label="Actor sections"><button v-for="view in actorViews" :key="view.value" type="button" :class="{'is-selected': detailView === view.value}" :aria-pressed="detailView === view.value" @click="detailView = view.value">{{ view.label }}</button></div>
+            <section v-show="detailView === 'overview'" aria-label="Identity and vitals">
+            <h4 class="record-section-title">Identity &amp; progression</h4>
             <v-row dense class="ma-0">
                 <v-col cols="12" md="6">
                     <v-text-field
@@ -150,7 +139,10 @@ export default {
                 </v-col>
             </v-row>
 
-            <v-card-subtitle class="pa-1 mt-2">Params</v-card-subtitle>
+            </section>
+            <section v-show="detailView === 'parameters'" aria-label="Actor parameters">
+            <h4 class="record-section-title">Parameters</h4>
+            <p class="workspace-hint">Adjust this actor's values, including equipment and bonuses.</p>
             <v-row dense class="ma-0">
                 <v-col
                     v-for="(_, paramIdx) in detail.param.length"
@@ -166,7 +158,9 @@ export default {
                 </v-col>
             </v-row>
 
-            <v-card-subtitle class="pa-1 mt-2">Skills ({{ detail.learnedSkills.length }})</v-card-subtitle>
+            </section>
+            <section v-show="detailView === 'skills'" aria-label="Actor skills">
+            <h4 class="record-section-title">Learned skills · {{ detail.learnedSkills.length }}</h4>
             <div class="cheat-chip-row">
                 <v-chip
                     v-for="skill in detail.learnedSkills"
@@ -199,7 +193,9 @@ export default {
                 </v-col>
             </v-row>
 
-            <v-card-subtitle class="pa-1 mt-2">Status Effects ({{ detail.activeStates.length }})</v-card-subtitle>
+            </section>
+            <section v-show="detailView === 'status'" aria-label="Actor status effects">
+            <h4 class="record-section-title">Active effects · {{ detail.activeStates.length }}</h4>
             <div class="cheat-chip-row">
                 <v-chip
                     v-for="st in favoriteStates"
@@ -226,12 +222,11 @@ export default {
                     <v-btn x-small class="ml-2" @click="clearStatesConfirmation = true">Clear All</v-btn>
                 </v-col>
             </v-row>
-        </v-col>
-        <v-col cols="12" sm="8" class="pa-1" v-else>
-            <p class="caption cheat-muted pa-2">No actor selected. Open a game with a party first.</p>
-        </v-col>
-    </v-row>
-    <v-alert v-if="partyError" type="error" dense>{{ partyError }}</v-alert>
+            </section>
+        </div>
+        <div class="record-inspector workspace-empty" v-else>No actor selected. Load a game to begin.</div>
+    </section>
+    <v-alert v-if="partyError" type="error" role="alert" dense>{{ partyError }}</v-alert>
     <v-dialog v-model="partyConfirmation" max-width="400"><v-card><v-card-text class="pt-4">{{ selectedInParty ? 'Remove this actor from your party?' : 'Recruit this actor? This may bypass story progression and does not override battle-party limits.' }}</v-card-text><v-card-actions><v-btn text @click="partyConfirmation = false">Cancel</v-btn><v-btn text @click="changeParty">Confirm</v-btn></v-card-actions></v-card></v-dialog>
     <v-dialog v-model="clearStatesConfirmation" max-width="360"><v-card><v-card-text class="pt-4">Remove all status effects from this actor?</v-card-text><v-card-actions><v-btn text @click="clearStatesConfirmation = false">Cancel</v-btn><v-btn text @click="clearStatesConfirmation = false; onClearStates()">Clear effects</v-btn></v-card-actions></v-card></v-dialog>
 </v-card>
@@ -240,6 +235,15 @@ export default {
   data() {
     return {
       actors: [],
+      actorSearch: "",
+      actorFilter: "all",
+      detailView: "overview",
+      actorViews: [
+        { value: "overview", label: "Overview" },
+        { value: "parameters", label: "Parameters" },
+        { value: "skills", label: "Skills" },
+        { value: "status", label: "Status" },
+      ],
       paramNames: [],
       classes: [],
       allSkills: [],
@@ -256,6 +260,40 @@ export default {
   },
 
   computed: {
+    actorRows() {
+      const term = String(this.actorSearch || "")
+        .trim()
+        .toLowerCase();
+      return this.groupedActors
+        .reduce((rows, group) => rows.concat(group.items), [])
+        .filter(
+          (actor) =>
+            (this.actorFilter !== "party" || actor.isInParty) &&
+            (!term ||
+              (
+                actor.id +
+                " " +
+                actor.name +
+                " " +
+                actor.nickname +
+                " " +
+                actor.className
+              )
+                .toLowerCase()
+                .indexOf(term) >= 0),
+        );
+    },
+    selectedMapActor() {
+      const snapshot = this.actors.find(
+        (row) => row.id === this.selectedActorId,
+      );
+      if (!snapshot || !snapshot.isInParty) return null;
+      return (
+        readMapActors(getGameWindow()).find(
+          (row) => row.actorId === this.selectedActorId,
+        ) || null
+      );
+    },
     selectedInParty() {
       const row = this.actors.find(
         (actor) => actor.id === this.selectedActorId,
@@ -347,6 +385,16 @@ export default {
   },
 
   methods: {
+    showOnMap() {
+      const game = getGameWindow(),
+        actor = readMapActors(game).find(
+          (row) => row.actorId === this.selectedActorId,
+        );
+      if (actor)
+        requestMapNavigation(
+          Object.assign({ mapId: game.$gameMap.mapId() }, actor),
+        );
+    },
     changeParty() {
       this.partyConfirmation = false;
       try {

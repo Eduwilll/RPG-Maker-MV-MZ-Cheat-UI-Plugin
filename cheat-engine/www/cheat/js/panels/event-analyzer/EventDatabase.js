@@ -82,6 +82,10 @@ export class EventDatabase {
       gameMap && typeof gameMap.mapId === "function" ? gameMap.mapId() : 0;
     this._currentMapId = mapId;
 
+    for (const key of this._mapEvents.keys()) {
+      if (key.startsWith(`${mapId}:`)) this._mapEvents.delete(key);
+    }
+
     for (const event of dataMap.events) {
       if (event && event.id) {
         this._mapEvents.set(`${mapId}:${event.id}`, event);

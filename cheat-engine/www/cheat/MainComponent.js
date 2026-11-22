@@ -1,4 +1,5 @@
 import CheatModal from "./CheatModal.js";
+import { DEFAULT_WINDOW_SIZE } from "./js/ui/LayoutGeometry.js";
 import { GLOBAL_SHORTCUT } from "./js/shortcuts/GlobalShortcut.js";
 import { GeneralCheat } from "./js/cheats/GeneralCheat.js";
 import AlertSnackbar from "./components/AlertSnackbar.js";
@@ -100,11 +101,39 @@ export default {
       this.show = false;
     };
     window.addEventListener("cheat-return-to-game", this._returnToGame);
+    this._ensureRecordNavigation = (event) => {
+      if (this.show) return;
+      const panels = {
+        "cheat-navigate-event": "event-analyzer-panel",
+        "cheat-navigate-actor": "actor-setting-panel",
+        "cheat-navigate-map": "map-event-panel",
+      };
+      this.openCheatModal(panels[event.type]);
+      this.$nextTick(() =>
+        window.dispatchEvent(
+          new CustomEvent(event.type, { detail: event.detail }),
+        ),
+      );
+    };
+    [
+      "cheat-navigate-event",
+      "cheat-navigate-actor",
+      "cheat-navigate-map",
+    ].forEach((type) =>
+      window.addEventListener(type, this._ensureRecordNavigation),
+    );
 
     this.checkVersion();
   },
 
   beforeDestroy() {
+    [
+      "cheat-navigate-event",
+      "cheat-navigate-actor",
+      "cheat-navigate-map",
+    ].forEach((type) =>
+      window.removeEventListener(type, this._ensureRecordNavigation),
+    );
     window.removeEventListener("cheat-return-to-game", this._returnToGame);
     window.removeEventListener("keydown", this.onGlobalKeyDown);
     window.removeEventListener("keyup", this.onGlobalKeyUp);
@@ -250,14 +279,17 @@ export default {
             320,
             Math.min(
               window.screen.availWidth,
-              readNumberSetting("cheatWindow.width", 700),
+              readNumberSetting("cheatWindow.width", DEFAULT_WINDOW_SIZE.width),
             ),
           ),
           height: Math.max(
             240,
             Math.min(
               window.screen.availHeight,
-              readNumberSetting("cheatWindow.height", 800),
+              readNumberSetting(
+                "cheatWindow.height",
+                DEFAULT_WINDOW_SIZE.height,
+              ),
             ),
           ),
           resizable: true,

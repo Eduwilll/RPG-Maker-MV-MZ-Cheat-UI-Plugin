@@ -15,6 +15,7 @@ export default {
         { key: "upperTiles", label: "Roofs / upper tiles" },
         { key: "background", label: "Map background" },
         { key: "player", label: "Player marker" },
+        { key: "saved", label: "Saved points" },
         { key: "npcs", label: "NPCs" },
         { key: "enemies", label: "Enemies" },
         { key: "treasures", label: "Items / treasure" },

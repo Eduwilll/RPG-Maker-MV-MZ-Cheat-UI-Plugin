@@ -115,7 +115,11 @@ function tilePainter(game, entry, ctx, scale, data, detached, layers) {
 }
 
 /** One bounded map canvas per game, shared by the overlay and separate window. */
-export function createMapArtwork(game, optionalLoader) {
+export function createMapArtwork(game, optionalLoader, options = {}) {
+  const maxTileSize = Math.max(
+    1,
+    Math.min(48, Math.floor(Number(options.maxTileSize) || 16)),
+  );
   let assets = null;
   let cache = null;
   let lastStatus = { stage: "idle", detail: "", cacheKey: "" };
@@ -189,7 +193,7 @@ export function createMapArtwork(game, optionalLoader) {
     const scale = Math.max(
       1,
       Math.min(
-        16,
+        maxTileSize,
         Math.floor(4096 / Math.max(w, h)),
         Math.floor(Math.sqrt(8388608 / (w * h))),
       ),

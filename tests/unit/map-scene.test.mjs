@@ -77,6 +77,6 @@ test("player arrow follows facing, and reduced motion stops its pulse without hi
   assert.notEqual(ctx.radii[1], ctx.radii[2]);
   assert.equal(
     new Set(Object.values(MAP_MARKER_STYLES).map((row) => row.glyph)).size,
-    4,
+    6,
   );
 });

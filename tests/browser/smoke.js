@@ -15,6 +15,8 @@ import {
   readMinimapSettings,
 } from "../../cheat-engine/www/cheat/js/panels/minimap/MinimapPanelState.js";
 import { KEY_VALUE_STORAGE } from "../../cheat-engine/www/cheat/js/storage/KeyValueStorage.js";
+import { connectedMapChecks } from "./connected-map-checks.js";
+import { recordPanelChecks } from "./record-panel-checks.js";
 
 const errors = [];
 const checks = [];
@@ -286,6 +288,8 @@ async function run() {
     "Enemy cards show descriptions and base drop chances",
   );
   enemyTooltip.open = false;
+  enemyPanel.detailView = "battle";
+  await tick();
   click("Start Battle Here");
   await tick();
   assert(
@@ -319,6 +323,8 @@ async function run() {
   assert($dataEnemies[1].gold === 99, "Edited save restores database override");
   await route("skill-editor-panel");
   fill("MP Cost", "1");
+  descendants(app, "DatabaseEditorPanel").detailView = "damage";
+  await tick();
   fill(
     "Damage Formula (RPG Maker JavaScript)",
     "window.__previewExecuted = true",
@@ -1543,6 +1549,50 @@ async function run() {
     frame.contentDocument.body.textContent.includes("Custom Game Toggle"),
     "Pop-out discovers game-specific options in game realm",
   );
+  await connectedMapChecks({
+    root: app,
+    view: window,
+    game: window,
+    route,
+    find: descendants,
+    assert,
+    tick,
+    label: "Overlay",
+  });
+  await connectedMapChecks({
+    root: popupRoot,
+    view: frame.contentWindow,
+    game: window,
+    route: async (panel) => {
+      popupRoot.activeComponentName = panel;
+      await tick();
+    },
+    find: descendants,
+    assert,
+    tick,
+    label: "Separate window",
+  });
+  await recordPanelChecks({
+    root: app,
+    view: window,
+    route,
+    find: descendants,
+    assert,
+    tick,
+    label: "Overlay",
+  });
+  await recordPanelChecks({
+    root: popupRoot,
+    view: frame.contentWindow,
+    route: async (panel) => {
+      popupRoot.activeComponentName = panel;
+      await tick();
+    },
+    find: descendants,
+    assert,
+    tick,
+    label: "Separate window",
+  });
   popupRoot.activeComponentName = "shortcut-panel";
   await tick();
   const shortcutsPanel = descendants(popupRoot, "ShortcutPanel");

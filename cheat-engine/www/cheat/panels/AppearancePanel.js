@@ -1,3 +1,4 @@
+import { DEFAULT_WINDOW_SIZE } from "../js/ui/LayoutGeometry.js";
 import {
   readNumberSetting,
   writeNumberSetting,
@@ -58,7 +59,7 @@ export default {
                 @change="onLayoutChange" />
         </div>
         <div class="cheat-inline cheat-inline--top">
-            <v-btn small outlined @click="resetOverlaySize">Reset to 750 x 450</v-btn>
+            <v-btn small outlined @click="resetOverlaySize">Reset to 880 x 660</v-btn>
             <span class="caption">Size is clamped to the game window.</span>
         </div>
     </section>
@@ -138,8 +139,14 @@ export default {
     const primaryColor = readThemeSelection().primary;
     return {
       useGameFont: readBooleanSetting("cheatModal.gameFont", false),
-      overlayWidth: readNumberSetting("cheatModal.width", 750),
-      overlayHeight: readNumberSetting("cheatModal.height", 450),
+      overlayWidth: readNumberSetting(
+        "cheatModal.width",
+        DEFAULT_WINDOW_SIZE.width,
+      ),
+      overlayHeight: readNumberSetting(
+        "cheatModal.height",
+        DEFAULT_WINDOW_SIZE.height,
+      ),
       windowOpacity: readNumberSetting(WINDOW_OPACITY_SETTING, 0.9),
       isDarkMode: readBooleanSetting(THEME_DARK_MODE_SETTING, true),
       primaryColor: primaryColor,
@@ -158,11 +165,23 @@ export default {
       writeBooleanSetting("cheatModal.gameFont", this.useGameFont);
       writeNumberSetting(
         "cheatModal.width",
-        Math.max(320, Math.min(4096, Number(this.overlayWidth) || 750)),
+        Math.max(
+          320,
+          Math.min(
+            4096,
+            Number(this.overlayWidth) || DEFAULT_WINDOW_SIZE.width,
+          ),
+        ),
       );
       writeNumberSetting(
         "cheatModal.height",
-        Math.max(240, Math.min(2160, Number(this.overlayHeight) || 450)),
+        Math.max(
+          240,
+          Math.min(
+            2160,
+            Number(this.overlayHeight) || DEFAULT_WINDOW_SIZE.height,
+          ),
+        ),
       );
       window.dispatchEvent(new CustomEvent("cheat-layout-change"));
       const game = getGameWindow();
@@ -170,8 +189,8 @@ export default {
         game.dispatchEvent(new game.CustomEvent("cheat-layout-change"));
     },
     resetOverlaySize() {
-      this.overlayWidth = 750;
-      this.overlayHeight = 450;
+      this.overlayWidth = DEFAULT_WINDOW_SIZE.width;
+      this.overlayHeight = DEFAULT_WINDOW_SIZE.height;
       this.onLayoutChange();
     },
     selectColor(value) {

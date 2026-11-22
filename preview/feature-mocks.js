@@ -1,6 +1,9 @@
 /** Development-only engine contracts for preview and isolated UI smoke tests. */
 export function installBrowserFixture(game) {
   const actorPrototype = game.Game_Actor.prototype;
+  actorPrototype.setName = function (value) {
+    this._name = String(value);
+  };
   actorPrototype.faceName = () => "Actor1";
   actorPrototype.faceIndex = function () {
     return this._actorId - 1;

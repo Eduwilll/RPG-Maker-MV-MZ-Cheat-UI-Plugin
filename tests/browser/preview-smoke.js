@@ -210,15 +210,12 @@ async function run() {
   app.activeComponentName = "teleport-panel";
   await delay();
   await delay();
-  const teleportTable = game.document.querySelector(".v-data-table");
-  const teleportRows = teleportTable
-    ? teleportTable.querySelectorAll("tbody tr")
-    : [];
+  const teleportRows = game.document.querySelectorAll(
+    ".destination-map-choice",
+  );
   assert(
-    teleportTable &&
-      teleportRows.length > 1 &&
-      !teleportTable.querySelector(".v-data-table__empty-wrapper"),
-    "Teleport lists the project maps instead of an empty table",
+    teleportRows.length > 1,
+    "Teleport lists project maps as selectable destinations",
   );
   app.activeComponentName = "game-options-panel";
   await delay();
@@ -445,6 +442,28 @@ async function run() {
     !game.$dataActors.__ob__ && !game.$dataMap.__ob__,
     "Preview keeps game data outside Vue observation",
   );
+  const previewFrame = document.getElementById("preview-frame"),
+    previousFrameWidth = previewFrame.style.width;
+  previewFrame.style.width = "1600px";
+  app.setScene("map");
+  app.activeComponentName = "teleport-panel";
+  await delay();
+  const wideModal = child(app, "CheatModal"),
+    previousModalWidth = wideModal.overlayWidth;
+  wideModal.overlayWidth = 1500;
+  await delay();
+  await delay();
+  const wideCanvas = game.document.querySelector(".map-preview__canvas"),
+    wideBounds = wideCanvas.getBoundingClientRect();
+  assert(
+    Math.abs(
+      wideBounds.width / wideBounds.height -
+        wideCanvas.width / wideCanvas.height,
+    ) < 0.01,
+    "Wide destination previews preserve their tile-click proportions",
+  );
+  wideModal.overlayWidth = previousModalWidth;
+  previewFrame.style.width = previousFrameWidth;
   const mvFrame = document.createElement("iframe");
   mvFrame.src =
     "/preview/index.html?testing=1&engine=MV&panel=message-log-panel";

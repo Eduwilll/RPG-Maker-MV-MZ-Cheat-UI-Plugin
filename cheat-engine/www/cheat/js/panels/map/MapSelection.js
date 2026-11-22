@@ -1,13 +1,27 @@
 import { markerVisible } from "./MapMarkers.js";
 
-export function selectMapPoint(point, markers, layers, mapId) {
-  const marker = markers.find(
-    (row) =>
-      markerVisible(row, layers) &&
-      Math.abs(row.x + 0.5 - point.x) <= 0.65 &&
-      Math.abs(row.y + 0.5 - point.y) <= 0.65,
+export function selectMapPoint(point, markers, layers, mapId, unit = 0) {
+  const radius = Math.max(
+    0.65,
+    unit > 0 ? (10 * (layers.markerScale || 1)) / unit : 0,
   );
-  return {
+  let marker = null,
+    nearest = Infinity;
+  markers.forEach((row) => {
+    if (!markerVisible(row, layers)) return;
+    const dx = row.x + 0.5 - point.x,
+      dy = row.y + 0.5 - point.y;
+    const head =
+      row.kind === "saved" && unit > 0
+        ? dy - (12 * (layers.markerScale || 1)) / unit
+        : dy;
+    const distance = Math.min(dx * dx + dy * dy, dx * dx + head * head);
+    if (distance <= radius * radius && distance < nearest) {
+      marker = row;
+      nearest = distance;
+    }
+  });
+  const selected = {
     x: Math.floor(marker ? marker.x : point.x),
     y: Math.floor(marker ? marker.y : point.y),
     id: marker ? marker.id : 0,
@@ -15,6 +29,9 @@ export function selectMapPoint(point, markers, layers, mapId) {
     kind: marker ? marker.kind : "location",
     mapId,
   };
+  if (marker && marker.actorId) selected.actorId = marker.actorId;
+  if (marker && marker.kind === "saved") selected.flags = marker.flags || [];
+  return selected;
 }
 
 export function teleportMapSelection(game, selected) {

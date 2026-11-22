@@ -23,7 +23,7 @@ import LocksPanel from "./panels/LocksPanel.js";
 import GameOptionsPanel from "./panels/GameOptionsPanel.js";
 import FeatureFinder from "./components/FeatureFinder.js";
 import OverlayResize from "./components/OverlayResize.js";
-import { boundedSize } from "./js/ui/LayoutGeometry.js";
+import { boundedSize, DEFAULT_WINDOW_SIZE } from "./js/ui/LayoutGeometry.js";
 import { createFeatureCatalog } from "./js/ui/FeatureCatalog.js";
 import { deepFreeze } from "./js/ui/StaticData.js";
 import { GLOBAL_SHORTCUT } from "./js/shortcuts/GlobalShortcut.js";
@@ -180,8 +180,8 @@ export default {
   data() {
     return {
       // Layout state (remains in CheatModal as it's specific to this component)
-      overlayWidth: 750,
-      overlayHeight: 450,
+      overlayWidth: DEFAULT_WINDOW_SIZE.width,
+      overlayHeight: DEFAULT_WINDOW_SIZE.height,
       viewportWidth: window.innerWidth,
       viewportHeight: window.innerHeight,
       finderOpen: false,
@@ -295,8 +295,14 @@ export default {
     });
 
     this._layoutChanged = () => {
-      this.overlayWidth = readNumberSetting("cheatModal.width", 750);
-      this.overlayHeight = readNumberSetting("cheatModal.height", 450);
+      this.overlayWidth = readNumberSetting(
+        "cheatModal.width",
+        DEFAULT_WINDOW_SIZE.width,
+      );
+      this.overlayHeight = readNumberSetting(
+        "cheatModal.height",
+        DEFAULT_WINDOW_SIZE.height,
+      );
     };
     this._viewportChanged = () => {
       this.viewportWidth = window.innerWidth;
@@ -319,6 +325,30 @@ export default {
       });
     };
     window.addEventListener("cheat-navigate-actor", this._navigateActor);
+    this._navigateEvent = (event) => {
+      const point = event.detail;
+      if (
+        !point ||
+        !Number.isInteger(point.mapId) ||
+        !Number.isInteger(point.eventId)
+      )
+        return;
+      this.navigateFeature({ panel: "event-analyzer-panel" });
+      this.$nextTick(() => {
+        const panel = this.$refs.panel;
+        if (panel && panel.selectEvent)
+          panel.selectEvent(point.mapId, point.eventId);
+      });
+    };
+    this._navigateMap = (event) => {
+      this.navigateFeature({ panel: "map-event-panel" });
+      this.$nextTick(() => {
+        const panel = this.$refs.panel;
+        if (panel && panel.focusPoint) panel.focusPoint(event.detail);
+      });
+    };
+    window.addEventListener("cheat-navigate-event", this._navigateEvent);
+    window.addEventListener("cheat-navigate-map", this._navigateMap);
 
     // Initialize panel selection
     let componentName = this.currentComponentName;
@@ -340,6 +370,8 @@ export default {
     window.removeEventListener("cheat-layout-change", this._layoutChanged);
     window.removeEventListener("resize", this._viewportChanged);
     window.removeEventListener("cheat-navigate-actor", this._navigateActor);
+    window.removeEventListener("cheat-navigate-event", this._navigateEvent);
+    window.removeEventListener("cheat-navigate-map", this._navigateMap);
     window.removeEventListener("cheat-open-finder", this._openFinder);
 
     if (this._unsubNavigation) this._unsubNavigation();

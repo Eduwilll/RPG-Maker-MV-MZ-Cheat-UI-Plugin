@@ -1,8 +1,11 @@
 import { getMapCharacters } from "./MapCharacters.js";
 import { markerVisible } from "./MapMarkers.js";
 import { deepFreeze } from "../../ui/StaticData.js";
+import { drawLocationPin } from "./LocationPins.js";
 
 export const MAP_MARKER_STYLES = deepFreeze({
+  actor: { label: "Party member", color: "#34d399", glyph: "P" },
+  saved: { label: "Saved point", color: "#fbbf24", glyph: "S" },
   npc: { label: "NPC", color: "#38bdf8", glyph: "N" },
   enemy: { label: "Enemy", color: "#fb7185", glyph: "!" },
   treasure: { label: "Treasure", color: "#fbbf24", glyph: "+" },
@@ -183,21 +186,28 @@ export function createMapScene(canvas) {
     if (characters) characters.beginFrame();
     (options.markers || []).forEach((marker) => {
       if (!markerVisible(marker, layers)) return;
+      if (marker.isPlayer) return;
       const x = view.ox + (marker.x + 0.5) * view.unit,
         y = view.oy + (marker.y + 0.5) * view.unit;
       if (x < -40 || y < -64 || x > view.width + 40 || y > view.height + 64)
         return;
-      const drawn =
-        characters &&
-        characters.draw(ctx, marker, {
+      let drawn = false;
+      if (marker.kind === "saved") {
+        drawLocationPin(ctx, x, y, marker.flags, layers.markerScale || 1);
+        drawn = true;
+      } else if (characters) {
+        drawn = characters.draw(ctx, marker, {
           unit: view.unit,
           ox: view.ox,
           oy: view.oy,
           scale: layers.markerScale,
         });
+      }
       if (!drawn) badge(ctx, x, y, marker, layers.markerScale || 1);
       if (layers.labels) {
-        const text = (marker.name || "Event") + " #" + marker.id;
+        const text =
+          (marker.name || "Event") +
+          (marker.kind === "saved" ? "" : " #" + (marker.actorId || marker.id));
         ctx.font = "11px sans-serif";
         ctx.textAlign = "left";
         ctx.textBaseline = "bottom";

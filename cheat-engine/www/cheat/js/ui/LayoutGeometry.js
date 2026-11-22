@@ -1,12 +1,23 @@
+export const DEFAULT_WINDOW_SIZE = Object.freeze({ width: 880, height: 660 });
+
 export function boundedSize(width, height, viewportWidth, viewportHeight) {
-  const vw = Math.max(1, Number(viewportWidth) || 750),
-    vh = Math.max(1, Number(viewportHeight) || 450);
+  const vw = Math.max(1, Number(viewportWidth) || DEFAULT_WINDOW_SIZE.width),
+    vh = Math.max(1, Number(viewportHeight) || DEFAULT_WINDOW_SIZE.height);
   return {
     width: Math.round(
-      Math.min(vw, Math.max(Math.min(320, vw), Number(width) || 750)),
+      Math.min(
+        vw,
+        Math.max(Math.min(320, vw), Number(width) || DEFAULT_WINDOW_SIZE.width),
+      ),
     ),
     height: Math.round(
-      Math.min(vh, Math.max(Math.min(240, vh), Number(height) || 450)),
+      Math.min(
+        vh,
+        Math.max(
+          Math.min(240, vh),
+          Number(height) || DEFAULT_WINDOW_SIZE.height,
+        ),
+      ),
     ),
   };
 }

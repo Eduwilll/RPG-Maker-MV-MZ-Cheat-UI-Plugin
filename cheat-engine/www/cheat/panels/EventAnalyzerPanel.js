@@ -1,4 +1,15 @@
 import { EventDatabase } from "../js/panels/event-analyzer/EventDatabase.js";
+import EventContext from "../components/EventContext.js";
+import EventReferenceTable from "../components/EventReferenceTable.js";
+import VirtualList from "../components/VirtualList.js";
+import {
+  facingEventId,
+  battleConditionLines,
+  eventReferencePages,
+} from "../js/panels/event-analyzer/EventExplorerState.js";
+import { buildDataEventReferenceRows } from "../js/panels/watcher/WatcherPanelState.js";
+import { getGameWindow } from "../js/runtime/FeatureRuntime.js";
+import { requestMapNavigation } from "../js/ui/RecordNavigation.js";
 import { SequenceTracer } from "../js/panels/event-analyzer/SequenceTracer.js";
 import {
   getCommandIcon,
@@ -27,210 +38,51 @@ const CE_TRIGGER_LABELS = ["None", "Autorun", "Parallel"];
 
 export default {
   name: "EventAnalyzerPanel",
+  components: { EventContext, EventReferenceTable, VirtualList },
 
   template: `
-<v-card flat class="ma-0 pa-0" color="transparent">
-
-    <!-- ══════════════════════════════════════════════════════
-         ROOT SELECTOR
-    ══════════════════════════════════════════════════════ -->
-    <div class="cheat-panel__head">
-        <div class="cheat-panel__title">Event Sequence Analyzer</div>
-        <v-btn small text title="Reload game data" aria-label="Reload game data" @click="reload">
-            <v-icon left small>mdi-refresh</v-icon>Reload
-        </v-btn>
+<section class="event-workspace" aria-label="Event explorer">
+  <aside class="event-finder">
+    <div class="workspace-rail-heading"><strong>Find an event</strong><button type="button" class="workspace-icon" title="Refresh game data" aria-label="Reload game data" @click="reload"><v-icon small>mdi-refresh</v-icon></button></div>
+    <div class="workspace-segments" role="group" aria-label="Event source">
+      <button v-for="mode in [{id:'facing',label:'Facing'},{id:'nearby',label:'Nearby'},{id:'browse',label:'Browse'}]" :key="mode.id" type="button" :class="{'is-selected':entryMode===mode.id}" :aria-pressed="String(entryMode===mode.id)" @click="setEntryMode(mode.id)">{{mode.label}}</button>
     </div>
-
-    <!-- Type picker -->
-    <v-radio-group v-model="rootType" row dense hide-details class="ma-1 mt-0">
-        <v-radio label="Common Event" value="common" color="accent" />
-        <v-radio label="Map Event"    value="map"    color="info" />
-        <v-radio label="Battle Event" value="battle" color="error" />
-    </v-radio-group>
-
-    <!-- ── Common Event selectors ── -->
-    <template v-if="rootType === 'common'">
-        <v-select
-            v-model="selectedCeId"
-            :items="availableCommonEvents"
-            item-text="label"
-            item-value="id"
-            label="Common Event"
-            dense outlined hide-details
-            class="ma-1"
-            @keydown.self.stop />
-    </template>
-
-    <!-- ── Map Event selectors ── -->
-    <template v-if="rootType === 'map'">
-        <v-row class="ma-0" dense>
-            <v-col cols="12" sm="6" class="pa-1">
-                <v-select
-                    v-model="selectedMapId"
-                    :items="availableMaps"
-                    item-text="name"
-                    item-value="id"
-                    label="Map"
-                    dense outlined hide-details
-                    @change="onMapChange"
-                    @keydown.self.stop />
-            </v-col>
-            <v-col cols="12" sm="6" class="pa-1">
-                <v-select
-                    v-model="selectedEventId"
-                    :items="availableMapEvents"
-                    item-value="id"
-                    label="Event"
-                    dense outlined hide-details
-                    no-data-text="No events (map not loaded)"
-                    @change="onEventChange"
-                    @keydown.self.stop>
-                    <template v-slot:item="{ item }">
-                        <span class="caption">#{{ item.id }} {{ item.name || '(Unnamed)' }}</span>
-                    </template>
-                    <template v-slot:selection="{ item }">
-                        <span class="caption">#{{ item.id }} {{ item.name || '(Unnamed)' }}</span>
-                    </template>
-                </v-select>
-            </v-col>
-            <v-col cols="12" sm="6" class="pa-1">
-                <v-select
-                    v-model="selectedPageIndex"
-                    :items="mapPageItems"
-                    item-text="label"
-                    item-value="value"
-                    label="Page"
-                    dense outlined hide-details
-                    no-data-text="Select an event first"
-                    @keydown.self.stop />
-            </v-col>
-        </v-row>
-
-        <!-- Map loading controls -->
-        <div class="cheat-chip-row cheat-chip-row--loose ma-1 align-center">
-            <v-btn
-                x-small color="primary"
-                :disabled="!selectedMapId || mapIsLoaded || loadingMaps"
-                @click="loadCurrentMap">
-                Load This Map
-            </v-btn>
-            <v-btn
-                x-small color="primary"
-                :loading="loadingMaps"
-                :disabled="loadingMaps"
-                @click="loadAllMaps">
-                Load All Maps
-            </v-btn>
-            <span v-if="loadingMaps" class="caption cheat-muted">
-                {{ loadProgress.loaded }}/{{ loadProgress.total }}
-                <template v-if="loadProgress.current"> — {{ loadProgress.current }}</template>
-            </span>
-            <span v-else-if="dbVersion > 0" class="caption cheat-muted">
-                {{ availableMaps.length }} map(s) loaded
-            </span>
-        </div>
-    </template>
-
-    <!-- ── Battle Event selectors ── -->
-    <template v-if="rootType === 'battle'">
-        <v-row class="ma-0" dense>
-            <v-col cols="12" sm="7" class="pa-1">
-                <v-select
-                    v-model="selectedTroopId"
-                    :items="availableBattleTroops"
-                    item-text="label"
-                    item-value="id"
-                    label="Troop"
-                    dense outlined hide-details
-                    @change="onTroopChange"
-                    @keydown.self.stop />
-            </v-col>
-            <v-col cols="12" sm="5" class="pa-1">
-                <v-select
-                    v-model="selectedBattlePageIndex"
-                    :items="battlePageItems"
-                    item-text="label"
-                    item-value="value"
-                    label="Page"
-                    dense outlined hide-details
-                    no-data-text="Select a troop first"
-                    @keydown.self.stop />
-            </v-col>
-        </v-row>
-    </template>
-
-    <!-- Trace button -->
-    <div class="ma-1">
-        <v-btn
-            color="accent" small
-            :disabled="!canTrace || tracing"
-            :loading="tracing"
-            @click="trace">
-            <v-icon left small>mdi-magnify-scan</v-icon>
-            Trace Execution
-        </v-btn>
-        <v-btn
-            v-if="treeItems.length > 0"
-            x-small text class="ml-2"
-            @click="expandAll">
-            <v-icon x-small left>mdi-unfold-more-horizontal</v-icon>Expand All
-        </v-btn>
-        <v-btn
-            v-if="treeItems.length > 0"
-            x-small text
-            @click="collapseAll">
-            <v-icon x-small left>mdi-unfold-less-horizontal</v-icon>Collapse All
-        </v-btn>
+    <event-context v-if="entryMode!=='browse'" :mode="entryMode" :selected-event-id="selectedEventId" :selected-map-id="selectedMapId" @nearby="setEntryMode('nearby')" @inspect="selectEvent($event.mapId,$event.eventId)"/>
+    <div v-else class="event-browser">
+      <v-select v-model="rootType" :items="[{text:'Map events',value:'map'},{text:'Common events',value:'common'},{text:'Battle events',value:'battle'}]" label="Event type" dense outlined hide-details @keydown.stop/>
+      <v-autocomplete v-if="rootType==='map'" v-model="selectedMapId" :items="availableMaps" item-text="name" item-value="id" label="Map" dense outlined hide-details @change="onMapChange" @keydown.stop/>
+      <v-text-field v-model="eventSearch" label="Name or event ID" dense outlined hide-details clearable @keydown.stop/>
+      <div v-if="loadingMaps" class="workspace-rail-note" role="status">Loading events...</div>
+      <virtual-list :items="browseRows" :item-size="56" :height="250"><template v-slot:default="{item}"><button type="button" class="workspace-choice event-choice" :class="{'is-selected':selectedRecordId===item.id}" @click="chooseBrowseRecord(item)"><strong>{{item.name}}</strong><small>#{{item.id}}</small></button></template></virtual-list>
+      <p v-if="!loadingMaps && !browseRows.length" class="workspace-empty">No events match this source.</p>
+      <details class="workspace-advanced"><summary>Data tools</summary><p class="caption">Other maps load when you select them.</p><v-btn x-small outlined :loading="loadingMaps" @click="loadAllMaps">Preload all maps</v-btn><span v-if="loadProgress.total" class="workspace-rail-note">{{loadProgress.loaded}} / {{loadProgress.total}}</span></details>
     </div>
-
-    <v-divider class="mb-1" />
-
-    <!-- Error -->
-    <v-alert v-if="traceError" type="error" dense class="ma-1 mb-1">
-        {{ traceError }}
-    </v-alert>
-
-    <!-- ══════════════════════════════════════════════════════
-         TRACE RESULT
-    ══════════════════════════════════════════════════════ -->
-    <template v-if="traceTree">
-
-        <!-- Root header -->
-        <div class="event-analyzer__root">
-            <div class="subtitle-2">{{ traceTree.name }}</div>
-
-            <!-- Common Event trigger -->
-            <div v-if="traceTree.eventKind === 'common'" class="caption cheat-muted mt-1">
-                Trigger: {{ formatTrigger(traceTree.trigger) }}
-                <template v-if="traceTree.trigger > 0 && traceTree.switchId">
-                    &nbsp;|&nbsp; Switch: [{{ traceTree.switchId }}: {{ getSwitchName(traceTree.switchId) }}]
-                </template>
-            </div>
-
-            <!-- Page conditions -->
-            <template v-if="pageConditionLines.length > 0">
-                <div class="caption cheat-text-success font-weight-bold mt-1">Page Conditions:</div>
-                <div
-                    v-for="(line, i) in pageConditionLines"
-                    :key="'cond-' + i"
-                    class="caption ml-1">
-                    ▸ {{ line }}
-                </div>
-            </template>
-            <div v-else-if="traceTree.eventKind !== 'common'" class="caption cheat-muted mt-1">
-                No page conditions.
-            </div>
-        </div>
-
-        <!-- Stats -->
-        <div class="caption cheat-muted event-analyzer__stat-row">
-            {{ nodeCount }} node(s)
-            <template v-if="ceRefCount > 0"> · {{ ceRefCount }} CE reference(s)</template>
-            <template v-if="cycleCount > 0"> · <span class="cheat-text-warning font-weight-bold">{{ cycleCount }} cycle(s)</span></template>
-        </div>
-
-        <!-- Tree -->
-        <v-treeview
+  </aside>
+  <main class="event-inspector">
+    <v-alert v-if="traceError" type="error" dense>{{traceError}}</v-alert>
+    <template v-if="hasSelection">
+      <header class="workspace-inspector-heading"><div><span class="workspace-eyebrow">{{rootType==='map'?'Map event':rootType==='common'?'Common event':'Battle event'}} #{{selectedRecordId}}</span><h3>{{selectedTitle}}</h3></div><button v-if="rootType==='map' && selectedIsLive" type="button" class="workspace-icon" title="Show event on map" aria-label="Show event on map" @click="showOnMap"><v-icon small>mdi-map-outline</v-icon></button></header>
+      <div class="event-page-bar"><span>{{rootType==='map'?'Map '+selectedMapId:rootType==='common'?'Reusable event':'Troop event'}}</span><v-select v-if="rootType==='map' && mapPageItems.length>1" v-model="selectedPageIndex" :items="mapPageItems" item-text="label" item-value="value" label="Event page" dense outlined hide-details @keydown.stop/><v-select v-else-if="rootType==='battle' && battlePageItems.length>1" v-model="selectedBattlePageIndex" :items="battlePageItems" item-text="label" item-value="value" label="Battle page" dense outlined hide-details @keydown.stop/><span v-else-if="rootType!=='common'">Page 1</span></div>
+      <div class="inspector-views" role="group" aria-label="Event detail view">
+        <button type="button" :class="{'is-selected':detailTab==='overview'}" :aria-pressed="String(detailTab==='overview')" @click="openDetail('overview')">Details</button>
+        <button type="button" :class="{'is-selected':detailTab==='references'}" :aria-pressed="String(detailTab==='references')" @click="openDetail('references')">Switches &amp; variables</button>
+        <button type="button" :class="{'is-selected':detailTab==='tree'}" :aria-pressed="String(detailTab==='tree')" @click="openDetail('tree')">Commands</button>
+      </div>
+      <section v-if="detailTab==='overview'" class="event-overview">
+        <div class="event-facts"><div><span>Starts by</span><strong>{{selectedTrigger}}</strong></div><div><span>Commands</span><strong>{{selectedCommandCount}}</strong></div></div>
+        <h4>What makes this event available?</h4>
+        <ul v-if="selectedConditions.length" class="event-conditions"><li v-for="(line,i) in selectedConditions" :key="i">{{line}}</li></ul>
+        <p v-else class="workspace-secondary">No page conditions. This page does not require a switch or variable to be enabled.</p>
+        <button type="button" class="workspace-next-action" @click="openDetail('references')"><span><strong>Inspect its switches and variables</strong><small>See current values and change them here.</small></span><v-icon small>mdi-chevron-right</v-icon></button>
+        <p class="workspace-safe-note"><v-icon x-small>mdi-eye-outline</v-icon>Inspecting does not run this event.</p>
+      </section>
+      <section v-if="detailTab==='references'" class="event-values">
+        <p class="workspace-secondary">{{rootType==='map'?'References from all pages of this event.':'References on the selected event page.'}} Edits change the live game values.</p>
+        <event-reference-table compact :rows="referenceRows" @change="refreshReferences"/>
+      </section>
+      <section v-show="detailTab==='tree'" class="event-commands">
+        <div class="event-command-tools"><span>{{nodeCount}} commands and branches</span><v-btn x-small text :loading="tracing" @click="trace">Refresh</v-btn><v-btn x-small text :disabled="!treeItems.length" @click="expandAll">Expand</v-btn><v-btn x-small text :disabled="!treeItems.length" @click="collapseAll">Collapse</v-btn></div>
+                <v-treeview
             v-if="treeItems.length > 0"
             :items="treeItems"
             :open.sync="openItems"
@@ -269,9 +121,9 @@ export default {
                     
                     <!-- Run button -->
                     <v-btn
-                        v-if="item.eventKey && item.commandIndex !== undefined"
+                        v-if="executionUnlocked && item.eventKey && item.commandIndex !== undefined"
                         x-small text class="ml-2 pa-0 cheat-text-success event-analyzer__run"
-                        @click.stop="executeFromNode(item)">
+                        @click.stop="confirmExecution(item)">
                         <v-icon x-small color="success" left>mdi-play</v-icon>
                         <span class="caption">Run</span>
                     </v-btn>
@@ -288,18 +140,24 @@ export default {
             </template>
 
         </v-treeview>
-
-        <div v-if="treeItems.length === 0" class="caption cheat-muted ma-2">
-            No commands to display in this page.
-        </div>
+        <p v-if="!tracing && !treeItems.length" class="workspace-secondary">No commands on this page.</p>
+        <details class="workspace-advanced"><summary>Advanced: run game commands</summary><p class="caption">Running commands can change progress or start a battle. Reading the tree is safe.</p><v-checkbox v-model="executionUnlocked" label="Show Run actions" dense hide-details/></details>
+      </section>
     </template>
-
-</v-card>
+    <div v-else class="workspace-empty event-inspector-empty" role="status"><v-icon large>mdi-magnify-scan</v-icon><h3>{{selectingEvent?'Loading event...':'Choose an event to understand it'}}</h3><p v-if="!selectingEvent">Face an object in the game, choose a nearby event, or browse another map.</p><v-btn v-if="!selectingEvent" small outlined @click="setEntryMode('nearby')">Explore nearby events</v-btn></div>
+  </main>
+  <v-dialog :value="!!pendingRun" @input="pendingRun=null" max-width="420"><v-card><v-card-title class="subtitle-1">Run game commands?</v-card-title><v-card-text>This can change game progress, start battles or replace the current event flow. Inspecting the tree does not require running it.</v-card-text><v-card-actions><v-btn text @click="pendingRun=null">Cancel</v-btn><v-btn text color="warning" @click="runConfirmed">Run commands</v-btn></v-card-actions></v-card></v-dialog>
+</section>
   `,
-
-  // ── Component data ──────────────────────────────────────────────────────────
   data() {
     return {
+      entryMode: "facing",
+      eventSearch: "",
+      selectingEvent: false,
+      executionUnlocked: false,
+      detailTab: "overview",
+      referenceRows: [],
+      pendingRun: null,
       /** @type {import('../js/panels/event-analyzer/EventDatabase.js').EventDatabase | null} */
       db: null,
 
@@ -308,9 +166,10 @@ export default {
        * that depend on non-reactive db internals are re-evaluated.
        */
       dbVersion: 0,
+      liveMapId: 0,
 
       // Root type
-      rootType: "common",
+      rootType: "map",
 
       // Map event
       selectedMapId: 0,
@@ -351,6 +210,8 @@ export default {
 
     // Auto-select sensible defaults
     const mapId = this.db.getCurrentMapId();
+    this.liveMapId = mapId;
+    this._liveMapData = getGameWindow().$dataMap;
     if (mapId) this.selectedMapId = mapId;
 
     const ces = this.db.getAllCommonEvents();
@@ -358,13 +219,182 @@ export default {
 
     const troops = this.db.getAllBattleTroops();
     if (troops.length > 0) this.selectedTroopId = troops[0].id;
+    const facing = facingEventId(getGameWindow());
+    if (facing) this.selectEvent(mapId, facing);
+  },
+  mounted() {
+    this._referenceTimer = setInterval(() => {
+      const game = getGameWindow(),
+        id = game.$gameMap ? game.$gameMap.mapId() : 0;
+      if (id !== this.liveMapId || this._liveMapData !== game.$dataMap) {
+        this.liveMapId = id;
+        this._liveMapData = game.$dataMap;
+        this.db.loadFromGlobals();
+        this.dbVersion++;
+      }
+      if (
+        this.detailTab === "references" &&
+        (!this.$el.contains(document.activeElement) ||
+          !document.activeElement.matches("input,textarea,[contenteditable]"))
+      )
+        this.refreshReferences();
+    }, 750);
+  },
+  beforeDestroy() {
+    clearInterval(this._referenceTimer);
+    this._selectionRequest = null;
+    this._mapRequest = null;
+  },
+  watch: {
+    rootType() {
+      this.eventSearch = "";
+      this.detailTab = "overview";
+      this.clearTrace();
+      this.refreshReferences();
+    },
+    selectedCeId() {
+      this.clearTrace();
+      this.refreshReferences();
+    },
+    selectedTroopId() {
+      this.clearTrace();
+      this.refreshReferences();
+    },
+    selectedBattlePageIndex() {
+      this.clearTrace();
+      this.refreshReferences();
+      if (this.detailTab === "tree") this.$nextTick(() => this.trace());
+    },
+    selectedPageIndex() {
+      this.clearTrace();
+      this.refreshReferences();
+      if (this.detailTab === "tree") this.$nextTick(() => this.trace());
+    },
+    selectedEventId() {
+      this.clearTrace();
+      this.refreshReferences();
+    },
   },
 
   // ── Computed ────────────────────────────────────────────────────────────────
   computed: {
+    selectedRecordId() {
+      return this.rootType === "map"
+        ? this.selectedEventId
+        : this.rootType === "common"
+          ? this.selectedCeId
+          : this.selectedTroopId;
+    },
+    hasSelection() {
+      return !!(this.rootType === "map"
+        ? this.selectedDataEvent
+        : this.rootType === "common"
+          ? this.selectedCommon
+          : this.selectedTroop);
+    },
+    selectedTitle() {
+      const record =
+        this.rootType === "map"
+          ? this.selectedDataEvent
+          : this.rootType === "common"
+            ? this.selectedCommon
+            : this.selectedTroop;
+      return record ? record.name || "Unnamed event" : "";
+    },
+    browseRows() {
+      const source =
+        this.rootType === "map"
+          ? this.availableMapEvents
+          : this.rootType === "common"
+            ? this.availableCommonEvents
+            : this.availableBattleTroops;
+      const query = String(this.eventSearch || "").toLowerCase();
+      return source
+        .filter(
+          (row) =>
+            !query || (row.name + " #" + row.id).toLowerCase().includes(query),
+        )
+        .map((row) => ({ id: row.id, name: row.name || "Event " + row.id }));
+    },
+    selectedTrigger() {
+      if (this.rootType === "common")
+        return this.selectedCommon
+          ? this.formatTrigger(this.selectedCommon.trigger)
+          : "None";
+      if (this.rootType === "battle") return "Battle conditions";
+      const event = this.selectedDataEvent,
+        page = event && event.pages[this.selectedPageIndex];
+      return page
+        ? [
+            "Action button",
+            "Player touch",
+            "Event touch",
+            "Autorun",
+            "Parallel",
+          ][page.trigger || 0] || "Game event"
+        : "Unavailable";
+    },
+    selectedCommon() {
+      void this.dbVersion;
+      return this.db ? this.db.getCommonEvent(this.selectedCeId) : null;
+    },
+    selectedTroop() {
+      void this.dbVersion;
+      return this.db ? this.db.getBattleTroop(this.selectedTroopId) : null;
+    },
+    selectedDataEvent() {
+      void this.dbVersion;
+      return this.db
+        ? this.db.getMapEvent(this.selectedMapId, this.selectedEventId)
+        : null;
+    },
+    selectedIsLive() {
+      return this.liveMapId === this.selectedMapId;
+    },
+    selectedConditions() {
+      if (this.rootType === "common") {
+        const record = this.selectedCommon;
+        return record && record.trigger > 0 && record.switchId
+          ? [
+              "Switch " +
+                record.switchId +
+                ": " +
+                this.getSwitchName(record.switchId) +
+                " must be ON",
+            ]
+          : [];
+      }
+      if (this.rootType === "battle") {
+        const record = this.selectedTroop,
+          page = record && record.pages[this.selectedBattlePageIndex];
+        return battleConditionLines(
+          page && page.conditions,
+          getGameWindow().$dataSystem,
+        );
+      }
+      const event = this.selectedDataEvent,
+        page = event && event.pages[this.selectedPageIndex];
+      return page
+        ? formatPageConditions(page.conditions, getGameWindow().$dataSystem)
+        : [];
+    },
+    selectedCommandCount() {
+      if (this.rootType === "common")
+        return this.selectedCommon ? this.selectedCommon.list.length : 0;
+      const event =
+          this.rootType === "map" ? this.selectedDataEvent : this.selectedTroop,
+        page =
+          event &&
+          event.pages[
+            this.rootType === "map"
+              ? this.selectedPageIndex
+              : this.selectedBattlePageIndex
+          ];
+      return page && page.list ? page.list.length : 0;
+    },
     availableMaps() {
       void this.dbVersion;
-      return this.db ? this.db.getAllLoadedMaps() : [];
+      return this.db ? this.db.getAllMapInfos() : [];
     },
 
     availableCommonEvents() {
@@ -455,6 +485,138 @@ export default {
 
   // ── Methods ─────────────────────────────────────────────────────────────────
   methods: {
+    setEntryMode(mode) {
+      this.entryMode = mode;
+      if (mode === "browse") return;
+      const game = getGameWindow(),
+        mapId = game.$gameMap ? game.$gameMap.mapId() : 0;
+      if (mode === "facing") {
+        const id = facingEventId(game);
+        if (id) {
+          this.selectEvent(mapId, id);
+          return;
+        }
+      }
+      if (
+        this.rootType !== "map" ||
+        this.selectedMapId !== mapId ||
+        mode === "facing"
+      ) {
+        this.rootType = "map";
+        this.selectedMapId = mapId;
+        this.selectedEventId = 0;
+        this._selectionRequest = null;
+        this.selectingEvent = false;
+        this.clearTrace();
+      }
+    },
+    openDetail(tab) {
+      this.detailTab = tab;
+      if (tab === "references") this.refreshReferences();
+      if (tab === "tree" && !this.traceTree) this.trace();
+    },
+    chooseBrowseRecord(row) {
+      if (this.rootType === "map") this.selectEvent(this.selectedMapId, row.id);
+      else if (this.rootType === "common") {
+        this.selectedCeId = row.id;
+        this.detailTab = "overview";
+      } else {
+        this.selectedTroopId = row.id;
+        this.selectedBattlePageIndex = 0;
+        this.detailTab = "overview";
+      }
+    },
+    clearTrace() {
+      this.executionUnlocked = false;
+      this.traceTree = null;
+      this.treeItems = [];
+      this.openItems = [];
+      this.pendingRun = null;
+      this.traceError = null;
+    },
+    async selectEvent(mapId, eventId) {
+      if (!this.db || !Number.isInteger(mapId) || !Number.isInteger(eventId))
+        return;
+      const request = {};
+      this._selectionRequest = request;
+      this.selectingEvent = true;
+      this.rootType = "map";
+      this.selectedMapId = mapId;
+      this.selectedEventId = 0;
+      this.traceTree = null;
+      this.treeItems = [];
+      this.traceError = null;
+      try {
+        this.db.loadFromGlobals();
+        await this.db.loadMap(mapId);
+        if (
+          this._selectionRequest !== request ||
+          this.selectedMapId !== mapId ||
+          this.rootType !== "map"
+        )
+          return;
+        this.dbVersion++;
+        this.selectedEventId = eventId;
+        const game = getGameWindow(),
+          live =
+            game.$gameMap &&
+            game.$gameMap.mapId() === mapId &&
+            game.$gameMap.event(eventId);
+        this.selectedPageIndex =
+          live && live._pageIndex >= 0 ? live._pageIndex : 0;
+        this.detailTab = "overview";
+        this.refreshReferences();
+      } catch (error) {
+        if (this._selectionRequest === request) this.traceError = String(error);
+      } finally {
+        if (this._selectionRequest === request) this.selectingEvent = false;
+      }
+    },
+    refreshReferences() {
+      const event = this.selectedDataEvent;
+      if (this.rootType === "map")
+        this.referenceRows = event
+          ? buildDataEventReferenceRows(
+              event,
+              "Selected event (all pages)",
+              null,
+              this.selectedMapId,
+            )
+          : [];
+      else {
+        const record =
+          this.rootType === "common" ? this.selectedCommon : this.selectedTroop;
+        const pages = eventReferencePages(
+          record,
+          this.rootType,
+          this.selectedBattlePageIndex,
+        );
+        this.referenceRows =
+          record && pages[0]
+            ? buildDataEventReferenceRows(
+                { id: 0, name: record.name, pages },
+                "Global reference",
+                null,
+                0,
+              ).filter((row) => row.type !== "selfSwitch")
+            : [];
+      }
+    },
+    showOnMap() {
+      const game = getGameWindow(),
+        event = game.$gameMap.event(this.selectedEventId),
+        data = this.selectedDataEvent;
+      if (!data) return;
+      requestMapNavigation({
+        mapId: this.selectedMapId,
+        eventId: this.selectedEventId,
+        id: this.selectedEventId,
+        name: data.name,
+        kind: "event",
+        x: event ? event.x : data.x,
+        y: event ? event.y : data.y,
+      });
+    },
     // ── Tracing ───────────────────────────────────────────────────────────────
 
     async trace() {
@@ -507,12 +669,15 @@ export default {
 
     async loadCurrentMap() {
       if (!this.db || !this.selectedMapId) return;
+      const request = {};
+      this._mapRequest = request;
+      const mapId = this.selectedMapId;
       this.loadingMaps = true;
       try {
-        await this.db.loadMap(this.selectedMapId);
-        this.dbVersion++;
+        await this.db.loadMap(mapId);
+        if (this._mapRequest === request) this.dbVersion++;
       } finally {
-        this.loadingMaps = false;
+        if (this._mapRequest === request) this.loadingMaps = false;
       }
     },
 
@@ -541,8 +706,27 @@ export default {
 
     // ── Execution ─────────────────────────────────────────────────────────────
 
+    confirmExecution(item) {
+      this.pendingRun = item;
+    },
+    runConfirmed() {
+      const item = this.pendingRun;
+      this.pendingRun = null;
+      if (item) this.executeFromNode(item);
+    },
+
     executeFromNode(item) {
       if (!this.db || !item.eventKey || item.commandIndex === undefined) return;
+      const game = getGameWindow();
+      if (
+        item.eventKey.startsWith("map:") &&
+        (!game.$gameMap ||
+          Number(item.eventKey.split(":")[1]) !== game.$gameMap.mapId())
+      ) {
+        this.traceError =
+          "This event belongs to another map. Travel there before running its commands.";
+        return;
+      }
 
       let list = null;
       let eventIdForInterpreter = 0;
@@ -606,13 +790,29 @@ export default {
 
     // ── Selection change handlers ─────────────────────────────────────────────
 
-    onMapChange() {
+    async onMapChange() {
+      this._selectionRequest = null;
+      this.selectingEvent = false;
       this.selectedEventId = 0;
       this.selectedPageIndex = 0;
+      this.clearTrace();
+      try {
+        await this.loadCurrentMap();
+      } catch (error) {
+        this.traceError = String(error);
+      }
     },
 
     onEventChange() {
-      this.selectedPageIndex = 0;
+      this._selectionRequest = null;
+      const game = getGameWindow(),
+        live =
+          game.$gameMap &&
+          game.$gameMap.mapId() === this.selectedMapId &&
+          game.$gameMap.event(this.selectedEventId);
+      this.selectedPageIndex =
+        live && live._pageIndex >= 0 ? live._pageIndex : 0;
+      this.refreshReferences();
     },
 
     onTroopChange() {
@@ -632,10 +832,15 @@ export default {
     // ── Jump to battle event ──────────────────────────────────────────────────
 
     jumpToBattleEvent(troopId) {
+      this.entryMode = "browse";
+      this.detailTab = "tree";
       this.rootType = "battle";
       this.selectedTroopId = troopId;
       this.selectedBattlePageIndex = 0;
-      this.$nextTick(() => this.trace());
+      this.$nextTick(() => {
+        this.detailTab = "tree";
+        this.trace();
+      });
     },
 
     // ── Treeview item conversion ───────────────────────────────────────────────

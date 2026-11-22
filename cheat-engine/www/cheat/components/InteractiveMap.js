@@ -1,4 +1,12 @@
 import MapLayers from "./MapLayers.js";
+import SaveMapPoint from "./SaveMapPoint.js";
+import { SAVED_LOCATIONS } from "../js/runtime/SavedLocations.js";
+import { readMapActors, readActorChoices } from "../js/panels/map/MapActors.js";
+import GameAsset from "./GameAsset.js";
+import {
+  requestActorNavigation,
+  requestEventNavigation,
+} from "../js/ui/RecordNavigation.js";
 import MinimapPanel from "../panels/MinimapPanel.js";
 import { getGameWindow } from "../js/runtime/FeatureRuntime.js";
 import { KEY_VALUE_STORAGE } from "../js/storage/KeyValueStorage.js";
@@ -52,7 +60,7 @@ function storedView() {
 
 export default {
   name: "InteractiveMap",
-  components: { MapLayers, MinimapPanel },
+  components: { MapLayers, MinimapPanel, SaveMapPoint, GameAsset },
   props: { compact: Boolean, active: { type: Boolean, default: true } },
   data() {
     const saved = storedView();
@@ -65,6 +73,10 @@ export default {
       search: "",
       searchRows: [],
       selection: null,
+      savingPoint: false,
+      actorPicker: false,
+      actorSearch: "",
+      actorChoices: [],
       hoverInfo: "",
       mapName: "Map",
       currentMapId: 0,
@@ -89,6 +101,15 @@ export default {
           this.measure();
           this.renderMap();
         });
+    },
+  },
+  computed: {
+    filteredActors() {
+      const query = this.actorSearch.trim().toLowerCase();
+      return this.actorChoices.filter(
+        (row) =>
+          !query || (row.name + " #" + row.id).toLowerCase().includes(query),
+      );
     },
   },
   template: `
@@ -130,11 +151,17 @@ export default {
   </aside>
   <div v-if="legend && !drawer" class="interactive-map__legend"><span v-for="(style,kind) in markerStyles" :key="kind"><i :style="{background:style.color}"></i>{{style.label}}</span></div>
   <div v-if="selection && !drawer" class="interactive-map__selection" @pointerdown.stop>
-    <div><span class="map-result__kind">{{selection.kind === 'location' ? 'Location' : markerStyles[selection.kind].label}}</span><strong>{{selection.name}}</strong><small>X {{selection.x}} · Y {{selection.y}}<template v-if="selection.id"> · #{{selection.id}}</template></small></div>
+    <div class="interactive-map__selection-header"><div><span class="map-result__kind">{{selection.kind === 'location' ? 'Location' : markerStyles[selection.kind].label}}</span><strong>{{selection.name}}</strong><small>X {{selection.x}} · Y {{selection.y}}<template v-if="selection.id"> · #{{selection.id}}</template></small></div><button type="button" class="map-tool" aria-label="Clear map selection" @click="selection = null"><v-icon small>mdi-close</v-icon></button></div>
+    <div class="interactive-map__selection-actions" role="toolbar" aria-label="Selected map character actions">
     <button type="button" class="map-teleport" @click="teleportSelection" aria-label="Teleport to selected location"><v-icon small>mdi-map-marker</v-icon> Teleport</button>
-    <button type="button" class="map-tool" aria-label="Clear map selection" @click="selection = null"><v-icon small>mdi-close</v-icon></button>
+    <button v-if="selection.actorId || (selection.id && selection.kind !== 'saved')" type="button" class="map-teleport" @click="openActor"><v-icon small>mdi-account</v-icon> {{selection.actorId ? 'Open actor' : 'Actors...'}}</button>
+    <button v-if="selection.id && selection.kind !== 'actor' && selection.kind !== 'saved'" type="button" class="map-teleport" @click="analyzeSelection"><v-icon small>mdi-magnify-scan</v-icon> Analyze</button>
+    <button type="button" class="map-teleport" @click="savingPoint = !savingPoint"><v-icon small>mdi-map-marker-plus</v-icon> Save point</button>
+    </div>
   </div>
+  <v-dialog v-model="actorPicker" max-width="440" scrollable><v-card><v-card-title class="subtitle-1">All actors</v-card-title><v-card-text class="map-actor-picker"><p class="caption">Includes non-party characters. Choose the matching record to open its editor; this does not change the selected event.</p><v-text-field v-model="actorSearch" label="Search actors by name or ID" dense outlined hide-details @keydown.stop/><v-list dense class="map-actor-picker__list"><v-list-item v-for="actor in filteredActors" :key="actor.id" @click="openActorRecord(actor.id)"><game-asset kind="actor" :record-id="actor.id" :label="actor.name" :size="28" :navigate="false" class="mr-2"/><v-list-item-content><v-list-item-title>{{actor.name}}</v-list-item-title></v-list-item-content><v-list-item-action>#{{actor.id}}</v-list-item-action></v-list-item><div v-if="!filteredActors.length" class="caption pa-2">No actor records match.</div></v-list></v-card-text><v-card-actions><v-btn text @click="actorPicker=false">Close</v-btn></v-card-actions></v-card></v-dialog>
   <div class="interactive-map__status" aria-live="off"><span>{{onMap ? (hoverInfo || playerLabel) : 'No active map'}}</span><span v-if="!compact">{{Math.round(zoom*100)}}%</span></div>
+  <div v-if="selection && savingPoint && !drawer" class="interactive-map__point-form" @pointerdown.stop @wheel.stop><save-map-point :point="selection" @saved="pointSaved" @cancel="savingPoint=false"/></div>
   <div v-if="message" class="interactive-map__message" role="status">{{message}}</div>
 </section>`,
   mounted() {
@@ -172,6 +199,43 @@ export default {
     window.removeEventListener("cheat-layout-change", this._resize);
   },
   methods: {
+    analyzeSelection() {
+      if (this.selection && this.selection.mapId === this.currentMapId)
+        requestEventNavigation(this.selection.mapId, this.selection.id);
+    },
+    openActor() {
+      if (!this.selection) return;
+      if (this.selection.actorId)
+        return this.openActorRecord(this.selection.actorId);
+      this.actorChoices = readActorChoices(this._game);
+      this.actorSearch = "";
+      this.actorPicker = true;
+    },
+    openActorRecord(id) {
+      this.actorPicker = false;
+      requestActorNavigation(id);
+    },
+    pointSaved() {
+      this.savingPoint = false;
+      this._pointsTime = 0;
+      this.message = "Map point saved";
+      this._messageUntil = Date.now() + 2200;
+      this.renderMap();
+    },
+    focusPoint(point) {
+      if (!point || !this._game || point.mapId !== this._game.$gameMap.mapId())
+        return;
+      this.follow = false;
+      this._center = { x: point.x + 0.5, y: point.y + 0.5 };
+      this.zoom = Math.max(this.zoom, 2);
+      this.selection = Object.assign(
+        { kind: "location", name: "Selected event" },
+        point,
+        { x: Math.floor(point.x), y: Math.floor(point.y) },
+      );
+      this.drawer = "";
+      this.renderMap();
+    },
     measure() {
       if (!this.$el) return;
       if (!this.compact) {
@@ -222,6 +286,7 @@ export default {
         this._mapGeneration = (this._mapGeneration || 0) + 1;
         this._center = null;
         this.selection = null;
+        this.savingPoint = false;
         this.searchRows = [];
         this._scene.invalidate();
       }
@@ -248,6 +313,16 @@ export default {
       const layers = readMapLayers();
       this._visibleEvents =
         settings && !settings.showEvents ? [] : frame.events;
+      if (!this._pointsTime || Date.now() - this._pointsTime > 1000) {
+        this._savedPoints = SAVED_LOCATIONS.read();
+        this._pointsTime = Date.now();
+      }
+      this._selectionMarkers = readMapActors(game).concat(
+        this._visibleEvents,
+        (this._savedPoints || [])
+          .filter((row) => row.mapId === id)
+          .map((row) => Object.assign({}, row, { kind: "saved" })),
+      );
       const base =
         layers.background && this.renderMode === "realistic"
           ? renderBaseMap()
@@ -257,7 +332,7 @@ export default {
         camera: this._camera,
         mode: base || !layers.background ? this.renderMode : "radar",
         layers,
-        markers: this._visibleEvents,
+        markers: this._selectionMarkers,
         player: {
           x: frame.playerX,
           y: frame.playerY,
@@ -391,9 +466,10 @@ export default {
       if (tile)
         this.selection = selectMapPoint(
           tile,
-          this._visibleEvents || [],
+          this._selectionMarkers || [],
           readMapLayers(),
           this.currentMapId,
+          this._camera.unit,
         );
       this.drawer = "";
     },

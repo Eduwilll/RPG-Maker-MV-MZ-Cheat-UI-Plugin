@@ -8,6 +8,7 @@ export const MAP_LAYER_DEFAULTS = {
   treasures: true,
   events: true,
   player: true,
+  saved: true,
   labels: false,
   grid: false,
   markerScale: 1,

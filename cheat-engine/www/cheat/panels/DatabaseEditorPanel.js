@@ -15,6 +15,7 @@ import DatabaseRowsEditor from "../components/DatabaseRowsEditor.js";
 import DatabaseTooltip from "../components/DatabaseTooltip.js";
 import EncounterBrowser from "../components/EncounterBrowser.js";
 import VirtualList from "../components/VirtualList.js";
+import GameAsset from "../components/GameAsset.js";
 
 export default {
   name: "DatabaseEditorPanel",
@@ -24,12 +25,14 @@ export default {
     DatabaseTooltip,
     EncounterBrowser,
     VirtualList,
+    GameAsset,
   },
   props: { kind: { type: String, default: "enemy" } },
   data() {
     return {
       state: null,
       enemyView: "encounters",
+      detailView: "overview",
       mapEvents: [],
       selectedEvent: null,
       search: "",
@@ -48,11 +51,39 @@ export default {
     };
   },
   computed: {
+    hasDraftChanges() {
+      return !!(
+        this.state &&
+        this.state.draft &&
+        JSON.stringify(this.state.draft) !== JSON.stringify(this.state.original)
+      );
+    },
+    inspectorViews() {
+      if (this.kind === "enemy")
+        return [
+          { value: "overview", label: "Parameters" },
+          { value: "behavior", label: "Actions & traits" },
+          { value: "battle", label: "Battle" },
+        ];
+      if (this.kind === "skill")
+        return [
+          { value: "overview", label: "Costs & targeting" },
+          { value: "damage", label: "Damage" },
+          { value: "effects", label: "Effects" },
+        ];
+      return [
+        { value: "overview", label: "Parameters" },
+        { value: "progression", label: "Progression" },
+        { value: "traits", label: "Traits" },
+      ];
+    },
     title() {
       return { enemy: "Enemies", skill: "Skills", class: "Classes" }[this.kind];
     },
     rows() {
-      const term = this.search.trim().toLowerCase();
+      const term = String(this.search || "")
+        .trim()
+        .toLowerCase();
       if (!this.state) return [];
       if (!term) return this.state.rows;
       return this.state.rows.filter((row) =>
@@ -129,42 +160,45 @@ export default {
     clearInterval(this._timer);
   },
   template: `<v-card flat class="pa-1">
-    <v-btn-toggle v-if="kind === 'enemy'" v-model="enemyView" mandatory class="mb-2" dense><v-btn small value="encounters">Troops</v-btn><v-btn small value="records">Enemies</v-btn></v-btn-toggle>
+    <div v-if="kind === 'enemy'" class="workspace-segments record-mode" role="group" aria-label="Enemy view"><button type="button" :class="{'is-selected': enemyView === 'encounters'}" :aria-pressed="enemyView === 'encounters'" @click="enemyView = 'encounters'">Troops</button><button type="button" :class="{'is-selected': enemyView === 'records'}" :aria-pressed="enemyView === 'records'" @click="enemyView = 'records'">Enemy records</button></div>
     <encounter-browser v-if="kind === 'enemy' && enemyView === 'encounters'" @edit="editEncounterPart"/>
     <div v-if="kind !== 'enemy' || enemyView === 'records'">
-    <div class="d-flex align-center mb-2"><strong>{{ title }}</strong><v-spacer/><v-btn x-small text @click="reload">Reload</v-btn></div>
-    <v-alert v-if="error" type="error" dense dismissible @input="error = ''">{{ error }}</v-alert>
-    <v-row dense v-if="state"><v-col cols="12" sm="4">
+    <v-alert v-if="error" type="error" role="alert" dense dismissible @input="error = ''">{{ error }}</v-alert>
+    <div v-if="!state" class="workspace-empty"><p>Records are not available yet. Load a game, then try again.</p><v-btn small outlined @click="initialize">Retry loading</v-btn></div>
+    <section class="record-workspace" v-if="state"><aside class="record-finder" :aria-label="title + ' records'">
+      <div class="workspace-rail-heading"><strong>{{ title }}</strong><span>{{ rows.length }} / {{ state.rows.length }}</span><button type="button" class="workspace-icon" :aria-label="'Reload ' + title" :title="'Reload ' + title" @click="reload"><v-icon small>mdi-refresh</v-icon></button></div>
       <v-text-field v-model="search" label="Search name or ID" dense outlined hide-details prepend-inner-icon="mdi-magnify" clearable @keydown.stop/>
-      <virtual-list v-if="rows.length" :items="rows" :height="330" :item-size="48">
+      <virtual-list v-if="rows.length" :items="rows" :height="Math.min(350, rows.length * 60)" :item-size="60">
         <template v-slot="{ item: row }">
-          <div class="cheat-virtual-row" :class="{ 'cheat-virtual-row--active': state.selectedId === row.id }" role="button" tabindex="0" :title="descriptions[row.id] || null" @click="choose(row.id)" @keydown.enter.stop.prevent="choose(row.id)">
-            <div class="cheat-virtual-row__main"><database-tooltip :kind="kind" :record-id="row.id" :label="'#' + row.id + ' ' + row.name"/></div>
-            <span v-if="row.edited" class="cheat-virtual-row__flag">edited</span>
+          <div class="workspace-choice record-choice" :class="{ 'is-selected': state.selectedId === row.id }" role="button" tabindex="0" :aria-pressed="state.selectedId === row.id" :title="descriptions[row.id] || null" @click="choose(row.id)" @keydown.enter.stop.prevent="choose(row.id)" @keydown.space.stop.prevent="choose(row.id)">
+            <span class="record-choice__body"><strong><database-tooltip :kind="kind" :record-id="row.id" :label="row.name"/></strong><small>#{{ row.id }}{{ row.edited ? ' · Edited' : '' }}</small></span>
           </div>
         </template>
       </virtual-list>
-      <div v-else class="caption pa-2">No matching records.</div>
-    </v-col><v-col cols="12" sm="8" v-if="state.draft">
-      <div class="caption mb-2">{{ state.draft.name }} #{{ state.selectedId }}. Apply changes, then save the game. Original game files are never changed.</div>
-      <v-alert v-if="state.status" dense type="info" class="caption">{{ state.status }}</v-alert>
-      <div class="mb-2"><v-btn x-small color="primary" @click="apply">Apply</v-btn><v-btn x-small text @click="discard">Discard Draft</v-btn><v-btn x-small text color="warning" @click="confirmAction('Reset this record to its original values?', 'reset')">Reset to Original</v-btn></div>
+      <p v-else class="workspace-empty">No matching records. Try another name or ID.</p>
+    </aside><div class="record-inspector" v-if="state.draft">
+      <header class="record-heading"><game-asset v-if="kind !== 'class'" :kind="kind" :record-id="state.selectedId" :label="state.draft.name" :size="52" :navigate="false"/><div class="record-heading__body"><h3>{{ state.draft.name }}</h3><small>{{ kind === 'class' ? 'Class' : kind === 'skill' ? 'Skill' : 'Enemy' }} #{{ state.selectedId }}{{ state.edited ? ' · Edited in this save' : '' }}</small></div></header>
+      <div class="record-apply-bar"><v-btn small color="primary" :disabled="!hasDraftChanges" @click="apply">Apply</v-btn><v-btn small text :disabled="!hasDraftChanges" @click="discard">Discard Draft</v-btn><span class="record-draft-status" role="status">{{ hasDraftChanges ? 'Unapplied changes' : state.status || 'No pending changes' }}</span></div>
+      <p class="workspace-hint">Apply changes, then save the game. Original game files are never changed.</p>
+      <div class="inspector-views" role="group" :aria-label="title + ' sections'"><button v-for="view in inspectorViews" :key="view.value" type="button" :class="{'is-selected': detailView === view.value}" :aria-pressed="detailView === view.value" @click="detailView = view.value">{{ view.label }}</button></div>
+      <section v-show="detailView === 'overview'">
+      <h4 class="record-section-title">{{ kind === 'enemy' ? 'Rewards' : kind === 'skill' ? 'Costs & performance' : 'Parameter curves' }}</h4>
       <v-row dense v-if="kind !== 'class'"><v-col v-for="field in numericFields" :key="field.key" cols="6"><v-text-field v-model="state.draft[field.key]" :label="field.label" type="number" dense outlined hide-details @keydown.stop/></v-col></v-row>
-      <template v-if="kind === 'enemy'"><div class="subtitle-2 mt-3">Base Parameters</div><v-row dense><v-col v-for="(value,i) in state.draft.params" :key="i" cols="6"><v-text-field v-model="state.draft.params[i]" :label="paramNames[i]" type="number" dense outlined hide-details @keydown.stop/></v-col></v-row>
-        <div class="subtitle-2 mt-3">Actions</div><database-rows-editor v-model="state.draft.actions" type="actions" :references="state.references"/>
+      </section>
+      <template v-if="kind === 'enemy'"><section v-show="detailView === 'overview'"><h4 class="record-section-title">Base parameters</h4><v-row dense><v-col v-for="(value,i) in state.draft.params" :key="i" cols="6"><v-text-field v-model="state.draft.params[i]" :label="paramNames[i]" type="number" dense outlined hide-details @keydown.stop/></v-col></v-row></section>
+        <section v-show="detailView === 'behavior'"><h4 class="record-section-title">Actions</h4><database-rows-editor v-model="state.draft.actions" type="actions" :references="state.references"/></section>
       </template>
-      <template v-if="kind === 'skill'"><v-row dense class="mt-1"><v-col cols="6"><v-select v-model="state.draft.scope" :items="scopeOptions" label="Target Scope" dense outlined hide-details/></v-col><v-col cols="6"><v-select v-model="state.draft.hitType" :items="[{text:'Certain Hit',value:0},{text:'Physical',value:1},{text:'Magical',value:2}]" label="Hit Type" dense outlined hide-details/></v-col></v-row>
-        <div class="subtitle-2 mt-3">Damage</div><v-row dense v-if="state.draft.damage"><v-col cols="6"><v-select v-model="state.draft.damage.type" :items="[{text:'None',value:0},{text:'HP Damage',value:1},{text:'MP Damage',value:2},{text:'HP Recovery',value:3},{text:'MP Recovery',value:4},{text:'HP Drain',value:5},{text:'MP Drain',value:6}]" label="Damage Type" dense outlined hide-details/></v-col><v-col cols="6"><v-select v-model="state.draft.damage.elementId" :items="elementOptions" label="Element" dense outlined hide-details/></v-col><v-col cols="12"><v-textarea v-model="state.draft.damage.formula" label="Damage Formula (RPG Maker JavaScript)" rows="2" dense outlined hide-details @keydown.stop/><div class="caption cheat-text-warning">Formulas are code. They are not executed as a preview; invalid code can fail during battle.</div></v-col><v-col cols="6"><v-text-field v-model="state.draft.damage.variance" label="Variance (%)" type="number" dense outlined hide-details @keydown.stop/></v-col><v-col cols="6"><v-checkbox v-model="state.draft.damage.critical" label="Critical Hits" dense hide-details class="mt-1"/></v-col></v-row>
-        <div class="subtitle-2 mt-3">Effects</div><database-rows-editor v-model="state.draft.effects" type="effects" :references="state.references"/>
+      <template v-if="kind === 'skill'"><section v-show="detailView === 'overview'"><h4 class="record-section-title">Targeting</h4><v-row dense><v-col cols="6"><v-select v-model="state.draft.scope" :items="scopeOptions" label="Target Scope" dense outlined hide-details/></v-col><v-col cols="6"><v-select v-model="state.draft.hitType" :items="[{text:'Certain Hit',value:0},{text:'Physical',value:1},{text:'Magical',value:2}]" label="Hit Type" dense outlined hide-details/></v-col></v-row></section>
+        <section v-show="detailView === 'damage'"><h4 class="record-section-title">Damage</h4><v-row dense v-if="state.draft.damage"><v-col cols="6"><v-select v-model="state.draft.damage.type" :items="[{text:'None',value:0},{text:'HP Damage',value:1},{text:'MP Damage',value:2},{text:'HP Recovery',value:3},{text:'MP Recovery',value:4},{text:'HP Drain',value:5},{text:'MP Drain',value:6}]" label="Damage Type" dense outlined hide-details/></v-col><v-col cols="6"><v-select v-model="state.draft.damage.elementId" :items="elementOptions" label="Element" dense outlined hide-details/></v-col><v-col cols="12"><v-textarea v-model="state.draft.damage.formula" label="Damage Formula (RPG Maker JavaScript)" rows="2" dense outlined hide-details @keydown.stop/><div class="caption cheat-text-warning">Formulas are code. They are not executed as a preview; invalid code can fail during battle.</div></v-col><v-col cols="6"><v-text-field v-model="state.draft.damage.variance" label="Variance (%)" type="number" dense outlined hide-details @keydown.stop/></v-col><v-col cols="6"><v-checkbox v-model="state.draft.damage.critical" label="Critical Hits" dense hide-details class="mt-1"/></v-col></v-row></section>
+        <section v-show="detailView === 'effects'"><h4 class="record-section-title">Effects</h4><database-rows-editor v-model="state.draft.effects" type="effects" :references="state.references"/></section>
       </template>
-      <template v-if="kind === 'class'"><div class="subtitle-2">Parameter Curves</div><v-text-field v-model.number="level" :min="1" :max="maxLevel" label="Edit values at level" type="number" dense outlined hide-details class="my-2" @change="normalizeLevel" @keydown.stop/>
+      <template v-if="kind === 'class'"><section v-show="detailView === 'overview'"><v-text-field v-model.number="level" :min="1" :max="maxLevel" label="Edit values at level" type="number" dense outlined hide-details class="my-2 record-level" @change="normalizeLevel" @keydown.stop/>
         <v-row dense><v-col v-for="(curve,i) in state.draft.params" :key="i" cols="6"><v-text-field :value="curve[validLevel()]" @input="setCurve(i,$event)" :label="paramNames[i] + ' at Lv' + validLevel()" type="number" dense outlined hide-details @keydown.stop/></v-col></v-row>
-        <div class="subtitle-2 mt-3">EXP Curve</div><v-row dense><v-col v-for="(name,i) in ['Base Value','Extra Value','Acceleration A','Acceleration B']" :key="i" cols="6"><v-text-field v-model="state.draft.expParams[i]" :label="name" type="number" dense outlined hide-details @keydown.stop/></v-col></v-row>
-        <div class="subtitle-2 mt-3">Level-up Skills</div><div class="caption">Changes apply to future level-ups, not skills already learned.</div><database-rows-editor v-model="state.draft.learnings" type="learnings" :references="state.references"/>
+        </section><section v-show="detailView === 'progression'"><h4 class="record-section-title">EXP curve</h4><v-row dense><v-col v-for="(name,i) in ['Base Value','Extra Value','Acceleration A','Acceleration B']" :key="i" cols="6"><v-text-field v-model="state.draft.expParams[i]" :label="name" type="number" dense outlined hide-details @keydown.stop/></v-col></v-row>
+        <h4 class="record-section-title">Level-up skills</h4><p class="workspace-hint">Changes apply to future level-ups, not skills already learned.</p><database-rows-editor v-model="state.draft.learnings" type="learnings" :references="state.references"/></section>
       </template>
-      <template v-if="state.draft.traits"><div class="subtitle-2 mt-3">Traits</div><database-rows-editor v-model="state.draft.traits" type="traits" :references="state.references"/></template>
-    </v-col><v-col v-else cols="12" sm="8" class="caption pa-3">Select a record to edit.</v-col></v-row>
-    <div v-if="kind === 'enemy' && state" class="mt-3">
+      <section v-if="state.draft.traits" v-show="detailView === (kind === 'enemy' ? 'behavior' : kind === 'skill' ? 'effects' : 'traits')"><h4 class="record-section-title">Traits</h4><database-rows-editor v-model="state.draft.traits" type="traits" :references="state.references"/></section>
+    <div v-if="kind === 'enemy' && state" v-show="detailView === 'battle'" class="mt-3">
       <v-btn small color="primary" :disabled="!availability.start.allowed || !state.selectedId" @click="confirmAction('Start a standalone battle here? Normal defeat and rewards still apply; the original map event will not run.', 'selected-enemy')">Start Battle Here</v-btn>
       <v-btn small text @click="refreshMapEvents">Refresh map events</v-btn>
       <div class="caption mt-1">{{ availability.start.reason }} Standalone fights do not move the player.</div>
@@ -173,7 +207,7 @@ export default {
       <v-btn small class="mt-1" :disabled="!selectedEvent || !availability.start.allowed" @click="confirmMapEvent">Run Map Event</v-btn>
       <div class="caption">Original events may change quests, flags, items or location. Conditional branches may not enter combat. Script-only battles cannot be matched automatically.</div>
     </div>
-    <v-expansion-panels v-if="kind === 'enemy' && state" class="mt-2"><v-expansion-panel><v-expansion-panel-header>Troops & Reinforcements</v-expansion-panel-header><v-expansion-panel-content>
+    <v-expansion-panels v-if="kind === 'enemy' && state" v-show="detailView === 'battle'" class="mt-2"><v-expansion-panel><v-expansion-panel-header>Troops & Reinforcements</v-expansion-panel-header><v-expansion-panel-content>
       <div class="caption mb-2">Custom battle plugins may restrict these actions. Existing enemy definitions use your applied edits.</div>
       <v-select v-model="troopId" :items="state.references.troops" item-text="name" item-value="id" label="Existing Troop" dense outlined hide-details/>
       <v-btn x-small class="my-2" :disabled="!troopId || !availability.start.allowed" @click="confirmAction('Start the selected troop encounter?', 'troop')">Fight Troop</v-btn>
@@ -183,6 +217,8 @@ export default {
       <v-btn x-small class="my-2" :disabled="!roster.length || !availability.start.allowed" @click="confirmAction('Start a custom encounter with this roster?', 'roster')">Fight Roster</v-btn>
       <v-btn x-small class="ml-1" :disabled="!state.selectedId || !availability.summon.allowed" @click="confirmAction('Add this enemy to the current battle?', 'summon')">Summon Selected</v-btn><div class="caption">{{ availability.summon.reason }}</div>
     </v-expansion-panel-content></v-expansion-panel></v-expansion-panels>
+    <details class="workspace-advanced mt-3"><summary>Original values</summary><p class="workspace-hint">Revert this record's saved overrides, not just the current draft.</p><v-btn x-small text color="warning" @click="confirmAction('Reset this record to its original values?', 'reset')">Reset to Original</v-btn></details>
+    </div><div v-else class="record-inspector workspace-empty">Select a record to edit.</div></section>
     <v-dialog :value="!!confirmation" @input="!$event && (confirmation = '')" max-width="400"><v-card><v-card-text class="pt-4">{{ confirmation }}</v-card-text><v-card-actions><v-btn text @click="confirmation = ''">Cancel</v-btn><v-btn text color="primary" @click="proceed">Continue</v-btn></v-card-actions></v-card></v-dialog>
     </div>
   </v-card>`,
@@ -243,6 +279,7 @@ export default {
         );
     },
     initialize() {
+      this.error = "";
       try {
         const runtime = this.cheatRuntime || getFeatureRuntime();
         if (!runtime)

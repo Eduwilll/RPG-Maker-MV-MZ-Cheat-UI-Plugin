@@ -1,3 +1,5 @@
+import { readEventActorId } from "./MapActors.js";
+
 const COLORS = {
   npc: "#ffd700",
   enemy: "#ff8c00",
@@ -113,6 +115,7 @@ export function readMapMarkers(game) {
           ? event.y
           : event._y;
       if (!Number.isFinite(x) || !Number.isFinite(y)) return rows;
+      const actorId = readEventActorId(game, event, data);
       rows.push({
         id,
         name,
@@ -161,6 +164,7 @@ export function readMapMarkers(game) {
           ) || 0,
         direction: event._direction || 2,
         moving: event._moveType > 0,
+        ...(actorId ? { actorId } : {}),
       });
     } catch (error) {
       /* A nonstandard event must not hide the rest of the map. */
@@ -170,6 +174,8 @@ export function readMapMarkers(game) {
 }
 
 export function markerVisible(marker, layers) {
+  if (marker.kind === "actor") return layers.player !== false;
+  if (marker.kind === "saved") return layers.saved !== false;
   const key =
     { npc: "npcs", enemy: "enemies", treasure: "treasures", event: "events" }[
       marker.kind

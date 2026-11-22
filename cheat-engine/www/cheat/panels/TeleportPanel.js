@@ -1,283 +1,192 @@
+import MapPreview from "../components/MapPreview.js";
+import SaveMapPoint from "../components/SaveMapPoint.js";
+import VirtualList from "../components/VirtualList.js";
 import { TRANSLATE_SETTINGS } from "../js/TranslateHelper.js";
 import { Alert } from "../js/AlertHelper.js";
-import MapPreview from "../components/MapPreview.js";
+import { SAVED_LOCATIONS } from "../js/runtime/SavedLocations.js";
+import {
+  getGameWindow,
+  getFeatureRuntime,
+} from "../js/runtime/FeatureRuntime.js";
 import {
   buildMapRows,
   matchesPanelSearch,
-  refreshPanelState,
 } from "../js/panels/PanelGameState.js";
 import {
   attachTranslateRefresh,
   detachTranslateRefresh,
   getTranslatedPanelText,
 } from "../js/panels/PanelTranslation.js";
-import { deepFreeze } from "../js/ui/StaticData.js";
-
-const TABLE_HEADERS = deepFreeze([
-  {
-    text: "Id",
-    value: "id",
-  },
-  {
-    text: "Name",
-    value: "name",
-  },
-  {
-    text: "FullPath",
-    value: "fullPath",
-  },
-  {
-    text: "Actions",
-    value: "actions",
-  },
-]);
+import { isDestinationValid } from "../js/panels/map/DestinationState.js";
 
 export default {
   name: "TeleportPanel",
-  components: { MapPreview },
-
-  template: `
-<v-card flat class="ma-0 pa-0">
-    <v-data-table
-        v-if="tableHeaders"
-        class="mt-2"
-        dense
-        :headers="filteredTableHeaders"
-        :items="maps"
-        :search="search"
-        :custom-filter="tableItemFilter"
-        :items-per-page="10">
-        <template v-slot:top>
-            <v-text-field
-                label="Search..."
-                solo
-                v-model="search"
-                dense
-                hide-details
-                @keydown.self.stop
-                @focus="$event.target.select()">
-            </v-text-field>
-            <div class="teleport-coordinates">
-            <v-checkbox
-                v-model="excludeFullPath"
-                label="Hide Full Path Field">
-          </v-checkbox>
-          <v-text-field
-            v-model="inputX"
-            label="X"
-            type="number"
-            class="mr-2 mb-2 cheat-field-w80"
-            dense
-            hide-details
-            outlined
-            @keydown.self.stop
-            @focus="$event.target.select()">
-          </v-text-field>
-          <v-text-field
-            v-model="inputY"
-            label="Y"
-            type="number"
-            class="mr-2 mb-2 cheat-field-w80"
-            dense
-            hide-details
-            outlined
-            @keydown.self.stop
-            @focus="$event.target.select()">
-        </v-text-field>
-        <v-tooltip bottom>
-            <span>Reload maps and translations</span>
-            <template v-slot:activator="{ on, attrs }">
-                <v-btn
-                    small
-                    text
-                    class="cheat-reload teleport-coordinates__field ml-auto mb-2"
-                    aria-label="Reload maps and translations"
-                    v-bind="attrs"
-                    v-on="on"
-                    @click="manualRefresh">
-                    <v-icon small left>mdi-refresh</v-icon>
-                    Reload
-                </v-btn>
-            </template>
-        </v-tooltip>
-        </div>
-        </template>
-        <template
-            v-slot:item.fullPath="{ item }">
-            {{item.fullPathJoin}}
-        </template>
-        <template
-            v-slot:item.actions="{ item, index }">
-            <div class="d-inline-flex">
-                <v-btn x-small text @click="previewMap = { id: item.id, name: item.name || item.fullPathJoin }">Preview</v-btn>
-                <v-tooltip
-                    bottom>
-                    <span>Teleport to X/Y</span>
-                    <template v-slot:activator="{ on, attrs }">
-                    
-                        <v-btn
-                            color="success"
-                            x-small
-                            fab
-                            v-bind="attrs"
-                            v-on="on"
-                            @click="teleportLocation(item.id, Number(inputX), Number(inputY))">
-                            <v-icon small>mdi-map-marker</v-icon>
-                        </v-btn>
-                    </template>
-                </v-tooltip>
-                <v-tooltip
-                    bottom>
-                    <span>Teleport to Map Center</span>
-                    <template v-slot:activator="{ on, attrs }">
-                        <v-btn
-                            color="info"
-                            x-small
-                            fab
-                            class="ml-1"
-                            v-bind="attrs"
-                            v-on="on"
-                            @click="teleportMapCenter(item.id)">
-                            <v-icon small>mdi-crosshairs-gps</v-icon>
-                        </v-btn>
-                    </template>
-                </v-tooltip>
-            </div>
-        </template>
-    </v-data-table>
-
-    <v-dialog :value="!!previewMap" @input="previewMap = null" max-width="560"><v-card v-if="previewMap"><v-card-title class="subtitle-1">{{ previewMap.name }} #{{ previewMap.id }}</v-card-title><v-card-text><map-preview :map-id="previewMap.id" :x="Number(inputX)" :y="Number(inputY)"/></v-card-text><v-card-actions><v-btn text @click="previewMap = null">Close</v-btn><v-btn text @click="teleportLocation(previewMap.id, Number(inputX), Number(inputY)); previewMap = null">Teleport to X/Y</v-btn><v-btn text @click="teleportMapCenter(previewMap.id); previewMap = null">Teleport to Center</v-btn></v-card-actions></v-card></v-dialog>
-</v-card>
-    `,
-
+  components: { MapPreview, SaveMapPoint, VirtualList },
   data() {
     return {
       previewMap: null,
+      saving: false,
+      savedPoints: [],
       inputX: "0",
       inputY: "0",
-
       search: "",
-      excludeFullPath: false,
-
       maps: [],
-
-      tableHeaders: TABLE_HEADERS,
+      dimensions: null,
+      pointTouched: false,
+      showPaths: false,
     };
   },
-
+  template: `<section class="destination-workspace" aria-label="Teleport destination">
+    <aside class="destination-rail">
+      <div class="workspace-rail-heading"><strong>Maps</strong><span>{{maps.length}}</span><button type="button" class="workspace-icon" title="Reload maps and translations" aria-label="Reload maps and translations" @click="manualRefresh"><v-icon small>mdi-refresh</v-icon></button></div>
+      <v-text-field v-model="search" label="Find a map" dense outlined hide-details clearable @keydown.stop/>
+      <virtual-list v-if="filteredMaps.length" :items="filteredMaps" :item-size="56" :height="330"><template v-slot:default="{item}"><button type="button" class="workspace-choice destination-map-choice" :class="{'is-selected':previewMap && previewMap.id===item.id}" :aria-pressed="String(!!previewMap && previewMap.id===item.id)" @click="selectMap(item)" :title="item.fullPathJoin"><strong>{{item.name || 'Map '+item.id}}</strong><small>#{{item.id}}<template v-if="showPaths"> · {{item.fullPathJoin}}</template></small></button></template></virtual-list>
+      <p v-if="!filteredMaps.length" class="workspace-empty">No maps match your search.</p>
+      <v-checkbox v-model="showPaths" label="Show map paths" dense hide-details class="workspace-toggle"/>
+    </aside>
+    <main class="destination-inspector">
+      <template v-if="previewMap">
+        <header class="workspace-inspector-heading"><div><span class="workspace-eyebrow">Destination · Map #{{previewMap.id}}</span><h3 :title="previewMap.name">{{previewMap.name}}</h3></div><span class="workspace-status">{{dimensions ? 'Choose a point' : 'Loading'}}</span></header>
+        <map-preview ref="mapPreview" :map-id="previewMap.id" :x="Number(inputX)" :y="Number(inputY)" :points="savedPoints" interactive @select="choosePoint" @loaded="onPreviewLoaded"/>
+        <div class="destination-point-bar">
+          <div class="teleport-coordinates"><v-text-field v-model="inputX" label="X" type="number" min="0" :max="dimensions ? dimensions.width-1 : undefined" class="cheat-field-w80" dense outlined hide-details @input="pointTouched=true" @keydown.self.stop @focus="$event.target.select()"/><v-text-field v-model="inputY" label="Y" type="number" min="0" :max="dimensions ? dimensions.height-1 : undefined" class="cheat-field-w80" dense outlined hide-details @input="pointTouched=true" @keydown.self.stop @focus="$event.target.select()"/></div>
+          <button type="button" class="workspace-text-action" :disabled="!dimensions" @click="selectMapCenter"><v-icon small>mdi-crosshairs-gps</v-icon>Map center</button>
+        </div>
+        <div class="workspace-validation" :class="{'workspace-validation--error':dimensions && !validDestination}" role="status">{{dimensions && !validDestination ? 'Choose whole-number X/Y coordinates inside this map.' : 'Select a tile on the map. Nothing moves until you teleport.'}}</div>
+        <footer class="destination-actions"><v-btn small color="primary" :disabled="!validDestination" @click="teleportLocation(previewMap.id,Number(inputX),Number(inputY))"><v-icon small left>mdi-map-marker</v-icon>Teleport here</v-btn><v-btn small outlined :disabled="!validDestination" @click="saving=true"><v-icon small left>mdi-map-marker-plus</v-icon>Save point</v-btn></footer>
+      </template><div v-else class="workspace-empty"><v-icon>mdi-map-outline</v-icon><h3>Choose a map</h3><p>Select a map from the list to explore its destination.</p></div>
+    </main>
+    <v-dialog v-model="saving" max-width="460"><v-card><v-card-title class="subtitle-1">Save destination</v-card-title><v-card-text><save-map-point v-if="saving" :point="selectedPoint" @saved="onPointSaved" @cancel="saving=false"/></v-card-text></v-card></v-dialog>
+  </section>`,
   created() {
     this.initializeVariables();
+    this.savedPoints = SAVED_LOCATIONS.read();
     attachTranslateRefresh(this, () =>
       TRANSLATE_SETTINGS.isMapTranslateEnabled(),
     );
   },
-
   beforeDestroy() {
     detachTranslateRefresh(this);
   },
-
   computed: {
-    filteredTableHeaders() {
-      if (this.excludeFullPath) {
-        return this.tableHeaders.filter(
-          (header) => header.value !== "fullPath",
-        );
-      }
-
-      return this.tableHeaders;
+    selectedPoint() {
+      return {
+        mapId: this.previewMap ? this.previewMap.id : 0,
+        x: this.inputX === "" ? NaN : Number(this.inputX),
+        y: this.inputY === "" ? NaN : Number(this.inputY),
+      };
+    },
+    validDestination() {
+      return isDestinationValid(this.selectedPoint, this.dimensions);
+    },
+    filteredMaps() {
+      return this.maps.filter((row) =>
+        matchesPanelSearch(this.search, [row.id, row.name, row.fullPathJoin]),
+      );
     },
   },
-
   methods: {
+    selectMap(item) {
+      const changed = !this.previewMap || this.previewMap.id !== item.id;
+      this.previewMap = {
+        id: item.id,
+        name: item.name || item.fullPathJoin || "Map " + item.id,
+      };
+      if (changed) {
+        this.dimensions = null;
+        this.pointTouched = false;
+      }
+      this.saving = false;
+    },
+    choosePoint(point) {
+      this.inputX = String(point.x);
+      this.inputY = String(point.y);
+      this.pointTouched = true;
+    },
+    onPreviewLoaded(dimensions) {
+      if (!this.previewMap || dimensions.mapId !== this.previewMap.id) return;
+      this.dimensions = dimensions;
+      if (!this.pointTouched) {
+        const game = getGameWindow(),
+          current =
+            game.$gameMap &&
+            game.$gameMap.mapId() === dimensions.mapId &&
+            game.$gamePlayer;
+        this.inputX = String(
+          current ? current.x : Math.floor(dimensions.width / 2),
+        );
+        this.inputY = String(
+          current ? current.y : Math.floor(dimensions.height / 2),
+        );
+      }
+    },
+    selectMapCenter() {
+      if (!this.dimensions) return;
+      this.choosePoint({
+        x: Math.floor(this.dimensions.width / 2),
+        y: Math.floor(this.dimensions.height / 2),
+      });
+      if (this.$refs.mapPreview)
+        this.$nextTick(() => this.$refs.mapPreview.focusPoint());
+    },
+    onPointSaved() {
+      this.saving = false;
+      this.savedPoints = SAVED_LOCATIONS.read();
+      Alert.success("Map point saved");
+    },
     initializeVariables() {
-      const translateEnabled = TRANSLATE_SETTINGS.isMapTranslateEnabled();
-      this.maps = buildMapRows($dataMapInfos, (name) => {
-        return getTranslatedPanelText(name, translateEnabled);
-      });
+      this.maps = buildMapRows(getGameWindow().$dataMapInfos, (name) =>
+        getTranslatedPanelText(
+          name,
+          TRANSLATE_SETTINGS.isMapTranslateEnabled(),
+        ),
+      );
+      if (!this.previewMap) {
+        const game = getGameWindow();
+        const current =
+          this.maps.find(
+            (row) => game.$gameMap && row.id === game.$gameMap.mapId(),
+          ) || this.maps[0];
+        if (current) this.selectMap(current);
+      }
     },
-
-    async manualRefresh() {
-      await refreshPanelState(this, () => {
-        this.maps = [];
-      });
+    manualRefresh() {
+      this.initializeVariables();
+      this.savedPoints = SAVED_LOCATIONS.read();
+      if (this.$refs.mapPreview) this.$refs.mapPreview.load();
     },
-
-    teleportLocation(mapId, x, y) {
-      $gamePlayer.reserveTransfer(mapId, x, y, $gamePlayer.direction(), 0);
-      $gamePlayer.setPosition(x, y);
+    loadMapData(id) {
+      const game = getGameWindow();
+      return game.$gameMap && game.$gameMap.mapId() === id && game.$dataMap
+        ? Promise.resolve(game.$dataMap)
+        : getFeatureRuntime().previews.load(id);
     },
-
-    async teleportMapCenter(mapId) {
+    async teleportLocation(mapId, x, y) {
       try {
-        const mapData = await this.loadMapData(mapId);
-        const width = Number(mapData && mapData.width ? mapData.width : 0);
-        const height = Number(mapData && mapData.height ? mapData.height : 0);
-        const x = Math.max(0, Math.floor(width / 2));
-        const y = Math.max(0, Math.floor(height / 2));
-
-        this.teleportLocation(mapId, x, y);
-        Alert.success(`Teleporting to map center (${x}, ${y})`);
+        const data = await this.loadMapData(mapId);
+        if (
+          !isDestinationValid({ mapId, x, y }, Object.assign({ mapId }, data))
+        )
+          throw Error("Choose a point inside the map.");
+        const player = getGameWindow().$gamePlayer;
+        if (!player) throw Error("Start or load a game before teleporting.");
+        player.reserveTransfer(mapId, x, y, player.direction(), 0);
+        Alert.success(`Teleporting to (${x}, ${y})`);
       } catch (error) {
-        console.warn("Could not teleport to map center:", error);
-        Alert.error("Could not read map center");
+        Alert.error(error.message);
       }
     },
-
-    loadMapData(mapId) {
-      if (
-        typeof $gameMap !== "undefined" &&
-        typeof $dataMap !== "undefined" &&
-        $gameMap &&
-        typeof $gameMap.mapId === "function" &&
-        $gameMap.mapId() === mapId &&
-        $dataMap
-      ) {
-        return Promise.resolve($dataMap);
+    async teleportMapCenter(id) {
+      try {
+        const data = await this.loadMapData(id);
+        await this.teleportLocation(
+          id,
+          Math.floor(data.width / 2),
+          Math.floor(data.height / 2),
+        );
+      } catch (error) {
+        Alert.error(error.message);
       }
-
-      return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", this.getMapDataUrl(mapId));
-        xhr.overrideMimeType("application/json");
-        xhr.onload = function () {
-          if (xhr.status < 400) {
-            try {
-              resolve(JSON.parse(xhr.responseText));
-            } catch (error) {
-              reject(error);
-            }
-          } else {
-            reject(new Error(`Map ${mapId} failed to load: ${xhr.status}`));
-          }
-        };
-        xhr.onerror = function () {
-          reject(new Error(`Map ${mapId} failed to load`));
-        };
-        xhr.send();
-      });
-    },
-
-    getMapDataUrl(mapId) {
-      const mapIdText = this.formatMapId(mapId);
-      const isCheatWindow =
-        window.location.pathname.indexOf("/cheat/") >= 0 ||
-        window.location.pathname.indexOf("\\cheat\\") >= 0;
-      const dataPrefix = isCheatWindow ? "../data/" : "data/";
-
-      return `${dataPrefix}Map${mapIdText}.json`;
-    },
-
-    formatMapId(mapId) {
-      const text = String(mapId);
-      return ("000" + text).slice(-3);
-    },
-
-    tableItemFilter(value, search, item) {
-      return matchesPanelSearch(search, [
-        item.name,
-        item.fullPathJoin,
-        item.id,
-      ]);
     },
   },
 };
